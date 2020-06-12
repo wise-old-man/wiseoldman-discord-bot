@@ -53,7 +53,7 @@ class ActivitiesCommand implements Command {
 
   buildActivityFields(snapshot: Object): EmbedFieldData[] {
     // Convert the snapshot into activity results
-    const activityResults = <ActivityResult[]>toResults(snapshot, MetricType.ACTIVITY);
+    const activityResults = <ActivityResult[]>toResults(snapshot, MetricType.Activity);
 
     // Convert each activity result into an embed field
     return activityResults.map(r => {

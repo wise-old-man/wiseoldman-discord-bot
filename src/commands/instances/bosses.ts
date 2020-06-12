@@ -29,7 +29,7 @@ class BossesCommand implements Command {
       const title = player.displayName;
       const url = `https://wiseoldman.net/players/${player.id}/overview/bossing`;
       const updatedAgo = durationSince(new Date(player.updatedAt), 2);
-      const bossResults = <BossResult[]>toResults(player.latestSnapshot, MetricType.BOSS);
+      const bossResults = <BossResult[]>toResults(player.latestSnapshot, MetricType.Boss);
       const rankedResults = bossResults.filter(r => r.rank > -1 && r.kills > -1);
 
       if (rankedResults.length === 0) {

@@ -53,7 +53,7 @@ class StatsCommand implements Command {
 
   buildStatsFields(snapshot: Object): EmbedFieldData[] {
     // Convert the snapshot into skill results
-    const skillResults = <SkillResult[]>toResults(snapshot, MetricType.SKILL);
+    const skillResults = <SkillResult[]>toResults(snapshot, MetricType.Skill);
 
     // Calculate the total level from the skill results
     const totalLevel = getTotalLevel(skillResults);

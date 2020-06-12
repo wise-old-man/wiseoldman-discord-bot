@@ -107,14 +107,14 @@ export function isBoss(metric: string): boolean {
 
 export function getType(metric: string): MetricType {
   if (isSkill(metric)) {
-    return MetricType.SKILL;
+    return MetricType.Skill;
   }
 
   if (isActivity(metric)) {
-    return MetricType.ACTIVITY;
+    return MetricType.Activity;
   }
 
-  return MetricType.BOSS;
+  return MetricType.Boss;
 }
 
 export function getMeasure(metric: string): string {
