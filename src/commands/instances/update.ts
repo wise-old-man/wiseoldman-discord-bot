@@ -2,6 +2,7 @@ import axios from 'axios';
 import { MessageEmbed } from 'discord.js';
 import config from '../../config';
 import { Command, ParsedMessage } from '../../types';
+import CommandError from '../CommandError';
 
 class UpdateCommand implements Command {
   name: string;
@@ -30,17 +31,9 @@ class UpdateCommand implements Command {
       message.respond(response);
     } catch (e) {
       if (e.response?.status === 500) {
-        const response = new MessageEmbed()
-          .setColor(config.visuals.red)
-          .setDescription(`Failed to update **${username}**: Invalid username.`);
-
-        message.respond(response);
+        throw new CommandError(`Failed to update **${username}**: Invalid username.`);
       } else {
-        const response = new MessageEmbed()
-          .setColor(config.visuals.red)
-          .setDescription(e.response?.data?.message || `Failed to update **${username}**.`);
-
-        message.respond(response);
+        throw new CommandError(e.response?.data?.message || `Failed to update **${username}**.`);
       }
     }
   }

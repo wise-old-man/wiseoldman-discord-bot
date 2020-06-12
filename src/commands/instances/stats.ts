@@ -3,6 +3,7 @@ import { EmbedFieldData, MessageEmbed } from 'discord.js';
 import config from '../../config';
 import { Command, MetricType, ParsedMessage, SkillResult } from '../../types';
 import { getEmoji, getLevel, getMetricName, getTotalLevel, toKMB, toResults } from '../../utils';
+import CommandError from '../CommandError';
 
 class StatsCommand implements Command {
   name: string;
@@ -35,12 +36,10 @@ class StatsCommand implements Command {
 
       message.respond(response);
     } catch (e) {
-      const response = new MessageEmbed()
-        .setColor(config.visuals.red)
-        .setDescription(`**${username}** is not being tracked yet.`)
-        .setFooter(`Try !update ${username}`);
+      const errorMessage = `**${username}** is not being tracked yet.`;
+      const errorTip = `Try !update ${username}`;
 
-      message.respond(response);
+      throw new CommandError(errorMessage, errorTip);
     }
   }
 
@@ -54,10 +53,10 @@ class StatsCommand implements Command {
     // Convert the snapshot into skill results
     const skillResults = <SkillResult[]>toResults(snapshot, MetricType.SKILL);
 
-    // Calculatethe total level from the skill results
+    // Calculate the total level from the skill results
     const totalLevel = getTotalLevel(skillResults);
 
-    // Convert each skill result into a embed field
+    // Convert each skill result into an embed field
     return skillResults.map(r => {
       const skillName = getMetricName(r.name);
       const skillEmoji = getEmoji(r.name);
