@@ -1,9 +1,8 @@
 import axios from 'axios';
-import { EmbedFieldData, Message, MessageEmbed } from 'discord.js';
+import { EmbedFieldData, MessageEmbed } from 'discord.js';
 import config from '../../config';
-import { Command, MetricType, SkillResult } from '../../types';
+import { Command, MetricType, ParsedMessage, SkillResult } from '../../types';
 import { getEmoji, getLevel, getMetricName, getTotalLevel, toKMB, toResults } from '../../utils';
-import { parseCommand } from '../parser';
 
 class StatsCommand implements Command {
   name: string;
@@ -15,14 +14,12 @@ class StatsCommand implements Command {
     this.template = '!stats {username}';
   }
 
-  activated(message: Message) {
-    const { primary } = parseCommand(message.content);
-    return primary === 'stats';
+  activated(message: ParsedMessage) {
+    return message.command === 'stats';
   }
 
-  async execute(message: Message) {
-    const { options } = parseCommand(message.content);
-    const username = options.join(' ');
+  async execute(message: ParsedMessage) {
+    const username = message.args.join(' ');
 
     try {
       const player = await this.fetchPlayer(username);
@@ -36,10 +33,10 @@ class StatsCommand implements Command {
         .addFields(fields)
         .addField('Full player details at:', pageURL);
 
-      message.channel.send(response);
+      message.respond(response);
     } catch (e) {
       const response = `**${username}** is not being tracked yet. Try \`!update ${username}\` first.`;
-      message.channel.send(response);
+      message.respond(response);
     }
   }
 

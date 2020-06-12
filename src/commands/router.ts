@@ -1,25 +1,27 @@
 import { Message } from 'discord.js';
-import config from '../config';
 import { isAdmin } from '../utils';
 import commands from './instances';
+import * as parser from './parser';
 
-export function onMessage(message: Message) {
-  // All bot commands should start with the predetermined prefix (! for now)
-  if (!message.content.startsWith(config.prefix)) {
+export function onMessageReceived(message: Message) {
+  // The message received is not valid
+  if (!parser.isValid(message)) {
     return;
   }
+
+  const parsed = parser.parse(message);
 
   // Loop through all the commands, if any of them are activated, execute them
   commands.forEach(c => {
     // If the message doesn't match the activation conditions
-    if (!c.activated(message)) {
+    if (!c.activated(parsed)) {
       return;
     }
 
     if (c.requiresAdmin && !isAdmin(message.member)) {
       message.channel.send('That command requires Admin permissions.');
     } else {
-      c.execute(message);
+      c.execute(parsed);
     }
   });
 }

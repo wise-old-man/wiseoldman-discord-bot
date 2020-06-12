@@ -1,11 +1,19 @@
-import { Message } from 'discord.js';
+import { Message, StringResolvable } from 'discord.js';
 
 export interface Command {
   name: string;
   template: string;
   requiresAdmin?: boolean;
-  activated(message: Message): boolean;
-  execute(message: Message): void;
+  activated(message: ParsedMessage): boolean;
+  execute(message: ParsedMessage): void;
+}
+
+export interface ParsedMessage {
+  source: Message;
+  prefix: string;
+  command: string;
+  args: string[];
+  respond(response: StringResolvable): void;
 }
 
 export enum MetricType {

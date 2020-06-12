@@ -6,5 +6,5 @@ export function init(client: Client) {
   client.user?.setActivity('wiseoldman.net', { type: 'PLAYING' });
 
   // Send received messages to the command router
-  client.on('message', router.onMessage);
+  client.on('message', router.onMessageReceived);
 }
