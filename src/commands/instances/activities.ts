@@ -45,12 +45,18 @@ class ActivitiesCommand implements Command {
     }
   }
 
+  /**
+   * Fetch the player details from the API.
+   */
   async fetchPlayer(username: string) {
     const URL = `${config.baseAPIUrl}/players?username=${username}`;
     const { data } = await axios.get(URL);
     return data;
   }
 
+  /**
+   * Build the embed message's fields for each activity and its respective score.
+   */
   buildActivityFields(snapshot: Object): EmbedFieldData[] {
     // Convert the snapshot into activity results
     const activityResults = <ActivityResult[]>toResults(snapshot, MetricType.Activity);

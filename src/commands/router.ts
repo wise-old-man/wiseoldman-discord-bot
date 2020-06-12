@@ -16,9 +16,7 @@ export function onMessageReceived(message: Message): void {
   // Loop through all the commands, if any of them are activated, execute them
   commands.forEach(async c => {
     // If the message doesn't match the activation conditions
-    if (!c.activated(parsed)) {
-      return;
-    }
+    if (!c.activated(parsed)) return;
 
     if (c.requiresAdmin && !isAdmin(message.member)) {
       const response = new MessageEmbed()

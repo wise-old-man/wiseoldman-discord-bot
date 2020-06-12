@@ -38,6 +38,9 @@ class UpdateCommand implements Command {
     }
   }
 
+  /**
+   * Send an API request attempting to update a given username.
+   */
   async updatePlayer(username: string) {
     const URL = `${config.baseAPIUrl}/players/track`;
     const { data } = await axios.post(URL, { username });

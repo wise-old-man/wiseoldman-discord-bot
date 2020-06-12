@@ -46,6 +46,9 @@ class BossesCommand implements Command {
     }
   }
 
+  /**
+   * Fetch the player details from the API.
+   */
   async fetchPlayer(username: string) {
     const URL = `${config.baseAPIUrl}/players?username=${username}`;
     const { data } = await axios.get(URL);
@@ -83,6 +86,9 @@ class BossesCommand implements Command {
     return responses;
   }
 
+  /**
+   * Build the embed message's fields for each boss and its respective kc.
+   */
   buildBossFields(bossResults: BossResult[]): EmbedFieldData[] {
     // Convert each boss result into an embed field
     return bossResults.map(r => {

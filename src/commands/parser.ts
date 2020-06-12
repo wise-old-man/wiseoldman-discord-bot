@@ -2,6 +2,10 @@ import { Message, StringResolvable } from 'discord.js';
 import config from '../config';
 import { ParsedMessage } from '../types';
 
+/**
+ * Convert a Discord Message object into our own
+ * ParsedMessage object, which should be simpler to use.
+ */
 export function parse(message: Message): ParsedMessage {
   // Remove the prefix from the command text
   const commandBody = message.content.replace(config.prefix, '');
@@ -29,6 +33,10 @@ export function parse(message: Message): ParsedMessage {
   return { source, prefix, command, args, respond };
 }
 
+/**
+ * Check if a message is a valid command.
+ * Note: this doesn't check if the command exists.
+ */
 export function isValid(message: Message): boolean {
   // Must be defined and not empty
   if (!message || !message.content || !message.content.length) {

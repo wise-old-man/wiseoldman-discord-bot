@@ -45,12 +45,18 @@ class StatsCommand implements Command {
     }
   }
 
+  /**
+   * Fetch the player details from the API.
+   */
   async fetchPlayer(username: string) {
     const URL = `${config.baseAPIUrl}/players?username=${username}`;
     const { data } = await axios.get(URL);
     return data;
   }
 
+  /**
+   * Build the embed message's fields for each skill and its respective exp and level.
+   */
   buildStatsFields(snapshot: Object): EmbedFieldData[] {
     // Convert the snapshot into skill results
     const skillResults = <SkillResult[]>toResults(snapshot, MetricType.Skill);
