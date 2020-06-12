@@ -1,10 +1,10 @@
 import { TimeGap } from '../types';
 
-export function durationSince(date: Date, maxDepth = 10, shortNames = false) {
+export function durationSince(date: Date, maxDepth = 10, shortNames = false): string {
   return durationBetween(date, new Date(), maxDepth, shortNames);
 }
 
-export function durationBetween(start: Date, end: Date, maxDepth = 10, shortNames = false) {
+export function durationBetween(start: Date, end: Date, maxDepth = 10, shortNames = false): string {
   if (!start || !end) {
     return '0 seconds';
   }

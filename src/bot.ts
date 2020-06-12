@@ -1,7 +1,7 @@
 import { Client } from 'discord.js';
 import * as router from './commands/router';
 
-export function init(client: Client) {
+export function init(client: Client): void {
   // Init bot properties
   client.user?.setActivity('wiseoldman.net', { type: 'PLAYING' });
 

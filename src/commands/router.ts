@@ -5,7 +5,7 @@ import CommandError from './CommandError';
 import commands from './instances';
 import * as parser from './parser';
 
-export function onMessageReceived(message: Message) {
+export function onMessageReceived(message: Message): void {
   // The message received is not valid
   if (!parser.isValid(message)) {
     return;

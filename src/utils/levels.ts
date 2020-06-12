@@ -3,7 +3,7 @@ import { SkillResult } from '../types';
 export const MAX_LEVEL = 99;
 export const MAX_VIRTUAL_LEVEL = 126;
 
-export function getLevel(experience: number, virtual = false) {
+export function getLevel(experience: number, virtual = false): number {
   // Unranked
   if (experience === -1) {
     return 0;
@@ -26,14 +26,14 @@ export function getLevel(experience: number, virtual = false) {
   return maxlevel;
 }
 
-export function getTotalLevel(skills: SkillResult[]) {
+export function getTotalLevel(skills: SkillResult[]): number {
   return skills
     .filter(skill => skill.name !== 'overall')
     .map(skill => getLevel(skill.experience))
     .reduce((acc, cur) => acc + cur, 0);
 }
 
-export function getExperienceAt(level: number) {
+export function getExperienceAt(level: number): number {
   let accumulated = 0;
 
   for (let l = 1; l !== level + 1; l++) {
