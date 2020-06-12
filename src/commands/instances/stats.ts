@@ -3,6 +3,7 @@ import { EmbedFieldData, MessageEmbed } from 'discord.js';
 import config from '../../config';
 import { Command, MetricType, ParsedMessage, SkillResult } from '../../types';
 import { getEmoji, getLevel, getMetricName, getTotalLevel, toKMB, toResults } from '../../utils';
+import { durationSince } from '../../utils/dates';
 import CommandError from '../CommandError';
 
 class StatsCommand implements Command {
@@ -25,6 +26,7 @@ class StatsCommand implements Command {
     try {
       const player = await this.fetchPlayer(username);
       const fields = this.buildStatsFields(player.latestSnapshot);
+      const updatedAgo = durationSince(new Date(player.updatedAt), 2);
       const pageURL = `https://wiseoldman.net/players/${player.id}`;
 
       const response = new MessageEmbed()
@@ -32,7 +34,7 @@ class StatsCommand implements Command {
         .setTitle(player.displayName)
         .setURL(pageURL)
         .addFields(fields)
-        .addField('Full player details at:', pageURL);
+        .setFooter(`Last updated: ${updatedAgo} ago`);
 
       message.respond(response);
     } catch (e) {

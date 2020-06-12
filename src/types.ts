@@ -16,6 +16,13 @@ export interface ParsedMessage {
   respond(response: StringResolvable): void;
 }
 
+export interface TimeGap {
+  seconds: number;
+  minutes: number;
+  hours: number;
+  days: number;
+}
+
 export enum MetricType {
   SKILL = 'Skill',
   BOSS = 'Boss',
