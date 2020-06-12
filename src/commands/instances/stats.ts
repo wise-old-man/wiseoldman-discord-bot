@@ -27,7 +27,7 @@ class StatsCommand implements Command {
       const pageURL = `https://wiseoldman.net/players/${player.id}`;
 
       const response = new MessageEmbed()
-        .setColor(config.color)
+        .setColor(config.visuals.blue)
         .setTitle(player.displayName)
         .setURL(pageURL)
         .addFields(fields)
@@ -35,7 +35,11 @@ class StatsCommand implements Command {
 
       message.respond(response);
     } catch (e) {
-      const response = `**${username}** is not being tracked yet. Try \`!update ${username}\` first.`;
+      const response = new MessageEmbed()
+        .setColor(config.visuals.red)
+        .setDescription(`**${username}** is not being tracked yet.`)
+        .setFooter(`Try !update ${username}`);
+
       message.respond(response);
     }
   }

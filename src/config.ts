@@ -4,5 +4,10 @@ export default {
   token: process.env.DISCORD_TOKEN,
   prefix: '!',
   baseAPIUrl: 'https://wiseoldman.net/api',
-  color: '#2980b9'
+  visuals: {
+    blue: '#2980b9',
+    red: '#cc4242',
+    green: '#64d85b',
+    orange: '#ecbf54'
+  }
 };
