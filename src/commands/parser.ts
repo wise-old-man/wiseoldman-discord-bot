@@ -17,7 +17,14 @@ export function parse(message: Message): ParsedMessage {
   const command = split[0];
   const prefix = config.prefix;
   const args = split.slice(1, split.length);
-  const respond = (response: StringResolvable) => message.channel.send(response);
+
+  const respond = (response: StringResolvable | StringResolvable[]) => {
+    if (Array.isArray(response)) {
+      response.forEach(r => message.channel.send(r));
+    } else {
+      message.channel.send(response);
+    }
+  };
 
   return { source, prefix, command, args, respond };
 }
