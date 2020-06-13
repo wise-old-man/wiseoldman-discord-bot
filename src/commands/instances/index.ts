@@ -1,9 +1,19 @@
 import { Command } from '../../types';
-import ActivitiesCommand from './activities';
-import BossesCommand from './bosses';
-import StatsCommand from './stats';
-import UpdateCommand from './update';
+import GroupInfoCommand from './group/info';
+import PlayerActivitiesCommand from './player/activities';
+import PlayerBossesCommand from './player/bosses';
+import PlayerStatsCommand from './player/stats';
+import PlayerUpdateCommand from './player/update';
 
-const commands: Command[] = [StatsCommand, BossesCommand, ActivitiesCommand, UpdateCommand];
+const commands: Command[] = [
+  // player commands
+  PlayerStatsCommand,
+  PlayerBossesCommand,
+  PlayerActivitiesCommand,
+  PlayerUpdateCommand,
+
+  // group commands
+  GroupInfoCommand
+];
 
 export default commands;

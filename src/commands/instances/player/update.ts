@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { MessageEmbed } from 'discord.js';
-import config from '../../config';
-import { Command, ParsedMessage } from '../../types';
-import CommandError from '../CommandError';
+import config from '../../../config';
+import { Command, ParsedMessage } from '../../../types';
+import CommandError from '../../CommandError';
 
 class UpdateCommand implements Command {
   name: string;

@@ -37,7 +37,8 @@
     "axios": "^0.19.2",
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "moment": "^2.26.0"
   },
   "engines": {
     "node": ">=12.0"

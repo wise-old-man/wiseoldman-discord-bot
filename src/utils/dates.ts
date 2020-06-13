@@ -1,4 +1,9 @@
+import moment from 'moment';
 import { TimeGap } from '../types';
+
+export function formatDate(date: Date, format = 'MM-DD-YYYY HH:mm'): string {
+  return moment(date).format(format);
+}
 
 export function durationSince(date: Date, maxDepth = 10, shortNames = false): string {
   return durationBetween(date, new Date(), maxDepth, shortNames);
