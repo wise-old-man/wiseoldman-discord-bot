@@ -2,8 +2,7 @@ import axios from 'axios';
 import { MessageEmbed } from 'discord.js';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
-import { getEmoji } from '../../../utils';
-import { formatDate } from '../../../utils/dates';
+import { formatDate, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class InfoCommand implements Command {

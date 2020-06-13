@@ -2,8 +2,7 @@ import axios from 'axios';
 import { EmbedFieldData, MessageEmbed } from 'discord.js';
 import config from '../../../config';
 import { Command, MetricType, ParsedMessage, SkillResult } from '../../../types';
-import { getEmoji, getLevel, getMetricName, getTotalLevel, toKMB, toResults } from '../../../utils';
-import { durationSince } from '../../../utils/dates';
+import { durationSince, getEmoji, getMetricName, toKMB, toResults } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class StatsCommand implements Command {
@@ -61,19 +60,15 @@ class StatsCommand implements Command {
     // Convert the snapshot into skill results
     const skillResults = <SkillResult[]>toResults(snapshot, MetricType.Skill);
 
-    // Calculate the total level from the skill results
-    const totalLevel = getTotalLevel(skillResults);
-
     // Convert each skill result into an embed field
     return skillResults.map(r => {
       const skillName = getMetricName(r.name);
       const skillEmoji = getEmoji(r.name);
       const experience = toKMB(r.experience);
-      const level = r.name === 'overall' ? totalLevel : getLevel(r.experience);
 
       return {
         name: `${skillEmoji} ${skillName}`,
-        value: `\`${level} (${experience})\``,
+        value: `\`${r.level} (${experience})\``,
         inline: true
       };
     });

@@ -16,6 +16,20 @@ export interface ParsedMessage {
   respond(response: StringResolvable): void;
 }
 
+export interface Competition {
+  id: number;
+  title: string;
+  metric: string;
+  score: number;
+  startsAt: string;
+  endsAt: string;
+  createdAt: string;
+  updatedAt: string;
+  duration?: string;
+  groupId?: number;
+  participantCount?: number;
+}
+
 export interface TimeGap {
   seconds: number;
   minutes: number;
@@ -43,6 +57,7 @@ export interface SkillResult {
   type: MetricType;
   rank: number;
   experience: number;
+  level?: number;
 }
 
 export interface BossResult {

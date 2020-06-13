@@ -2,8 +2,7 @@ import axios from 'axios';
 import { EmbedFieldData, MessageEmbed } from 'discord.js';
 import config from '../../../config';
 import { ActivityResult, Command, MetricType, ParsedMessage } from '../../../types';
-import { getEmoji, getMetricName, toKMB, toResults } from '../../../utils';
-import { durationSince } from '../../../utils/dates';
+import { durationSince, getEmoji, getMetricName, toKMB, toResults } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class ActivitiesCommand implements Command {
