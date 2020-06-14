@@ -44,12 +44,12 @@ class HiscoresCommand implements Command {
   }
 
   buildHiscoresFields(metric: string, hiscores: HiscoresResult[]): EmbedFieldData[] {
-    return hiscores.map(result => {
+    return hiscores.map((result, index) => {
       const name = result.displayName;
       const value = this.getValue(metric, result);
 
       return {
-        name: name,
+        name: `${index + 1}. ${name}`,
         value: `\`${value}\``,
         inline: true
       };

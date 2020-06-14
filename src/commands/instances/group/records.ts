@@ -1,23 +1,23 @@
 import axios from 'axios';
 import { EmbedFieldData, MessageEmbed } from 'discord.js';
 import config from '../../../config';
-import { Command, GainedResult, ParsedMessage } from '../../../types';
-import { getEmoji, getMetricName, toKMB } from '../../../utils';
+import { Command, ParsedMessage, RecordResult } from '../../../types';
+import { formatDate, getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class GainedCommand implements Command {
+class RecordsCommand implements Command {
   name: string;
   template: string;
   requiresAdmin?: boolean | undefined;
 
   constructor() {
-    this.name = 'View group gains';
-    this.template = '!group gained {period} {metric}';
+    this.name = 'View group records';
+    this.template = '!group records {period} {metric}';
   }
 
   activated(message: ParsedMessage) {
     const { command, args } = message;
-    return command === 'group' && args.length >= 2 && args[0] === 'gained';
+    return command === 'group' && args.length >= 2 && args[0] === 'records';
   }
 
   async execute(message: ParsedMessage) {
@@ -27,14 +27,14 @@ class GainedCommand implements Command {
 
     try {
       const group = await this.fetchGroupInfo(groupId);
-      const gained = await this.fetchGroupGained(groupId, period, metric);
-      const pageURL = `https://wiseoldman.net/groups/${groupId}/gained/`;
-      const fields = this.buildGainedFields(gained);
+      const records = await this.fetchGroupRecords(groupId, period, metric);
+      const pageURL = `https://wiseoldman.net/groups/${groupId}/records/`;
+      const fields = this.buildRecordFields(records);
       const icon = getEmoji(metric);
 
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
-        .setTitle(`${icon} ${group.name} ${getMetricName(metric)} gains (${period})`)
+        .setTitle(`${icon} ${group.name} ${getMetricName(metric)} records (${period})`)
         .setURL(pageURL)
         .addFields(fields);
 
@@ -44,14 +44,15 @@ class GainedCommand implements Command {
     }
   }
 
-  buildGainedFields(gained: GainedResult[]): EmbedFieldData[] {
-    return gained.map((result, index) => {
+  buildRecordFields(records: RecordResult[]): EmbedFieldData[] {
+    return records.map((result, index) => {
       const name = result.displayName;
-      const value = toKMB(result.gained);
+      const value = toKMB(result.value);
+      const date = formatDate(new Date(result.updatedAt), "DD MMM 'YY");
 
       return {
         name: `${index + 1}. ${name}`,
-        value: `\`${value}\``,
+        value: `\`${value}\` ${date}`,
         inline: true
       };
     });
@@ -67,10 +68,10 @@ class GainedCommand implements Command {
   }
 
   /**
-   * Fetch group gains from the API.
+   * Fetch group records from the API.
    */
-  async fetchGroupGained(id: number, period: string, metric: string) {
-    const URL = `${config.baseAPIUrl}/groups/${id}/gained`;
+  async fetchGroupRecords(id: number, period: string, metric: string) {
+    const URL = `${config.baseAPIUrl}/groups/${id}/records`;
     const params = { metric: metric.toLowerCase(), period: period.toLowerCase(), limit: 21 };
     const { data } = await axios.get(URL, { params });
 
@@ -78,4 +79,4 @@ class GainedCommand implements Command {
   }
 }
 
-export default new GainedCommand();
+export default new RecordsCommand();

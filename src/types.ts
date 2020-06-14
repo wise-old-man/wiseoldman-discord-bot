@@ -57,6 +57,15 @@ export interface GainedResult {
   gained: number;
 }
 
+export interface RecordResult {
+  playerId: number;
+  username: string;
+  displayName: string;
+  type: string;
+  value: number;
+  updatedAt: string;
+}
+
 export interface TimeGap {
   seconds: number;
   minutes: number;
