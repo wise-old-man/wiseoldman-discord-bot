@@ -45,6 +45,18 @@ export interface HiscoresResult {
   level?: number;
 }
 
+export interface GainedResult {
+  playerId: number;
+  username: string;
+  displayName: string;
+  type: string;
+  startDate: string;
+  endDate: string;
+  endValue: number;
+  startValue: number;
+  gained: number;
+}
+
 export interface TimeGap {
   seconds: number;
   minutes: number;
