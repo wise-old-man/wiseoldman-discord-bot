@@ -7,4 +7,6 @@ export function init(client: Client): void {
 
   // Send received messages to the command router
   client.on('message', router.onMessageReceived);
+
+  console.log('Bot is running.');
 }

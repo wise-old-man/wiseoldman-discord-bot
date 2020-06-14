@@ -49,7 +49,7 @@ class BossesCommand implements Command {
    * Fetch the player details from the API.
    */
   async fetchPlayer(username: string) {
-    const URL = `${config.baseAPIUrl}/players?username=${username}`;
+    const URL = `${config.baseAPIUrl}/players/username/${username}`;
     const { data } = await axios.get(URL);
     return data;
   }

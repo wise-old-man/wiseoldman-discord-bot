@@ -36,7 +36,7 @@ class InfoCommand implements Command {
         .setURL(pageURL)
         .addFields([
           { name: 'Clan chat', value: group.clanChat || '---' },
-          { name: 'Members', value: group.membersCount || 0 },
+          { name: 'Members', value: group.memberCount || 0 },
           { name: 'Created at', value: formatDate(group.createdAt, 'DD MMM, YYYY') },
           { name: '\u200B', value: verification }
         ]);

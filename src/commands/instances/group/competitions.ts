@@ -86,9 +86,8 @@ class CompetitionsCommand implements Command {
    * Fetch all group competitions from the API.
    */
   async fetchGroupCompetitions(id: number): Promise<Competition[]> {
-    const URL = `${config.baseAPIUrl}/competitions/`;
-    const params = { groupId: id };
-    const { data } = await axios.get(URL, { params });
+    const URL = `${config.baseAPIUrl}/groups/${id}/competitions`;
+    const { data } = await axios.get(URL);
 
     if (data.length === 0) {
       return [];
