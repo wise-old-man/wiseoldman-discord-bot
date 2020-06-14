@@ -1,5 +1,6 @@
 import { Command } from '../../types';
 import GroupCompetitionsCommand from './group/competitions';
+import GroupHiscoresCommand from './group/hiscores';
 import GroupInfoCommand from './group/info';
 import PlayerActivitiesCommand from './player/activities';
 import PlayerBossesCommand from './player/bosses';
@@ -15,6 +16,7 @@ const commands: Command[] = [
 
   // group commands
   GroupInfoCommand,
+  GroupHiscoresCommand,
   GroupCompetitionsCommand
 ];
 

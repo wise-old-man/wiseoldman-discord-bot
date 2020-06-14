@@ -30,6 +30,21 @@ export interface Competition {
   participantCount?: number;
 }
 
+export interface HiscoresResult {
+  id: number;
+  username: string;
+  displayName: string;
+  type: string;
+  lastImportedAt?: string;
+  registeredAt: string;
+  updatedAt: string;
+  rank: number;
+  experience?: number;
+  kills?: number;
+  score?: number;
+  level?: number;
+}
+
 export interface TimeGap {
   seconds: number;
   minutes: number;
