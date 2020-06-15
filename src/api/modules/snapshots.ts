@@ -1,17 +1,18 @@
 import { mapValues } from 'lodash';
-import { MetricResult, MetricType } from '../api/types';
-import { getLevel, getTotalLevel } from './levels';
-import { getType } from './metrics';
+import { getLevel, getTotalLevel, getType } from '../../utils';
+import { MetricResult, MetricType, Snapshot } from '../types';
 
 /**
  * Converts a snapshot object (from API) to an array of metric results
  */
-export function toResults(snapshot: Object, type?: MetricType): MetricResult[] {
+export function toResults(snapshot: Snapshot, type?: MetricType): MetricResult[] {
   const results = Object.values(
     mapValues(snapshot, (val: any, key) => {
       return val ? { name: key, type: getType(key), ...val } : null;
     })
   ).filter(r => r && (!type || r.type === type));
+
+  console.log(snapshot);
 
   // If it's skill results, add the level field
   if (type === MetricType.Skill) {

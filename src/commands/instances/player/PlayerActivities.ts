@@ -1,9 +1,10 @@
 import { EmbedFieldData, MessageEmbed } from 'discord.js';
-import { fetchPlayer } from '../../../api/modules/player';
-import { ActivityResult, MetricType } from '../../../api/types';
+import { fetchPlayer } from '../../../api/modules/players';
+import { toResults } from '../../../api/modules/snapshots';
+import { ActivityResult, MetricType, Snapshot } from '../../../api/types';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
-import { durationSince, getEmoji, getMetricName, toKMB, toResults } from '../../../utils';
+import { durationSince, getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class ActivitiesCommand implements Command {
@@ -49,7 +50,7 @@ class ActivitiesCommand implements Command {
   /**
    * Build the embed message's fields for each activity and its respective score.
    */
-  buildActivityFields(snapshot: Object): EmbedFieldData[] {
+  buildActivityFields(snapshot: Snapshot): EmbedFieldData[] {
     // Convert the snapshot into activity results
     const activityResults = <ActivityResult[]>toResults(snapshot, MetricType.Activity);
 

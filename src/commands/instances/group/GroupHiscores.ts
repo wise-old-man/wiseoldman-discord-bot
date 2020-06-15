@@ -1,5 +1,5 @@
 import { EmbedFieldData, MessageEmbed } from 'discord.js';
-import { fetchGroupDetails, fetchGroupHiscores } from '../../../api/modules/group';
+import { fetchGroupDetails, fetchGroupHiscores } from '../../../api/modules/groups';
 import { GroupHiscoresEntry } from '../../../api/types';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';

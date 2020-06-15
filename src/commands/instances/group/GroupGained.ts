@@ -1,26 +1,26 @@
 import { EmbedFieldData, MessageEmbed } from 'discord.js';
-import { fetchGroupDetails, fetchGroupRecords } from '../../../api/modules/group';
-import { GroupRecordEntry } from '../../../api/types';
+import { fetchGroupDetails, fetchGroupGained } from '../../../api/modules/groups';
+import { GroupGainedEntry } from '../../../api/types';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
-import { formatDate, getEmoji, getMetricName, toKMB } from '../../../utils';
+import { getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class RecordsCommand implements Command {
+class GainedCommand implements Command {
   name: string;
   template: string;
   requiresAdmin?: boolean | undefined;
   requiresGroup?: boolean | undefined;
 
   constructor() {
-    this.name = 'View group records';
-    this.template = '!group records {period} {metric}';
+    this.name = 'View group gains';
+    this.template = '!group gained {period} {metric}';
     this.requiresGroup = true;
   }
 
   activated(message: ParsedMessage) {
     const { command, args } = message;
-    return command === 'group' && args.length >= 2 && args[0] === 'records';
+    return command === 'group' && args.length >= 2 && args[0] === 'gained';
   }
 
   async execute(message: ParsedMessage) {
@@ -30,14 +30,14 @@ class RecordsCommand implements Command {
 
     try {
       const group = await fetchGroupDetails(groupId);
-      const records = await fetchGroupRecords(groupId, period, metric);
-      const pageURL = `https://wiseoldman.net/groups/${groupId}/records/`;
-      const fields = this.buildRecordFields(records);
+      const gained = await fetchGroupGained(groupId, period, metric);
+      const pageURL = `https://wiseoldman.net/groups/${groupId}/gained/`;
+      const fields = this.buildGainedFields(gained);
       const icon = getEmoji(metric);
 
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
-        .setTitle(`${icon} ${group.name} ${getMetricName(metric)} records (${period})`)
+        .setTitle(`${icon} ${group.name} ${getMetricName(metric)} gains (${period})`)
         .setURL(pageURL)
         .addFields(fields);
 
@@ -47,19 +47,18 @@ class RecordsCommand implements Command {
     }
   }
 
-  buildRecordFields(records: GroupRecordEntry[]): EmbedFieldData[] {
-    return records.map((result, index) => {
+  buildGainedFields(gained: GroupGainedEntry[]): EmbedFieldData[] {
+    return gained.map((result, index) => {
       const name = result.displayName;
-      const value = toKMB(result.value);
-      const date = formatDate(result.updatedAt, "DD MMM 'YY");
+      const value = toKMB(result.gained);
 
       return {
         name: `${index + 1}. ${name}`,
-        value: `\`${value}\` ${date}`,
+        value: `\`${value}\``,
         inline: true
       };
     });
   }
 }
 
-export default new RecordsCommand();
+export default new GainedCommand();

@@ -1,13 +1,13 @@
 import { Command } from '../../types';
-import GroupCompetitionsCommand from './group/competitions';
-import GroupDetailsCommand from './group/details';
-import GroupGainedCommand from './group/gained';
-import GroupHiscoresCommand from './group/hiscores';
-import GroupRecordsCommand from './group/records';
-import PlayerActivitiesCommand from './player/activities';
-import PlayerBossesCommand from './player/bosses';
-import PlayerStatsCommand from './player/stats';
-import PlayerUpdateCommand from './player/update';
+import GroupCompetitionsCommand from './group/GroupCompetitions';
+import GroupDetailsCommand from './group/GroupDetails';
+import GroupGainedCommand from './group/GroupGained';
+import GroupHiscoresCommand from './group/GroupHiscores';
+import GroupRecordsCommand from './group/GroupRecords';
+import PlayerActivitiesCommand from './player/PlayerActivities';
+import PlayerBossesCommand from './player/PlayerBosses';
+import PlayerStatsCommand from './player/PlayerStats';
+import PlayerUpdateCommand from './player/UpdatePlayer';
 
 const commands: Command[] = [
   // player commands

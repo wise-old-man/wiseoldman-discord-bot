@@ -1,5 +1,5 @@
 import { MessageEmbed } from 'discord.js';
-import { updatePlayer } from '../../../api/modules/player';
+import { updatePlayer } from '../../../api/modules/players';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
 import CommandError from '../../CommandError';

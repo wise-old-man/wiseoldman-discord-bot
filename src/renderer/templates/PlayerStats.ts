@@ -1,8 +1,8 @@
 import Canvas from 'canvas';
 import { MessageAttachment } from 'discord.js';
+import { toResults } from '../../api/modules/snapshots';
 import { MetricType, Player, SkillResult } from '../../api/types';
 import { GraphicTemplate } from '../../types';
-import { toResults } from '../../utils';
 
 const SCALE_FACTOR = 2;
 const WIDTH = 337 * SCALE_FACTOR;

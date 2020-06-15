@@ -1,5 +1,5 @@
 import { MessageEmbed } from 'discord.js';
-import { fetchGroupDetails } from '../../../api/modules/group';
+import { fetchGroupDetails } from '../../../api/modules/groups';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
 import { formatDate, getEmoji } from '../../../utils';

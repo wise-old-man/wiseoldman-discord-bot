@@ -1,6 +1,6 @@
 import { MessageEmbed } from 'discord.js';
-import { getCompetitionStatus } from '../../../api/modules/competition';
-import { fetchGroupCompetitions, fetchGroupDetails } from '../../../api/modules/group';
+import { getCompetitionStatus } from '../../../api/modules/competitions';
+import { fetchGroupCompetitions, fetchGroupDetails } from '../../../api/modules/groups';
 import { Competition } from '../../../api/types';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';

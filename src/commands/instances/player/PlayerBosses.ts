@@ -1,9 +1,10 @@
 import { EmbedFieldData, MessageEmbed } from 'discord.js';
-import { fetchPlayer } from '../../../api/modules/player';
+import { fetchPlayer } from '../../../api/modules/players';
+import { toResults } from '../../../api/modules/snapshots';
 import { BossResult, MetricType } from '../../../api/types';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
-import { durationSince, getEmoji, getMetricName, MAX_FIELD_SIZE, toResults } from '../../../utils';
+import { durationSince, getEmoji, getMetricName, MAX_FIELD_SIZE } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class BossesCommand implements Command {

@@ -1,9 +1,10 @@
 import { EmbedFieldData, MessageEmbed } from 'discord.js';
-import { fetchPlayer } from '../../../api/modules/player';
-import { MetricType, SkillResult } from '../../../api/types';
+import { fetchPlayer } from '../../../api/modules/players';
+import { toResults } from '../../../api/modules/snapshots';
+import { MetricType, SkillResult, Snapshot } from '../../../api/types';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
-import { durationSince, getEmoji, getMetricName, toKMB, toResults } from '../../../utils';
+import { durationSince, getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class StatsCommand implements Command {
@@ -51,7 +52,7 @@ class StatsCommand implements Command {
   /**
    * Build the embed message's fields for each skill and its respective exp and level.
    */
-  buildStatsFields(snapshot: Object): EmbedFieldData[] {
+  buildStatsFields(snapshot: Snapshot): EmbedFieldData[] {
     // Convert the snapshot into skill results
     const skillResults = <SkillResult[]>toResults(snapshot, MetricType.Skill);
 
