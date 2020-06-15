@@ -1,12 +1,14 @@
+import { Message, StringResolvable } from 'discord.js';
 import config from '../config';
+import { ParsedMessage } from '../types';
 
-export function parseCommand(text: string) {
-  if (!text.startsWith(config.prefix)) {
-    throw new Error('Command does not start with a valid prefix.');
-  }
-
+/**
+ * Convert a Discord Message object into our own
+ * ParsedMessage object, which should be simpler to use.
+ */
+export function parse(message: Message): ParsedMessage {
   // Remove the prefix from the command text
-  const commandBody = text.replace(config.prefix, '');
+  const commandBody = message.content.replace(config.prefix, '');
 
   // Split the command into its different sections
   const split = commandBody.split(' ').filter(s => s.length);
@@ -15,8 +17,37 @@ export function parseCommand(text: string) {
     throw new Error('Empty command.');
   }
 
-  const primary = split[0];
-  const options = split.slice(1, split.length);
+  const source = message;
+  const command = split[0];
+  const prefix = config.prefix;
+  const args = split.slice(1, split.length);
 
-  return { primary, options };
+  const respond = (response: StringResolvable | StringResolvable[]) => {
+    if (Array.isArray(response)) {
+      response.forEach(r => message.channel.send(r));
+    } else {
+      message.channel.send(response);
+    }
+  };
+
+  return { source, prefix, command, args, respond };
+}
+
+/**
+ * Check if a message is a valid command.
+ * Note: this doesn't check if the command exists.
+ */
+export function isValid(message: Message): boolean {
+  // Must be defined and not empty
+  if (!message || !message.content || !message.content.length) {
+    return false;
+  }
+
+  // Must start with the prefix
+  if (!message.content.startsWith(config.prefix)) {
+    return false;
+  }
+
+  // The message can't just be the prefix and nothing else
+  return message.content.length > config.prefix.length;
 }

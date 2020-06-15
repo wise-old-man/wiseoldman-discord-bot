@@ -1,25 +1,52 @@
-import { Message } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import config from '../config';
 import { isAdmin } from '../utils';
+import CommandError from './CommandError';
 import commands from './instances';
+import * as parser from './parser';
 
-export function onMessage(message: Message) {
-  // All bot commands should start with the predetermined prefix (! for now)
-  if (!message.content.startsWith(config.prefix)) {
+const TEST_HAS_GROUP = true;
+
+export function onMessageReceived(message: Message): void {
+  // The message received is not valid
+  if (!parser.isValid(message)) {
     return;
   }
 
+  const parsed = parser.parse(message);
+
   // Loop through all the commands, if any of them are activated, execute them
-  commands.forEach(c => {
+  commands.forEach(async c => {
     // If the message doesn't match the activation conditions
-    if (!c.activated(message)) {
-      return;
-    }
+    if (!c.activated(parsed)) return;
 
     if (c.requiresAdmin && !isAdmin(message.member)) {
-      message.channel.send('That command requires Admin permissions.');
-    } else {
-      c.execute(message);
+      const response = new MessageEmbed()
+        .setColor(config.visuals.red)
+        .setDescription('That command requires Admin permissions.')
+        .setFooter('Contact your server administrator for help.');
+
+      return message.channel.send(response);
+    }
+
+    if (c.requiresGroup && !TEST_HAS_GROUP) {
+      const response = new MessageEmbed()
+        .setColor(config.visuals.red)
+        .setDescription('That command requires a group to be configured.')
+        .setFooter('Start the setup process with !setup');
+
+      return message.channel.send(response);
+    }
+
+    try {
+      // All conditions are met, execute the command
+      await c.execute(parsed);
+    } catch (e) {
+      // If a command error was thrown during execution, handle the response here.
+      if (e instanceof CommandError) {
+        const response = new MessageEmbed().setColor(config.visuals.red).setDescription(e.message);
+        message.channel.send(e.tip ? response.setFooter(e.tip) : response);
+      }
     }
   });
 }

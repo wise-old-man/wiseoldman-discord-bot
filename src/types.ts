@@ -1,41 +1,41 @@
-import { Message } from 'discord.js';
+import { Message, MessageAttachment, StringResolvable } from 'discord.js';
 
 export interface Command {
   name: string;
   template: string;
   requiresAdmin?: boolean;
-  activated(message: Message): boolean;
-  execute(message: Message): void;
+  requiresGroup?: boolean;
+  activated(message: ParsedMessage): boolean;
+  execute(message: ParsedMessage): void;
 }
 
-export enum MetricType {
-  SKILL = 'Skill',
-  BOSS = 'Boss',
-  ACTIVITY = 'Activity'
+export interface Renderable {
+  render(props: any): Promise<MessageAttachment>;
 }
 
-export interface SkillResult {
-  name: string;
-  type: MetricType;
-  rank: number;
-  experience: number;
+export interface ParsedMessage {
+  source: Message;
+  prefix: string;
+  command: string;
+  args: string[];
+  respond(response: StringResolvable): void;
 }
 
-export interface BossResult {
-  name: string;
-  type: MetricType;
-  rank: number;
-  kills: number;
+export interface TimeGap {
+  seconds: number;
+  minutes: number;
+  hours: number;
+  days: number;
 }
 
-export interface ActivityResult {
-  name: string;
-  type: MetricType;
-  rank: number;
-  score: number;
+export const enum TimePeriod {
+  Second = 1000,
+  Minute = 1000 * 60,
+  Hour = 1000 * 60 * 60,
+  Day = 1000 * 60 * 60 * 24,
+  Month = 1000 * 60 * 60 * 24 * 31,
+  Year = 1000 * 60 * 60 * 24 * 365
 }
-
-export type MetricResult = SkillResult | BossResult | ActivityResult;
 
 export enum Emoji {
   overall = '<:icon_Overall:720446212356177951>',

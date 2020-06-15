@@ -1,14 +1,3 @@
-import { GuildMember } from 'discord.js';
-import { Emoji } from '../types';
-
-export function isAdmin(member: GuildMember | null) {
-  return member?.hasPermission('ADMINISTRATOR');
-}
-
-export function getEmoji(metric: string) {
-  return (<any>Emoji)[metric];
-}
-
 // Source: https://github.com/gc/oldschooljs/blob/master/src/util/util.ts
 export function toKMB(number: number): string {
   function round(number: number): string {

@@ -1,4 +1,4 @@
-import { MetricType } from '../types';
+import { MetricType } from '../api/types';
 
 const SKILLS_MAP = [
   { key: 'overall', name: 'Overall' },
@@ -77,7 +77,7 @@ const BOSSES_MAP = [
   { key: 'the_gauntlet', name: 'The Gauntlet' },
   { key: 'the_corrupted_gauntlet', name: 'The Corrupted Gauntlet' },
   { key: 'theatre_of_blood', name: 'Theatre Of Blood' },
-  { key: 'thermonuclear_smoke_devil', name: 'Thermonuclear Smoke Devil' },
+  { key: 'thermonuclear_smoke_devil', name: 'Therm. Smoke Devil' },
   { key: 'tzkal_zuk', name: 'TzKal-Zuk' },
   { key: 'tztok_jad', name: 'TzTok-Jad' },
   { key: 'venenatis', name: 'Venenatis' },
@@ -107,14 +107,14 @@ export function isBoss(metric: string): boolean {
 
 export function getType(metric: string): MetricType {
   if (isSkill(metric)) {
-    return MetricType.SKILL;
+    return MetricType.Skill;
   }
 
   if (isActivity(metric)) {
-    return MetricType.ACTIVITY;
+    return MetricType.Activity;
   }
 
-  return MetricType.BOSS;
+  return MetricType.Boss;
 }
 
 export function getMeasure(metric: string): string {
