@@ -5,6 +5,8 @@ import CommandError from './CommandError';
 import commands from './instances';
 import * as parser from './parser';
 
+const TEST_HAS_GROUP = true;
+
 export function onMessageReceived(message: Message): void {
   // The message received is not valid
   if (!parser.isValid(message)) {
@@ -23,6 +25,15 @@ export function onMessageReceived(message: Message): void {
         .setColor(config.visuals.red)
         .setDescription('That command requires Admin permissions.')
         .setFooter('Contact your server administrator for help.');
+
+      return message.channel.send(response);
+    }
+
+    if (c.requiresGroup && !TEST_HAS_GROUP) {
+      const response = new MessageEmbed()
+        .setColor(config.visuals.red)
+        .setDescription('That command requires a group to be configured.')
+        .setFooter('Start the setup process with !setup');
 
       return message.channel.send(response);
     }

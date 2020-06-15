@@ -11,10 +11,12 @@ class CompetitionsCommand implements Command {
   name: string;
   template: string;
   requiresAdmin?: boolean | undefined;
+  requiresGroup?: boolean | undefined;
 
   constructor() {
     this.name = 'View group competitions';
     this.template = '!group competitions';
+    this.requiresGroup = true;
   }
 
   activated(message: ParsedMessage) {

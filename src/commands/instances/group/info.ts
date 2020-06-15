@@ -9,10 +9,12 @@ class InfoCommand implements Command {
   name: string;
   template: string;
   requiresAdmin?: boolean | undefined;
+  requiresGroup?: boolean | undefined;
 
   constructor() {
     this.name = 'View group information';
     this.template = '!group info';
+    this.requiresGroup = true;
   }
 
   activated(message: ParsedMessage) {

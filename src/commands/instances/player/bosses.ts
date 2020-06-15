@@ -9,6 +9,7 @@ class BossesCommand implements Command {
   name: string;
   template: string;
   requiresAdmin?: boolean | undefined;
+  requiresGroup?: boolean | undefined;
 
   constructor() {
     this.name = 'View player bosses killcount';

@@ -4,6 +4,7 @@ export interface Command {
   name: string;
   template: string;
   requiresAdmin?: boolean;
+  requiresGroup?: boolean;
   activated(message: ParsedMessage): boolean;
   execute(message: ParsedMessage): void;
 }

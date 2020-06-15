@@ -9,10 +9,12 @@ class HiscoresCommand implements Command {
   name: string;
   template: string;
   requiresAdmin?: boolean | undefined;
+  requiresGroup?: boolean | undefined;
 
   constructor() {
     this.name = 'View group hiscores';
     this.template = '!group hiscores {metric}';
+    this.requiresGroup = true;
   }
 
   activated(message: ParsedMessage) {

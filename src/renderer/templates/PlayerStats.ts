@@ -3,7 +3,7 @@ import { MessageAttachment } from 'discord.js';
 import { GraphicTemplate, MetricType, Player, SkillResult } from '../../types';
 import { toResults } from '../../utils';
 
-const SCALE_FACTOR = 1;
+const SCALE_FACTOR = 2;
 const WIDTH = 337 * SCALE_FACTOR;
 const HEIGHT = 315 * SCALE_FACTOR;
 const PADDING = 15;

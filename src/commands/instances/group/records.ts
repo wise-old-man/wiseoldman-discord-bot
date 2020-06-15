@@ -9,10 +9,12 @@ class RecordsCommand implements Command {
   name: string;
   template: string;
   requiresAdmin?: boolean | undefined;
+  requiresGroup?: boolean | undefined;
 
   constructor() {
     this.name = 'View group records';
     this.template = '!group records {period} {metric}';
+    this.requiresGroup = true;
   }
 
   activated(message: ParsedMessage) {
