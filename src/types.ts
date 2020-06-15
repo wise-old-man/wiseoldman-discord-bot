@@ -9,8 +9,7 @@ export interface Command {
   execute(message: ParsedMessage): void;
 }
 
-export interface GraphicTemplate {
-  name: string;
+export interface Renderable {
   render(props: any): Promise<MessageAttachment>;
 }
 

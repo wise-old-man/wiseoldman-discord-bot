@@ -12,8 +12,6 @@ export function toResults(snapshot: Snapshot, type?: MetricType): MetricResult[]
     })
   ).filter(r => r && (!type || r.type === type));
 
-  console.log(snapshot);
-
   // If it's skill results, add the level field
   if (type === MetricType.Skill) {
     // Calculate the total level from the skill results
