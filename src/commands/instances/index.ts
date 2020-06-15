@@ -1,8 +1,8 @@
 import { Command } from '../../types';
 import GroupCompetitionsCommand from './group/competitions';
+import GroupDetailsCommand from './group/details';
 import GroupGainedCommand from './group/gained';
 import GroupHiscoresCommand from './group/hiscores';
-import GroupInfoCommand from './group/info';
 import GroupRecordsCommand from './group/records';
 import PlayerActivitiesCommand from './player/activities';
 import PlayerBossesCommand from './player/bosses';
@@ -17,7 +17,7 @@ const commands: Command[] = [
   PlayerUpdateCommand,
 
   // group commands
-  GroupInfoCommand,
+  GroupDetailsCommand,
   GroupHiscoresCommand,
   GroupRecordsCommand,
   GroupGainedCommand,

@@ -1,7 +1,8 @@
-import axios from 'axios';
 import { EmbedFieldData, MessageEmbed } from 'discord.js';
+import { fetchGroupDetails, fetchGroupHiscores } from '../../../api/modules/group';
+import { GroupHiscoresEntry } from '../../../api/types';
 import config from '../../../config';
-import { Command, HiscoresResult, ParsedMessage } from '../../../types';
+import { Command, ParsedMessage } from '../../../types';
 import { getEmoji, getMetricName, isBoss, isSkill, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
@@ -27,8 +28,8 @@ class HiscoresCommand implements Command {
     const metric = message.args.length >= 2 ? message.args[1] : 'overall';
 
     try {
-      const group = await this.fetchGroupInfo(groupId);
-      const hiscores = await this.fetchGroupHiscores(groupId, metric);
+      const group = await fetchGroupDetails(groupId);
+      const hiscores = await fetchGroupHiscores(groupId, metric);
       const pageURL = `https://wiseoldman.net/groups/${groupId}/hiscores/`;
       const fields = this.buildHiscoresFields(metric, hiscores);
       const icon = getEmoji(metric);
@@ -45,7 +46,7 @@ class HiscoresCommand implements Command {
     }
   }
 
-  buildHiscoresFields(metric: string, hiscores: HiscoresResult[]): EmbedFieldData[] {
+  buildHiscoresFields(metric: string, hiscores: GroupHiscoresEntry[]): EmbedFieldData[] {
     return hiscores.map((result, index) => {
       const name = result.displayName;
       const value = this.getValue(metric, result);
@@ -58,7 +59,7 @@ class HiscoresCommand implements Command {
     });
   }
 
-  getValue(metric: string, result: HiscoresResult): string {
+  getValue(metric: string, result: GroupHiscoresEntry): string {
     if (isSkill(metric)) {
       return `${result.level} (${toKMB(result.experience || 0)})`;
     }
@@ -68,26 +69,6 @@ class HiscoresCommand implements Command {
     }
 
     return `${toKMB(result.score || 0)}`;
-  }
-
-  /**
-   * Fetch the group details from the API.
-   */
-  async fetchGroupInfo(id: number) {
-    const URL = `${config.baseAPIUrl}/groups/${id}`;
-    const { data } = await axios.get(URL);
-    return data;
-  }
-
-  /**
-   * Fetch group hiscores from the API.
-   */
-  async fetchGroupHiscores(id: number, metric: string) {
-    const URL = `${config.baseAPIUrl}/groups/${id}/hiscores`;
-    const params = { metric: metric.toLowerCase(), limit: 21 };
-    const { data } = await axios.get(URL, { params });
-
-    return data;
   }
 }
 

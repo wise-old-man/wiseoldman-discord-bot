@@ -1,4 +1,4 @@
-import { SkillResult } from '../types';
+import { SkillResult } from '../api/types';
 
 export const MAX_LEVEL = 99;
 export const MAX_VIRTUAL_LEVEL = 126;

@@ -1,4 +1,4 @@
-import { MetricType } from '../types';
+import { MetricType } from '../api/types';
 
 const SKILLS_MAP = [
   { key: 'overall', name: 'Overall' },

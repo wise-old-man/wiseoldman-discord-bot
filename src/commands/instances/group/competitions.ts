@@ -1,8 +1,10 @@
-import axios from 'axios';
 import { MessageEmbed } from 'discord.js';
+import { getCompetitionStatus } from '../../../api/modules/competition';
+import { fetchGroupCompetitions, fetchGroupDetails } from '../../../api/modules/group';
+import { Competition } from '../../../api/types';
 import config from '../../../config';
-import { Command, Competition, ParsedMessage } from '../../../types';
-import { durationBetween, getEmoji } from '../../../utils';
+import { Command, ParsedMessage } from '../../../types';
+import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
 const MAX_COMPETITIONS = 5;
@@ -27,8 +29,8 @@ class CompetitionsCommand implements Command {
     const groupId = config.testGroupId;
 
     try {
-      const group = await this.fetchGroupInfo(groupId);
-      const competitions = await this.fetchGroupCompetitions(groupId);
+      const group = await fetchGroupDetails(groupId);
+      const competitions = await fetchGroupCompetitions(groupId);
       const fields = this.buildCompetitionsList(competitions);
       const pageURL = `https://wiseoldman.net/groups/${groupId}/competitions`;
 
@@ -45,62 +47,19 @@ class CompetitionsCommand implements Command {
   }
 
   buildCompetitionsList(competitions: Competition[]) {
-    return competitions.map(c => {
-      const icon = getEmoji(c.metric);
-      const status = this.getStatus(c);
-      const participants = `${c.participantCount} participants`;
+    return competitions
+      .sort((a: Competition, b: Competition) => b.startsAt.getTime() - a.startsAt.getTime())
+      .slice(0, MAX_COMPETITIONS)
+      .map(c => {
+        const icon = getEmoji(c.metric);
+        const status = getCompetitionStatus(c);
+        const participants = `${c.participantCount} participants`;
 
-      return {
-        name: c.title,
-        value: `${icon} • ${participants} • ${status}`
-      };
-    });
-  }
-
-  getStatus(competition: Competition) {
-    const now = new Date();
-    const endsAt = new Date(competition.endsAt);
-    const startsAt = new Date(competition.startsAt);
-
-    if (endsAt.getTime() < now.getTime()) {
-      return `Ended at ${endsAt.toLocaleDateString()}`;
-    }
-
-    if (startsAt.getTime() < now.getTime()) {
-      const timeLeft = durationBetween(now, endsAt, 2);
-      return `Ends in ${timeLeft}`;
-    }
-
-    const timeLeft = durationBetween(now, startsAt, 2);
-    return `Starting in ${timeLeft}`;
-  }
-
-  /**
-   * Fetch the group details from the API.
-   */
-  async fetchGroupInfo(id: number) {
-    const URL = `${config.baseAPIUrl}/groups/${id}`;
-    const { data } = await axios.get(URL);
-    return data;
-  }
-
-  /**
-   * Fetch all group competitions from the API.
-   */
-  async fetchGroupCompetitions(id: number): Promise<Competition[]> {
-    const URL = `${config.baseAPIUrl}/groups/${id}/competitions`;
-    const { data } = await axios.get(URL);
-
-    if (data.length === 0) {
-      return [];
-    }
-
-    // Only show the 5 most recent competitions
-    return data
-      .sort((a: Competition, b: Competition) => {
-        return new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime();
-      })
-      .slice(0, MAX_COMPETITIONS);
+        return {
+          name: c.title,
+          value: `${icon} • ${participants} • ${status}`
+        };
+      });
   }
 }
 

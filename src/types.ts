@@ -22,68 +22,6 @@ export interface ParsedMessage {
   respond(response: StringResolvable): void;
 }
 
-export interface Player {
-  id: number;
-  username: string;
-  displayName: string;
-  type: string;
-  lastImportedAt?: string;
-  registeredAt: string;
-  updatedAt: string;
-  combatLevel: number;
-  latestSnapshot: Object;
-}
-
-export interface Competition {
-  id: number;
-  title: string;
-  metric: string;
-  score: number;
-  startsAt: string;
-  endsAt: string;
-  createdAt: string;
-  updatedAt: string;
-  duration?: string;
-  groupId?: number;
-  participantCount?: number;
-}
-
-export interface HiscoresResult {
-  id: number;
-  username: string;
-  displayName: string;
-  type: string;
-  lastImportedAt?: string;
-  registeredAt: string;
-  updatedAt: string;
-  rank: number;
-  experience?: number;
-  kills?: number;
-  score?: number;
-  level?: number;
-}
-
-export interface GainedResult {
-  playerId: number;
-  username: string;
-  displayName: string;
-  type: string;
-  startDate: string;
-  endDate: string;
-  endValue: number;
-  startValue: number;
-  gained: number;
-}
-
-export interface RecordResult {
-  playerId: number;
-  username: string;
-  displayName: string;
-  type: string;
-  value: number;
-  updatedAt: string;
-}
-
 export interface TimeGap {
   seconds: number;
   minutes: number;
@@ -99,36 +37,6 @@ export const enum TimePeriod {
   Month = 1000 * 60 * 60 * 24 * 31,
   Year = 1000 * 60 * 60 * 24 * 365
 }
-
-export enum MetricType {
-  Skill = 'Skill',
-  Boss = 'Boss',
-  Activity = 'Activity'
-}
-
-export interface SkillResult {
-  name: string;
-  type: MetricType;
-  rank: number;
-  experience: number;
-  level?: number;
-}
-
-export interface BossResult {
-  name: string;
-  type: MetricType;
-  rank: number;
-  kills: number;
-}
-
-export interface ActivityResult {
-  name: string;
-  type: MetricType;
-  rank: number;
-  score: number;
-}
-
-export type MetricResult = SkillResult | BossResult | ActivityResult;
 
 export enum Emoji {
   overall = '<:icon_Overall:720446212356177951>',

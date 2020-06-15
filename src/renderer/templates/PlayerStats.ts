@@ -1,6 +1,7 @@
 import Canvas from 'canvas';
 import { MessageAttachment } from 'discord.js';
-import { GraphicTemplate, MetricType, Player, SkillResult } from '../../types';
+import { MetricType, Player, SkillResult } from '../../api/types';
+import { GraphicTemplate } from '../../types';
 import { toResults } from '../../utils';
 
 const SCALE_FACTOR = 2;

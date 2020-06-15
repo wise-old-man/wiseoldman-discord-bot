@@ -1,5 +1,5 @@
 import { mapValues } from 'lodash';
-import { MetricResult, MetricType } from '../types';
+import { MetricResult, MetricType } from '../api/types';
 import { getLevel, getTotalLevel } from './levels';
 import { getType } from './metrics';
 

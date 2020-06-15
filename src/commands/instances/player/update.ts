@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { MessageEmbed } from 'discord.js';
+import { updatePlayer } from '../../../api/modules/player';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
 import CommandError from '../../CommandError';
@@ -23,7 +23,7 @@ class UpdateCommand implements Command {
     const username = message.args.join(' ');
 
     try {
-      const result = await this.updatePlayer(username);
+      const result = await updatePlayer(username);
 
       const response = new MessageEmbed()
         .setColor(config.visuals.green)
@@ -37,15 +37,6 @@ class UpdateCommand implements Command {
         throw new CommandError(e.response?.data?.message || `Failed to update **${username}**.`);
       }
     }
-  }
-
-  /**
-   * Send an API request attempting to update a given username.
-   */
-  async updatePlayer(username: string) {
-    const URL = `${config.baseAPIUrl}/players/track`;
-    const { data } = await axios.post(URL, { username });
-    return data;
   }
 }
 
