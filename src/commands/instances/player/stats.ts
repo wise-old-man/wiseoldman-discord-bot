@@ -1,8 +1,9 @@
 import axios from 'axios';
-import { EmbedFieldData, MessageEmbed } from 'discord.js';
+import { EmbedFieldData } from 'discord.js';
 import config from '../../../config';
+import PlayerStatsTemplate from '../../../renderer/templates/PlayerStats';
 import { Command, MetricType, ParsedMessage, SkillResult } from '../../../types';
-import { durationSince, getEmoji, getMetricName, toKMB, toResults } from '../../../utils';
+import { getEmoji, getMetricName, toKMB, toResults } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class StatsCommand implements Command {
@@ -24,10 +25,13 @@ class StatsCommand implements Command {
 
     try {
       const player = await this.fetchPlayer(username);
+      /*
       const fields = this.buildStatsFields(player.latestSnapshot);
       const updatedAgo = durationSince(new Date(player.updatedAt), 2);
       const pageURL = `https://wiseoldman.net/players/${player.id}`;
+      */
 
+      /*
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
         .setTitle(player.displayName)
@@ -36,7 +40,11 @@ class StatsCommand implements Command {
         .setFooter(`Last updated: ${updatedAgo} ago`);
 
       message.respond(response);
+      */
+
+      message.respond(await PlayerStatsTemplate.render(player));
     } catch (e) {
+      console.log(e);
       const errorMessage = `**${username}** is not being tracked yet.`;
       const errorTip = `Try !update ${username}`;
 

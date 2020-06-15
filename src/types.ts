@@ -1,4 +1,4 @@
-import { Message, StringResolvable } from 'discord.js';
+import { Message, MessageAttachment, StringResolvable } from 'discord.js';
 
 export interface Command {
   name: string;
@@ -8,12 +8,29 @@ export interface Command {
   execute(message: ParsedMessage): void;
 }
 
+export interface GraphicTemplate {
+  name: string;
+  render(props: any): Promise<MessageAttachment>;
+}
+
 export interface ParsedMessage {
   source: Message;
   prefix: string;
   command: string;
   args: string[];
   respond(response: StringResolvable): void;
+}
+
+export interface Player {
+  id: number;
+  username: string;
+  displayName: string;
+  type: string;
+  lastImportedAt?: string;
+  registeredAt: string;
+  updatedAt: string;
+  combatLevel: number;
+  latestSnapshot: Object;
 }
 
 export interface Competition {
