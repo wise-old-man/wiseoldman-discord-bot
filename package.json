@@ -7,7 +7,8 @@
     "build": "tsc -p .",
     "lint": "eslint . --ext .ts",
     "predev": "npm run build && sequelize db:migrate",
-    "dev": "nodemon --exec ts-node src/index.ts"
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "migration:generate": "cross-env MIGRATING=false npx sequelize-cli migration:generate --name "
   },
   "keywords": [
     "discord",
@@ -40,6 +41,7 @@
     "@types/validator": "^13.0.0",
     "axios": "^0.19.2",
     "canvas": "^2.6.1",
+    "cross-env": "^7.0.2",
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
     "lodash": "^4.17.15",
