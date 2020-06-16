@@ -1,10 +1,10 @@
 import { Column, Default, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
 @Table
-export class Server extends Model<Server> {
+export class Guild extends Model<Guild> {
   @PrimaryKey
   @Column
-  guildId!: string;
+  id!: string;
 
   @Column
   groupId!: number;

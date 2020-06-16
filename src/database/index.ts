@@ -1,13 +1,13 @@
 import { Sequelize } from 'sequelize-typescript';
 import databaseConfig from './config';
-import { Server } from './models/Server';
+import { Guild } from './models/Guild';
 
 const sequelize = new Sequelize({
   database: databaseConfig.database,
   username: databaseConfig.username,
   password: databaseConfig.password,
   dialect: 'mysql',
-  models: [Server]
+  models: [Guild]
 });
 
 export { sequelize };
