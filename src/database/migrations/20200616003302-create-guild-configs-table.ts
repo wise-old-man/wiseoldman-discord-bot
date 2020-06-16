@@ -2,8 +2,8 @@
 import { QueryInterface } from 'sequelize/types';
 
 function up(queryInterface: QueryInterface, dataTypes: any): Promise<void> {
-  return queryInterface.createTable('guilds', {
-    id: {
+  return queryInterface.createTable('servers', {
+    guildId: {
       type: dataTypes.STRING(256),
       primaryKey: true
     },
@@ -27,7 +27,7 @@ function up(queryInterface: QueryInterface, dataTypes: any): Promise<void> {
 }
 
 function down(queryInterface: QueryInterface): Promise<void> {
-  return queryInterface.dropTable('guilds');
+  return queryInterface.dropTable('servers');
 }
 
 export { up, down };
