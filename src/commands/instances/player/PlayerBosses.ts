@@ -1,11 +1,14 @@
+import { Embeds } from 'discord-paginationembed';
 import { EmbedFieldData, MessageEmbed } from 'discord.js';
 import { fetchPlayer } from '../../../api/modules/players';
 import { toResults } from '../../../api/modules/snapshots';
 import { BossResult, MetricType } from '../../../api/types';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
-import { durationSince, getEmoji, getMetricName, MAX_FIELD_SIZE } from '../../../utils';
+import { durationSince, getEmoji, getMetricName } from '../../../utils';
 import CommandError from '../../CommandError';
+
+const BOSSES_PER_PAGE = 12;
 
 class BossesCommand implements Command {
   name: string;
@@ -39,7 +42,12 @@ class BossesCommand implements Command {
       }
 
       const responses = this.buildResponses(title, url, updatedAgo, rankedResults);
-      message.respond(responses);
+
+      // Respond with a paginated embed
+      new Embeds()
+        .setArray(responses)
+        .setChannel(<any>message.source.channel)
+        .build();
     } catch (e) {
       const errorMessage = `**${username}** is not being tracked yet.`;
       const errorTip = `Try !update ${username}`;
@@ -53,7 +61,7 @@ class BossesCommand implements Command {
    * their respective names, icons and killcounts.
    */
   buildResponses(title: string, url: string, updated: string, results: BossResult[]): MessageEmbed[] {
-    const resultsPerMessage = MAX_FIELD_SIZE;
+    const resultsPerMessage = BOSSES_PER_PAGE;
     const messageCount = Math.ceil(results.length / resultsPerMessage);
     const responses: MessageEmbed[] = [];
     const footerTimeago = `Last updated: ${updated} ago`;

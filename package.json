@@ -42,6 +42,7 @@
     "axios": "^0.19.2",
     "canvas": "^2.6.1",
     "cross-env": "^7.0.2",
+    "discord-paginationembed": "^2.0.0-beta.4",
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
     "lodash": "^4.17.15",
