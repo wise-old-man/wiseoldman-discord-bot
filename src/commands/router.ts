@@ -1,11 +1,15 @@
 import { Message, MessageEmbed } from 'discord.js';
 import config from '../config';
+import { getServer } from '../database/services/server';
 import { isAdmin } from '../utils';
 import CommandError from './CommandError';
 import commands from './instances';
 import * as parser from './parser';
 
-const TEST_HAS_GROUP = true;
+export function onError(message: Message, title: string, tip?: string): void {
+  const response = new MessageEmbed().setColor(config.visuals.red).setDescription(title);
+  message.channel.send(tip ? response.setFooter(tip) : response);
+}
 
 export function onMessageReceived(message: Message): void {
   // The message received is not valid
@@ -15,27 +19,36 @@ export function onMessageReceived(message: Message): void {
 
   const parsed = parser.parse(message);
 
-  // Loop through all the commands, if any of them are activated, execute them
   commands.forEach(async c => {
     // If the message doesn't match the activation conditions
     if (!c.activated(parsed)) return;
 
+    // If the message requires admin permissions and the
+    // member who sent it is not an admin
     if (c.requiresAdmin && !isAdmin(message.member)) {
-      const response = new MessageEmbed()
-        .setColor(config.visuals.red)
-        .setDescription('That command requires Admin permissions.')
-        .setFooter('Contact your server administrator for help.');
-
-      return message.channel.send(response);
+      return onError(
+        message,
+        'That command requires Admin permissions.',
+        'Contact your server administrator for help.'
+      );
     }
 
-    if (c.requiresGroup && !TEST_HAS_GROUP) {
-      const response = new MessageEmbed()
-        .setColor(config.visuals.red)
-        .setDescription('That command requires a group to be configured.')
-        .setFooter('Start the setup process with !setup');
+    // If the message requires a group to be setup
+    if (c.requiresGroup) {
+      // Load the server config for this message's guild
+      const server = await getServer(message.guild?.id);
 
-      return message.channel.send(response);
+      // If it has a configured group, add it as a property to the message
+      if (server?.groupId && server.groupId >= 0) {
+        parsed.server = server;
+      } else {
+        // If no group is configured, throw error (because this command requires it)
+        return onError(
+          message,
+          'That command requires a group to be configured.',
+          'Start the setup process with !setup'
+        );
+      }
     }
 
     try {
@@ -44,8 +57,7 @@ export function onMessageReceived(message: Message): void {
     } catch (e) {
       // If a command error was thrown during execution, handle the response here.
       if (e instanceof CommandError) {
-        const response = new MessageEmbed().setColor(config.visuals.red).setDescription(e.message);
-        message.channel.send(e.tip ? response.setFooter(e.tip) : response);
+        return onError(message, e.message, e.tip);
       }
     }
   });

@@ -22,6 +22,7 @@ class StatsCommand implements Command, Renderable {
     this.name = 'View player stats';
     this.template = '!stats {username}';
   }
+
   activated(message: ParsedMessage) {
     return message.command === 'stats';
   }
