@@ -31,15 +31,6 @@ export interface TimeGap {
   days: number;
 }
 
-export const enum TimePeriod {
-  Second = 1000,
-  Minute = 1000 * 60,
-  Hour = 1000 * 60 * 60,
-  Day = 1000 * 60 * 60 * 24,
-  Month = 1000 * 60 * 60 * 24 * 31,
-  Year = 1000 * 60 * 60 * 24 * 365
-}
-
 export enum Emoji {
   overall = '<:icon_Overall:720446212356177951>',
   attack = '<:icon_Attack:706462610840879146>',

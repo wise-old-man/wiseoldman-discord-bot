@@ -206,3 +206,51 @@ export interface SnapshotActivity {
   rank: number;
   score: number;
 }
+
+export interface PlayerGained {
+  period: string;
+  startsAt: Date | null;
+  endsAt: Date | null;
+  data: {
+    [key: string]: {
+      rank: {
+        start: number;
+        end: number;
+        gained: number;
+      };
+      // Defined in skill gains
+      experience?: {
+        start: number;
+        end: number;
+        gained: number;
+      };
+      // Defined in boss gains
+      kills?: {
+        start: number;
+        end: number;
+        gained: number;
+      };
+      // Defined in activity gains
+      score?: {
+        start: number;
+        end: number;
+        gained: number;
+      };
+    };
+  };
+}
+
+export interface PlayerRecord {
+  value: number;
+  period: string;
+  metric: string;
+  updatedAt: Date;
+}
+
+export interface PlayerAchievement {
+  playerId: number;
+  threshold: number;
+  type: string;
+  metric: string;
+  createdAt: Date;
+}

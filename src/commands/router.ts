@@ -17,6 +17,10 @@ export function onMessageReceived(message: Message): void {
     return;
   }
 
+  if (message.content.startsWith('!ehp')) {
+    message.channel.send('Pls come back @dkvl');
+  }
+
   const parsed = parser.parse(message);
 
   commands.forEach(async c => {
