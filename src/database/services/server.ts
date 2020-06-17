@@ -1,7 +1,9 @@
-import { Server } from '../models/Server';
+import { Server } from '../';
 
-async function getServer(guildId: string): Promise<Server | null> {
-  const [match] = await Server.findOrCreate({ where: { id: guildId } });
+async function getServer(guildId: string | undefined): Promise<Server | null> {
+  if (!guildId) return null;
+
+  const [match] = await Server.findOrCreate({ where: { guildId } });
   return match;
 }
 

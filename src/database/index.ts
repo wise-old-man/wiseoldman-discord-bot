@@ -10,4 +10,4 @@ const sequelize = new Sequelize({
   models: [Server]
 });
 
-export { sequelize };
+export { sequelize, Server };

@@ -26,7 +26,7 @@ class CompetitionsCommand implements Command {
   }
 
   async execute(message: ParsedMessage) {
-    const groupId = config.testGroupId;
+    const groupId = message.server?.groupId || -1;
 
     try {
       const group = await fetchGroupDetails(groupId);
