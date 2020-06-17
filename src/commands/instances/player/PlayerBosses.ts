@@ -13,12 +13,12 @@ const BOSSES_PER_PAGE = 12;
 class BossesCommand implements Command {
   name: string;
   template: string;
-  requiresAdmin?: boolean | undefined;
-  requiresGroup?: boolean | undefined;
+  requiresPagination?: boolean | undefined;
 
   constructor() {
     this.name = 'View player bosses killcount';
     this.template = '!bosses {username}';
+    this.requiresPagination = true;
   }
 
   activated(message: ParsedMessage) {

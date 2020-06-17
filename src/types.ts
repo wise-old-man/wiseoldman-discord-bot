@@ -6,6 +6,7 @@ export interface Command {
   template: string;
   requiresAdmin?: boolean;
   requiresGroup?: boolean;
+  requiresPagination?: boolean;
   activated(message: ParsedMessage): boolean;
   execute(message: ParsedMessage): void;
 }

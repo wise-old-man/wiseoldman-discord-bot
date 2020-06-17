@@ -9,7 +9,6 @@ import CommandError from '../../CommandError';
 class RecordsCommand implements Command {
   name: string;
   template: string;
-  requiresAdmin?: boolean | undefined;
   requiresGroup?: boolean | undefined;
 
   constructor() {

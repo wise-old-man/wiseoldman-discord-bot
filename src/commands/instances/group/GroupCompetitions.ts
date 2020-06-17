@@ -12,7 +12,6 @@ const MAX_COMPETITIONS = 5;
 class CompetitionsCommand implements Command {
   name: string;
   template: string;
-  requiresAdmin?: boolean | undefined;
   requiresGroup?: boolean | undefined;
 
   constructor() {

@@ -8,7 +8,6 @@ import CommandError from '../../CommandError';
 class DetailsCommand implements Command {
   name: string;
   template: string;
-  requiresAdmin?: boolean | undefined;
   requiresGroup?: boolean | undefined;
 
   constructor() {

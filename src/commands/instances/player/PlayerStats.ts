@@ -15,8 +15,6 @@ const RENDER_PADDING = 15;
 class StatsCommand implements Command, Renderable {
   name: string;
   template: string;
-  requiresAdmin?: boolean | undefined;
-  requiresGroup?: boolean | undefined;
 
   constructor() {
     this.name = 'View player stats';

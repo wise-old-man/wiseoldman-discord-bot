@@ -1,7 +1,7 @@
 import { Message, MessageEmbed } from 'discord.js';
 import config from '../config';
 import { getServer } from '../database/services/server';
-import { isAdmin } from '../utils';
+import { canManageMessages, isAdmin } from '../utils';
 import CommandError from './CommandError';
 import commands from './instances';
 import * as parser from './parser';
@@ -29,6 +29,16 @@ export function onMessageReceived(message: Message): void {
       return onError(
         message,
         'That command requires Admin permissions.',
+        'Contact your server administrator for help.'
+      );
+    }
+
+    // If the message requires pagination, the bot requires "Manage Messages"
+    // permissions to do the pagination via emoji reactions behaviour
+    if (c.requiresPagination && !canManageMessages(message.guild?.me)) {
+      return onError(
+        message,
+        'That command requires the bot to have "Manage Messages" permissions.',
         'Contact your server administrator for help.'
       );
     }
