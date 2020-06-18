@@ -11,8 +11,13 @@ export interface Command {
   execute(message: ParsedMessage): void;
 }
 
+export interface CanvasAttachment {
+  attachment: MessageAttachment;
+  fileName: string;
+}
+
 export interface Renderable {
-  render(props: any): Promise<MessageAttachment>;
+  render(props: any): Promise<CanvasAttachment>;
 }
 
 export interface ParsedMessage {
