@@ -4,6 +4,7 @@ import GroupDetailsCommand from './group/GroupDetails';
 import GroupGainedCommand from './group/GroupGained';
 import GroupHiscoresCommand from './group/GroupHiscores';
 import GroupRecordsCommand from './group/GroupRecords';
+import PlayerAchievements from './player/PlayerAchievements';
 import PlayerActivitiesCommand from './player/PlayerActivities';
 import PlayerBossesCommand from './player/PlayerBosses';
 import PlayerStatsCommand from './player/PlayerStats';
@@ -14,6 +15,7 @@ const commands: Command[] = [
   PlayerStatsCommand,
   PlayerBossesCommand,
   PlayerActivitiesCommand,
+  PlayerAchievements,
   PlayerUpdateCommand,
 
   // group commands
