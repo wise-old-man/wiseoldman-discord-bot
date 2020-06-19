@@ -29,16 +29,16 @@ const SKILLS_MAP = [
 
 const ACTIVITIES_MAP = [
   { key: 'league_points', name: 'League Points' },
+  { key: 'last_man_standing', name: 'Last Man Standing' },
   { key: 'bounty_hunter_hunter', name: 'Bounty Hunter (Hunter)' },
   { key: 'bounty_hunter_rogue', name: 'Bounty Hunter (Rogue)' },
-  { key: 'clue_scrolls_all', name: 'Clue Scrolls (All)' },
   { key: 'clue_scrolls_beginner', name: 'Clue Scrolls (Beginner)' },
   { key: 'clue_scrolls_easy', name: 'Clue Scroll (Easy)' },
   { key: 'clue_scrolls_medium', name: 'Clue Scroll (Medium)' },
   { key: 'clue_scrolls_hard', name: 'Clue Scroll (Hard)' },
   { key: 'clue_scrolls_elite', name: 'Clue Scroll (Elite)' },
   { key: 'clue_scrolls_master', name: 'Clue Scroll (Master)' },
-  { key: 'last_man_standing', name: 'Last Man Standing' }
+  { key: 'clue_scrolls_all', name: 'Clue Scrolls (All)' }
 ];
 
 const BOSSES_MAP = [
