@@ -1,30 +1,30 @@
 import { MetricType } from '../api/types';
 
 const SKILLS_MAP = [
-  { key: 'overall', name: 'Overall' },
   { key: 'attack', name: 'Attack' },
-  { key: 'defence', name: 'Defence' },
   { key: 'strength', name: 'Strength' },
-  { key: 'hitpoints', name: 'Hitpoints' },
+  { key: 'defence', name: 'Defence' },
   { key: 'ranged', name: 'Ranged' },
   { key: 'prayer', name: 'Prayer' },
   { key: 'magic', name: 'Magic' },
-  { key: 'cooking', name: 'Cooking' },
-  { key: 'woodcutting', name: 'Woodcutting' },
-  { key: 'fletching', name: 'Fletching' },
-  { key: 'fishing', name: 'Fishing' },
-  { key: 'firemaking', name: 'Firemaking' },
-  { key: 'crafting', name: 'Crafting' },
-  { key: 'smithing', name: 'Smithing' },
-  { key: 'mining', name: 'Mining' },
-  { key: 'herblore', name: 'Herblore' },
-  { key: 'agility', name: 'Agility' },
-  { key: 'thieving', name: 'Thieving' },
-  { key: 'slayer', name: 'Slayer' },
-  { key: 'farming', name: 'Farming' },
   { key: 'runecrafting', name: 'Runecrafting' },
+  { key: 'construction', name: 'Construction' },
+  { key: 'hitpoints', name: 'Hitpoints' },
+  { key: 'agility', name: 'Agility' },
+  { key: 'herblore', name: 'Herblore' },
+  { key: 'thieving', name: 'Thieving' },
+  { key: 'crafting', name: 'Crafting' },
+  { key: 'fletching', name: 'Fletching' },
+  { key: 'slayer', name: 'Slayer' },
   { key: 'hunter', name: 'Hunter' },
-  { key: 'construction', name: 'Construction' }
+  { key: 'mining', name: 'Mining' },
+  { key: 'smithing', name: 'Smithing' },
+  { key: 'fishing', name: 'Fishing' },
+  { key: 'cooking', name: 'Cooking' },
+  { key: 'firemaking', name: 'Firemaking' },
+  { key: 'woodcutting', name: 'Woodcutting' },
+  { key: 'farming', name: 'Farming' },
+  { key: 'overall', name: 'Overall' }
 ];
 
 const ACTIVITIES_MAP = [

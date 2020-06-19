@@ -5,7 +5,7 @@ import { toResults } from '../../../api/modules/snapshots';
 import { MetricType, Player, SkillResult } from '../../../api/types';
 import config from '../../../config';
 import { CanvasAttachment, Command, ParsedMessage, Renderable } from '../../../types';
-import { toKMB } from '../../../utils';
+import { SKILLS, toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 
@@ -67,7 +67,12 @@ class StatsCommand implements Command, Renderable {
     const { player, variant } = props;
 
     // Convert the snapshot into skill results
-    const skillResults = <SkillResult[]>toResults(player.latestSnapshot, MetricType.Skill);
+    // Sort them by the skill's name (to match the ingame stats interface)
+    const skillResults = <SkillResult[]>(
+      toResults(player.latestSnapshot, MetricType.Skill).sort(
+        (a, b) => SKILLS.indexOf(a.name) - SKILLS.indexOf(b.name)
+      )
+    );
 
     // Create a scaled empty canvas
     const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
