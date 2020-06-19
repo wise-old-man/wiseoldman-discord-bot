@@ -1,24 +1,31 @@
-import { Embeds } from 'discord-paginationembed';
-import { EmbedFieldData, MessageEmbed } from 'discord.js';
+import Canvas from 'canvas';
+import { MessageAttachment, MessageEmbed } from 'discord.js';
 import { fetchPlayer } from '../../../api/modules/players';
 import { toResults } from '../../../api/modules/snapshots';
-import { BossResult, MetricType } from '../../../api/types';
+import { BossResult, MetricType, Player } from '../../../api/types';
 import config from '../../../config';
-import { Command, ParsedMessage } from '../../../types';
-import { durationSince, getEmoji, getMetricName } from '../../../utils';
+import { CanvasAttachment, Command, ParsedMessage, Renderable } from '../../../types';
+import { toKMB } from '../../../utils';
+import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 
-const BOSSES_PER_PAGE = 12;
+const RENDER_COLUMNS = 4;
+const RENDER_WIDTH = 282;
+const RENDER_HEIGHT = 355;
+const RENDER_PADDING = 15;
 
-class BossesCommand implements Command {
+enum RenderVariant {
+  Kills = 'Kills',
+  Ranks = 'Ranks'
+}
+
+class BossesCommand implements Command, Renderable {
   name: string;
   template: string;
-  requiresPagination?: boolean | undefined;
 
   constructor() {
-    this.name = 'View player bosses killcount';
-    this.template = '!bosses {username}';
-    this.requiresPagination = true;
+    this.name = 'View player bosses';
+    this.template = '!bosses {username} [--ranks]';
   }
 
   activated(message: ParsedMessage) {
@@ -26,28 +33,28 @@ class BossesCommand implements Command {
   }
 
   async execute(message: ParsedMessage) {
-    const username = message.args.join(' ');
+    // Grab the username from the command's arguments
+    const username = this.getUsername(message.args);
+
+    // Grab (if it exists) the command variant from the command's arguments (--exp / --ranks)
+    const variant = this.getRenderVariant(message.args);
 
     try {
       const player = await fetchPlayer(username);
-
-      const title = player.displayName;
       const url = `https://wiseoldman.net/players/${player.id}/overview/bossing`;
-      const updatedAgo = durationSince(player.updatedAt, 2);
-      const bossResults = <BossResult[]>toResults(player.latestSnapshot, MetricType.Boss);
-      const rankedResults = bossResults.filter(r => r.rank > -1 && r.kills > -1);
 
-      if (rankedResults.length === 0) {
-        throw new CommandError(`**${username}** is not ranked in any boss.`);
-      }
+      const { attachment, fileName } = await this.render({ player, variant });
 
-      const responses = this.buildResponses(title, url, updatedAgo, rankedResults);
+      const embed = new MessageEmbed()
+        .setColor(config.visuals.blue)
+        .setURL(url)
+        .setTitle(`${player.displayName} - ${variant}`)
+        .setImage(`attachment://${fileName}`)
+        .setFooter('Last updated')
+        .setTimestamp(player.updatedAt)
+        .attachFiles([attachment]);
 
-      // Respond with a paginated embed
-      new Embeds()
-        .setArray(responses)
-        .setChannel(<any>message.source.channel)
-        .build();
+      message.respond(embed);
     } catch (e) {
       const errorMessage = `**${username}** is not being tracked yet.`;
       const errorTip = `Try !update ${username}`;
@@ -56,52 +63,85 @@ class BossesCommand implements Command {
     }
   }
 
-  /**
-   * For every 25 bosses, build an embed message displaying
-   * their respective names, icons and killcounts.
-   */
-  buildResponses(title: string, url: string, updated: string, results: BossResult[]): MessageEmbed[] {
-    const resultsPerMessage = BOSSES_PER_PAGE;
-    const messageCount = Math.ceil(results.length / resultsPerMessage);
-    const responses: MessageEmbed[] = [];
-    const footerTimeago = `Last updated: ${updated} ago`;
+  async render(props: { player: Player; variant: RenderVariant }): Promise<CanvasAttachment> {
+    const { player, variant } = props;
 
-    for (let i = 0; i < messageCount; i++) {
-      const currentResults = results.slice(i * resultsPerMessage, (i + 1) * resultsPerMessage);
-      const fields = this.buildBossFields(currentResults);
-      const paginationLabel = `Message (${i + 1}/${messageCount})`;
-      const footer = messageCount === 1 ? footerTimeago : `${paginationLabel} • ${footerTimeago}`;
+    // Convert the snapshot into boss results
+    const bossResults = <BossResult[]>toResults(player.latestSnapshot, MetricType.Boss);
 
-      const response = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setTitle(title)
-        .setURL(url)
-        .addFields(fields)
-        .setFooter(footer);
+    // Create a scaled empty canvas
+    const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
 
-      // Doesn't make a lot of sense to show "Message 1/1",
-      // so let's not set a footer for single message responses
-      responses.push(response);
+    // Load images
+    const badge = await Canvas.loadImage(`./public/x2/badge.png`);
+
+    // Background fill
+    ctx.fillStyle = '#1d1d1d';
+    ctx.fillRect(0, 0, width, height);
+
+    // Player stats
+    for (const [index, result] of bossResults.entries()) {
+      const x = Math.floor(index / (bossResults.length / RENDER_COLUMNS));
+      const y = index % (bossResults.length / RENDER_COLUMNS);
+
+      const originX = RENDER_PADDING - 7 + x * 67;
+      const originY = RENDER_PADDING - 5 + y * 31;
+
+      const icon = await Canvas.loadImage(`./public/x2/${result.name}.png`);
+
+      // Badge background and boss icon
+      ctx.drawImage(badge, originX, originY, 64, 26);
+      ctx.drawImage(icon, originX, originY - 1, icon.width / 2, icon.height / 2);
+
+      const isRanked = result.kills && result.kills > -1;
+
+      if (variant === RenderVariant.Kills) {
+        ctx.font = 'bold 12px Arial';
+
+        const kills = `${isRanked ? (result.kills >= 10000 ? toKMB(result.kills) : result.kills) : '?'}`;
+        const killsWidth = ctx.measureText(kills).width;
+
+        // Boss kills
+        ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
+        ctx.fillText(kills, originX + 42 - killsWidth / 2, originY + 17);
+      } else if (variant === RenderVariant.Ranks) {
+        ctx.font = 'bold 10px Arial';
+
+        const rank = `${isRanked ? toKMB(result.rank, 1) : '?'}`;
+        const rankWidth = ctx.measureText(rank).width;
+
+        // Boss rank
+        ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
+        ctx.fillText(rank, originX + 44 - rankWidth / 2, originY + 17);
+      }
     }
 
-    return responses;
+    const fileName = `${Date.now()}-${player.username.replace(/ /g, '_')}-${variant}.jpeg`;
+    const attachment = new MessageAttachment(canvas.toBuffer(), fileName);
+
+    return { attachment, fileName };
   }
 
-  /**
-   * Build the embed message's fields for each boss and its respective kc.
-   */
-  buildBossFields(bossResults: BossResult[]): EmbedFieldData[] {
-    // Convert each boss result into an embed field
-    return bossResults.map(r => {
-      const bossName = getMetricName(r.name);
-      const bossEmoji = getEmoji('cooking');
+  getUsername(args: string[]): string {
+    return args.filter(a => !a.startsWith('--')).join(' ');
+  }
 
-      return {
-        name: `${bossEmoji} ${bossName}`,
-        value: `\`${r.kills}\``,
-        inline: true
-      };
-    });
+  getRenderVariant(args: string[]): RenderVariant {
+    if (!args || args.length === 0) {
+      return RenderVariant.Kills;
+    }
+
+    const variantArg = args.find(a => a.startsWith('--'));
+
+    if (!variantArg) {
+      return RenderVariant.Kills;
+    }
+
+    if (variantArg === '--rank' || variantArg === '--ranks') {
+      return RenderVariant.Ranks;
+    }
+
+    return RenderVariant.Kills;
   }
 }
 

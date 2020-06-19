@@ -23,7 +23,7 @@ class GainedCommand implements Command {
   }
 
   async execute(message: ParsedMessage) {
-    const groupId = message.server?.groupId || -1;
+    const groupId = 1; // message.server?.groupId || -1;
     const period = message.args[1];
     const metric = message.args.length >= 3 ? message.args[2] : 'overall';
 

@@ -5,7 +5,7 @@ import { toResults } from '../../../api/modules/snapshots';
 import { MetricType, Player, SkillResult } from '../../../api/types';
 import config from '../../../config';
 import { CanvasAttachment, Command, ParsedMessage, Renderable } from '../../../types';
-import { formatDate, toKMB } from '../../../utils';
+import { toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 
@@ -13,7 +13,7 @@ const RENDER_WIDTH = 215;
 const RENDER_HEIGHT = 260;
 const RENDER_PADDING = 15;
 
-enum Variant {
+enum RenderVariant {
   Levels = 'Levels',
   Ranks = 'Ranks',
   Experience = 'Experience'
@@ -42,7 +42,6 @@ class StatsCommand implements Command, Renderable {
     try {
       const player = await fetchPlayer(username);
       const url = `https://wiseoldman.net/players/${player.id}`;
-      const updatedDate = `Last updated at ${formatDate(player.updatedAt)}`;
 
       const { attachment, fileName } = await this.render({ player, variant });
 
@@ -51,7 +50,8 @@ class StatsCommand implements Command, Renderable {
         .setURL(url)
         .setTitle(`${player.displayName} - ${variant}`)
         .setImage(`attachment://${fileName}`)
-        .setFooter(updatedDate)
+        .setFooter('Last updated')
+        .setTimestamp(player.updatedAt)
         .attachFiles([attachment]);
 
       message.respond(embed);
@@ -63,7 +63,7 @@ class StatsCommand implements Command, Renderable {
     }
   }
 
-  async render(props: { player: Player; variant: Variant }): Promise<CanvasAttachment> {
+  async render(props: { player: Player; variant: RenderVariant }): Promise<CanvasAttachment> {
     const { player, variant } = props;
 
     // Convert the snapshot into skill results
@@ -73,7 +73,7 @@ class StatsCommand implements Command, Renderable {
     const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
 
     // Load images
-    const skillBadge = await Canvas.loadImage(`./public/x2/skill_badge.png`);
+    const badge = await Canvas.loadImage(`./public/x2/badge.png`);
 
     // Background fill
     ctx.fillStyle = '#1d1d1d';
@@ -90,12 +90,12 @@ class StatsCommand implements Command, Renderable {
       const icon = await Canvas.loadImage(`./public/x2/${result.name}.png`);
 
       // Badge background and skill icon
-      ctx.drawImage(skillBadge, originX, originY, 64, 26);
+      ctx.drawImage(badge, originX, originY, 64, 26);
       ctx.drawImage(icon, originX + 1, originY, icon.width / 2, icon.height / 2);
 
       ctx.fillStyle = '#ffffff';
 
-      if (variant === Variant.Levels) {
+      if (variant === RenderVariant.Levels) {
         ctx.font = 'bold 12px Arial';
 
         const level = `${result.level || 1}`;
@@ -103,7 +103,7 @@ class StatsCommand implements Command, Renderable {
 
         // Skill level
         ctx.fillText(level, originX + 42 - lvlWidth / 2, originY + 17);
-      } else if (variant === Variant.Experience) {
+      } else if (variant === RenderVariant.Experience) {
         ctx.font = 'bold 10px Arial';
 
         const exp = `${toKMB(result.experience, 1) || 0}`;
@@ -111,7 +111,7 @@ class StatsCommand implements Command, Renderable {
 
         // Skill Experience
         ctx.fillText(exp, originX + 43 - expWidth / 2, originY + 17);
-      } else if (variant === Variant.Ranks) {
+      } else if (variant === RenderVariant.Ranks) {
         ctx.font = 'bold 10px Arial';
 
         const rank = `${toKMB(result.rank, 1) || 0}`;
@@ -122,7 +122,7 @@ class StatsCommand implements Command, Renderable {
       }
     }
 
-    const fileName = `${Date.now()}-${player.username}-${variant}.jpeg`;
+    const fileName = `${Date.now()}-${player.username.replace(/ /g, '_')}-${variant}.jpeg`;
     const attachment = new MessageAttachment(canvas.toBuffer(), fileName);
 
     return { attachment, fileName };
@@ -132,26 +132,26 @@ class StatsCommand implements Command, Renderable {
     return args.filter(a => !a.startsWith('--')).join(' ');
   }
 
-  getRenderVariant(args: string[]): Variant {
+  getRenderVariant(args: string[]): RenderVariant {
     if (!args || args.length === 0) {
-      return Variant.Levels;
+      return RenderVariant.Levels;
     }
 
     const variantArg = args.find(a => a.startsWith('--'));
 
     if (!variantArg) {
-      return Variant.Levels;
+      return RenderVariant.Levels;
     }
 
     if (variantArg === '--exp' || variantArg === '--xp') {
-      return Variant.Experience;
+      return RenderVariant.Experience;
     }
 
     if (variantArg === '--rank' || variantArg === '--ranks') {
-      return Variant.Ranks;
+      return RenderVariant.Ranks;
     }
 
-    return Variant.Levels;
+    return RenderVariant.Levels;
   }
 }
 

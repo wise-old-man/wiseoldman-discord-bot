@@ -1,5 +1,5 @@
 import { Message, MessageAttachment, StringResolvable } from 'discord.js';
-import { Server } from './database';
+// import { Server } from './database';
 
 export interface Command {
   name: string;
@@ -25,7 +25,7 @@ export interface ParsedMessage {
   prefix: string;
   command: string;
   args: string[];
-  server?: Server;
+  // server?: Server;
   respond(response: StringResolvable): void;
 }
 

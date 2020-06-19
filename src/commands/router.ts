@@ -1,6 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import config from '../config';
-import { getServer } from '../database/services/server';
+// import { getServer } from '../database/services/server';
 import { canManageMessages, isAdmin } from '../utils';
 import CommandError from './CommandError';
 import commands from './instances';
@@ -47,6 +47,7 @@ export function onMessageReceived(message: Message): void {
       );
     }
 
+    /*
     // If the message requires a group to be setup
     if (c.requiresGroup) {
       // Load the server config for this message's guild
@@ -64,6 +65,7 @@ export function onMessageReceived(message: Message): void {
         );
       }
     }
+    */
 
     try {
       // All conditions are met, execute the command

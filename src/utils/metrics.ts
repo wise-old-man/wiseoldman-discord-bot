@@ -105,7 +105,7 @@ export function isBoss(metric: string): boolean {
   return BOSSES.includes(metric);
 }
 
-export function getType(metric: string): MetricType {
+export function getType(metric: string): MetricType | null {
   if (isSkill(metric)) {
     return MetricType.Skill;
   }
@@ -114,7 +114,11 @@ export function getType(metric: string): MetricType {
     return MetricType.Activity;
   }
 
-  return MetricType.Boss;
+  if (isBoss(metric)) {
+    return MetricType.Boss;
+  }
+
+  return null;
 }
 
 export function getMeasure(metric: string): string {
