@@ -9,6 +9,9 @@ export class Server extends Model<Server> {
   @Column
   groupId!: number;
 
+  @Column
+  botChannelId!: string;
+
   @Default(() => '!')
   @Column
   prefix!: string;
@@ -19,5 +22,9 @@ export class Server extends Model<Server> {
 
   async setPrefix(prefix: string): Promise<Server> {
     return await this.update({ prefix });
+  }
+
+  async setBotChannel(botChannelId: string): Promise<Server> {
+    return await this.update({ botChannelId });
   }
 }

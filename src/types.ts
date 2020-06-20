@@ -11,6 +11,16 @@ export interface Command {
   execute(message: ParsedMessage): void;
 }
 
+export interface Event {
+  type: string;
+  execute(data: Object): void;
+}
+
+export interface EventPayload {
+  type: string;
+  data: Object;
+}
+
 export interface CanvasAttachment {
   attachment: MessageAttachment;
   fileName: string;
@@ -63,5 +73,13 @@ export enum Emoji {
   construction = '<:icon_Construction:706462610853330986>',
 
   success = '✅',
-  error = '❌'
+  error = '❌',
+  warning = '⚠️',
+  tada = '🎉',
+  wave = '👋',
+  speaker = '📢',
+  gold_medal = '🥇',
+  silver_medal = '🥈',
+  bronze_medal = '🥉',
+  clock = '🕒'
 }

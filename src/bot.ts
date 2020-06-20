@@ -1,12 +1,27 @@
 import { Client } from 'discord.js';
 import * as router from './commands/router';
+import config from './config';
 
-export function init(client: Client): void {
-  // Init bot properties
-  client.user?.setActivity('wiseoldman.net', { type: 'PLAYING' });
+class Bot {
+  client: Client;
 
-  // Send received messages to the command router
-  client.on('message', router.onMessageReceived);
+  constructor() {
+    this.client = new Client();
+  }
 
-  console.log('Bot is running.');
+  init() {
+    this.client.once('ready', () => {
+      // Init bot properties
+      this.client.user?.setActivity('wiseoldman.net');
+
+      // Send received messages to the command router
+      this.client.on('message', router.onMessageReceived);
+
+      console.log('Bot is running.');
+    });
+
+    this.client.login(config.token);
+  }
 }
+
+export default new Bot();

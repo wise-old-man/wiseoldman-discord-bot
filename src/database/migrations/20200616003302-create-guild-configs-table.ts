@@ -10,6 +10,10 @@ function up(queryInterface: QueryInterface, dataTypes: any): Promise<void> {
     groupId: {
       type: dataTypes.INTEGER
     },
+    botChannelId: {
+      type: dataTypes.STRING(256),
+      allowNull: false
+    },
     prefix: {
       type: dataTypes.STRING(20),
       allowNull: false,

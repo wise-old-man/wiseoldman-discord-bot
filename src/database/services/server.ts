@@ -7,6 +7,19 @@ async function getServer(guildId: string | undefined): Promise<Server | null> {
   return match;
 }
 
+async function getServers(groupId: number): Promise<Server[]> {
+  const results = await Server.findAll({ where: { groupId } });
+  return results;
+}
+
+async function getChannelIds(groupId: number): Promise<string[] | undefined> {
+  const servers = await getServers(groupId);
+
+  if (!servers || servers.length === 0) return;
+
+  return servers.map(s => s.botChannelId);
+}
+
 async function updateGroup(guildId: string, groupId: number): Promise<Server> {
   const server = await getServer(guildId);
 
@@ -27,4 +40,4 @@ async function updatePrefix(guildId: string, prefix: string): Promise<Server> {
   return await server.setPrefix(prefix);
 }
 
-export { getServer, updateGroup, updatePrefix };
+export { getServer, getServers, getChannelIds, updateGroup, updatePrefix };
