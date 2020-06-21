@@ -40,4 +40,14 @@ async function updatePrefix(guildId: string, prefix: string): Promise<Server> {
   return await server.setPrefix(prefix);
 }
 
-export { getServer, getServers, getChannelIds, updateGroup, updatePrefix };
+async function updateAnnouncementChannel(guildId: string, channelId: string): Promise<Server> {
+  const server = await getServer(guildId);
+
+  if (!server) {
+    throw new Error(`Server does not exist for guild id: ${guildId}`);
+  }
+
+  return await server.setBotChannel(channelId);
+}
+
+export { getServer, getServers, getChannelIds, updateGroup, updatePrefix, updateAnnouncementChannel };

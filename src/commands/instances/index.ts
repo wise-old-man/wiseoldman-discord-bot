@@ -1,4 +1,5 @@
 import { Command } from '../../types';
+import ConfigChannel from './config/ConfigChannel';
 import GroupCompetitionCommand from './group/GroupCompetition';
 import GroupCompetitionsCommand from './group/GroupCompetitions';
 import GroupDetailsCommand from './group/GroupDetails';
@@ -29,7 +30,10 @@ const commands: Command[] = [
   GroupRecordsCommand,
   GroupGainedCommand,
   GroupCompetitionCommand,
-  GroupCompetitionsCommand
+  GroupCompetitionsCommand,
+
+  // config commands
+  ConfigChannel
 ];
 
 export default commands;
