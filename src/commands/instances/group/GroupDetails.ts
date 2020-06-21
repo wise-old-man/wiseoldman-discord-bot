@@ -21,7 +21,7 @@ class GroupDetails implements Command {
   }
 
   async execute(message: ParsedMessage) {
-    const groupId = 1; // message.server?.groupId || -1;
+    const groupId = message.server?.groupId || -1;
 
     try {
       const group = await fetchGroupDetails(groupId);

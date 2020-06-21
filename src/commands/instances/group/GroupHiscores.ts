@@ -23,7 +23,7 @@ class GroupHiscores implements Command {
   }
 
   async execute(message: ParsedMessage) {
-    const groupId = 1; // message.server?.groupId || -1;
+    const groupId = message.server?.groupId || -1;
     const metric = message.args.length >= 2 ? message.args[1] : 'overall';
 
     try {
