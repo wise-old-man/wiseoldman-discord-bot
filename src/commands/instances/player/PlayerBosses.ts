@@ -18,7 +18,7 @@ enum RenderVariant {
   Ranks = 'Ranks'
 }
 
-class BossesCommand implements Command, Renderable {
+class PlayerBosses implements Command, Renderable {
   name: string;
   template: string;
 
@@ -144,4 +144,4 @@ class BossesCommand implements Command, Renderable {
   }
 }
 
-export default new BossesCommand();
+export default new PlayerBosses();

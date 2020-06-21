@@ -18,7 +18,7 @@ enum RenderVariant {
   Ranks = 'Ranks'
 }
 
-class ActivitiesCommand implements Command, Renderable {
+class PlayerActivities implements Command, Renderable {
   name: string;
   template: string;
 
@@ -148,4 +148,4 @@ class ActivitiesCommand implements Command, Renderable {
   }
 }
 
-export default new ActivitiesCommand();
+export default new PlayerActivities();

@@ -4,7 +4,7 @@ import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
 import CommandError from '../../CommandError';
 
-class UpdateCommand implements Command {
+class UpdatePlayer implements Command {
   name: string;
   template: string;
 
@@ -38,4 +38,4 @@ class UpdateCommand implements Command {
   }
 }
 
-export default new UpdateCommand();
+export default new UpdatePlayer();

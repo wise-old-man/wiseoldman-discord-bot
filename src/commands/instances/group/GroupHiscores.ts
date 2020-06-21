@@ -1,4 +1,4 @@
-import { EmbedFieldData, MessageEmbed } from 'discord.js';
+import { MessageEmbed } from 'discord.js';
 import { fetchGroupDetails, fetchGroupHiscores } from '../../../api/modules/groups';
 import { GroupHiscoresEntry } from '../../../api/types';
 import config from '../../../config';
@@ -6,14 +6,14 @@ import { Command, ParsedMessage } from '../../../types';
 import { getEmoji, getMetricName, isBoss, isSkill, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class HiscoresCommand implements Command {
+class GroupHiscores implements Command {
   name: string;
   template: string;
   requiresGroup?: boolean | undefined;
 
   constructor() {
     this.name = 'View group hiscores';
-    this.template = '!group hiscores {metric}';
+    this.template = '!group hiscores {metric}?';
     this.requiresGroup = true;
   }
 
@@ -29,15 +29,13 @@ class HiscoresCommand implements Command {
     try {
       const group = await fetchGroupDetails(groupId);
       const hiscores = await fetchGroupHiscores(groupId, metric);
-      const pageURL = `https://wiseoldman.net/groups/${groupId}/hiscores/`;
-      const fields = this.buildHiscoresFields(metric, hiscores);
-      const icon = getEmoji(metric);
 
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
-        .setTitle(`${icon} ${group.name} ${getMetricName(metric)} Hiscores`)
-        .setURL(pageURL)
-        .addFields(fields);
+        .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} hiscores`)
+        .setDescription(this.buildList(metric, hiscores))
+        .setURL(`https://wiseoldman.net/groups/${groupId}/records/`)
+        .setFooter(`Tip: Try !group hiscores zulrah`);
 
       message.respond(response);
     } catch (e) {
@@ -45,17 +43,10 @@ class HiscoresCommand implements Command {
     }
   }
 
-  buildHiscoresFields(metric: string, hiscores: GroupHiscoresEntry[]): EmbedFieldData[] {
-    return hiscores.map((result, index) => {
-      const name = result.displayName;
-      const value = this.getValue(metric, result);
-
-      return {
-        name: `${index + 1}. ${name}`,
-        value: `\`${value}\``,
-        inline: true
-      };
-    });
+  buildList(metric: string, hiscores: GroupHiscoresEntry[]) {
+    return hiscores
+      .map((g, i) => `${i + 1}. **${g.displayName}** - ${this.getValue(metric, g)}`)
+      .join('\n');
   }
 
   getValue(metric: string, result: GroupHiscoresEntry): string {
@@ -71,4 +62,4 @@ class HiscoresCommand implements Command {
   }
 }
 
-export default new HiscoresCommand();
+export default new GroupHiscores();

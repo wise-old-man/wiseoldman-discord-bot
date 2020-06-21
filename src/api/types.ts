@@ -8,6 +8,9 @@ export interface Player {
   updatedAt: Date;
   lastImportedAt?: Date;
   latestSnapshot: Snapshot;
+
+  // Only in group related lists
+  role?: string;
 }
 
 export interface Competition {
@@ -22,6 +25,16 @@ export interface Competition {
   duration?: string;
   groupId?: number;
   participantCount?: number;
+  totalGained?: number;
+  participants: {
+    id: number;
+    displayName: string;
+    progress: {
+      start: number;
+      end: number;
+      gained: number;
+    };
+  }[];
 }
 
 export interface Group {
@@ -207,7 +220,7 @@ export interface SnapshotActivity {
   score: number;
 }
 
-export interface PlayerGained {
+export interface PlayerGains {
   period: string;
   startsAt: Date | null;
   endsAt: Date | null;

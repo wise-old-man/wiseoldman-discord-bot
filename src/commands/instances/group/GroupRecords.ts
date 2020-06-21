@@ -1,44 +1,42 @@
-import { EmbedFieldData, MessageEmbed } from 'discord.js';
+import { MessageEmbed } from 'discord.js';
 import { fetchGroupDetails, fetchGroupRecords } from '../../../api/modules/groups';
 import { GroupRecordEntry } from '../../../api/types';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
-import { formatDate, getEmoji, getMetricName, toKMB } from '../../../utils';
+import { getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class RecordsCommand implements Command {
+class GroupRecords implements Command {
   name: string;
   template: string;
   requiresGroup?: boolean | undefined;
 
   constructor() {
     this.name = 'View group records';
-    this.template = '!group records {period} {metric}';
+    this.template = '!group records {metric}? [--day/--week/--month/--year]';
     this.requiresGroup = true;
   }
 
   activated(message: ParsedMessage) {
     const { command, args } = message;
-    return command === 'group' && args.length >= 2 && args[0] === 'records';
+    return command === 'group' && args.length >= 1 && args[0] === 'records';
   }
 
   async execute(message: ParsedMessage) {
     const groupId = 1; // message.server?.groupId || -1;
-    const period = message.args[1];
-    const metric = message.args.length >= 3 ? message.args[2] : 'overall';
+    const metric = this.getMetricArg(message.args);
+    const period = this.getPeriodArg(message.args);
 
     try {
       const group = await fetchGroupDetails(groupId);
       const records = await fetchGroupRecords(groupId, period, metric);
-      const pageURL = `https://wiseoldman.net/groups/${groupId}/records/`;
-      const fields = this.buildRecordFields(records);
-      const icon = getEmoji(metric);
 
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
-        .setTitle(`${icon} ${group.name} ${getMetricName(metric)} records (${period})`)
-        .setURL(pageURL)
-        .addFields(fields);
+        .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} records (${period})`)
+        .setDescription(this.buildList(records))
+        .setURL(`https://wiseoldman.net/groups/${groupId}/records/`)
+        .setFooter(`Tip: Try !group records zulrah --day`);
 
       message.respond(response);
     } catch (e) {
@@ -46,19 +44,18 @@ class RecordsCommand implements Command {
     }
   }
 
-  buildRecordFields(records: GroupRecordEntry[]): EmbedFieldData[] {
-    return records.map((result, index) => {
-      const name = result.displayName;
-      const value = toKMB(result.value);
-      const date = formatDate(result.updatedAt, "DD MMM 'YY");
+  buildList(records: GroupRecordEntry[]) {
+    return records.map((g, i) => `${i + 1}. **${g.displayName}** - ${toKMB(g.value)}`).join('\n');
+  }
 
-      return {
-        name: `${index + 1}. ${name}`,
-        value: `\`${value}\` ${date}`,
-        inline: true
-      };
-    });
+  getMetricArg(args: string[]): string {
+    const matches = args.filter(a => !a.startsWith('--') && a !== 'records').join('');
+    return matches && matches.length > 0 ? matches : 'overall';
+  }
+
+  getPeriodArg(args: string[]): string {
+    return args.find(a => a.startsWith('--'))?.replace('--', '') || 'week';
   }
 }
 
-export default new RecordsCommand();
+export default new GroupRecords();

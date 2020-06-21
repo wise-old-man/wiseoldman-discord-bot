@@ -1,6 +1,6 @@
 import axios from 'axios';
 import config from '../../config';
-import { Player, PlayerAchievement, PlayerGained, PlayerRecord } from '../types';
+import { Player, PlayerAchievement, PlayerGains, PlayerRecord } from '../types';
 import { convertDates } from '../utils';
 
 /*
@@ -34,7 +34,7 @@ async function updatePlayer(username: string): Promise<Player> {
 /**
  * Fetch the player's gains from the API.
  */
-async function fetchPlayerGains(username: string, period: string): Promise<PlayerGained> {
+async function fetchPlayerGains(username: string, period: string): Promise<PlayerGains> {
   const URL = `${config.baseAPIUrl}/players/username/${username}/gained`;
   const { data } = await axios.get(URL, { params: { period } });
 

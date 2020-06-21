@@ -5,7 +5,7 @@ import { Command, ParsedMessage } from '../../../types';
 import { formatDate, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class DetailsCommand implements Command {
+class GroupDetails implements Command {
   name: string;
   template: string;
   requiresGroup?: boolean | undefined;
@@ -49,4 +49,4 @@ class DetailsCommand implements Command {
   }
 }
 
-export default new DetailsCommand();
+export default new GroupDetails();

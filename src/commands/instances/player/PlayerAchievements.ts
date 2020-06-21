@@ -11,7 +11,7 @@ const RENDER_WIDTH = 260;
 const RENDER_HEIGHT = 165;
 const RENDER_PADDING = 15;
 
-class AchievementsCommand implements Command, Renderable {
+class PlayerAchievements implements Command, Renderable {
   name: string;
   template: string;
 
@@ -110,4 +110,4 @@ class AchievementsCommand implements Command, Renderable {
   }
 }
 
-export default new AchievementsCommand();
+export default new PlayerAchievements();

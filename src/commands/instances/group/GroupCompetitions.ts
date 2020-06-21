@@ -1,5 +1,5 @@
 import { MessageEmbed } from 'discord.js';
-import { getCompetitionStatus } from '../../../api/modules/competitions';
+import { getCompetitionTimeLeft } from '../../../api/modules/competitions';
 import { fetchGroupCompetitions, fetchGroupDetails } from '../../../api/modules/groups';
 import { Competition } from '../../../api/types';
 import config from '../../../config';
@@ -9,7 +9,7 @@ import CommandError from '../../CommandError';
 
 const MAX_COMPETITIONS = 5;
 
-class CompetitionsCommand implements Command {
+class GroupCompetitions implements Command {
   name: string;
   template: string;
   requiresGroup?: boolean | undefined;
@@ -51,15 +51,15 @@ class CompetitionsCommand implements Command {
       .slice(0, MAX_COMPETITIONS)
       .map(c => {
         const icon = getEmoji(c.metric);
-        const status = getCompetitionStatus(c);
+        const timeLeft = getCompetitionTimeLeft(c);
         const participants = `${c.participantCount} participants`;
 
         return {
           name: c.title,
-          value: `${icon} • ${participants} • ${status}`
+          value: `${icon} • ${participants} • ${timeLeft}`
         };
       });
   }
 }
 
-export default new CompetitionsCommand();
+export default new GroupCompetitions();

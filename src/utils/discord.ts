@@ -13,7 +13,7 @@ export function canManageMessages(member: GuildMember | null | undefined): boole
 }
 
 export function getEmoji(metric: string): string {
-  return (<any>Emoji)[metric];
+  return (<any>Emoji)[metric] || '❌';
 }
 
 export function propagate(message: StringResolvable, channelIds: string[] | undefined): void {

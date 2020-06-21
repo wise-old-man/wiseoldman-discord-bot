@@ -1,4 +1,4 @@
-import { EmbedFieldData, MessageEmbed } from 'discord.js';
+import { MessageEmbed } from 'discord.js';
 import { fetchGroupDetails, fetchGroupGained } from '../../../api/modules/groups';
 import { GroupGainedEntry } from '../../../api/types';
 import config from '../../../config';
@@ -6,39 +6,37 @@ import { Command, ParsedMessage } from '../../../types';
 import { getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class GainedCommand implements Command {
+class GroupGained implements Command {
   name: string;
   template: string;
   requiresGroup?: boolean | undefined;
 
   constructor() {
     this.name = 'View group gains';
-    this.template = '!group gained {period} {metric}';
+    this.template = '!group gained {metric}? [--day/--week/--month/--year]';
     this.requiresGroup = true;
   }
 
   activated(message: ParsedMessage) {
     const { command, args } = message;
-    return command === 'group' && args.length >= 2 && args[0] === 'gained';
+    return command === 'group' && args.length >= 1 && args[0] === 'gained';
   }
 
   async execute(message: ParsedMessage) {
     const groupId = 1; // message.server?.groupId || -1;
-    const period = message.args[1];
-    const metric = message.args.length >= 3 ? message.args[2] : 'overall';
+    const metric = this.getMetricArg(message.args);
+    const period = this.getPeriodArg(message.args);
 
     try {
       const group = await fetchGroupDetails(groupId);
       const gained = await fetchGroupGained(groupId, period, metric);
-      const pageURL = `https://wiseoldman.net/groups/${groupId}/gained/`;
-      const fields = this.buildGainedFields(gained);
-      const icon = getEmoji(metric);
 
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
-        .setTitle(`${icon} ${group.name} ${getMetricName(metric)} gains (${period})`)
-        .setURL(pageURL)
-        .addFields(fields);
+        .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} gains (${period})`)
+        .setDescription(this.buildList(gained))
+        .setURL(`https://wiseoldman.net/groups/${groupId}/gained/`)
+        .setFooter(`Tip: Try !group gained zulrah --day`);
 
       message.respond(response);
     } catch (e) {
@@ -46,18 +44,18 @@ class GainedCommand implements Command {
     }
   }
 
-  buildGainedFields(gained: GroupGainedEntry[]): EmbedFieldData[] {
-    return gained.map((result, index) => {
-      const name = result.displayName;
-      const value = toKMB(result.gained);
+  buildList(gained: GroupGainedEntry[]) {
+    return gained.map((g, i) => `${i + 1}. **${g.displayName}** - ${toKMB(g.gained)}`).join('\n');
+  }
 
-      return {
-        name: `${index + 1}. ${name}`,
-        value: `\`${value}\``,
-        inline: true
-      };
-    });
+  getMetricArg(args: string[]): string {
+    const matches = args.filter(a => !a.startsWith('--') && a !== 'gained').join('');
+    return matches && matches.length > 0 ? matches : 'overall';
+  }
+
+  getPeriodArg(args: string[]): string {
+    return args.find(a => a.startsWith('--'))?.replace('--', '') || 'week';
   }
 }
 
-export default new GainedCommand();
+export default new GroupGained();

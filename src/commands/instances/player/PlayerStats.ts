@@ -19,7 +19,7 @@ enum RenderVariant {
   Experience = 'Experience'
 }
 
-class StatsCommand implements Command, Renderable {
+class PlayerStats implements Command, Renderable {
   name: string;
   template: string;
 
@@ -160,4 +160,4 @@ class StatsCommand implements Command, Renderable {
   }
 }
 
-export default new StatsCommand();
+export default new PlayerStats();
