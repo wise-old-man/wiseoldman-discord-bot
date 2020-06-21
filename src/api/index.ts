@@ -16,8 +16,14 @@ export function init(): Express {
   });
 
   app.post('/event', (req, res) => {
+    const token = req.header('api_token');
+
+    if (!token || token !== process.env.API_TOKEN) {
+      return res.status(401).json('Wrong API Token.');
+    }
+
     onEventReceived(req.body);
-    res.json('Yep.');
+    return res.json('Event received.');
   });
 
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
