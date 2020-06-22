@@ -8,10 +8,12 @@ import CommandError from '../../CommandError';
 class ConfigChannel implements Command {
   name: string;
   template: string;
+  requiresAdmin: boolean;
 
   constructor() {
     this.name = 'Configure the prefered announcement channel.';
     this.template = '!config announcement-channel {#channel}/here';
+    this.requiresAdmin = true;
   }
 
   activated(message: ParsedMessage) {
@@ -25,25 +27,25 @@ class ConfigChannel implements Command {
   async execute(message: ParsedMessage) {
     const channelId = this.getChannel(message);
 
-    if (channelId) {
-      try {
-        const guildId = message.source.guild?.id || '';
-        await updateAnnouncementChannel(guildId, channelId);
-
-        const response = new MessageEmbed()
-          .setColor(config.visuals.green)
-          .setTitle(`${getEmoji('success')} Announcement channel updated`)
-          .setDescription(`All automatic Wise Old Man announcements will be sent to <#${channelId}>`);
-
-        message.respond(response);
-      } catch (error) {
-        throw new CommandError('Failed to update announcement channel.');
-      }
-    } else {
+    if (!channelId) {
       throw new CommandError(
         `Couldn't find channel.`,
         'Try typing "!config announcement-channel here" on the intended channel.'
       );
+    }
+
+    try {
+      const guildId = message.source.guild?.id || '';
+      await updateAnnouncementChannel(guildId, channelId);
+
+      const response = new MessageEmbed()
+        .setColor(config.visuals.green)
+        .setTitle(`${getEmoji('success')} Announcement channel updated`)
+        .setDescription(`All automatic Wise Old Man announcements will be sent to <#${channelId}>`);
+
+      message.respond(response);
+    } catch (error) {
+      throw new CommandError('Failed to update announcement channel.');
     }
   }
 
