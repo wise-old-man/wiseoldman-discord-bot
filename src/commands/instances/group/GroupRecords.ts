@@ -23,7 +23,7 @@ class GroupRecords implements Command {
   }
 
   async execute(message: ParsedMessage) {
-    const groupId = message.server?.groupId || -1;
+    const groupId = message.originServer?.groupId || -1;
     const metric = this.getMetricArg(message.args);
     const period = this.getPeriodArg(message.args);
 

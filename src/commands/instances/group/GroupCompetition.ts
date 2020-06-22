@@ -23,7 +23,7 @@ class GroupCompetition implements Command {
   }
 
   async execute(message: ParsedMessage) {
-    const groupId = message.server?.groupId || -1;
+    const groupId = message.originServer?.groupId || -1;
     const status = this.getStatusArgs(message.args);
 
     try {

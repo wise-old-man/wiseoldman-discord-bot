@@ -1,6 +1,5 @@
 import { Message, MessageEmbed } from 'discord.js';
 import config from '../config';
-import { getServer } from '../database/services/server';
 import { canManageMessages, isAdmin } from '../utils';
 import CommandError from './CommandError';
 import commands from './instances';
@@ -11,8 +10,7 @@ export function onError(message: Message, title: string, tip?: string): void {
   message.channel.send(tip ? response.setFooter(tip) : response);
 }
 
-export function onMessageReceived(message: Message): void {
-  // The message received is not valid
+export async function onMessageReceived(message: Message): Promise<void> {
   if (!parser.isValid(message)) {
     return;
   }
@@ -21,7 +19,7 @@ export function onMessageReceived(message: Message): void {
     message.channel.send('Pls come back @dkvl');
   }
 
-  const parsed = parser.parse(message);
+  const parsed = await parser.parse(message);
 
   commands.forEach(async c => {
     // If the message doesn't match the activation conditions
@@ -47,22 +45,14 @@ export function onMessageReceived(message: Message): void {
       );
     }
 
-    // If the message requires a group to be setup
-    if (c.requiresGroup) {
-      // Load the server config for this message's guild
-      const server = await getServer(message.guild?.id);
-
-      // If it has a configured group, add it as a property to the message
-      if (server?.groupId && server.groupId >= 0) {
-        parsed.server = server;
-      } else {
-        // If no group is configured, throw error (because this command requires it)
-        return onError(
-          message,
-          'That command requires a group to be configured.',
-          'Start the setup process with !setup'
-        );
-      }
+    // If the message requires a group to be setup, and no group is defined
+    // for the message's origin server
+    if (c.requiresGroup && !(parsed.originServer && parsed.originServer.groupId)) {
+      return onError(
+        message,
+        'That command requires a group to be configured.',
+        'Start the setup process with !setup'
+      );
     }
 
     try {

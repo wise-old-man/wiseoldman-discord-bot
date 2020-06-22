@@ -31,11 +31,11 @@ export interface Renderable {
 }
 
 export interface ParsedMessage {
-  source: Message;
+  sourceMessage: Message;
+  originServer?: Server;
   prefix: string;
   command: string;
   args: string[];
-  server?: Server;
   respond(response: StringResolvable): void;
 }
 

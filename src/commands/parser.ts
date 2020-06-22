@@ -1,14 +1,19 @@
 import { Message, StringResolvable } from 'discord.js';
 import config from '../config';
+import { getServer } from '../database/services/server';
 import { ParsedMessage } from '../types';
 
 /**
  * Convert a Discord Message object into our own
  * ParsedMessage object, which should be simpler to use.
  */
-export function parse(message: Message): ParsedMessage {
+export async function parse(message: Message): Promise<ParsedMessage> {
+  const sourceMessage = message;
+  const originServer = (await getServer(message.guild?.id)) || undefined;
+  const prefix = originServer?.prefix || config.defaultPrefix;
+
   // Remove the prefix from the command text
-  const commandBody = message.content.replace(config.prefix, '');
+  const commandBody = message.content.replace(prefix, '');
 
   // Split the command into its different sections
   const split = commandBody.split(' ').filter(s => s.length);
@@ -17,9 +22,7 @@ export function parse(message: Message): ParsedMessage {
     throw new Error('Empty command.');
   }
 
-  const source = message;
   const command = split[0];
-  const prefix = config.prefix;
   const args = split.slice(1, split.length);
 
   const respond = (response: StringResolvable | StringResolvable[]) => {
@@ -30,7 +33,7 @@ export function parse(message: Message): ParsedMessage {
     }
   };
 
-  return { source, prefix, command, args, respond };
+  return { sourceMessage, originServer, prefix, command, args, respond };
 }
 
 /**
@@ -43,11 +46,10 @@ export function isValid(message: Message): boolean {
     return false;
   }
 
-  // Must start with the prefix
-  if (!message.content.startsWith(config.prefix)) {
+  // If doesn't start with any of the valid prefixes
+  if (!config.validPrefixes.find(p => message.content.startsWith(p))) {
     return false;
   }
 
-  // The message can't just be the prefix and nothing else
-  return message.content.length > config.prefix.length;
+  return true;
 }

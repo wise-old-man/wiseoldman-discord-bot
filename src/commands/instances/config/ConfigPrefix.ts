@@ -23,16 +23,16 @@ class ConfigPrefix implements Command {
   async execute(message: ParsedMessage) {
     const prefix = this.getPrefix(message);
 
-    if (!prefix) {
-      throw new CommandError(`Invalid command prefix.`, 'Example: !config prefix --');
-    }
-
-    if (prefix.length >= 5) {
-      throw new CommandError(`Command prefix too long.`, 'Prefixes must be shorter than 5 characters');
+    if (!prefix || !config.validPrefixes.includes(prefix)) {
+      const validPrefixesString = config.validPrefixes.map(p => `\`${p}\``).join(',');
+      throw new CommandError(
+        `Invalid command prefix.\nValid prefixes: ${validPrefixesString}`,
+        'If you have suggestions for other prefixes. Contact us on discord.'
+      );
     }
 
     try {
-      const guildId = message.source.guild?.id || '';
+      const guildId = message.sourceMessage.guild?.id || '';
       await updatePrefix(guildId, prefix);
 
       const response = new MessageEmbed()

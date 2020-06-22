@@ -28,7 +28,7 @@ class GroupMembers implements Command {
   }
 
   async execute(message: ParsedMessage) {
-    const groupId = message.server?.groupId || -1;
+    const groupId = message.originServer?.groupId || -1;
 
     try {
       const group = await fetchGroupDetails(groupId);
@@ -49,7 +49,7 @@ class GroupMembers implements Command {
 
       new Embeds()
         .setArray(pages)
-        .setChannel(<any>message.source.channel)
+        .setChannel(<any>message.sourceMessage.channel)
         .setPageIndicator(true)
         .build();
     } catch (e) {

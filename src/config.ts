@@ -2,7 +2,8 @@ import 'dotenv/config';
 
 export default {
   token: process.env.DISCORD_TOKEN,
-  prefix: '!',
+  defaultPrefix: '!',
+  validPrefixes: ['!', '-', '--', '+', '++', '$'],
   baseAPIUrl: 'https://wiseoldman.net/api',
   visuals: {
     blue: '#2980b9',

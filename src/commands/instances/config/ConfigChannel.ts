@@ -35,7 +35,7 @@ class ConfigChannel implements Command {
     }
 
     try {
-      const guildId = message.source.guild?.id || '';
+      const guildId = message.sourceMessage.guild?.id || '';
       await updateAnnouncementChannel(guildId, channelId);
 
       const response = new MessageEmbed()
@@ -51,7 +51,7 @@ class ConfigChannel implements Command {
 
   getChannel(message: ParsedMessage) {
     if (message.args.includes('here')) {
-      return message.source.channel.id;
+      return message.sourceMessage.channel.id;
     }
 
     const channelTag = message.args.find(a => a.startsWith('<#'));
@@ -61,7 +61,7 @@ class ConfigChannel implements Command {
     }
 
     const channelId = channelTag.replace('<#', '').replace('>', '');
-    const channel = message.source.guild?.channels.cache.get(channelId);
+    const channel = message.sourceMessage.guild?.channels.cache.get(channelId);
 
     if (channel) {
       return channel.id;

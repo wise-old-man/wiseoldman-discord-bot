@@ -31,7 +31,7 @@ class ConfigGroup implements Command {
     try {
       const group = await fetchGroupDetails(groupId);
 
-      const guildId = message.source.guild?.id || '';
+      const guildId = message.sourceMessage.guild?.id || '';
       await updateGroup(guildId, groupId);
 
       const response = new MessageEmbed()
