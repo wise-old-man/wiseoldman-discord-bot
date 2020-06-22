@@ -1,7 +1,26 @@
+import axios from 'axios';
+import config from '../../config';
 import { durationBetween } from '../../utils';
 import { Competition } from '../types';
+import { convertDates } from '../utils';
 
 export function getCompetitionStatus(competition: Competition): string {
+  const now = new Date();
+  const endsAt = competition.endsAt;
+  const startsAt = competition.startsAt;
+
+  if (endsAt.getTime() < now.getTime()) {
+    return 'finished';
+  }
+
+  if (startsAt.getTime() < now.getTime()) {
+    return 'ongoing';
+  }
+
+  return 'upcoming';
+}
+
+export function getCompetitionTimeLeft(competition: Competition): string {
   const now = new Date();
   const endsAt = competition.endsAt;
   const startsAt = competition.startsAt;
@@ -17,4 +36,17 @@ export function getCompetitionStatus(competition: Competition): string {
 
   const timeLeft = durationBetween(now, startsAt, 2);
   return `Starting in ${timeLeft}`;
+}
+
+/**
+ * Fetch competition details from the API.
+ */
+export async function fetchCompetition(id: number): Promise<Competition> {
+  const URL = `${config.baseAPIUrl}/competitions/${id}`;
+  const { data } = await axios.get(URL);
+
+  // Convert date strings into date instances
+  convertDates(data, ['createdAt', 'updatedAt', 'startsAt', 'endsAt']);
+
+  return data;
 }

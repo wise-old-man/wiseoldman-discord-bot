@@ -6,20 +6,36 @@ export interface Command {
   template: string;
   requiresAdmin?: boolean;
   requiresGroup?: boolean;
+  requiresPagination?: boolean;
   activated(message: ParsedMessage): boolean;
   execute(message: ParsedMessage): void;
 }
 
+export interface Event {
+  type: string;
+  execute(data: Object): void;
+}
+
+export interface EventPayload {
+  type: string;
+  data: Object;
+}
+
+export interface CanvasAttachment {
+  attachment: MessageAttachment;
+  fileName: string;
+}
+
 export interface Renderable {
-  render(props: any): Promise<MessageAttachment>;
+  render(props: any): Promise<CanvasAttachment>;
 }
 
 export interface ParsedMessage {
-  source: Message;
+  sourceMessage: Message;
+  originServer?: Server;
   prefix: string;
   command: string;
   args: string[];
-  server?: Server;
   respond(response: StringResolvable): void;
 }
 
@@ -28,15 +44,6 @@ export interface TimeGap {
   minutes: number;
   hours: number;
   days: number;
-}
-
-export const enum TimePeriod {
-  Second = 1000,
-  Minute = 1000 * 60,
-  Hour = 1000 * 60 * 60,
-  Day = 1000 * 60 * 60 * 24,
-  Month = 1000 * 60 * 60 * 24 * 31,
-  Year = 1000 * 60 * 60 * 24 * 365
 }
 
 export enum Emoji {
@@ -66,5 +73,14 @@ export enum Emoji {
   construction = '<:icon_Construction:706462610853330986>',
 
   success = '✅',
-  error = '❌'
+  error = '❌',
+  warning = '⚠️',
+  tada = '🎉',
+  wave = '👋',
+  speaker = '📢',
+  gold_medal = '🥇',
+  silver_medal = '🥈',
+  bronze_medal = '🥉',
+  clock = '🕒',
+  crown = '👑'
 }

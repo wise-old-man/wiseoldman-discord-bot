@@ -8,6 +8,9 @@ export interface Player {
   updatedAt: Date;
   lastImportedAt?: Date;
   latestSnapshot: Snapshot;
+
+  // Only in group related lists
+  role?: string;
 }
 
 export interface Competition {
@@ -22,6 +25,16 @@ export interface Competition {
   duration?: string;
   groupId?: number;
   participantCount?: number;
+  totalGained?: number;
+  participants: {
+    id: number;
+    displayName: string;
+    progress: {
+      start: number;
+      end: number;
+      gained: number;
+    };
+  }[];
 }
 
 export interface Group {
@@ -205,4 +218,52 @@ export interface SnapshotBoss {
 export interface SnapshotActivity {
   rank: number;
   score: number;
+}
+
+export interface PlayerGains {
+  period: string;
+  startsAt: Date | null;
+  endsAt: Date | null;
+  data: {
+    [key: string]: {
+      rank: {
+        start: number;
+        end: number;
+        gained: number;
+      };
+      // Defined in skill gains
+      experience?: {
+        start: number;
+        end: number;
+        gained: number;
+      };
+      // Defined in boss gains
+      kills?: {
+        start: number;
+        end: number;
+        gained: number;
+      };
+      // Defined in activity gains
+      score?: {
+        start: number;
+        end: number;
+        gained: number;
+      };
+    };
+  };
+}
+
+export interface PlayerRecord {
+  value: number;
+  period: string;
+  metric: string;
+  updatedAt: Date;
+}
+
+export interface PlayerAchievement {
+  playerId: number;
+  threshold: number;
+  type: string;
+  metric: string;
+  createdAt: Date;
 }

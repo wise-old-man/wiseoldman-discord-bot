@@ -1,12 +1,19 @@
 import axios from 'axios';
 import config from '../../config';
-import { Competition, Group, GroupGainedEntry, GroupHiscoresEntry, GroupRecordEntry } from '../types';
+import {
+  Competition,
+  Group,
+  GroupGainedEntry,
+  GroupHiscoresEntry,
+  GroupRecordEntry,
+  Player
+} from '../types';
 import { convertDates } from '../utils';
 
 /**
  * Fetch the group details from the API.
  */
-export async function fetchGroupDetails(id: number): Promise<Group> {
+async function fetchGroupDetails(id: number): Promise<Group> {
   const URL = `${config.baseAPIUrl}/groups/${id}`;
   const { data } = await axios.get(URL);
 
@@ -17,9 +24,19 @@ export async function fetchGroupDetails(id: number): Promise<Group> {
 }
 
 /**
+ * Fetch the group members from the API.
+ */
+async function fetchGroupMembers(id: number): Promise<Player[]> {
+  const URL = `${config.baseAPIUrl}/groups/${id}/members`;
+  const { data } = await axios.get(URL);
+
+  return data;
+}
+
+/**
  * Fetch all group competitions from the API.
  */
-export async function fetchGroupCompetitions(id: number): Promise<Competition[]> {
+async function fetchGroupCompetitions(id: number): Promise<Competition[]> {
   const URL = `${config.baseAPIUrl}/groups/${id}/competitions`;
   const { data } = await axios.get(URL);
 
@@ -32,7 +49,7 @@ export async function fetchGroupCompetitions(id: number): Promise<Competition[]>
 /**
  * Fetch group hiscores from the API.
  */
-export async function fetchGroupHiscores(id: number, metric: string): Promise<GroupHiscoresEntry[]> {
+async function fetchGroupHiscores(id: number, metric: string): Promise<GroupHiscoresEntry[]> {
   const URL = `${config.baseAPIUrl}/groups/${id}/hiscores`;
   const params = { metric: metric.toLowerCase(), limit: 21 };
   const { data } = await axios.get(URL, { params });
@@ -46,13 +63,13 @@ export async function fetchGroupHiscores(id: number, metric: string): Promise<Gr
 /**
  * Fetch group gains from the API.
  */
-export async function fetchGroupGained(
+async function fetchGroupGained(
   id: number,
   period: string,
   metric: string
 ): Promise<GroupGainedEntry[]> {
   const URL = `${config.baseAPIUrl}/groups/${id}/gained`;
-  const params = { metric: metric.toLowerCase(), period: period.toLowerCase(), limit: 21 };
+  const params = { metric: metric.toLowerCase(), period: period.toLowerCase() };
   const { data } = await axios.get(URL, { params });
 
   // Convert date strings into date instances
@@ -64,7 +81,7 @@ export async function fetchGroupGained(
 /**
  * Fetch group records from the API.
  */
-export async function fetchGroupRecords(
+async function fetchGroupRecords(
   id: number,
   period: string,
   metric: string
@@ -78,3 +95,12 @@ export async function fetchGroupRecords(
 
   return data;
 }
+
+export {
+  fetchGroupDetails,
+  fetchGroupMembers,
+  fetchGroupCompetitions,
+  fetchGroupHiscores,
+  fetchGroupGained,
+  fetchGroupRecords
+};

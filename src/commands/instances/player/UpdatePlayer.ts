@@ -4,11 +4,9 @@ import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
 import CommandError from '../../CommandError';
 
-class UpdateCommand implements Command {
+class UpdatePlayer implements Command {
   name: string;
   template: string;
-  requiresAdmin?: boolean | undefined;
-  requiresGroup?: boolean | undefined;
 
   constructor() {
     this.name = 'Update player';
@@ -40,4 +38,4 @@ class UpdateCommand implements Command {
   }
 }
 
-export default new UpdateCommand();
+export default new UpdatePlayer();

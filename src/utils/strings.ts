@@ -1,7 +1,13 @@
 // Source: https://github.com/gc/oldschooljs/blob/master/src/util/util.ts
-export function toKMB(number: number): string {
+/**
+ * Example: 356 688 847
+ * Decimal precision of 1 = 356.7
+ * Decimal precision of 2 = 356.69
+ */
+export function toKMB(number: number, decimalPrecision = 2): string {
   function round(number: number): string {
-    return (Math.round(number * 100) / 100).toString();
+    const precision = Math.pow(10, decimalPrecision);
+    return (Math.round(number * precision) / precision).toString();
   }
 
   if (number > 999999999 || number < -999999999) {

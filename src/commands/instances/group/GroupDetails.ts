@@ -5,10 +5,9 @@ import { Command, ParsedMessage } from '../../../types';
 import { formatDate, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class DetailsCommand implements Command {
+class GroupDetails implements Command {
   name: string;
   template: string;
-  requiresAdmin?: boolean | undefined;
   requiresGroup?: boolean | undefined;
 
   constructor() {
@@ -22,7 +21,7 @@ class DetailsCommand implements Command {
   }
 
   async execute(message: ParsedMessage) {
-    const groupId = message.server?.groupId || -1;
+    const groupId = message.originServer?.groupId || -1;
 
     try {
       const group = await fetchGroupDetails(groupId);
@@ -50,4 +49,4 @@ class DetailsCommand implements Command {
   }
 }
 
-export default new DetailsCommand();
+export default new GroupDetails();
