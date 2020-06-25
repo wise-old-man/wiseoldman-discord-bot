@@ -1,0 +1,16 @@
+name: Build Docker Image
+on:
+  push:
+    branches: [master]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build & Push the Docker image
+        run: |
+          docker build . --file Dockerfile --tag psikoi/discord-bot:latest
+          docker push psikoi/discord-bot:latest
