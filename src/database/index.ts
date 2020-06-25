@@ -6,7 +6,7 @@ const sequelize = new Sequelize({
   database: databaseConfig.database,
   username: databaseConfig.username,
   password: databaseConfig.password,
-  dialect: 'mysql',
+  dialect: 'postgres',
   models: [Server]
 });
 
