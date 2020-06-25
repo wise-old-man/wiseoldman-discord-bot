@@ -2,7 +2,7 @@ import cors from 'cors';
 import express, { Express } from 'express';
 import { onEventReceived } from '../events/router';
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 7000;
 
 export function init(): Express {
   const app = express();
