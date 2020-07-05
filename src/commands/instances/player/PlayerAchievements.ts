@@ -88,11 +88,10 @@ class PlayerAchievements implements Command, Renderable {
       ctx.drawImage(icon, originX, originY, icon.width / 2, icon.height / 2);
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = '10px Arial';
+      ctx.font = '9px Arial';
       ctx.fillText(result.type, originX + 30, originY + 17);
 
       ctx.fillStyle = '#b3b3b3';
-      ctx.font = '9px Arial';
 
       if (result.createdAt.getFullYear() > 2000) {
         ctx.fillText(formatDate(result.createdAt, 'Do MMM'), originX + 205, originY + 17);
