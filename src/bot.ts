@@ -12,7 +12,7 @@ class Bot {
   init() {
     this.client.once('ready', () => {
       // Init bot properties
-      this.client.user?.setActivity('wiseoldman.net');
+      this.client.user?.setActivity('bot.wiseoldman.net');
 
       // Send received messages to the command router
       this.client.on('message', router.onMessageReceived);
