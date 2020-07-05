@@ -6,8 +6,10 @@
   "scripts": {
     "build": "tsc -p .",
     "lint": "eslint . --ext .ts",
+    "prestart": "sequelize db:migrate",
+    "start": "pm2-runtime dist/index.js -i 2",
     "predev": "npm run build && sequelize db:migrate",
-    "dev": "nodemon --exec ts-node src/index.ts",
+    "dev": "nodemon -L --exec ts-node src/index.ts",
     "migration:generate": "cross-env MIGRATING=false npx sequelize-cli migration:generate --name "
   },
   "keywords": [
@@ -51,7 +53,7 @@
     "express": "^4.17.1",
     "lodash": "^4.17.15",
     "moment": "^2.26.0",
-    "mysql2": "^2.1.0",
+    "pg": "^8.2.1",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^5.21.13",
     "sequelize-typescript": "^1.1.0"

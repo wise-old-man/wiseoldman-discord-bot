@@ -99,7 +99,7 @@ class PlayerActivities implements Command, Renderable {
       const isRanked = result.score && result.score > -1;
 
       if (variant === RenderVariant.Scores) {
-        ctx.font = 'bold 12px Arial';
+        ctx.font = '11px Arial';
 
         const score = `${isRanked ? (result.score >= 10000 ? toKMB(result.score) : result.score) : '?'}`;
         const scoreWidth = ctx.measureText(score).width;
@@ -108,7 +108,7 @@ class PlayerActivities implements Command, Renderable {
         ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
         ctx.fillText(score, originX + 42 - scoreWidth / 2, originY + 17);
       } else if (variant === RenderVariant.Ranks) {
-        ctx.font = 'bold 10px Arial';
+        ctx.font = '10px Arial';
 
         const rank = `${isRanked ? toKMB(result.rank, 1) : '?'}`;
         const rankWidth = ctx.measureText(rank).width;

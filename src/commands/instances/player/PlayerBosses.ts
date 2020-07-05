@@ -95,7 +95,7 @@ class PlayerBosses implements Command, Renderable {
       const isRanked = result.kills && result.kills > -1;
 
       if (variant === RenderVariant.Kills) {
-        ctx.font = 'bold 12px Arial';
+        ctx.font = '11px Arial';
 
         const kills = `${isRanked ? (result.kills >= 10000 ? toKMB(result.kills) : result.kills) : '?'}`;
         const killsWidth = ctx.measureText(kills).width;
@@ -104,7 +104,7 @@ class PlayerBosses implements Command, Renderable {
         ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
         ctx.fillText(kills, originX + 42 - killsWidth / 2, originY + 17);
       } else if (variant === RenderVariant.Ranks) {
-        ctx.font = 'bold 10px Arial';
+        ctx.font = '10px Arial';
 
         const rank = `${isRanked ? toKMB(result.rank, 1) : '?'}`;
         const rankWidth = ctx.measureText(rank).width;

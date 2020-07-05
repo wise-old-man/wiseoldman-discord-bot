@@ -1,0 +1,48 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    networks:
+      - webnet
+      - pgadminnet
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    env_file:
+      - ./.env
+    expose:
+      - '5432'
+    command: postgres -c listen_addresses='*'
+  pgadmin:
+    image: dpage/pgadmin4
+    env_file:
+      - ./.env
+    ports:
+      - '54321:80'
+    depends_on:
+      - db
+    logging:
+      driver: none
+    networks:
+      - pgadminnet
+  bot:
+    build: .
+    expose:
+      - '7000'
+    ports:
+      - '7000:7000'
+    networks:
+      - webnet
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+    volumes:
+      - .:/wise-old-man/discord-bot
+      - /wise-old-man/discord-bot/node_modules
+    command: ['./wait-for-it.sh', '-t', '30', 'db:5432', '--', 'npm', 'run', 'dev']
+networks:
+  webnet:
+  pgadminnet:
+    driver: bridge
+volumes:
+  pgdata:

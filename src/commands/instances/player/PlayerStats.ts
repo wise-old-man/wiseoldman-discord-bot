@@ -101,7 +101,7 @@ class PlayerStats implements Command, Renderable {
       ctx.fillStyle = '#ffffff';
 
       if (variant === RenderVariant.Levels) {
-        ctx.font = 'bold 12px Arial';
+        ctx.font = '11px sans-serif';
 
         const level = `${result.level || 1}`;
         const lvlWidth = ctx.measureText(level).width;
@@ -109,21 +109,22 @@ class PlayerStats implements Command, Renderable {
         // Skill level
         ctx.fillText(level, originX + 42 - lvlWidth / 2, originY + 17);
       } else if (variant === RenderVariant.Experience) {
-        ctx.font = 'bold 10px Arial';
+        const fontSize = result.name === 'overall' ? 9 : 10;
+        ctx.font = `${fontSize}px sans-serif`;
 
         const exp = `${toKMB(result.experience, 1) || 0}`;
         const expWidth = ctx.measureText(exp).width;
 
         // Skill Experience
-        ctx.fillText(exp, originX + 43 - expWidth / 2, originY + 17);
+        ctx.fillText(exp, originX + 44 - expWidth / 2, originY + 17);
       } else if (variant === RenderVariant.Ranks) {
-        ctx.font = 'bold 10px Arial';
+        ctx.font = '10px sans-serif';
 
         const rank = `${toKMB(result.rank, 1) || 0}`;
         const rankWidth = ctx.measureText(rank).width;
 
         // Skill Rank
-        ctx.fillText(rank, originX + 43 - rankWidth / 2, originY + 17);
+        ctx.fillText(rank, originX + 44 - rankWidth / 2, originY + 17);
       }
     }
 

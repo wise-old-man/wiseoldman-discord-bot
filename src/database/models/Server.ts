@@ -1,6 +1,6 @@
 import { Column, Default, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
-@Table
+@Table({ tableName: 'servers' })
 export class Server extends Model<Server> {
   @PrimaryKey
   @Column
