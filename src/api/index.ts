@@ -16,8 +16,9 @@ export function init(): Express {
   });
 
   app.post('/event', (req, res) => {
-    const token = req.header('api_token');
+    const token = req.headers['api_token'];
 
+    console.log(req.headers);
     console.log(token);
     console.log(process.env.API_TOKEN);
     console.log('');
