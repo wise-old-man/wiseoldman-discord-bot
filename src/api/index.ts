@@ -18,6 +18,10 @@ export function init(): Express {
   app.post('/event', (req, res) => {
     const token = req.header('api_token');
 
+    console.log(token);
+    console.log(process.env.API_TOKEN);
+    console.log('');
+
     if (!token || token !== process.env.API_TOKEN) {
       return res.status(401).json('Wrong API Token.');
     }
