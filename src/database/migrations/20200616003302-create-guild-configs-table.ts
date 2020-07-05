@@ -11,8 +11,7 @@ function up(queryInterface: QueryInterface, dataTypes: any): Promise<void> {
       type: dataTypes.INTEGER
     },
     botChannelId: {
-      type: dataTypes.STRING(256),
-      allowNull: false
+      type: dataTypes.STRING(256)
     },
     prefix: {
       type: dataTypes.STRING(20),

@@ -3,9 +3,7 @@ import databaseConfig from './config';
 import { Server } from './models/Server';
 
 const sequelize = new Sequelize({
-  database: databaseConfig.database,
-  username: databaseConfig.username,
-  password: databaseConfig.password,
+  ...databaseConfig,
   dialect: 'postgres',
   models: [Server]
 });
