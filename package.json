@@ -7,7 +7,7 @@
     "build": "tsc -p .",
     "lint": "eslint . --ext .ts",
     "prestart": "sequelize db:migrate",
-    "start": "pm2-runtime dist/index.js -i 2",
+    "start": "pm2-runtime dist/index.js",
     "predev": "npm run build && sequelize db:migrate",
     "dev": "nodemon -L --exec ts-node src/index.ts",
     "migration:generate": "cross-env MIGRATING=false npx sequelize-cli migration:generate --name "
