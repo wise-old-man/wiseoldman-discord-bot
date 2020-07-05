@@ -8,5 +8,3 @@ RUN npm install pm2 -g
 
 COPY . .
 COPY wait-for-it.sh .
-
-RUN ["chmod", "+x", "./wait-for-it.sh"]
