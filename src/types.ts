@@ -83,5 +83,6 @@ export enum Emoji {
   bronze_medal = '🥉',
   clock = '🕒',
   crown = '👑',
-  heart = '❤️'
+  heart = '❤️',
+  info = 'ℹ️'
 }

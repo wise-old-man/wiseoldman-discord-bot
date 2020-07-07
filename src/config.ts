@@ -4,6 +4,7 @@ export default {
   token: process.env.DISCORD_TOKEN,
   defaultPrefix: '!',
   validPrefixes: ['!', '-', '+', '++', '$'],
+  helpCommand: 'wom!help',
   baseAPIUrl: 'https://wiseoldman.net/api',
   visuals: {
     blue: '#2980b9',

@@ -46,8 +46,11 @@ export function isValid(message: Message): boolean {
     return false;
   }
 
-  // If doesn't start with any of the valid prefixes
-  if (!config.validPrefixes.find(p => message.content.startsWith(p))) {
+  // If doesn't start with any of the valid prefixes or isn't the help command
+  if (
+    !message.content.startsWith(config.helpCommand) &&
+    !config.validPrefixes.find(p => message.content.startsWith(p))
+  ) {
     return false;
   }
 
