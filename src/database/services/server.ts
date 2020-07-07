@@ -17,7 +17,7 @@ async function getChannelIds(groupId: number): Promise<string[] | undefined> {
 
   if (!servers || servers.length === 0) return;
 
-  return servers.map(s => s.botChannelId);
+  return servers.map(s => s.botChannelId).filter(s => s);
 }
 
 async function updateGroup(guildId: string, groupId: number): Promise<Server> {

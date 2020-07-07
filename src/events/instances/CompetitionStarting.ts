@@ -36,17 +36,20 @@ class CompetitionStarting implements Event {
     if (!timeLeft) return;
 
     const channelIds = await getChannelIds(groupId);
+
+    // If no servers/channels care about this group
+    if (!channelIds || channelIds.length === 0) return;
+
     const url = `https://wiseoldman.net/competitions/${id}`;
 
     const fields = [
-      { name: 'Title', value: title },
       { name: 'Metric', value: `${getEmoji(metric)} ${getMetricName(metric)}` },
       { name: 'Duration', value: duration }
     ];
 
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji('clock')} A competition is starting in ${timeLeft}`)
+      .setTitle(`${getEmoji('clock')} ${title} is starting in ${timeLeft}`)
       .setURL(url)
       .addFields(fields);
 

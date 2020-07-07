@@ -2,7 +2,7 @@ import { MessageEmbed } from 'discord.js';
 import config from '../../config';
 import { getChannelIds } from '../../database/services/server';
 import { Event } from '../../types';
-import { getEmoji, getMetricName, propagate, toKMB } from '../../utils';
+import { getEmoji, propagate, toKMB } from '../../utils';
 
 interface CompetitionStanding {
   displayName: string;
@@ -29,38 +29,37 @@ class CompetitionEnded implements Event {
 
   async execute(data: CompetitionEndedData): Promise<void> {
     const { groupId, competition, standings } = data;
-    const { id, metric, duration, title } = competition;
+    const { id, title } = competition;
 
     if (!groupId) return;
 
     const channelIds = await getChannelIds(groupId);
-    const url = `https://wiseoldman.net/competitions/${id}`;
 
-    const fields = [
-      { name: 'Title', value: title },
-      { name: 'Metric', value: `${getEmoji(metric)} ${getMetricName(metric)}` },
-      { name: 'Duration', value: duration },
-      {
-        name: 'Top participants',
-        value: standings
-          .slice(0, 3)
-          .map((s, i) => {
-            const place = i + 1;
-            const emoji = getStandingEmoji(place);
-            return `${emoji} ${place}. ${s.displayName} - **${toKMB(s.gained)}**`;
-          })
-          .join('\n')
-      }
-    ];
+    // If no servers/channels care about this group
+    if (!channelIds || channelIds.length === 0) return;
+
+    const url = `https://wiseoldman.net/competitions/${id}`;
 
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji('speaker')} A competition has ended!`)
+      .setTitle(`${getEmoji('speaker')} ${title} has ended!`)
       .setURL(url)
-      .addFields(fields);
+      .addFields([
+        {
+          name: 'Top participants',
+          value: getStandings(standings)
+        }
+      ]);
 
     propagate(message, channelIds);
   }
+}
+
+function getStandings(standings: CompetitionStanding[]): string {
+  return standings
+    .slice(0, 3)
+    .map((s, i) => `${getStandingEmoji(i + 1)} ${i + 1}. ${s.displayName} - **${toKMB(s.gained)}**`)
+    .join('\n');
 }
 
 function getStandingEmoji(place: number) {

@@ -1,4 +1,4 @@
-import { GuildMember, StringResolvable, TextChannel } from 'discord.js';
+import { Guild, GuildChannel, GuildMember, StringResolvable, TextChannel } from 'discord.js';
 import bot from '../bot';
 import { Emoji } from '../types';
 
@@ -13,7 +13,8 @@ export function canManageMessages(member: GuildMember | null | undefined): boole
 }
 
 export function getEmoji(metric: string): string {
-  return (<any>Emoji)[metric] || '❌';
+  const emojiKey = metric.startsWith('clue') ? 'clue' : metric;
+  return (<any>Emoji)[emojiKey] || '❌';
 }
 
 export function propagate(message: StringResolvable, channelIds: string[] | undefined): void {
@@ -29,4 +30,16 @@ export function propagate(message: StringResolvable, channelIds: string[] | unde
 
     channel.send(message);
   });
+}
+
+/**
+ * Finds the first text channel where the bot has
+ * permissions to send messages to.
+ */
+export function findOpenChannel(guild: Guild): GuildChannel | undefined {
+  const channel = guild.channels.cache.find(channel => {
+    return !!(channel.type === 'text' && guild.me?.hasPermission('SEND_MESSAGES'));
+  });
+
+  return channel;
 }

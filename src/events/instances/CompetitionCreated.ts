@@ -29,6 +29,10 @@ class CompetitionCreated implements Event {
     if (!groupId) return;
 
     const channelIds = await getChannelIds(groupId);
+
+    // If no servers/channels care about this group
+    if (!channelIds || channelIds.length === 0) return;
+
     const url = `https://wiseoldman.net/competitions/${id}`;
 
     const fields = [
@@ -39,7 +43,7 @@ class CompetitionCreated implements Event {
 
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle('New competition created!')
+      .setTitle(`${getEmoji('tada')} New competition created!`)
       .setURL(url)
       .addFields(fields)
       .setFooter('Starts at')

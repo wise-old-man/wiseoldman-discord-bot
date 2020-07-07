@@ -2,6 +2,7 @@ import { Command } from '../../types';
 import ConfigChannel from './config/ConfigChannel';
 import ConfigGroup from './config/ConfigGroup';
 import ConfigPrefix from './config/ConfigPrefix';
+import HelpCommand from './general/Help';
 import GroupCompetitionCommand from './group/GroupCompetition';
 import GroupCompetitionsCommand from './group/GroupCompetitions';
 import GroupDetailsCommand from './group/GroupDetails';
@@ -17,6 +18,9 @@ import PlayerStatsCommand from './player/PlayerStats';
 import PlayerUpdateCommand from './player/UpdatePlayer';
 
 const commands: Command[] = [
+  // general commands
+  HelpCommand,
+
   // player commands
   PlayerStatsCommand,
   PlayerBossesCommand,
