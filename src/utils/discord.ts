@@ -13,7 +13,8 @@ export function canManageMessages(member: GuildMember | null | undefined): boole
 }
 
 export function getEmoji(metric: string): string {
-  return (<any>Emoji)[metric] || '❌';
+  const emojiKey = metric.startsWith('clue') ? 'clue' : metric;
+  return (<any>Emoji)[emojiKey] || '❌';
 }
 
 export function propagate(message: StringResolvable, channelIds: string[] | undefined): void {
