@@ -28,17 +28,20 @@ class CompetitionStarted implements Event {
     if (!groupId) return;
 
     const channelIds = await getChannelIds(groupId);
+
+    // If no servers/channels care about this group
+    if (!channelIds || channelIds.length === 0) return;
+
     const url = `https://wiseoldman.net/competitions/${id}`;
 
     const fields = [
-      { name: 'Title', value: title },
       { name: 'Metric', value: `${getEmoji(metric)} ${getMetricName(metric)}` },
       { name: 'Ends in', value: duration }
     ];
 
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji('speaker')} A competition has started!`)
+      .setTitle(`${getEmoji('speaker')} ${title} has started!`)
       .setURL(url)
       .addFields(fields);
 

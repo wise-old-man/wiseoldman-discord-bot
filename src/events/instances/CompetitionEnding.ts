@@ -31,15 +31,18 @@ class CompetitionEnding implements Event {
 
     if (!groupId) return;
 
+    const channelIds = await getChannelIds(groupId);
+
+    // If no servers/channels care about this group
+    if (!channelIds || channelIds.length === 0) return;
+
     const timeLeft = getTimeLeft(period);
 
     if (!timeLeft) return;
 
-    const channelIds = await getChannelIds(groupId);
     const url = `https://wiseoldman.net/competitions/${id}`;
 
     const fields = [
-      { name: 'Title', value: title },
       { name: 'Metric', value: `${getEmoji(metric)} ${getMetricName(metric)}` },
       { name: 'Duration', value: duration }
     ];
@@ -54,7 +57,7 @@ class CompetitionEnding implements Event {
 
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji('clock')} A competition is ending in ${timeLeft}`)
+      .setTitle(`${getEmoji('clock')} ${title} is ending in ${timeLeft}`)
       .setURL(url)
       .addFields(fields);
 
