@@ -35,10 +35,16 @@ class PlayerGained implements Command {
         throw new Error(`${player.displayName} has no ${period} gains.`);
       }
 
+      const gainsList = this.buildList(period, gained);
+
+      if (gainsList.length === 0) {
+        throw new Error(`${player.displayName} has no ${period} gains.`);
+      }
+
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
         .setTitle(`${player.displayName} gains (${period})`)
-        .setDescription(this.buildList(period, gained))
+        .setDescription(gainsList)
         .setURL(`https://wiseoldman.net/players/${player.id}/gained/`);
 
       message.respond(response);
