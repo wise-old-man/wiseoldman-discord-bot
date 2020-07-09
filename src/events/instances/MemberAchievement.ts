@@ -1,5 +1,6 @@
 import { MessageEmbed } from 'discord.js';
 import config from '../../config';
+import { getUserId } from '../../database/services/alias';
 import { getChannelIds } from '../../database/services/server';
 import { Event } from '../../types';
 import { getEmoji, propagate } from '../../utils';
@@ -33,10 +34,13 @@ class MemberAchievement implements Event {
     const channelIds = await getChannelIds(groupId);
     const url = `https://wiseoldman.net/players/${id}/achievements`;
 
+    const userId = await getUserId(displayName);
+    const discordTag = userId ? `(<@${userId}>)` : '';
+
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
       .setTitle(`${getEmoji('tada')} New member achievement!`)
-      .setDescription(`${displayName} - ${getEmoji(metric)} ${type}`)
+      .setDescription(`${displayName} ${discordTag} - ${getEmoji(metric)} ${type}`)
       .setURL(url);
 
     propagate(message, channelIds);

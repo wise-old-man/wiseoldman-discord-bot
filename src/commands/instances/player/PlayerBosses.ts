@@ -4,6 +4,7 @@ import { fetchPlayer } from '../../../api/modules/players';
 import { toResults } from '../../../api/modules/snapshots';
 import { BossResult, MetricType, Player } from '../../../api/types';
 import config from '../../../config';
+import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, ParsedMessage, Renderable } from '../../../types';
 import { toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
@@ -32,11 +33,17 @@ class PlayerBosses implements Command, Renderable {
   }
 
   async execute(message: ParsedMessage) {
-    // Grab the username from the command's arguments
-    const username = this.getUsername(message.args);
+    // Grab the username from the command's arguments or database alias
+    const username = await this.getUsername(message);
 
     // Grab (if it exists) the command variant from the command's arguments (--exp / --ranks)
     const variant = this.getRenderVariant(message.args);
+
+    if (!username) {
+      throw new CommandError(
+        'This commands requires a username. Set a default by using the `setrsn` command.'
+      );
+    }
 
     try {
       const player = await fetchPlayer(username);
@@ -121,8 +128,16 @@ class PlayerBosses implements Command, Renderable {
     return { attachment, fileName };
   }
 
-  getUsername(args: string[]): string {
-    return args.filter(a => !a.startsWith('--')).join(' ');
+  async getUsername(message: ParsedMessage): Promise<string | undefined | null> {
+    const explicitUsername = message.args.filter(a => !a.startsWith('--')).join(' ');
+
+    if (explicitUsername) {
+      return explicitUsername;
+    }
+
+    const inferedUsername = await getUsername(message.sourceMessage.author.id);
+
+    return inferedUsername;
   }
 
   getRenderVariant(args: string[]): RenderVariant {

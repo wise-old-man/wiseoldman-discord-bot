@@ -14,6 +14,7 @@ import PlayerAchievements from './player/PlayerAchievements';
 import PlayerActivitiesCommand from './player/PlayerActivities';
 import PlayerBossesCommand from './player/PlayerBosses';
 import PlayerGainedCommand from './player/PlayerGained';
+import PlayerSetUsername from './player/PlayerSetUsername';
 import PlayerStatsCommand from './player/PlayerStats';
 import PlayerUpdateCommand from './player/UpdatePlayer';
 
@@ -28,6 +29,7 @@ const commands: Command[] = [
   PlayerAchievements,
   PlayerUpdateCommand,
   PlayerGainedCommand,
+  PlayerSetUsername,
 
   // group commands
   GroupDetailsCommand,

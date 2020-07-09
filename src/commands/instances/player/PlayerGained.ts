@@ -3,6 +3,7 @@ import { map } from 'lodash';
 import { fetchPlayer, fetchPlayerGains } from '../../../api/modules/players';
 import { PlayerGains } from '../../../api/types';
 import config from '../../../config';
+import { getUsername } from '../../../database/services/alias';
 import { Command, ParsedMessage } from '../../../types';
 import { getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
@@ -21,11 +22,17 @@ class PlayerGained implements Command {
   }
 
   async execute(message: ParsedMessage) {
-    // Grab the username from the command's arguments
-    const username = this.getUsername(message.args);
+    // Grab the username from the command's arguments or database alias
+    const username = await this.getUsername(message);
 
     // Grab
     const period = this.getPeriodArg(message.args);
+
+    if (!username) {
+      throw new CommandError(
+        'This commands requires a username. Set a default by using the `setrsn` command.'
+      );
+    }
 
     try {
       const player = await fetchPlayer(username);
@@ -91,8 +98,16 @@ class PlayerGained implements Command {
       .join('\n');
   }
 
-  getUsername(args: string[]): string {
-    return args.filter(a => !a.startsWith('--')).join(' ');
+  async getUsername(message: ParsedMessage): Promise<string | undefined | null> {
+    const explicitUsername = message.args.filter(a => !a.startsWith('--')).join(' ');
+
+    if (explicitUsername) {
+      return explicitUsername;
+    }
+
+    const inferedUsername = await getUsername(message.sourceMessage.author.id);
+
+    return inferedUsername;
   }
 
   getPeriodArg(args: string[]): string {
