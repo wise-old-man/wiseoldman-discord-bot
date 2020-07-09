@@ -3,21 +3,23 @@ import { Alias } from '../';
 /**
  * Find the "alias" username for a given discord userId.
  */
-async function getUsername(userId: string | undefined): Promise<Alias | null> {
+async function getUsername(userId: string | undefined): Promise<string | undefined | null> {
   if (!userId) return null;
 
   const alias = await Alias.findOne({ where: { userId } });
-  return alias;
+
+  return alias?.username;
 }
 
 /**
  * Find the "alias" userId for a given username.
  */
-async function getUserId(username: string | undefined): Promise<Alias | null> {
+async function getUserId(username: string | undefined): Promise<string | undefined | null> {
   if (!username) return null;
 
   const alias = await Alias.findOne({ where: { username } });
-  return alias;
+
+  return alias?.userId;
 }
 
 /**

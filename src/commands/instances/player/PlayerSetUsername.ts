@@ -22,8 +22,6 @@ class PlayerSetUsername implements Command {
     const username = message.args.join(' ');
     const userId = message.sourceMessage.author.id;
 
-    console.log('entrou', userId, username);
-
     try {
       const player = await fetchPlayer(username);
 
