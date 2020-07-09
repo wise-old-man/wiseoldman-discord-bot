@@ -1,5 +1,8 @@
 import { Server } from '../';
 
+/**
+ * Find the Server object corresponding to a given guildId.
+ */
 async function getServer(guildId: string | undefined): Promise<Server | null> {
   if (!guildId) return null;
 
@@ -7,11 +10,18 @@ async function getServer(guildId: string | undefined): Promise<Server | null> {
   return match;
 }
 
+/**
+ * Find all the Server objects that are tracking a given groupId.
+ */
 async function getServers(groupId: number): Promise<Server[]> {
   const results = await Server.findAll({ where: { groupId } });
   return results;
 }
 
+/**
+ * Find all "announcement channels" for the Servers
+ * that are tracking a given groupId.
+ */
 async function getChannelIds(groupId: number): Promise<string[] | undefined> {
   const servers = await getServers(groupId);
 
@@ -20,6 +30,9 @@ async function getChannelIds(groupId: number): Promise<string[] | undefined> {
   return servers.map(s => s.botChannelId).filter(s => s);
 }
 
+/**
+ * Update the "tracked" group for a given guild.
+ */
 async function updateGroup(guildId: string, groupId: number): Promise<Server> {
   const server = await getServer(guildId);
 
@@ -30,6 +43,9 @@ async function updateGroup(guildId: string, groupId: number): Promise<Server> {
   return await server.setGroup(groupId);
 }
 
+/**
+ * Update the command prefix for a given guild.
+ */
 async function updatePrefix(guildId: string, prefix: string): Promise<Server> {
   const server = await getServer(guildId);
 
@@ -40,6 +56,9 @@ async function updatePrefix(guildId: string, prefix: string): Promise<Server> {
   return await server.setPrefix(prefix);
 }
 
+/**
+ * Update the bot's announcement channel for a given guild.
+ */
 async function updateAnnouncementChannel(guildId: string, channelId: string): Promise<Server> {
   const server = await getServer(guildId);
 
