@@ -3,7 +3,7 @@ import { fetchGroupDetails, fetchGroupHiscores } from '../../../api/modules/grou
 import { GroupHiscoresEntry } from '../../../api/types';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
-import { getEmoji, getMetricName, isBoss, isSkill, toKMB } from '../../../utils';
+import { getAbbreviation, getEmoji, getMetricName, isBoss, isSkill, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class GroupHiscores implements Command {
@@ -24,7 +24,7 @@ class GroupHiscores implements Command {
 
   async execute(message: ParsedMessage) {
     const groupId = message.originServer?.groupId || -1;
-    const metric = message.args.length >= 2 ? message.args[1] : 'overall';
+    const metric = this.getMetricArg(message.args);
 
     try {
       const group = await fetchGroupDetails(groupId);
@@ -59,6 +59,10 @@ class GroupHiscores implements Command {
     }
 
     return `${toKMB(result.score || 0)}`;
+  }
+
+  getMetricArg(args: string[]): string {
+    return args.length >= 2 ? getAbbreviation(args[1]) : 'overall';
   }
 }
 
