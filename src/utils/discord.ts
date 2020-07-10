@@ -1,6 +1,7 @@
 import { Guild, GuildChannel, GuildMember, StringResolvable, TextChannel } from 'discord.js';
 import bot from '../bot';
 import { Emoji } from '../types';
+import { getAbbreviation } from './metrics';
 
 export const MAX_FIELD_SIZE = 25;
 
@@ -13,7 +14,7 @@ export function canManageMessages(member: GuildMember | null | undefined): boole
 }
 
 export function getEmoji(metric: string): string {
-  const emojiKey = metric.startsWith('clue') ? 'clue' : metric;
+  const emojiKey = metric.startsWith('clue') ? 'clue' : getAbbreviation(metric);
   return (<any>Emoji)[emojiKey] || '❌';
 }
 

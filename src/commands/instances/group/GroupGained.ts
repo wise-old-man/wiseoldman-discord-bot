@@ -3,7 +3,7 @@ import { fetchGroupDetails, fetchGroupGained } from '../../../api/modules/groups
 import { GroupGainedEntry } from '../../../api/types';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
-import { getEmoji, getMetricName, toKMB } from '../../../utils';
+import { getAbbreviation, getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class GroupGained implements Command {
@@ -50,7 +50,7 @@ class GroupGained implements Command {
 
   getMetricArg(args: string[]): string {
     const matches = args.filter(a => !a.startsWith('--') && a !== 'gained').join('');
-    return matches && matches.length > 0 ? matches : 'overall';
+    return matches && matches.length > 0 ? getAbbreviation(matches) : 'overall';
   }
 
   getPeriodArg(args: string[]): string {
