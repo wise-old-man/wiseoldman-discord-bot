@@ -6,8 +6,8 @@ import CompetitionStarted from './CompetitionStarted';
 import CompetitionStarting from './CompetitionStarting';
 import CompetitionTopChanged from './CompetitionTopChanged';
 import MemberAchievements from './MemberAchievements';
-import MemberJoined from './MemberJoined';
-import MemberLeft from './MemberLeft';
+import MembersJoined from './MembersJoined';
+import MembersLeft from './MembersLeft';
 
 const events: Event[] = [
   CompetitionCreated,
@@ -16,8 +16,8 @@ const events: Event[] = [
   CompetitionEnded,
   CompetitionEnding,
   CompetitionTopChanged,
-  MemberJoined,
-  MemberLeft,
+  MembersJoined,
+  MembersLeft,
   MemberAchievements
 ];
 
