@@ -8,7 +8,11 @@ import { ParsedMessage } from '../types';
  * ParsedMessage object, which should be simpler to use.
  */
 export async function parse(message: Message): Promise<ParsedMessage> {
+  // iOS apparently uses a special characters, so we should swap them
+  message.content = message.content.replace(/—/g, '--').replace(/’/g, "'");
+
   const sourceMessage = message;
+
   const originServer = (await getServer(message.guild?.id)) || undefined;
   const prefix = originServer?.prefix || config.defaultPrefix;
 
