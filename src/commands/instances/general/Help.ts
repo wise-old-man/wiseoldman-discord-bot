@@ -30,7 +30,9 @@ class Help implements Command {
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
         .setTitle(`${getEmoji('info')} Need help?`)
-        .setDescription(`You can find the full commands list at https://bot.wiseoldman.net/`)
+        .setDescription(
+          `You can find the full commands list at:\nhttps://bot.wiseoldman.net/.\n\nIf you need any help or would like to follow the development of this project, join our discord at:\nhttps://wiseoldman.net/discord`
+        )
         .addFields([
           {
             name: 'Prefix',
