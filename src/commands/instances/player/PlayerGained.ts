@@ -47,14 +47,23 @@ class PlayerGained implements Command {
 
       const pages = this.buildPages(player.displayName, period, playerGains);
 
-      new Embeds()
-        .setArray(pages)
-        .setChannel(<any>message.sourceMessage.channel)
-        .setPageIndicator(true)
-        .setColor(config.visuals.blue)
-        .setTitle(`${player.displayName} gains (${period})`)
-        .setURL(`https://wiseoldman.net/players/${player.id}/gained/`)
-        .build();
+      if (pages.length === 1) {
+        const response = pages[0]
+          .setColor(config.visuals.blue)
+          .setTitle(`${player.displayName} gains (${period})`)
+          .setURL(`https://wiseoldman.net/players/${player.id}/gained/`);
+
+        message.respond(response);
+      } else {
+        new Embeds()
+          .setArray(pages)
+          .setChannel(<any>message.sourceMessage.channel)
+          .setPageIndicator(true)
+          .setColor(config.visuals.blue)
+          .setTitle(`${player.displayName} gains (${period})`)
+          .setURL(`https://wiseoldman.net/players/${player.id}/gained/`)
+          .build();
+      }
     } catch (e) {
       if (e.message.includes('gains')) {
         throw new CommandError(e.message);
