@@ -1,3 +1,4 @@
+import { Embeds } from 'discord-paginationembed';
 import { MessageEmbed } from 'discord.js';
 import { map } from 'lodash';
 import { fetchPlayer, fetchPlayerGains } from '../../../api/modules/players';
@@ -7,6 +8,8 @@ import { getUsername } from '../../../database/services/alias';
 import { Command, ParsedMessage } from '../../../types';
 import { getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
+
+const GAINS_PER_PAGE = 10;
 
 class PlayerGained implements Command {
   name: string;
@@ -25,7 +28,7 @@ class PlayerGained implements Command {
     // Grab the username from the command's arguments or database alias
     const username = await this.getUsername(message);
 
-    // Grab
+    // Grab the period from the command's arguments
     const period = this.getPeriodArg(message.args);
 
     if (!username) {
@@ -36,25 +39,31 @@ class PlayerGained implements Command {
 
     try {
       const player = await fetchPlayer(username);
-      const gained = await fetchPlayerGains(username, period);
+      const playerGains = await fetchPlayerGains(username, period);
 
-      if (!gained || !gained.startsAt || !gained.endsAt) {
+      if (!playerGains || !playerGains.startsAt || !playerGains.endsAt) {
         throw new Error(`${player.displayName} has no ${period} gains.`);
       }
 
-      const gainsList = this.buildList(period, gained);
+      const pages = this.buildPages(player.displayName, period, playerGains);
 
-      if (gainsList.length === 0) {
-        throw new Error(`${player.displayName} has no ${period} gains.`);
+      if (pages.length === 1) {
+        const response = pages[0]
+          .setColor(config.visuals.blue)
+          .setTitle(`${player.displayName} gains (${period})`)
+          .setURL(`https://wiseoldman.net/players/${player.id}/gained/`);
+
+        message.respond(response);
+      } else {
+        new Embeds()
+          .setArray(pages)
+          .setChannel(<any>message.sourceMessage.channel)
+          .setPageIndicator(true)
+          .setColor(config.visuals.blue)
+          .setTitle(`${player.displayName} gains (${period})`)
+          .setURL(`https://wiseoldman.net/players/${player.id}/gained/`)
+          .build();
       }
-
-      const response = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setTitle(`${player.displayName} gains (${period})`)
-        .setDescription(gainsList)
-        .setURL(`https://wiseoldman.net/players/${player.id}/gained/`);
-
-      message.respond(response);
     } catch (e) {
       if (e.message.includes('gains')) {
         throw new CommandError(e.message);
@@ -71,7 +80,25 @@ class PlayerGained implements Command {
     }
   }
 
-  buildList(period: string, gained: PlayerGains) {
+  buildPages(displayName: string, period: string, gained: PlayerGains) {
+    const gainsList = this.buildGainsList(period, gained);
+    const pageCount = Math.ceil(gainsList.length / GAINS_PER_PAGE);
+
+    if (pageCount === 0) {
+      throw new Error(`${displayName} has no ${period} gains.`);
+    }
+
+    const pages = [];
+
+    for (let i = 0; i < pageCount; i++) {
+      const pageGains = gainsList.slice(i * GAINS_PER_PAGE, i * GAINS_PER_PAGE + GAINS_PER_PAGE);
+      pages.push(new MessageEmbed().setDescription(pageGains));
+    }
+
+    return pages;
+  }
+
+  buildGainsList(period: string, gained: PlayerGains) {
     // Ignore any skills/bosses/activities with "0" gained
     const valid = map(gained.data, (val, key) => {
       if (val.experience && val.experience.gained > 0) {
@@ -93,9 +120,10 @@ class PlayerGained implements Command {
       throw new Error(`No gains found for ${period}.`);
     }
 
-    return valid
-      .map(g => (!g ? '' : `${getEmoji(g.metric)} ${getMetricName(g.metric)} - **${toKMB(g.gained)}**`))
-      .join('\n');
+    return valid.map(g => {
+      if (!g) return '';
+      return `${getEmoji(g.metric)} ${getMetricName(g.metric)} - **${toKMB(g.gained)}**`;
+    });
   }
 
   async getUsername(message: ParsedMessage): Promise<string | undefined | null> {
