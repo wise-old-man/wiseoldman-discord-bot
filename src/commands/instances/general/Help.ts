@@ -5,6 +5,14 @@ import { Command, ParsedMessage } from '../../../types';
 import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
+const BOT_URL = 'https://bot.wiseoldman.net';
+const MAIN_URL = 'https://wiseoldman.net/discord';
+
+const LINE_COMMANDS = `You can find the full commands list at:\n${BOT_URL}`;
+const LINE_SUPPORT = `If you need any help or would like to follow the development of this project, join our discord at:\n${MAIN_URL}`;
+const LINE_PERMS =
+  "If some commands don't seem to be responding, it might be a permission related issue. Try to kick the bot and invite it back again. (link above)";
+
 class Help implements Command {
   name: string;
   template: string;
@@ -30,9 +38,7 @@ class Help implements Command {
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
         .setTitle(`${getEmoji('info')} Need help?`)
-        .setDescription(
-          `You can find the full commands list at:\nhttps://bot.wiseoldman.net/.\n\nIf you need any help or would like to follow the development of this project, join our discord at:\nhttps://wiseoldman.net/discord`
-        )
+        .setDescription(`${LINE_COMMANDS}\n\n${LINE_SUPPORT}\n\n${getEmoji('warning')}${LINE_PERMS}`)
         .addFields([
           {
             name: 'Prefix',
