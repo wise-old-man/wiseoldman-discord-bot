@@ -1,6 +1,5 @@
 import { Embeds } from 'discord-paginationembed';
 import { MessageEmbed } from 'discord.js';
-import { map } from 'lodash';
 import { fetchPlayer, fetchPlayerGains } from '../../../api/modules/players';
 import { PlayerGains } from '../../../api/types';
 import config from '../../../config';
@@ -100,21 +99,25 @@ class PlayerGained implements Command {
 
   buildGainsList(period: string, gained: PlayerGains) {
     // Ignore any skills/bosses/activities with "0" gained
-    const valid = map(gained.data, (val, key) => {
-      if (val.experience && val.experience.gained > 0) {
-        return { metric: key, gained: val.experience.gained };
-      }
+    const skillGains = 
+    Array.from(Object.entries(gained.data))
+      .filter(([, e]) => e.experience && e.experience.gained > 0)
+      .map(([key, val]) => ({metric: key, gained: val.experience?.gained}) as {metric: string, gained: number})
+      .sort((a, b) => b.gained - a.gained);
 
-      if (val.kills && val.kills.gained > 0) {
-        return { metric: key, gained: val.kills.gained };
-      }
+    const bossGains = 
+    Array.from(Object.entries(gained.data))
+      .filter(([, e]) => e.kills && e.kills.gained > 0)
+      .map(([key, val]) => ({metric: key, gained: val.kills?.gained}) as {metric: string, gained: number})
+      .sort((a, b) => b.gained - a.gained);
 
-      if (val.score && val.score.gained > 0) {
-        return { metric: key, gained: val.score.gained };
-      }
-
-      return null;
-    }).filter(v => v);
+    const activityGains = 
+    Array.from(Object.entries(gained.data))
+      .filter(([, e]) => e.score && e.score.gained > 0)
+      .map(([key, val]) => ({metric: key, gained: val.score?.gained}) as {metric: string, gained: number})
+      .sort((a, b) => b.gained - a.gained);
+      
+    const valid = skillGains.concat(bossGains, activityGains);
 
     if (!valid) {
       throw new Error(`No gains found for ${period}.`);
