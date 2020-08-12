@@ -56,6 +56,8 @@ export async function onMessageReceived(message: Message): Promise<void> {
     }
 
     try {
+      // Display bot is typing... indicator.
+      message.channel.startTyping();
       // All conditions are met, execute the command
       await c.execute(parsed);
     } catch (e) {
@@ -63,6 +65,8 @@ export async function onMessageReceived(message: Message): Promise<void> {
       if (e instanceof CommandError) {
         return onError(message, e.message, e.tip);
       }
+    } finally {
+      message.channel.stopTyping();
     }
   });
 }
