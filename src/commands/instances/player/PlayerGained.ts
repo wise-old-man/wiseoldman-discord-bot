@@ -1,6 +1,5 @@
 import { Embeds } from 'discord-paginationembed';
 import { MessageEmbed } from 'discord.js';
-import { map } from 'lodash';
 import { fetchPlayer, fetchPlayerGains } from '../../../api/modules/players';
 import { PlayerGains } from '../../../api/types';
 import config from '../../../config';
@@ -99,30 +98,31 @@ class PlayerGained implements Command {
   }
 
   buildGainsList(period: string, gained: PlayerGains) {
-    // Ignore any skills/bosses/activities with "0" gained
-    const valid = map(gained.data, (val, key) => {
-      if (val.experience && val.experience.gained > 0) {
-        return { metric: key, gained: val.experience.gained };
-      }
+    const gainedArray = Array.from(Object.entries(gained.data));
 
-      if (val.kills && val.kills.gained > 0) {
-        return { metric: key, gained: val.kills.gained };
-      }
+    const skillGains = gainedArray
+      .filter(([, e]) => e.experience && e.experience.gained > 0)
+      .map(([key, val]) => ({ metric: key, gained: val.experience?.gained || 0 }))
+      .sort((a: any, b: any) => b.gained - a.gained);
 
-      if (val.score && val.score.gained > 0) {
-        return { metric: key, gained: val.score.gained };
-      }
+    const bossGains = gainedArray
+      .filter(([, e]) => e.kills && e.kills.gained > 0)
+      .map(([key, val]) => ({ metric: key, gained: val.kills?.gained || 0 }))
+      .sort((a: any, b: any) => b.gained - a.gained);
 
-      return null;
-    }).filter(v => v);
+    const activityGains = gainedArray
+      .filter(([, e]) => e.score && e.score.gained > 0)
+      .map(([key, val]) => ({ metric: key, gained: val.score?.gained || 0 }))
+      .sort((a: any, b: any) => b.gained - a.gained);
 
-    if (!valid) {
+    const valid = [...skillGains, ...bossGains, ...activityGains];
+
+    if (!valid || valid.length === 0) {
       throw new Error(`No gains found for ${period}.`);
     }
 
-    return valid.map(g => {
-      if (!g) return '';
-      return `${getEmoji(g.metric)} ${getMetricName(g.metric)} - **${toKMB(g.gained)}**`;
+    return valid.map(({ metric, gained }) => {
+      return `${getEmoji(metric)} ${getMetricName(metric)} - **${toKMB(gained)}**`;
     });
   }
 
