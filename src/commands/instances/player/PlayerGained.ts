@@ -98,34 +98,31 @@ class PlayerGained implements Command {
   }
 
   buildGainsList(period: string, gained: PlayerGains) {
-    // Ignore any skills/bosses/activities with "0" gained
-    const skillGains = 
-    Array.from(Object.entries(gained.data))
+    const gainedArray = Array.from(Object.entries(gained.data));
+
+    const skillGains = gainedArray
       .filter(([, e]) => e.experience && e.experience.gained > 0)
-      .map(([key, val]) => ({metric: key, gained: val.experience?.gained}) as {metric: string, gained: number})
-      .sort((a, b) => b.gained - a.gained);
+      .map(([key, val]) => ({ metric: key, gained: val.experience?.gained || 0 }))
+      .sort((a: any, b: any) => b.gained - a.gained);
 
-    const bossGains = 
-    Array.from(Object.entries(gained.data))
+    const bossGains = gainedArray
       .filter(([, e]) => e.kills && e.kills.gained > 0)
-      .map(([key, val]) => ({metric: key, gained: val.kills?.gained}) as {metric: string, gained: number})
-      .sort((a, b) => b.gained - a.gained);
+      .map(([key, val]) => ({ metric: key, gained: val.kills?.gained || 0 }))
+      .sort((a: any, b: any) => b.gained - a.gained);
 
-    const activityGains = 
-    Array.from(Object.entries(gained.data))
+    const activityGains = gainedArray
       .filter(([, e]) => e.score && e.score.gained > 0)
-      .map(([key, val]) => ({metric: key, gained: val.score?.gained}) as {metric: string, gained: number})
-      .sort((a, b) => b.gained - a.gained);
-      
-    const valid = skillGains.concat(bossGains, activityGains);
+      .map(([key, val]) => ({ metric: key, gained: val.score?.gained || 0 }))
+      .sort((a: any, b: any) => b.gained - a.gained);
 
-    if (!valid) {
+    const valid = [...skillGains, ...bossGains, ...activityGains];
+
+    if (!valid || valid.length === 0) {
       throw new Error(`No gains found for ${period}.`);
     }
 
-    return valid.map(g => {
-      if (!g) return '';
-      return `${getEmoji(g.metric)} ${getMetricName(g.metric)} - **${toKMB(g.gained)}**`;
+    return valid.map(({ metric, gained }) => {
+      return `${getEmoji(metric)} ${getMetricName(metric)} - **${toKMB(gained)}**`;
     });
   }
 
