@@ -20,7 +20,7 @@ class PlayerGained implements Command {
   }
 
   activated(message: ParsedMessage) {
-    return message.command === 'gained' && message.args.length > 0;
+    return message.command === 'gained';
   }
 
   async execute(message: ParsedMessage) {
