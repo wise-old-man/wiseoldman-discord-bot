@@ -3,6 +3,7 @@ export interface Player {
   username: string;
   displayName: string;
   type: string;
+  build: string;
   combatLevel: number;
   registeredAt: Date;
   updatedAt: Date;
@@ -64,15 +65,10 @@ export interface GroupHiscoresEntry {
 }
 
 export interface GroupGainedEntry {
-  playerId: number;
-  username: string;
-  displayName: string;
-  type: string;
   startDate: Date;
   endDate: Date;
-  endValue: number;
-  startValue: number;
   gained: number;
+  player: Player;
 }
 
 export interface GroupRecordEntry {
