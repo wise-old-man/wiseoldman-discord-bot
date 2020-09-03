@@ -45,7 +45,7 @@ class GroupGained implements Command {
   }
 
   buildList(gained: GroupGainedEntry[]) {
-    return gained.map((g, i) => `${i + 1}. **${g.displayName}** - ${toKMB(g.gained)}`).join('\n');
+    return gained.map((g, i) => `${i + 1}. **${g.player.displayName}** - ${toKMB(g.gained)}`).join('\n');
   }
 
   getMetricArg(args: string[]): string {
