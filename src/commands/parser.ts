@@ -26,7 +26,7 @@ export async function parse(message: Message): Promise<ParsedMessage> {
     throw new Error('Empty command.');
   }
 
-  const command = split[0];
+  const command = split[0].toLowerCase();
   const args = split.slice(1, split.length);
 
   const respond = (response: StringResolvable | StringResolvable[]) => {
