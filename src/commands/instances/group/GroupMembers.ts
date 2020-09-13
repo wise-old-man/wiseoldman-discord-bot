@@ -60,7 +60,7 @@ class GroupMembers implements Command {
   buildList(members: Player[], page: number) {
     return members
       .slice(page * RESULTS_PER_PAGE, page * RESULTS_PER_PAGE + RESULTS_PER_PAGE)
-      .map((g, i) => `${i + 1}. **${g.displayName}** ${g.role === 'leader' ? getEmoji('crown') : ''} `)
+      .map((g, i) => `${page * RESULTS_PER_PAGE + i + 1}. **${g.displayName}** ${g.role === 'leader' ? getEmoji('crown') : ''} `)
       .join('\n');
   }
 }
