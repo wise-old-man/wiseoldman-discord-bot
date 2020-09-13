@@ -55,7 +55,7 @@ class GroupCompetition implements Command {
     const status = getCompetitionStatus(competition);
 
     if (status === 'upcoming') {
-      return new Date(competition.endsAt);
+      return new Date(competition.startsAt);
     } else {
       return new Date(competition.endsAt);
     }
