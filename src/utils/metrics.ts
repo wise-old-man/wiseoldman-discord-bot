@@ -190,7 +190,7 @@ export function getAbbreviation(abbr: string): string {
     case 'saradomin':
     case 'zilyana':
     case 'zily':
-      return 'Commander commander_zilyana';
+      return 'commander_zilyana';
 
     case 'corp':
       return 'corporeal_beast';
