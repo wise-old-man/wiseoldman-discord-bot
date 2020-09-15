@@ -80,7 +80,7 @@ class PlayerGained implements Command {
   }
 
   buildPages(displayName: string, period: string, gained: PlayerGains) {
-    const gainsList = this.buildGainsList(period, gained);
+    const gainsList = this.buildGainsList(displayName, period, gained);
     const pageCount = Math.ceil(gainsList.length / GAINS_PER_PAGE);
 
     if (pageCount === 0) {
@@ -97,7 +97,7 @@ class PlayerGained implements Command {
     return pages;
   }
 
-  buildGainsList(period: string, gained: PlayerGains) {
+  buildGainsList(displayName: string, period: string, gained: PlayerGains) {
     const gainedArray = Array.from(Object.entries(gained.data));
 
     const skillGains = gainedArray
@@ -118,7 +118,7 @@ class PlayerGained implements Command {
     const valid = [...skillGains, ...bossGains, ...activityGains];
 
     if (!valid || valid.length === 0) {
-      throw new Error(`No gains found for ${period}.`);
+      throw new Error(`${displayName} has no ${period} gains.`);
     }
 
     return valid.map(({ metric, gained }) => {
