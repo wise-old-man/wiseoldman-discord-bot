@@ -50,13 +50,15 @@ export interface Group {
 }
 
 export interface GroupHiscoresEntry {
-  id: number;
-  username: string;
-  displayName: string;
-  type: string;
-  lastImportedAt?: Date;
-  registeredAt: Date;
-  updatedAt: Date;
+  player: {
+    id: number;
+    username: string;
+    displayName: string;
+    type: string;
+    lastImportedAt?: Date;
+    registeredAt: Date;
+    updatedAt: Date;
+  };
   rank: number;
   experience?: number;
   kills?: number;
@@ -72,10 +74,12 @@ export interface GroupGainedEntry {
 }
 
 export interface GroupRecordEntry {
+  player: {
+    username: string;
+    displayName: string;
+    type: string;
+  };
   playerId: number;
-  username: string;
-  displayName: string;
-  type: string;
   value: number;
   updatedAt: Date;
 }

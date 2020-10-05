@@ -51,10 +51,12 @@ async function fetchGroupCompetitions(id: number): Promise<Competition[]> {
  */
 async function fetchGroupHiscores(id: number, metric: string): Promise<GroupHiscoresEntry[]> {
   const URL = `${config.baseAPIUrl}/groups/${id}/hiscores`;
-  const params = { metric: metric.toLowerCase(), limit: 21 };
+  const params = { metric: metric.toLowerCase(), limit: 20 };
   const { data } = await axios.get(URL, { params });
 
   // Convert date strings into date instances
+  // TODO: this isn't currently doing anything, but it's not affecting
+  // the bot's behaviour, so I'll worry about it later
   convertDates(data, ['lastImportedAt', 'registeredAt', 'updatedAt']);
 
   return data;
@@ -87,10 +89,12 @@ async function fetchGroupRecords(
   metric: string
 ): Promise<GroupRecordEntry[]> {
   const URL = `${config.baseAPIUrl}/groups/${id}/records`;
-  const params = { metric: metric.toLowerCase(), period: period.toLowerCase(), limit: 21 };
+  const params = { metric: metric.toLowerCase(), period: period.toLowerCase(), limit: 20 };
   const { data } = await axios.get(URL, { params });
 
   // Convert date strings into date instances
+  // TODO: this isn't currently doing anything, but it's not affecting
+  // the bot's behaviour, so I'll worry about it later
   convertDates(data, ['updatedAt']);
 
   return data;

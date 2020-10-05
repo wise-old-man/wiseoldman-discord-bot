@@ -45,7 +45,7 @@ class GroupHiscores implements Command {
 
   buildList(metric: string, hiscores: GroupHiscoresEntry[]) {
     return hiscores
-      .map((g, i) => `${i + 1}. **${g.displayName}** - ${this.getValue(metric, g)}`)
+      .map((g, i) => `${i + 1}. **${g.player.displayName}** - ${this.getValue(metric, g)}`)
       .join('\n');
   }
 
