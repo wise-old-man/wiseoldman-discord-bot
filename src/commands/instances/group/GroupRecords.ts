@@ -45,7 +45,7 @@ class GroupRecords implements Command {
   }
 
   buildList(records: GroupRecordEntry[]) {
-    return records.map((g, i) => `${i + 1}. **${g.displayName}** - ${toKMB(g.value)}`).join('\n');
+    return records.map((g, i) => `${i + 1}. **${g.player.displayName}** - ${toKMB(g.value)}`).join('\n');
   }
 
   getMetricArg(args: string[]): string {
