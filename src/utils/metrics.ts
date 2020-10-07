@@ -271,6 +271,45 @@ export function getAbbreviation(abbr: string): string {
     case 'snek':
       return 'zulrah';
 
+    // Minigames and others
+
+    case 'all-clues':
+      return 'clue_scrolls_all';
+
+    case 'beginner-clues':
+    case 'beg-clues':
+    case 'beginners':
+      return 'clue_scrolls_beginner';
+
+    case 'easy-clues':
+    case 'easies':
+      return 'clue_scrolls_easy';
+
+    case 'medium-clues':
+    case 'med-clues':
+    case 'mediums':
+      return 'clue_scrolls_medium';
+
+    case 'hard-clues':
+    case 'hards':
+      return 'clue_scrolls_hard';
+
+    case 'elite-clues':
+    case 'elites':
+      return 'clue_scrolls_elite';
+
+    case 'master-clues':
+    case 'masters':
+      return 'clue_scrolls_master';
+
+    case 'lms':
+      return 'last_man_standing';
+
+    case 'league':
+    case 'lp':
+    case 'lps':
+      return 'league_points';
+
     default:
       return abbr;
   }
