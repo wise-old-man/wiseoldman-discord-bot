@@ -274,6 +274,7 @@ export function getAbbreviation(abbr: string): string {
     // Minigames and others
 
     case 'all-clues':
+    case 'clues':
       return 'clue_scrolls_all';
 
     case 'beginner-clues':
