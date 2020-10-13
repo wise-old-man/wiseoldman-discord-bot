@@ -50,7 +50,7 @@ class PlayerGained implements Command {
         const response = pages[0]
           .setColor(config.visuals.blue)
           .setTitle(`${player.displayName} gains (${period})`)
-          .setURL(`https://wiseoldman.net/players/${player.id}/gained/`);
+          .setURL(`https://wiseoldman.net/players/${player.displayName}/gained/`);
 
         message.respond(response);
       } else {
@@ -60,7 +60,7 @@ class PlayerGained implements Command {
           .setPageIndicator(true)
           .setColor(config.visuals.blue)
           .setTitle(`${player.displayName} gains (${period})`)
-          .setURL(`https://wiseoldman.net/players/${player.id}/gained/`)
+          .setURL(`https://wiseoldman.net/players/${player.displayName}/gained/`)
           .build();
       }
     } catch (e) {

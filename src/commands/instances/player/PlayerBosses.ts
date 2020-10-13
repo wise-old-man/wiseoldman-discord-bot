@@ -47,7 +47,7 @@ class PlayerBosses implements Command, Renderable {
 
     try {
       const player = await fetchPlayer(username);
-      const url = `https://wiseoldman.net/players/${player.id}/overview/bossing`;
+      const url = `https://wiseoldman.net/players/${player.displayName}/overview/bossing`;
 
       const { attachment, fileName } = await this.render({ player, variant });
 

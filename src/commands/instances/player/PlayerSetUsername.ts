@@ -30,7 +30,7 @@ class PlayerSetUsername implements Command {
       const response = new MessageEmbed()
         .setColor(config.visuals.green)
         .setTitle('Player alias updated!')
-        .setURL(`https://wiseoldman.net/players/${player.id}`)
+        .setURL(`https://wiseoldman.net/players/${player.displayName}`)
         .setDescription(`<@${userId}> is now associated with the username \`${player.displayName}\`.`)
         .setFooter(`They can now call any player command without including the username.`);
 

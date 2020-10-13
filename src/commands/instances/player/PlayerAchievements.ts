@@ -43,7 +43,7 @@ class PlayerAchievements implements Command, Renderable {
         throw new Error(`${player.displayName} has no achievements.`);
       }
 
-      const url = `https://wiseoldman.net/players/${player.id}/achievements/`;
+      const url = `https://wiseoldman.net/players/${player.displayName}/achievements/`;
       const { attachment, fileName } = await this.render({ player, achievements });
 
       const embed = new MessageEmbed()

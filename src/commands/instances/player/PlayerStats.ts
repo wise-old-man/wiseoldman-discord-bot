@@ -48,7 +48,7 @@ class PlayerStats implements Command, Renderable {
 
     try {
       const player = await fetchPlayer(username);
-      const url = `https://wiseoldman.net/players/${player.id}`;
+      const url = `https://wiseoldman.net/players/${player.displayName}`;
 
       const { attachment, fileName } = await this.render({ player, variant });
 
