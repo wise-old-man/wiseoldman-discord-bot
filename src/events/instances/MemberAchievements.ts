@@ -45,7 +45,7 @@ class MemberAchievements implements Event {
     const { player, achievements } = data;
     const { displayName } = player;
 
-    const url = `https://wiseoldman.net/players/${player.id}/achievements`;
+    const url = `https://wiseoldman.net/players/${player.displayName}/achievements`;
     const title = `New member ${achievements.length > 1 ? 'achievements' : 'achievement'}`;
 
     const content = achievements

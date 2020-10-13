@@ -37,7 +37,7 @@ class MembersJoined implements Event {
 
     if (players.length === 1) {
       const player = players[0];
-      const url = `https://wiseoldman.net/players/${player.id}`;
+      const url = `https://wiseoldman.net/players/${player.displayName}`;
       const title = `${getEmoji('tada')} New group member: ${player.displayName}`;
 
       return new MessageEmbed().setColor(config.visuals.blue).setTitle(title).setURL(url);
