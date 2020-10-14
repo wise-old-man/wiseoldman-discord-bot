@@ -6,7 +6,7 @@ import { MetricType, Player, SkillResult } from '../../../api/types';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, ParsedMessage, Renderable } from '../../../types';
-import { SKILLS, toKMB } from '../../../utils';
+import { encodeURL, SKILLS, toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 
@@ -48,13 +48,12 @@ class PlayerStats implements Command, Renderable {
 
     try {
       const player = await fetchPlayer(username);
-      const url = `https://wiseoldman.net/players/${player.displayName}`;
 
       const { attachment, fileName } = await this.render({ player, variant });
 
       const embed = new MessageEmbed()
         .setColor(config.visuals.blue)
-        .setURL(url)
+        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
         .setTitle(`${player.displayName} - ${variant}`)
         .setImage(`attachment://${fileName}`)
         .setFooter('Last updated')

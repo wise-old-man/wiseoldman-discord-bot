@@ -2,7 +2,7 @@ import { MessageEmbed } from 'discord.js';
 import config from '../../config';
 import { getChannelIds } from '../../database/services/server';
 import { Event } from '../../types';
-import { getEmoji, propagate } from '../../utils';
+import { encodeURL, getEmoji, propagate } from '../../utils';
 
 interface Player {
   id: number;
@@ -37,10 +37,12 @@ class MembersJoined implements Event {
 
     if (players.length === 1) {
       const player = players[0];
-      const url = `https://wiseoldman.net/players/${player.displayName}`;
       const title = `${getEmoji('tada')} New group member: ${player.displayName}`;
 
-      return new MessageEmbed().setColor(config.visuals.blue).setTitle(title).setURL(url);
+      return new MessageEmbed()
+        .setColor(config.visuals.blue)
+        .setTitle(title)
+        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
     }
 
     const url = `https://wiseoldman.net/groups/${groupId}/members`;

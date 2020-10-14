@@ -4,7 +4,7 @@ import { fetchPlayer, fetchPlayerAchievements } from '../../../api/modules/playe
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, ParsedMessage, Renderable } from '../../../types';
-import { formatDate } from '../../../utils';
+import { encodeURL, formatDate } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 
@@ -43,12 +43,11 @@ class PlayerAchievements implements Command, Renderable {
         throw new Error(`${player.displayName} has no achievements.`);
       }
 
-      const url = `https://wiseoldman.net/players/${player.displayName}/achievements/`;
       const { attachment, fileName } = await this.render({ player, achievements });
 
       const embed = new MessageEmbed()
         .setColor(config.visuals.blue)
-        .setURL(url)
+        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements/`))
         .setTitle(`${player.displayName} - Recent achievements`)
         .setImage(`attachment://${fileName}`)
         .setFooter('Last updated')

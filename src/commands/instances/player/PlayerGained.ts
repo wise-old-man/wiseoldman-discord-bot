@@ -5,7 +5,7 @@ import { PlayerGains } from '../../../api/types';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { Command, ParsedMessage } from '../../../types';
-import { getEmoji, getMetricName, toKMB } from '../../../utils';
+import { encodeURL, getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
 const GAINS_PER_PAGE = 10;
@@ -50,7 +50,7 @@ class PlayerGained implements Command {
         const response = pages[0]
           .setColor(config.visuals.blue)
           .setTitle(`${player.displayName} gains (${period})`)
-          .setURL(`https://wiseoldman.net/players/${player.displayName}/gained/`);
+          .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`));
 
         message.respond(response);
       } else {
@@ -60,7 +60,7 @@ class PlayerGained implements Command {
           .setPageIndicator(true)
           .setColor(config.visuals.blue)
           .setTitle(`${player.displayName} gains (${period})`)
-          .setURL(`https://wiseoldman.net/players/${player.displayName}/gained/`)
+          .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
           .build();
       }
     } catch (e) {
