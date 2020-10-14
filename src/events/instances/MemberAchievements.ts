@@ -3,7 +3,7 @@ import config from '../../config';
 import { getUserId } from '../../database/services/alias';
 import { getChannelIds } from '../../database/services/server';
 import { Event } from '../../types';
-import { getEmoji, propagate } from '../../utils';
+import { encodeURL, getEmoji, propagate } from '../../utils';
 
 interface PlayerAchievement {
   type: string;
@@ -45,7 +45,6 @@ class MemberAchievements implements Event {
     const { player, achievements } = data;
     const { displayName } = player;
 
-    const url = `https://wiseoldman.net/players/${player.displayName}/achievements`;
     const title = `New member ${achievements.length > 1 ? 'achievements' : 'achievement'}`;
 
     const content = achievements
@@ -56,7 +55,7 @@ class MemberAchievements implements Event {
       .setColor(config.visuals.blue)
       .setTitle(`${getEmoji('tada')} ${title}`)
       .setDescription(content)
-      .setURL(url);
+      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements`));
   }
 }
 

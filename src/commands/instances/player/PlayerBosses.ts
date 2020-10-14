@@ -6,7 +6,7 @@ import { BossResult, MetricType, Player } from '../../../api/types';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, ParsedMessage, Renderable } from '../../../types';
-import { toKMB } from '../../../utils';
+import { encodeURL, toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 
@@ -47,13 +47,12 @@ class PlayerBosses implements Command, Renderable {
 
     try {
       const player = await fetchPlayer(username);
-      const url = `https://wiseoldman.net/players/${player.displayName}/overview/bossing`;
 
       const { attachment, fileName } = await this.render({ player, variant });
 
       const embed = new MessageEmbed()
         .setColor(config.visuals.blue)
-        .setURL(url)
+        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/overview/bossing`))
         .setTitle(`${player.displayName} - Boss ${variant}`)
         .setImage(`attachment://${fileName}`)
         .setFooter('Last updated')

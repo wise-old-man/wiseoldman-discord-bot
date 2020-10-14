@@ -3,6 +3,7 @@ import { fetchPlayer } from '../../../api/modules/players';
 import config from '../../../config';
 import { updateUsername } from '../../../database/services/alias';
 import { Command, ParsedMessage } from '../../../types';
+import { encodeURL } from '../../../utils/strings';
 import CommandError from '../../CommandError';
 
 class PlayerSetUsername implements Command {
@@ -30,7 +31,7 @@ class PlayerSetUsername implements Command {
       const response = new MessageEmbed()
         .setColor(config.visuals.green)
         .setTitle('Player alias updated!')
-        .setURL(`https://wiseoldman.net/players/${player.displayName}`)
+        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
         .setDescription(`<@${userId}> is now associated with the username \`${player.displayName}\`.`)
         .setFooter(`They can now call any player command without including the username.`);
 

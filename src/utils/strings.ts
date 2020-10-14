@@ -20,3 +20,7 @@ export function toKMB(number: number, decimalPrecision = 2): string {
     return round(number);
   }
 }
+
+export function encodeURL(url: string): string {
+  return encodeURI(url.replace(/ /g, '_'));
+}

@@ -6,7 +6,7 @@ import { ActivityResult, MetricType, Player } from '../../../api/types';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, ParsedMessage, Renderable } from '../../../types';
-import { ACTIVITIES, toKMB } from '../../../utils';
+import { ACTIVITIES, encodeURL, toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 
@@ -47,13 +47,12 @@ class PlayerActivities implements Command, Renderable {
 
     try {
       const player = await fetchPlayer(username);
-      const url = `https://wiseoldman.net/players/${player.displayName}/overview/activities`;
 
       const { attachment, fileName } = await this.render({ player, variant });
 
       const embed = new MessageEmbed()
         .setColor(config.visuals.blue)
-        .setURL(url)
+        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/overview/activities`))
         .setTitle(`${player.displayName} - Activity ${variant}`)
         .setImage(`attachment://${fileName}`)
         .setFooter('Last updated')
