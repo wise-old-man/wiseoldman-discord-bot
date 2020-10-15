@@ -55,7 +55,7 @@ class PlayerStats implements Command, Renderable {
       const embed = new MessageEmbed()
         .setColor(config.visuals.blue)
         .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
-        .setTitle(`${player.displayName} - ${variant}`)
+        .setTitle(`${player.displayName} (Combat ${player.combatLevel}) - ${variant}`)
         .setImage(`attachment://${fileName}`)
         .setFooter('Last updated')
         .setTimestamp(player.updatedAt)
