@@ -5,20 +5,20 @@
  * Decimal precision of 2 = 356.69
  */
 export function toKMB(number: number, decimalPrecision = 2): string {
-  function round(number: number): string {
-    const precision = Math.pow(10, decimalPrecision);
-    return (Math.round(number * precision) / precision).toString();
-  }
-
   if (number > 999999999 || number < -999999999) {
-    return round(number / 1000000000) + 'b';
+    return round(number / 1000000000, decimalPrecision) + 'b';
   } else if (number > 999999 || number < -999999) {
-    return round(number / 1000000) + 'm';
+    return round(number / 1000000, decimalPrecision) + 'm';
   } else if (number > 999 || number < -999) {
-    return round(number / 1000) + 'k';
+    return round(number / 1000, decimalPrecision) + 'k';
   } else {
-    return round(number);
+    return round(number, decimalPrecision);
   }
+}
+
+export function round(number: number, cases: number): string {
+  const precision = Math.pow(10, cases);
+  return (Math.round(number * precision) / precision).toString();
 }
 
 export function encodeURL(url: string): string {

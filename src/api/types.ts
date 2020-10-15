@@ -97,6 +97,7 @@ export interface SkillResult {
   type: MetricType;
   rank: number;
   experience: number;
+  ehp: number;
   level?: number;
 }
 
@@ -105,6 +106,7 @@ export interface BossResult {
   type: MetricType;
   rank: number;
   kills: number;
+  ehb: number;
 }
 
 export interface ActivityResult {
