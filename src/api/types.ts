@@ -9,6 +9,11 @@ export interface Player {
   updatedAt: Date;
   lastImportedAt?: Date;
   latestSnapshot: Snapshot;
+  ttm: number;
+  tt200m: number;
+  ehp: number;
+  ehb: number;
+  exp: number;
 
   // Only in group related lists
   role?: string;
