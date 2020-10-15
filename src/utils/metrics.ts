@@ -88,10 +88,16 @@ const BOSSES_MAP = [
   { key: 'zulrah', name: 'Zulrah' }
 ];
 
+const VIRTUALS_MAP = [
+  { key: 'ehp', name: 'EHP' },
+  { key: 'ehb', name: 'EHB' }
+];
+
 export const SKILLS = SKILLS_MAP.map(s => s.key);
 export const ACTIVITIES = ACTIVITIES_MAP.map(s => s.key);
 export const BOSSES = BOSSES_MAP.map(s => s.key);
-export const ALL_METRICS = [...SKILLS, ...ACTIVITIES, ...BOSSES];
+export const VIRTUALS = VIRTUALS_MAP.map(s => s.key);
+export const ALL_METRICS = [...SKILLS, ...ACTIVITIES, ...BOSSES, ...VIRTUALS];
 
 export function isSkill(metric: string): boolean {
   return SKILLS.includes(metric);
@@ -103,6 +109,10 @@ export function isActivity(metric: string): boolean {
 
 export function isBoss(metric: string): boolean {
   return BOSSES.includes(metric);
+}
+
+export function isVirtual(metric: string): boolean {
+  return VIRTUALS.includes(metric);
 }
 
 export function getType(metric: string): MetricType | null {
@@ -118,6 +128,10 @@ export function getType(metric: string): MetricType | null {
     return MetricType.Boss;
   }
 
+  if (isVirtual(metric)) {
+    return MetricType.Virtual;
+  }
+
   return null;
 }
 
@@ -130,7 +144,11 @@ export function getMeasure(metric: string): string {
     return 'score';
   }
 
-  return 'kills';
+  if (isBoss(metric)) {
+    return 'kills';
+  }
+
+  return 'value';
 }
 
 export function getMetricName(metric: string): string {
@@ -138,7 +156,7 @@ export function getMetricName(metric: string): string {
     return 'Combat';
   }
 
-  const allMetricConfigs = [...SKILLS_MAP, ...ACTIVITIES_MAP, ...BOSSES_MAP];
+  const allMetricConfigs = [...SKILLS_MAP, ...ACTIVITIES_MAP, ...BOSSES_MAP, ...VIRTUALS_MAP];
 
   for (let i = 0; i < allMetricConfigs.length; i += 1) {
     if (allMetricConfigs[i].key === metric) {

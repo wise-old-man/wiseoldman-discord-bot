@@ -6,7 +6,7 @@ import { BossResult, MetricType, Player } from '../../../api/types';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, ParsedMessage, Renderable } from '../../../types';
-import { encodeURL, toKMB } from '../../../utils';
+import { encodeURL, round, toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 
@@ -16,7 +16,8 @@ const RENDER_PADDING = 15;
 
 enum RenderVariant {
   Kills = 'Kills',
-  Ranks = 'Ranks'
+  Ranks = 'Ranks',
+  EHB = 'EHB'
 }
 
 class PlayerBosses implements Command, Renderable {
@@ -25,7 +26,7 @@ class PlayerBosses implements Command, Renderable {
 
   constructor() {
     this.name = 'View player bosses';
-    this.template = '!bosses {username} [--ranks]';
+    this.template = '!bosses {username} [--ranks/--ehb]';
   }
 
   activated(message: ParsedMessage) {
@@ -118,6 +119,15 @@ class PlayerBosses implements Command, Renderable {
         // Boss rank
         ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
         ctx.fillText(rank, originX + 44 - rankWidth / 2, originY + 17);
+      } else if (variant === RenderVariant.EHB) {
+        ctx.font = '10px Arial';
+
+        const ehb = `${round(result.ehb, 1)}`;
+        const ehbWidth = ctx.measureText(ehb).width;
+
+        // Boss EHB
+        ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
+        ctx.fillText(ehb, originX + 44 - ehbWidth / 2, originY + 17);
       }
     }
 
@@ -152,6 +162,10 @@ class PlayerBosses implements Command, Renderable {
 
     if (variantArg === '--rank' || variantArg === '--ranks') {
       return RenderVariant.Ranks;
+    }
+
+    if (variantArg === '--ehb' || variantArg === '--hours') {
+      return RenderVariant.EHB;
     }
 
     return RenderVariant.Kills;

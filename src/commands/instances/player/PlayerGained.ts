@@ -100,6 +100,11 @@ class PlayerGained implements Command {
   buildGainsList(displayName: string, period: string, gained: PlayerGains) {
     const gainedArray = Array.from(Object.entries(gained.data));
 
+    const virtualGains = gainedArray
+      .filter(([, e]) => e.value && e.value.gained > 0)
+      .map(([key, val]) => ({ metric: key, gained: val.value?.gained || 0 }))
+      .sort((a: any, b: any) => b.gained - a.gained);
+
     const skillGains = gainedArray
       .filter(([, e]) => e.experience && e.experience.gained > 0)
       .map(([key, val]) => ({ metric: key, gained: val.experience?.gained || 0 }))
@@ -115,7 +120,7 @@ class PlayerGained implements Command {
       .map(([key, val]) => ({ metric: key, gained: val.score?.gained || 0 }))
       .sort((a: any, b: any) => b.gained - a.gained);
 
-    const valid = [...skillGains, ...bossGains, ...activityGains];
+    const valid = [...virtualGains, ...skillGains, ...bossGains, ...activityGains];
 
     if (!valid || valid.length === 0) {
       throw new Error(`${displayName} has no ${period} gains.`);

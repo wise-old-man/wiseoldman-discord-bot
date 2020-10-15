@@ -6,7 +6,7 @@ import { MetricType, Player, SkillResult } from '../../../api/types';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, ParsedMessage, Renderable } from '../../../types';
-import { encodeURL, SKILLS, toKMB } from '../../../utils';
+import { encodeURL, round, SKILLS, toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 
@@ -17,7 +17,8 @@ const RENDER_PADDING = 15;
 enum RenderVariant {
   Levels = 'Levels',
   Ranks = 'Ranks',
-  Experience = 'Experience'
+  Experience = 'Experience',
+  EHP = 'EHP'
 }
 
 class PlayerStats implements Command, Renderable {
@@ -26,7 +27,7 @@ class PlayerStats implements Command, Renderable {
 
   constructor() {
     this.name = 'View player stats';
-    this.template = '!stats {username} [--exp/--ranks]';
+    this.template = '!stats {username} [--exp/--ranks/--ehp]';
   }
 
   activated(message: ParsedMessage) {
@@ -54,7 +55,7 @@ class PlayerStats implements Command, Renderable {
       const embed = new MessageEmbed()
         .setColor(config.visuals.blue)
         .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
-        .setTitle(`${player.displayName} - ${variant}`)
+        .setTitle(`${player.displayName} (Combat ${player.combatLevel}) - ${variant}`)
         .setImage(`attachment://${fileName}`)
         .setFooter('Last updated')
         .setTimestamp(player.updatedAt)
@@ -131,6 +132,14 @@ class PlayerStats implements Command, Renderable {
 
         // Skill Rank
         ctx.fillText(rank, originX + 44 - rankWidth / 2, originY + 17);
+      } else if (variant === RenderVariant.EHP) {
+        ctx.font = '9px sans-serif';
+
+        const ehp = `${round(result.ehp || 0, 1)}`;
+        const ehpWidth = ctx.measureText(ehp).width;
+
+        // Skill EHP
+        ctx.fillText(ehp, originX + 44 - ehpWidth / 2, originY + 16);
       }
     }
 
@@ -169,6 +178,10 @@ class PlayerStats implements Command, Renderable {
 
     if (variantArg === '--rank' || variantArg === '--ranks') {
       return RenderVariant.Ranks;
+    }
+
+    if (variantArg === '--ehp' || variantArg === '--hours') {
+      return RenderVariant.EHP;
     }
 
     return RenderVariant.Levels;

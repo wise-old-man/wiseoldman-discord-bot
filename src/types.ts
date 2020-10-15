@@ -126,6 +126,9 @@ export enum Emoji {
   bounty_hunter_rogue = '<:bounty_hunter_rogue:730171196561293392>',
   clue = '<:clue_scrolls_all:729844134004785204>',
 
+  ehp = '<:ehp:766260738221670432>',
+  ehb = '<:ehb:766260773617795103>',
+
   success = '✅',
   error = '❌',
   warning = '⚠️',

@@ -9,6 +9,11 @@ export interface Player {
   updatedAt: Date;
   lastImportedAt?: Date;
   latestSnapshot: Snapshot;
+  ttm: number;
+  tt200m: number;
+  ehp: number;
+  ehb: number;
+  exp: number;
 
   // Only in group related lists
   role?: string;
@@ -64,6 +69,7 @@ export interface GroupHiscoresEntry {
   kills?: number;
   score?: number;
   level?: number;
+  value?: number;
 }
 
 export interface GroupGainedEntry {
@@ -87,7 +93,8 @@ export interface GroupRecordEntry {
 export enum MetricType {
   Skill = 'Skill',
   Boss = 'Boss',
-  Activity = 'Activity'
+  Activity = 'Activity',
+  Virtual = 'Virtual'
 }
 
 export interface SkillResult {
@@ -95,6 +102,7 @@ export interface SkillResult {
   type: MetricType;
   rank: number;
   experience: number;
+  ehp: number;
   level?: number;
 }
 
@@ -103,6 +111,7 @@ export interface BossResult {
   type: MetricType;
   rank: number;
   kills: number;
+  ehb: number;
 }
 
 export interface ActivityResult {
@@ -245,6 +254,12 @@ export interface PlayerGains {
       };
       // Defined in activity gains
       score?: {
+        start: number;
+        end: number;
+        gained: number;
+      };
+      // Defined in virtual gains
+      value?: {
         start: number;
         end: number;
         gained: number;
