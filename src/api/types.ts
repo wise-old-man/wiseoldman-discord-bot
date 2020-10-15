@@ -64,6 +64,7 @@ export interface GroupHiscoresEntry {
   kills?: number;
   score?: number;
   level?: number;
+  value?: number;
 }
 
 export interface GroupGainedEntry {
@@ -246,6 +247,12 @@ export interface PlayerGains {
       };
       // Defined in activity gains
       score?: {
+        start: number;
+        end: number;
+        gained: number;
+      };
+      // Defined in virtual gains
+      value?: {
         start: number;
         end: number;
         gained: number;

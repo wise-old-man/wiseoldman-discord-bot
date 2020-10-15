@@ -3,7 +3,15 @@ import { fetchGroupDetails, fetchGroupHiscores } from '../../../api/modules/grou
 import { GroupHiscoresEntry } from '../../../api/types';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
-import { getAbbreviation, getEmoji, getMetricName, isBoss, isSkill, toKMB } from '../../../utils';
+import {
+  getAbbreviation,
+  getEmoji,
+  getMetricName,
+  isActivity,
+  isBoss,
+  isSkill,
+  toKMB
+} from '../../../utils';
 import CommandError from '../../CommandError';
 
 class GroupHiscores implements Command {
@@ -58,7 +66,11 @@ class GroupHiscores implements Command {
       return `${toKMB(result.kills || 0)}`;
     }
 
-    return `${toKMB(result.score || 0)}`;
+    if (isActivity(metric)) {
+      return `${toKMB(result.score || 0)}`;
+    }
+
+    return `${result.value || 0}`;
   }
 
   getMetricArg(args: string[]): string {
