@@ -87,7 +87,8 @@ export interface GroupRecordEntry {
 export enum MetricType {
   Skill = 'Skill',
   Boss = 'Boss',
-  Activity = 'Activity'
+  Activity = 'Activity',
+  Virtual = 'Virtual'
 }
 
 export interface SkillResult {
