@@ -55,7 +55,7 @@ class PlayerVirtuals implements Command {
             value: player.ehp ? round(player.ehp, 2) : '---'
           },
           {
-            name: 'Efficient Hours Bosses',
+            name: 'Efficient Hours Bossed',
             value: player.ehb ? round(player.ehb, 2) : '---'
           },
           {

@@ -15,10 +15,6 @@ export async function onMessageReceived(message: Message): Promise<void> {
     return;
   }
 
-  if (message.content.startsWith('!ehp')) {
-    message.channel.send('Pls come back @dkvl');
-  }
-
   const parsed = await parser.parse(message);
 
   commands.forEach(async c => {
