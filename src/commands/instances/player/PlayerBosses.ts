@@ -26,11 +26,11 @@ class PlayerBosses implements Command, Renderable {
 
   constructor() {
     this.name = 'View player bosses';
-    this.template = '!bosses {username} [--ranks/--ehb]';
+    this.template = '![bosses/ehb] {username} [--ranks/--ehb]';
   }
 
   activated(message: ParsedMessage) {
-    return message.command === 'bosses';
+    return message.command === 'bosses' || message.command === 'ehb';
   }
 
   async execute(message: ParsedMessage) {
@@ -38,7 +38,7 @@ class PlayerBosses implements Command, Renderable {
     const username = await this.getUsername(message);
 
     // Grab (if it exists) the command variant from the command's arguments (--exp / --ranks)
-    const variant = this.getRenderVariant(message.args);
+    const variant = this.getRenderVariant(message.command, message.args);
 
     if (!username) {
       throw new CommandError(
@@ -149,7 +149,11 @@ class PlayerBosses implements Command, Renderable {
     return inferedUsername;
   }
 
-  getRenderVariant(args: string[]): RenderVariant {
+  getRenderVariant(command: string, args: string[]): RenderVariant {
+    if (command === 'ehb') {
+      return RenderVariant.EHB;
+    }
+
     if (!args || args.length === 0) {
       return RenderVariant.Kills;
     }

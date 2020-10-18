@@ -13,10 +13,10 @@ import GroupRecordsCommand from './group/GroupRecords';
 import PlayerAchievements from './player/PlayerAchievements';
 import PlayerActivitiesCommand from './player/PlayerActivities';
 import PlayerBossesCommand from './player/PlayerBosses';
+import PlayerEfficiencyCommand from './player/PlayerEfficiency';
 import PlayerGainedCommand from './player/PlayerGained';
 import PlayerSetUsername from './player/PlayerSetUsername';
 import PlayerStatsCommand from './player/PlayerStats';
-import PlayerVirtualsCommand from './player/PlayerVirtuals';
 import PlayerUpdateCommand from './player/UpdatePlayer';
 
 const commands: Command[] = [
@@ -30,7 +30,7 @@ const commands: Command[] = [
   PlayerAchievements,
   PlayerUpdateCommand,
   PlayerGainedCommand,
-  PlayerVirtualsCommand,
+  PlayerEfficiencyCommand,
   PlayerSetUsername,
 
   // group commands
