@@ -27,11 +27,11 @@ class PlayerStats implements Command, Renderable {
 
   constructor() {
     this.name = 'View player stats';
-    this.template = '!stats {username} [--exp/--ranks/--ehp]';
+    this.template = '![stats/ehp] {username} [--exp/--ranks/--ehp]';
   }
 
   activated(message: ParsedMessage) {
-    return message.command === 'stats';
+    return message.command === 'stats' || message.command === 'ehp';
   }
 
   async execute(message: ParsedMessage) {
@@ -39,7 +39,7 @@ class PlayerStats implements Command, Renderable {
     const username = await this.getUsername(message);
 
     // Grab (if it exists) the command variant from the command's arguments (--exp / --ranks)
-    const variant = this.getRenderVariant(message.args);
+    const variant = this.getRenderVariant(message.command, message.args);
 
     if (!username) {
       throw new CommandError(
@@ -161,7 +161,11 @@ class PlayerStats implements Command, Renderable {
     return inferedUsername;
   }
 
-  getRenderVariant(args: string[]): RenderVariant {
+  getRenderVariant(command: string, args: string[]): RenderVariant {
+    if (command === 'ehp') {
+      return RenderVariant.EHP;
+    }
+
     if (!args || args.length === 0) {
       return RenderVariant.Levels;
     }

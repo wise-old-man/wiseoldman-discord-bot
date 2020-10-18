@@ -6,18 +6,17 @@ import { Command, ParsedMessage } from '../../../types';
 import { encodeURL, round, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class PlayerVirtuals implements Command {
+class PlayerEfficiency implements Command {
   name: string;
   template: string;
 
   constructor() {
-    this.name = 'View player virtual stats';
-    this.template = '![virtuals/ttm/ehp/ehb] {username}';
+    this.name = 'View player efficiency stats';
+    this.template = '![ttm/max] {username}';
   }
 
   activated(message: ParsedMessage) {
-    const cmd = message.command;
-    return cmd === 'virtuals' || cmd === 'ttm' || cmd === 'ehp' || cmd === 'ehb';
+    return message.command === 'ttm' || message.command === 'max';
   }
 
   async execute(message: ParsedMessage) {
@@ -40,7 +39,7 @@ class PlayerVirtuals implements Command {
       const embed = new MessageEmbed()
         .setColor(config.visuals.blue)
         .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
-        .setTitle(`${player.displayName} - Virtual Stats`)
+        .setTitle(`${player.displayName} - Efficiency Stats`)
         .addFields([
           {
             name: 'Time To Max',
@@ -90,4 +89,4 @@ class PlayerVirtuals implements Command {
   }
 }
 
-export default new PlayerVirtuals();
+export default new PlayerEfficiency();
