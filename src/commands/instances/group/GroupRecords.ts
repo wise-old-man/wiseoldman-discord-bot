@@ -13,7 +13,7 @@ class GroupRecords implements Command {
 
   constructor() {
     this.name = 'View group records';
-    this.template = '!group records {metric}? [--day/--week/--month/--year]';
+    this.template = '!group records {metric}? [--6h/--day/--week/--month/--year]';
     this.requiresGroup = true;
   }
 

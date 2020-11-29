@@ -16,7 +16,7 @@ class PlayerGained implements Command {
 
   constructor() {
     this.name = 'View player gains';
-    this.template = '!gained {username} [--day/--week/--month/--year]';
+    this.template = '!gained {username} [--6h/--day/--week/--month/--year]';
   }
 
   activated(message: ParsedMessage) {

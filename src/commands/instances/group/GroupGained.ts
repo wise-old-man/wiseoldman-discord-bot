@@ -13,7 +13,7 @@ class GroupGained implements Command {
 
   constructor() {
     this.name = 'View group gains';
-    this.template = '!group gained {metric}? [--day/--week/--month/--year]';
+    this.template = '!group gained {metric}? [--6h/--day/--week/--month/--year]';
     this.requiresGroup = true;
   }
 
