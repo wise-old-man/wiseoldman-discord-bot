@@ -286,8 +286,6 @@ export function getAbbreviation(abbr: string): string {
       return 'tztok_jad';
 
     case 'vork':
-    case 'vorkie':
-    case 'vorki':
     case 'vorky':
       return 'vorkath';
 
@@ -350,7 +348,6 @@ export function getAbbreviation(abbr: string): string {
 
     case 'runecraft':
     case 'rc':
-    case 'r/c':
       return 'runecrafting';
 
     case 'att':
@@ -363,13 +360,11 @@ export function getAbbreviation(abbr: string): string {
       return 'defence';
     
     case 'str':
-    case 'stronk':
       return 'strength';
 
     case 'hp':
       return 'hitpoints';
-
-    case 'archery':
+      
     case 'range':
       return 'ranged';
       
@@ -383,8 +378,6 @@ export function getAbbreviation(abbr: string): string {
       return 'cooking';
 
     case 'wc':
-    case 'w/c':
-    case 'chop':
       return 'woodcutting';
 
     case 'fletch':
@@ -394,7 +387,6 @@ export function getAbbreviation(abbr: string): string {
       return 'fishing';
 
     case 'fm':
-    case 'f/m':
     case 'burning':
       return 'firemaking';
     
@@ -417,7 +409,6 @@ export function getAbbreviation(abbr: string): string {
       return 'agility';
 
     case 'thief':
-    case 'stealing':
       return 'thieving';
 
     case 'slay':
@@ -433,7 +424,6 @@ export function getAbbreviation(abbr: string): string {
     case 'con':
     case 'cons':
     case 'const':
-    case 'building':
       return 'construction';
 
     default:
