@@ -198,7 +198,7 @@ export function getAbbreviation(abbr: string): string {
     case 'raids-cm':
       return 'chambers_of_xeric_challenge_mode';
 
-    case 'chaos ele':
+    case 'chaos-ele':
       return 'chaos_elemental';
 
     case 'fanatic':
@@ -213,7 +213,7 @@ export function getAbbreviation(abbr: string): string {
     case 'corp':
       return 'corporeal_beast';
 
-    case 'crazy arch':
+    case 'crazy-arch':
       return 'crazy_archaeologist';
 
     case 'prime':
@@ -223,7 +223,7 @@ export function getAbbreviation(abbr: string): string {
     case 'supreme':
       return 'dagannoth_supreme';
 
-    case 'deranged arch':
+    case 'deranged-arch':
       return 'deranged_archaeologist';
 
     case 'bandos':
@@ -237,6 +237,7 @@ export function getAbbreviation(abbr: string): string {
     case 'dawn':
     case 'gargs':
     case 'guardians':
+    case 'ggs':      
       return 'grotesque_guardians';
 
     case 'kq':
@@ -254,7 +255,7 @@ export function getAbbreviation(abbr: string): string {
     case 'zammy':
     case 'zamorak':
     case 'kril':
-    case 'kril trutsaroth':
+    case 'kril-tsutsaroth':
       return 'kril_tsutsaroth';
 
     case 'gaunt':
@@ -264,6 +265,7 @@ export function getAbbreviation(abbr: string): string {
     case 'cgaunt':
     case 'cgauntlet':
     case 'corrupted':
+    case 'corrupted-gauntlet':
       return 'the_corrupted_gauntlet';
 
     case 'tob':
@@ -279,18 +281,22 @@ export function getAbbreviation(abbr: string): string {
       return 'tzkal_zuk';
 
     case 'jad':
+    case 'fight-caves':
+    case 'fc':
       return 'tztok_jad';
 
     case 'vork':
+    case 'vorky':
       return 'vorkath';
 
     case 'wt':
       return 'wintertodt';
 
     case 'snek':
+    case 'zul':
       return 'zulrah';
-
-    // Minigames and others
+      
+      // Minigames and others
 
     case 'all-clues':
     case 'clues':
@@ -308,6 +314,8 @@ export function getAbbreviation(abbr: string): string {
       return 'clue_scrolls_easy';
 
     case 'medium':
+    case 'med':
+    case 'meds':
     case 'medium-clues':
     case 'med-clues':
     case 'mediums':
@@ -335,6 +343,88 @@ export function getAbbreviation(abbr: string): string {
     case 'lp':
     case 'lps':
       return 'league_points';
+
+      // Skills
+
+    case 'runecraft':
+    case 'rc':
+      return 'runecrafting';
+
+    case 'att':
+    case 'atk':
+    case 'attk':
+      return 'attack';
+
+    case 'def':
+    case 'defense':
+      return 'defence';
+    
+    case 'str':
+      return 'strength';
+
+    case 'hp':
+      return 'hitpoints';
+      
+    case 'range':
+      return 'ranged';
+      
+    case 'pray':
+      return 'prayer';
+
+    case 'mage':
+      return 'magic';
+
+    case 'cook':
+      return 'cooking';
+
+    case 'wc':
+      return 'woodcutting';
+
+    case 'fletch':
+      return 'fletching';
+    
+    case 'fish':
+      return 'fishing';
+
+    case 'fm':
+    case 'burning':
+      return 'firemaking';
+    
+    case 'craft':
+      return 'crafting';
+
+    case 'sm':
+    case 'smith':
+      return 'smithing';
+
+    case 'mine':
+    case 'smash':
+      return 'mining';
+
+    case 'herb':
+      return 'herblore';
+    
+    case 'agi':
+    case 'agil':
+      return 'agility';
+
+    case 'thief':
+      return 'thieving';
+
+    case 'slay':
+      return 'slayer';
+
+    case 'farm':
+      return 'farming';
+
+    case 'hunt':
+    case 'hunting':
+      return 'hunter';
+
+    case 'con':
+    case 'cons':
+    case 'const':
+      return 'construction';
 
     default:
       return abbr;
