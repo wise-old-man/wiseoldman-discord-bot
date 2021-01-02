@@ -69,7 +69,7 @@ class PlayerGained implements Command {
       } else {
         if (e.response?.data?.message.includes('tracked')) {
           const errorMessage = `**${username}** is not being tracked yet.`;
-          const errorTip = `Try !update ${username}`;
+          const errorTip = `Try ${message.prefix}update ${username}`;
 
           throw new CommandError(errorMessage, errorTip);
         } else {

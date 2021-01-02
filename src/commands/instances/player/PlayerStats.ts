@@ -64,7 +64,7 @@ class PlayerStats implements Command, Renderable {
       message.respond(embed);
     } catch (e) {
       const errorMessage = `**${username}** is not being tracked yet.`;
-      const errorTip = `Try !update ${username}`;
+      const errorTip = `Try ${message.prefix}update ${username}`;
 
       throw new CommandError(errorMessage, errorTip);
     }

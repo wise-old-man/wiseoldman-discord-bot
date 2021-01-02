@@ -30,7 +30,7 @@ class ConfigChannel implements Command {
     if (!channelId) {
       throw new CommandError(
         `Couldn't find channel.`,
-        'Try typing "!config announcement-channel here" on the intended channel.'
+        `Try typing "${message.prefix}config announcement-channel here" on the intended channel.`
       );
     }
 

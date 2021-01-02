@@ -33,7 +33,7 @@ class PlayerEfficiency implements Command {
       const player = await fetchPlayer(username);
 
       if (player.ehp === 0 && player.tt200m === 0) {
-        throw new CommandError(`This player is outdated. Please try "!update ${username}" first.`);
+        throw new CommandError(`This player is outdated. Please try "${message.prefix}update ${username}" first.`);
       }
 
       const embed = new MessageEmbed()
@@ -70,7 +70,7 @@ class PlayerEfficiency implements Command {
       if (e instanceof CommandError) throw e;
 
       const errorMessage = `**${username}** is not being tracked yet.`;
-      const errorTip = `Try !update ${username}`;
+      const errorTip = `Try ${message.prefix}update ${username}`;
 
       throw new CommandError(errorMessage, errorTip);
     }
