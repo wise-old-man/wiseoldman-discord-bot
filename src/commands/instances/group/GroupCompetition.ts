@@ -1,4 +1,5 @@
 import { MessageEmbed } from 'discord.js';
+import { capitalize, uniq } from 'lodash';
 import { fetchCompetition, getCompetitionStatus } from '../../../api/modules/competitions';
 import { fetchGroupCompetitions } from '../../../api/modules/groups';
 import { Competition } from '../../../api/types';
@@ -74,19 +75,53 @@ class GroupCompetition implements Command {
   }
 
   buildContent(competition: Competition) {
-    const topParticipants = competition.participants
-      .slice(0, 10)
-      .map(p => `${p.displayName} - **${toKMB(p.progress.gained)}**`);
+    const isTeamCompetition = competition.type === 'team';
 
-    return [
+    const lines = [
       `**Metric:**: ${getEmoji(competition.metric)} ${getMetricName(competition.metric)}`,
+      `**Type:**: ${capitalize(competition.type)}`,
       `**Participants:** ${competition.participants.length}`,
       `**Duration:** ${competition.duration}`,
       `**Total gained:** ${toKMB(competition.totalGained || 0)}`,
-      '',
-      '**Top Participants:**',
-      ...topParticipants
-    ].join('\n');
+      ''
+    ];
+
+    if (isTeamCompetition) {
+      lines.push('**Teams:**');
+      lines.push(...this.getTeamData(competition));
+    } else {
+      lines.push('**Top Participants:**');
+      lines.push(...this.getParticipantData(competition));
+    }
+
+    return lines.join('\n');
+  }
+
+  getTeamData(competition: Competition) {
+    const { participants } = competition;
+
+    if (!participants || participants.length === 0) return [];
+
+    const teamNames = uniq(participants.map(p => p.teamName));
+    const teamTally: { [name: string]: number } = Object.fromEntries(teamNames.map(t => [t, 0]));
+
+    participants.forEach(p => {
+      if (!p.teamName) return;
+      teamTally[p.teamName] = teamTally[p.teamName] + p.progress.gained;
+    });
+
+    const teamStandings = Object.entries(teamTally).map(t => ({ name: t[0], totalGained: t[1] }));
+
+    // Sort teams by most total gained
+    return teamStandings
+      .sort((a, b) => b.totalGained - a.totalGained)
+      .map(t => `${t.name} - **${toKMB(t.totalGained)}**`);
+  }
+
+  getParticipantData(competition: Competition) {
+    return competition.participants
+      .slice(0, 10)
+      .map(p => `${p.displayName} - **${toKMB(p.progress.gained)}**`);
   }
 
   getSelectedCompetitionId(competitions: Competition[], status: string, prefix: String) {
