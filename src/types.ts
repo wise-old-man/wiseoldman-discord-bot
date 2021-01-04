@@ -72,6 +72,7 @@ export enum Emoji {
   runecrafting = '<:runecrafting:706462611327287347>',
   hunter = '<:hunter:706462611218366534>',
   construction = '<:construction:706462610853330986>',
+  combat = '<:combat:795682581378498580>',
 
   // Boss emojis
   abyssal_sire = '<:abyssal_sire:729839920969023519>',
