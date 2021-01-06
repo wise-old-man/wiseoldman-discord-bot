@@ -211,6 +211,7 @@ export interface Snapshot {
   clue_scrolls_elite: SnapshotActivity;
   clue_scrolls_master: SnapshotActivity;
   last_man_standing: SnapshotActivity;
+  soul_wars_zeal: SnapshotActivity;
 }
 
 export interface SnapshotSkill {
