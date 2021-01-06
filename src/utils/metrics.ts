@@ -33,12 +33,13 @@ const ACTIVITIES_MAP = [
   { key: 'bounty_hunter_hunter', name: 'Bounty Hunter (Hunter)' },
   { key: 'bounty_hunter_rogue', name: 'Bounty Hunter (Rogue)' },
   { key: 'clue_scrolls_beginner', name: 'Clue Scrolls (Beginner)' },
-  { key: 'clue_scrolls_easy', name: 'Clue Scroll (Easy)' },
-  { key: 'clue_scrolls_medium', name: 'Clue Scroll (Medium)' },
-  { key: 'clue_scrolls_hard', name: 'Clue Scroll (Hard)' },
-  { key: 'clue_scrolls_elite', name: 'Clue Scroll (Elite)' },
-  { key: 'clue_scrolls_master', name: 'Clue Scroll (Master)' },
-  { key: 'clue_scrolls_all', name: 'Clue Scrolls (All)' }
+  { key: 'clue_scrolls_easy', name: 'Clue Scrolls (Easy)' },
+  { key: 'clue_scrolls_medium', name: 'Clue Scrolls (Medium)' },
+  { key: 'clue_scrolls_hard', name: 'Clue Scrolls (Hard)' },
+  { key: 'clue_scrolls_elite', name: 'Clue Scrolls (Elite)' },
+  { key: 'clue_scrolls_master', name: 'Clue Scrolls (Master)' },
+  { key: 'clue_scrolls_all', name: 'Clue Scrolls (All)' },
+  { key: 'soul_wars_zeal', name: 'Soul Wars Zeal' }
 ];
 
 const BOSSES_MAP = [
@@ -237,7 +238,7 @@ export function getAbbreviation(abbr: string): string {
     case 'dawn':
     case 'gargs':
     case 'guardians':
-    case 'ggs':      
+    case 'ggs':
       return 'grotesque_guardians';
 
     case 'kq':
@@ -295,8 +296,8 @@ export function getAbbreviation(abbr: string): string {
     case 'snek':
     case 'zul':
       return 'zulrah';
-      
-      // Minigames and others
+
+    // Minigames and others
 
     case 'all-clues':
     case 'clues':
@@ -344,7 +345,12 @@ export function getAbbreviation(abbr: string): string {
     case 'lps':
       return 'league_points';
 
-      // Skills
+    case 'sw':
+    case 'zeal':
+    case 'soul_wars':
+      return 'soul_wars_zeal';
+
+    // Skills
 
     case 'runecraft':
     case 'rc':
@@ -358,16 +364,16 @@ export function getAbbreviation(abbr: string): string {
     case 'def':
     case 'defense':
       return 'defence';
-    
+
     case 'str':
       return 'strength';
 
     case 'hp':
       return 'hitpoints';
-      
+
     case 'range':
       return 'ranged';
-      
+
     case 'pray':
       return 'prayer';
 
@@ -382,14 +388,14 @@ export function getAbbreviation(abbr: string): string {
 
     case 'fletch':
       return 'fletching';
-    
+
     case 'fish':
       return 'fishing';
 
     case 'fm':
     case 'burning':
       return 'firemaking';
-    
+
     case 'craft':
       return 'crafting';
 
@@ -403,7 +409,7 @@ export function getAbbreviation(abbr: string): string {
 
     case 'herb':
       return 'herblore';
-    
+
     case 'agi':
     case 'agil':
       return 'agility';
