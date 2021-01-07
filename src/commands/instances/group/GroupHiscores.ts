@@ -42,7 +42,7 @@ class GroupHiscores implements Command {
         .setColor(config.visuals.blue)
         .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} hiscores`)
         .setDescription(this.buildList(metric, hiscores))
-        .setURL(`https://wiseoldman.net/groups/${groupId}/records/`)
+        .setURL(`https://wiseoldman.net/groups/${groupId}/hiscores/`)
         .setFooter(`Tip: Try !group hiscores zulrah`);
 
       message.respond(response);
