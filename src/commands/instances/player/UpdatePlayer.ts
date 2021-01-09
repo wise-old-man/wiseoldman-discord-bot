@@ -38,7 +38,9 @@ class UpdatePlayer implements Command {
       message.respond(response);
     } catch (e) {
       if (e.response?.status === 500) {
-        throw new CommandError(`Failed to update **${username}**: Invalid username.`);
+        throw new CommandError(
+          'The OSRS Hiscores are down since the 6th of January, causing updates to rarely work. Please try again later.'
+        );
       } else {
         throw new CommandError(e.response?.data?.message || `Failed to update **${username}**.`);
       }
