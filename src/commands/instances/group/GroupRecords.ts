@@ -36,7 +36,7 @@ class GroupRecords implements Command {
         .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} records (${period})`)
         .setDescription(this.buildList(records))
         .setURL(`https://wiseoldman.net/groups/${groupId}/records/`)
-        .setFooter(`Tip: Try !group records zulrah --day`);
+        .setFooter(`Tip: Try ${message.prefix}group records zulrah --day`);
 
       message.respond(response);
     } catch (e) {

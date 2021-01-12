@@ -60,7 +60,7 @@ class PlayerAchievements implements Command, Renderable {
         throw new CommandError(e.message);
       } else {
         const errorMessage = `**${username}** is not being tracked yet.`;
-        const errorTip = `Try !update ${username}`;
+        const errorTip = `Try ${message.prefix}update ${username}`;
 
         throw new CommandError(errorMessage, errorTip);
       }

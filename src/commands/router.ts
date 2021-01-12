@@ -47,7 +47,7 @@ export async function onMessageReceived(message: Message): Promise<void> {
       return onError(
         message,
         'That command requires a group to be configured.',
-        'Start the group setup process with !config group *groupId*'
+        `Start the group setup with ${parsed.prefix}config group *groupId*`
       );
     }
 

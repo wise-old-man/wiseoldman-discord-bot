@@ -28,7 +28,7 @@ class GroupCompetition implements Command {
 
     try {
       const competitions = await fetchGroupCompetitions(groupId);
-      const competitionId = this.getSelectedCompetitionId(competitions, status);
+      const competitionId = this.getSelectedCompetitionId(competitions, status, message.prefix);
       const competition = await fetchCompetition(competitionId);
 
       const pageURL = `https://wiseoldman.net/competitions/${competition.id}/`;
@@ -46,7 +46,7 @@ class GroupCompetition implements Command {
       if (e.response?.data?.message) {
         throw new CommandError(e.response?.data?.message);
       } else {
-        throw new CommandError(e.message);
+        throw new CommandError(e.message, e.tip);
       }
     }
   }
@@ -89,14 +89,14 @@ class GroupCompetition implements Command {
     ].join('\n');
   }
 
-  getSelectedCompetitionId(competitions: Competition[], status: string) {
+  getSelectedCompetitionId(competitions: Competition[], status: string, prefix: String) {
     if (status === 'ongoing') {
       const ongoing = competitions.find(c => getCompetitionStatus(c) === 'ongoing');
 
       if (!ongoing) {
         throw new CommandError(
-          'There are no ongoing competitions for this group.',
-          'Try !group competition --upcoming'
+          'There are no ongoing competitions for this group.', 
+          `Try ${prefix}group competition --upcoming`
         );
       }
 
@@ -107,7 +107,7 @@ class GroupCompetition implements Command {
       if (!upcoming) {
         throw new CommandError(
           'There are no upcoming competitions for this group.',
-          'Try !group competition --ongoing'
+          `Try ${prefix}group competition --ongoing`
         );
       }
 
