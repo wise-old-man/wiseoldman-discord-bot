@@ -38,9 +38,7 @@ class UpdatePlayer implements Command {
       message.respond(response);
     } catch (e) {
       if (e.response?.status === 500) {
-        throw new CommandError(
-          'The OSRS Hiscores are down since the 6th of January, causing updates to rarely work. Please try again later.'
-        );
+        throw new CommandError('Failed to update: OSRS Hiscores are unavailable.'); 
       } else {
         throw new CommandError(e.response?.data?.message || `Failed to update **${username}**.`);
       }
