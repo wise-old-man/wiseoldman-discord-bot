@@ -72,6 +72,7 @@ export enum Emoji {
   runecrafting = '<:runecrafting:706462611327287347>',
   hunter = '<:hunter:706462611218366534>',
   construction = '<:construction:706462610853330986>',
+  combat = '<:combat:795682554896318465>',
 
   // Boss emojis
   abyssal_sire = '<:abyssal_sire:729839920969023519>',
@@ -125,6 +126,7 @@ export enum Emoji {
   bounty_hunter_hunter = '<:bounty_hunter_hunter:730171196410298378>',
   bounty_hunter_rogue = '<:bounty_hunter_rogue:730171196561293392>',
   clue = '<:clue_scrolls_all:729844134004785204>',
+  soul_wars_zeal = '<:soul_wars_zeal:796447053160906772>',
 
   ehp = '<:ehp:766260738221670432>',
   ehb = '<:ehb:766260773617795103>',
