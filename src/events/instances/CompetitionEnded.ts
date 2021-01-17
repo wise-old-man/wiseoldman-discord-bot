@@ -1,4 +1,5 @@
 import { MessageEmbed } from 'discord.js';
+import { uniq } from 'lodash';
 import config from '../../config';
 import { getChannelIds } from '../../database/services/server';
 import { Event } from '../../types';
@@ -6,6 +7,7 @@ import { getEmoji, propagate, toKMB } from '../../utils';
 
 interface CompetitionStanding {
   displayName: string;
+  teamName: string | null;
   gained: number;
 }
 
@@ -13,6 +15,7 @@ interface CompetitionEndedData {
   groupId: number;
   competition: {
     id: number;
+    type: string;
     metric: string;
     title: string;
     duration: string;
@@ -31,6 +34,8 @@ class CompetitionEnded implements Event {
     const { groupId, competition, standings } = data;
     const { id, title } = competition;
 
+    const isTeamCompetition = competition.type === 'team';
+
     if (!groupId) return;
 
     const channelIds = await getChannelIds(groupId);
@@ -46,13 +51,31 @@ class CompetitionEnded implements Event {
       .setURL(url)
       .addFields([
         {
-          name: 'Top participants',
-          value: getStandings(standings)
+          name: isTeamCompetition ? 'Top Teams' : 'Top participants',
+          value: isTeamCompetition ? getTeamStandings(standings) : getStandings(standings)
         }
       ]);
 
     propagate(message, channelIds);
   }
+}
+
+function getTeamStandings(standings: CompetitionStanding[]): string {
+  const teamNames = uniq(standings.map(p => p.teamName));
+  const teamTally: { [name: string]: number } = Object.fromEntries(teamNames.map(t => [t, 0]));
+
+  standings.forEach(s => {
+    if (!s.teamName) return;
+    teamTally[s.teamName] = teamTally[s.teamName] + s.gained;
+  });
+
+  const teamStandings = Object.entries(teamTally).map(t => ({ name: t[0], totalGained: t[1] }));
+
+  return teamStandings
+    .sort((a, b) => b.totalGained - a.totalGained)
+    .slice(0, 3)
+    .map((t, i) => `${getStandingEmoji(i + 1)} ${i + 1}. ${t.name} - **${toKMB(t.totalGained)}**`)
+    .join('\n');
 }
 
 function getStandings(standings: CompetitionStanding[]): string {

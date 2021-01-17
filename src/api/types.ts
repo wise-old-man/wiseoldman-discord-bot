@@ -23,6 +23,7 @@ export interface Competition {
   id: number;
   title: string;
   metric: string;
+  type: string;
   score: number;
   startsAt: Date;
   endsAt: Date;
@@ -32,15 +33,18 @@ export interface Competition {
   groupId?: number;
   participantCount?: number;
   totalGained?: number;
-  participants: {
-    id: number;
-    displayName: string;
-    progress: {
-      start: number;
-      end: number;
-      gained: number;
-    };
-  }[];
+  participants: Participant[];
+}
+
+export interface Participant {
+  id: number;
+  displayName: string;
+  teamName: string | null;
+  progress: {
+    start: number;
+    end: number;
+    gained: number;
+  };
 }
 
 export interface Group {

@@ -1,4 +1,5 @@
 import { MessageEmbed } from 'discord.js';
+import { capitalize } from 'lodash';
 import { getCompetitionTimeLeft } from '../../../api/modules/competitions';
 import { fetchGroupCompetitions, fetchGroupDetails } from '../../../api/modules/groups';
 import { Competition } from '../../../api/types';
@@ -51,12 +52,13 @@ class GroupCompetitions implements Command {
       .slice(0, MAX_COMPETITIONS)
       .map(c => {
         const icon = getEmoji(c.metric);
+        const type = capitalize(c.type);
         const timeLeft = getCompetitionTimeLeft(c);
         const participants = `${c.participantCount} participants`;
 
         return {
           name: c.title,
-          value: `${icon} • ${participants} • ${timeLeft}`
+          value: `${icon} • ${type} • ${participants} • ${timeLeft}`
         };
       });
   }

@@ -4,12 +4,12 @@
   "description": "A Discord bot for the Wise Old Man projects (https://github.com/wise-old-man/wise-old-man/)",
   "main": "index.js",
   "scripts": {
-    "build": "tsc -p .",
+    "build": "tsc",
     "lint": "eslint . --ext .ts",
     "prestart": "sequelize db:migrate",
     "start": "pm2-runtime dist/index.js",
     "predev": "npm run build && sequelize db:migrate",
-    "dev": "nodemon -L --exec ts-node src/index.ts",
+    "dev": "ts-node-dev --poll --respawn --transpile-only --ignore-watch node_modules src/index.ts",
     "migration:generate": "cross-env MIGRATING=false npx sequelize-cli migration:generate --name "
   },
   "keywords": [
@@ -34,10 +34,9 @@
     "eslint": "^7.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.3",
-    "nodemon": "^2.0.4",
     "prettier": "^2.0.5",
     "sequelize-cli": "^5.5.1",
-    "ts-node": "^8.10.2",
+    "ts-node-dev": "^1.0.0-pre.62",
     "typescript": "^3.9.5"
   },
   "dependencies": {

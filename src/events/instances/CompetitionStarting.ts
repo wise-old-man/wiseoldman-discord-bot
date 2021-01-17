@@ -1,4 +1,5 @@
 import { MessageEmbed } from 'discord.js';
+import { capitalize } from 'lodash';
 import config from '../../config';
 import { getChannelIds } from '../../database/services/server';
 import { Event } from '../../types';
@@ -9,6 +10,7 @@ interface CompetitionStartingData {
   competition: {
     id: number;
     metric: string;
+    type: string;
     title: string;
     duration: string;
   };
@@ -27,7 +29,7 @@ class CompetitionStarting implements Event {
 
   async execute(data: CompetitionStartingData): Promise<void> {
     const { groupId, competition, period } = data;
-    const { id, metric, duration, title } = competition;
+    const { id, metric, duration, type, title } = competition;
 
     if (!groupId) return;
 
@@ -44,6 +46,7 @@ class CompetitionStarting implements Event {
 
     const fields = [
       { name: 'Metric', value: `${getEmoji(metric)} ${getMetricName(metric)}` },
+      { name: 'Type', value: capitalize(type) },
       { name: 'Duration', value: duration }
     ];
 
