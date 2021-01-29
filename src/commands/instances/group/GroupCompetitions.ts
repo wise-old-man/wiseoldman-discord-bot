@@ -55,10 +55,11 @@ class GroupCompetitions implements Command {
         const type = capitalize(c.type);
         const timeLeft = getCompetitionTimeLeft(c);
         const participants = `${c.participantCount} participants`;
+        const id = c.id;
 
         return {
-          name: c.title,
-          value: `${icon} • ${type} • ${participants} • ${timeLeft}`
+          name: `${c.title}`,
+          value: `${icon} • ${type} • ${participants} • ${timeLeft} - ID: ${id}`
         };
       });
   }

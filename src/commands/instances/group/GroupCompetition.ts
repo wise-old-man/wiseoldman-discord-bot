@@ -29,7 +29,7 @@ class GroupCompetition implements Command {
 
     try {
       const competitions = await fetchGroupCompetitions(groupId);
-      const competitionId = this.getSelectedCompetitionId(competitions, status, message.prefix);
+      const competitionId = Number(message.args[1]) || this.getSelectedCompetitionId(competitions, status, message.prefix);
       const competition = await fetchCompetition(competitionId);
 
       const pageURL = `https://wiseoldman.net/competitions/${competition.id}/`;
@@ -125,12 +125,12 @@ class GroupCompetition implements Command {
   }
 
   getSelectedCompetitionId(competitions: Competition[], status: string, prefix: String) {
-    if (status === 'ongoing') {
+if (status === 'ongoing') {
       const ongoing = competitions.find(c => getCompetitionStatus(c) === 'ongoing');
 
       if (!ongoing) {
         throw new CommandError(
-          'There are no ongoing competitions for this group.', 
+          'There are no ongoing competitions for this group.',
           `Try ${prefix}group competition --upcoming`
         );
       }
