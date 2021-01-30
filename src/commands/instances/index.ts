@@ -16,6 +16,7 @@ import PlayerBossesCommand from './player/PlayerBosses';
 import PlayerEfficiencyCommand from './player/PlayerEfficiency';
 import PlayerGainedCommand from './player/PlayerGained';
 import PlayerSetUsername from './player/PlayerSetUsername';
+import PlayerSetFlag from './player/PlayerSetFlag';
 import PlayerStatsCommand from './player/PlayerStats';
 import PlayerUpdateCommand from './player/UpdatePlayer';
 
@@ -32,6 +33,7 @@ const commands: Command[] = [
   PlayerGainedCommand,
   PlayerEfficiencyCommand,
   PlayerSetUsername,
+  PlayerSetFlag,
 
   // group commands
   GroupDetailsCommand,
