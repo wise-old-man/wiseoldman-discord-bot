@@ -16,7 +16,7 @@ class PlayerGained implements Command {
 
   constructor() {
     this.name = 'View player gains';
-    this.template = '!gained {username} [--6h/--day/--week/--month/--year]';
+    this.template = '!gained {username} [--6h/--day/--week/--month/--year/--1y6d5h]';
   }
 
   activated(message: ParsedMessage) {
@@ -29,6 +29,8 @@ class PlayerGained implements Command {
 
     // Grab the period from the command's arguments
     const period = this.getPeriodArg(message.args);
+
+    const footer = `Tip: You can use custom periods with this format: ${message.prefix}gained --2m6d7h`;
 
     if (!username) {
       throw new CommandError(
@@ -50,7 +52,8 @@ class PlayerGained implements Command {
         const response = pages[0]
           .setColor(config.visuals.blue)
           .setTitle(`${player.displayName} gains (${period})`)
-          .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`));
+          .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
+          .setFooter(footer);
 
         message.respond(response);
       } else {
@@ -61,6 +64,7 @@ class PlayerGained implements Command {
           .setColor(config.visuals.blue)
           .setTitle(`${player.displayName} gains (${period})`)
           .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
+          .setFooter(footer)
           .build();
       }
     } catch (e) {
