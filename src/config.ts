@@ -5,7 +5,9 @@ export default {
   defaultPrefix: '!',
   validPrefixes: ['!', '-', '+', '++', '$'],
   helpCommand: 'wom!help',
-  baseAPIUrl: 'https://wiseoldman.net/api',
+  baseAPIUrl: 'https://api.wiseoldman.net',
+  womGuildId: '679454777708380161',
+  womFlagChannelId: '802680940835897384',
   visuals: {
     blue: '#2980b9',
     red: '#cc4242',

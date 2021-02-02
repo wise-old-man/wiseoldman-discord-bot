@@ -3,3 +3,4 @@ export * from './discord';
 export * from './levels';
 export * from './metrics';
 export * from './strings';
+export * from './flags';

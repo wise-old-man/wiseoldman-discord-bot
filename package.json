@@ -10,7 +10,8 @@
     "start": "pm2-runtime dist/index.js",
     "predev": "npm run build && sequelize db:migrate",
     "dev": "ts-node-dev --poll --respawn --transpile-only --ignore-watch node_modules src/index.ts",
-    "migration:generate": "cross-env MIGRATING=false npx sequelize-cli migration:generate --name "
+    "migration:generate": "cross-env MIGRATING=false npx sequelize-cli migration:generate --name ",
+    "docker:dev": "docker-compose up --build"
   },
   "keywords": [
     "discord",
@@ -36,7 +37,7 @@
     "eslint-plugin-prettier": "^3.1.3",
     "prettier": "^2.0.5",
     "sequelize-cli": "^5.5.1",
-    "ts-node-dev": "^1.0.0-pre.62",
+    "ts-node-dev": "^1.1.1",
     "typescript": "^3.9.5"
   },
   "dependencies": {

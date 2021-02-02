@@ -124,8 +124,8 @@ class GroupCompetition implements Command {
       .map(p => `${p.displayName} - **${toKMB(p.progress.gained)}**`);
   }
 
-  getSelectedCompetitionId(competitions: Competition[], status: string, prefix: String) {
-if (status === 'ongoing') {
+  getSelectedCompetitionId(competitions: Competition[], status: string, prefix: string) {
+    if (status === 'ongoing') {
       const ongoing = competitions.find(c => getCompetitionStatus(c) === 'ongoing');
 
       if (!ongoing) {

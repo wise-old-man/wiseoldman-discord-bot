@@ -32,6 +32,18 @@ async function updatePlayer(username: string): Promise<Player> {
 }
 
 /**
+ * Send an API request attempting to update a player's country
+ */
+async function updateCountry(username: string, country: string): Promise<{ message: string }> {
+  const URL = `${config.baseAPIUrl}/players/username/${username}/country`;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  const { data } = await axios.put(URL, { country, adminPassword });
+
+  return data;
+}
+
+/**
  * Fetch the player's gains from the API.
  */
 async function fetchPlayerGains(username: string, period: string): Promise<PlayerGains> {
@@ -76,4 +88,11 @@ async function fetchPlayerAchievements(username: string, limit = 5): Promise<Pla
   return achievements.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, limit);
 }
 
-export { fetchPlayer, updatePlayer, fetchPlayerGains, fetchPlayerRecords, fetchPlayerAchievements };
+export {
+  fetchPlayer,
+  updatePlayer,
+  updateCountry,
+  fetchPlayerGains,
+  fetchPlayerRecords,
+  fetchPlayerAchievements
+};
