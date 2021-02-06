@@ -29,7 +29,7 @@ class GroupCompetition implements Command {
 
     try {
       const competitions = await fetchGroupCompetitions(groupId);
-      const competitionId = this.getSelectedCompetitionId(competitions, status, message.prefix);
+      const competitionId = Number(message.args[1]) || this.getSelectedCompetitionId(competitions, status, message.prefix);
       const competition = await fetchCompetition(competitionId);
 
       const pageURL = `https://wiseoldman.net/competitions/${competition.id}/`;

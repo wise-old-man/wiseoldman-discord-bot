@@ -1,5 +1,5 @@
 <div align = "center">
-  
+
 ![Wise Old Man Discord Bot](https://user-images.githubusercontent.com/3278148/86964409-ec5f2880-c15d-11ea-84bf-8b484d60afd2.png)
 
 🔗 [www.bot.wiseoldman.net](https://bot.wiseoldman.net/)
@@ -22,12 +22,12 @@ This repository is an extention of the core project, a Discord Bot to server as 
 
 ## 👪 Related projects
 
-- [Core Repository (API/Webapp](https://github.com/wise-old-man/wise-old-man)
+- [Core Repository (API/Webapp)](https://github.com/wise-old-man/wise-old-man)
 - [Discord Bot Landing Page](https://github.com/wise-old-man/bot.wiseoldman.net)
 
 <br />
 
-## 📚  Technologies
+## 📚 Technologies
 
 This project is built using Discord.js, Sequelize and Express.
 
