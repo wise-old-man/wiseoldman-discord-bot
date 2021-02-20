@@ -283,7 +283,8 @@ export interface PlayerRecord {
 export interface PlayerAchievement {
   playerId: number;
   threshold: number;
-  type: string;
+  name: string;
   metric: string;
+  measure: string;
   createdAt: Date;
 }
