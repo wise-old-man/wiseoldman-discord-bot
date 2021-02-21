@@ -8,7 +8,7 @@ import { encodeURL, formatDate } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 
-const RENDER_WIDTH = 260;
+const RENDER_WIDTH = 280;
 const RENDER_HEIGHT = 165;
 const RENDER_PADDING = 15;
 
@@ -95,12 +95,12 @@ class PlayerAchievements implements Command, Renderable {
 
       ctx.fillStyle = '#ffffff';
       ctx.font = '9px Arial';
-      ctx.fillText(result.type, originX + 30, originY + 17);
+      ctx.fillText(result.name, originX + 30, originY + 17);
 
       ctx.fillStyle = '#b3b3b3';
 
       if (result.createdAt.getFullYear() > 2000) {
-        ctx.fillText(formatDate(result.createdAt, 'Do MMM'), originX + 205, originY + 17);
+        ctx.fillText(formatDate(result.createdAt, "Do MMM 'YY"), originX + 205, originY + 17);
       }
     }
 

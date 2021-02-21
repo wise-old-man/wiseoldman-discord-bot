@@ -6,7 +6,7 @@ import { Event } from '../../types';
 import { encodeURL, getEmoji, propagate } from '../../utils';
 
 interface PlayerAchievement {
-  type: string;
+  name: string;
   metric: string;
 }
 
@@ -48,7 +48,7 @@ class MemberAchievements implements Event {
     const title = `New member ${achievements.length > 1 ? 'achievements' : 'achievement'}`;
 
     const content = achievements
-      .map(({ metric, type }) => `${displayName} ${discordTag} - ${getEmoji(metric)} ${type}`)
+      .map(({ metric, name }) => `${displayName} ${discordTag} - ${getEmoji(metric)} ${name}`)
       .join('\n');
 
     return new MessageEmbed()
