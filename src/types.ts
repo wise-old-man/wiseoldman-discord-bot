@@ -143,5 +143,6 @@ export enum Emoji {
   clock = '🕒',
   crown = '👑',
   heart = '❤️',
-  info = 'ℹ️'
+  info = 'ℹ️',
+  grave = '🪦'
 }
