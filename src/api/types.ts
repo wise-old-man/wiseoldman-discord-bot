@@ -216,6 +216,10 @@ export interface Snapshot {
   clue_scrolls_master: SnapshotActivity;
   last_man_standing: SnapshotActivity;
   soul_wars_zeal: SnapshotActivity;
+
+  // Virtuals
+  ehp: VirtualActivity;
+  ehb: VirtualActivity;
 }
 
 export interface SnapshotSkill {
@@ -232,6 +236,11 @@ export interface SnapshotBoss {
 export interface SnapshotActivity {
   rank: number;
   score: number;
+}
+
+export interface VirtualActivity {
+  rank: number;
+  value: number;
 }
 
 export interface PlayerGains {
