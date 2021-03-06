@@ -10,11 +10,10 @@ async function getChannelPreference(guildId: string, type: string): Promise<Chan
 async function setChannelPreference(
   guildId: string,
   type: string,
-  channelId: string
+  channelId: string | null
 ): Promise<ChannelPreference> {
   if (!guildId) throw new Error('Invalid guildId.');
   if (!type) throw new Error('Invalid type.');
-  if (!channelId) throw new Error('Invalid channelId.');
 
   const channelPref = await ChannelPreference.findOne({ where: { guildId, type } });
 

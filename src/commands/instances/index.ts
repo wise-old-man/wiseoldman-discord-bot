@@ -1,5 +1,6 @@
 import { Command } from '../../types';
-import ConfigChannel from './config/ConfigChannel';
+import ConfigDefaultChannel from './config/ConfigDefaultChannel';
+import ConfigChannelPreference from './config/ConfigChannelPreference';
 import ConfigGroup from './config/ConfigGroup';
 import ConfigPrefix from './config/ConfigPrefix';
 import HelpCommand from './general/Help';
@@ -46,7 +47,8 @@ const commands: Command[] = [
 
   // config commands
   ConfigPrefix,
-  ConfigChannel,
+  ConfigDefaultChannel,
+  ConfigChannelPreference,
   ConfigGroup
 ];
 

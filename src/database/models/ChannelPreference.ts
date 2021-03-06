@@ -11,7 +11,7 @@ export class ChannelPreference extends Model<ChannelPreference> {
   @Column({ type: DataType.STRING(256), allowNull: true })
   channelId!: string;
 
-  async setChannelId(channelId: string): Promise<ChannelPreference> {
+  async setChannelId(channelId: string | null): Promise<ChannelPreference> {
     return await this.update({ channelId });
   }
 }

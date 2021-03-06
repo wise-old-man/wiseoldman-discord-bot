@@ -19,18 +19,6 @@ async function getServers(groupId: number): Promise<Server[]> {
 }
 
 /**
- * Find all "announcement channels" for the Servers
- * that are tracking a given groupId.
- */
-async function getChannelIds(groupId: number): Promise<string[] | undefined> {
-  const servers = await getServers(groupId);
-
-  if (!servers || servers.length === 0) return;
-
-  return servers.map(s => s.botChannelId).filter(s => s);
-}
-
-/**
  * Update the "tracked" group for a given guild.
  */
 async function updateGroup(guildId: string, groupId: number): Promise<Server> {
@@ -59,7 +47,7 @@ async function updatePrefix(guildId: string, prefix: string): Promise<Server> {
 /**
  * Update the bot's announcement channel for a given guild.
  */
-async function updateAnnouncementChannel(guildId: string, channelId: string): Promise<Server> {
+async function updateBotChannel(guildId: string, channelId: string): Promise<Server> {
   const server = await getServer(guildId);
 
   if (!server) {
@@ -69,4 +57,4 @@ async function updateAnnouncementChannel(guildId: string, channelId: string): Pr
   return await server.setBotChannel(channelId);
 }
 
-export { getServer, getServers, getChannelIds, updateGroup, updatePrefix, updateAnnouncementChannel };
+export { getServer, getServers, updateGroup, updatePrefix, updateBotChannel };
