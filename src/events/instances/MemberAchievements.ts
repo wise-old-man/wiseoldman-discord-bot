@@ -1,9 +1,8 @@
 import { MessageEmbed } from 'discord.js';
 import config from '../../config';
 import { getUserId } from '../../database/services/alias';
-import { getChannelIds } from '../../database/services/server';
-import { Event } from '../../types';
-import { encodeURL, getEmoji, propagate } from '../../utils';
+import { Event, BroadcastType } from '../../types';
+import { encodeURL, getEmoji, broadcastMessage } from '../../utils';
 
 interface PlayerAchievement {
   name: string;
@@ -31,14 +30,11 @@ class MemberAchievements implements Event {
 
     if (!groupId) return;
 
-    const channelIds = await getChannelIds(groupId);
-
     const userId = await getUserId(player.displayName);
     const discordTag = userId ? `(<@${userId}>)` : '';
 
     const message = this.buildMessage(data, discordTag);
-
-    propagate(message, channelIds);
+    broadcastMessage(groupId, BroadcastType.MemberAchievements, message);
   }
 
   buildMessage(data: MemberAchievementsData, discordTag: string): MessageEmbed {

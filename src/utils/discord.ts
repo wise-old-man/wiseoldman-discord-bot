@@ -18,7 +18,7 @@ export function getEmoji(metric: string): string {
   return (<any>Emoji)[emojiKey] || '❌';
 }
 
-export function propagate(message: StringResolvable, channelIds: string[] | undefined): void {
+export function propagateMessage(message: StringResolvable, channelIds: string[] | undefined): void {
   if (!channelIds) {
     return;
   }

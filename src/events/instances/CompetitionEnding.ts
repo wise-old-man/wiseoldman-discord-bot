@@ -1,9 +1,8 @@
 import { MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
-import { getChannelIds } from '../../database/services/server';
-import { Event } from '../../types';
-import { getEmoji, getMetricName, propagate } from '../../utils';
+import { BroadcastType, Event } from '../../types';
+import { getEmoji, getMetricName, broadcastMessage } from '../../utils';
 
 interface CompetitionEndingData {
   groupId: number;
@@ -33,11 +32,6 @@ class CompetitionEnding implements Event {
 
     if (!groupId) return;
 
-    const channelIds = await getChannelIds(groupId);
-
-    // If no servers/channels care about this group
-    if (!channelIds || channelIds.length === 0) return;
-
     const timeLeft = getTimeLeft(period);
 
     if (!timeLeft) return;
@@ -64,7 +58,7 @@ class CompetitionEnding implements Event {
       .setURL(url)
       .addFields(fields);
 
-    propagate(message, channelIds);
+    broadcastMessage(groupId, BroadcastType.CompetitionStatus, message);
   }
 }
 
