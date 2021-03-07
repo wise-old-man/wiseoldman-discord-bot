@@ -7,6 +7,13 @@ async function getChannelPreference(guildId: string, type: string): Promise<Chan
   return channelPref;
 }
 
+async function getChannelPreferences(guildId: string): Promise<ChannelPreference[]> {
+  if (!guildId) return [];
+
+  const channelPrefs = await ChannelPreference.findAll({ where: { guildId } });
+  return channelPrefs;
+}
+
 async function setChannelPreference(
   guildId: string,
   type: string,
@@ -17,7 +24,7 @@ async function setChannelPreference(
 
   const channelPref = await ChannelPreference.findOne({ where: { guildId, type } });
 
-  // Channel Preference already exists for this guild & announcement type
+  // Channel Preference already exists for this guild & broadcast type
   if (channelPref) {
     return await channelPref.setChannelId(channelId);
   }
@@ -32,7 +39,7 @@ async function getPreferredChannels(servers: Server[], type: string): Promise<st
       try {
         const preferred = await getChannelPreference(server.guildId, type);
 
-        // If this guild hasn't set a preferred channel for this announcement type
+        // If this guild hasn't set a preferred channel for this broadcast type
         // broadcast to their default bot channel instead.
         return preferred ? preferred.channelId : server.botChannelId;
       } catch (error) {
@@ -45,4 +52,4 @@ async function getPreferredChannels(servers: Server[], type: string): Promise<st
   return channels.filter(c => !!c) as string[];
 }
 
-export { getChannelPreference, getPreferredChannels, setChannelPreference };
+export { getChannelPreference, getChannelPreferences, getPreferredChannels, setChannelPreference };

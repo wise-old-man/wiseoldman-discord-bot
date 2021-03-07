@@ -2,7 +2,7 @@ import { MessageEmbed } from 'discord.js';
 import config from '../../../config';
 import { setChannelPreference } from '../../../database/services/channelPreferences';
 import { BroadcastType, Command, ParsedMessage } from '../../../types';
-import { getEmoji } from '../../../utils';
+import { getEmoji, getBroadcastName } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class ConfigChannelPreference implements Command {
@@ -27,7 +27,7 @@ class ConfigChannelPreference implements Command {
 
       const channelId = this.getChannelId(message);
       const broadcastType = this.getBroadcastType(message.args[0]);
-      const broadcastName = this.getBroadcastName(broadcastType);
+      const broadcastName = getBroadcastName(broadcastType);
 
       await setChannelPreference(guildId, broadcastType, channelId);
 
@@ -60,21 +60,6 @@ class ConfigChannelPreference implements Command {
       );
     } else {
       throw new CommandError('Failed to update channel preference.');
-    }
-  }
-
-  getBroadcastName(type: BroadcastType): string {
-    switch (type) {
-      case BroadcastType.CompetitionStatus:
-        return 'Competition Status';
-      case BroadcastType.MemberAchievements:
-        return 'Member Achievements';
-      case BroadcastType.MemberHardcoreDied:
-        return 'Member (HCIM) Died';
-      case BroadcastType.MemberNameChanged:
-        return 'Member Name Changed';
-      case BroadcastType.MembersListChanged:
-        return 'Members List Changed';
     }
   }
 

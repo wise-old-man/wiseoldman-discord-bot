@@ -37,7 +37,7 @@ class ConfigGroup implements Command {
       const response = new MessageEmbed()
         .setColor(config.visuals.green)
         .setTitle(`${getEmoji('success')} Server group updated`)
-        .setDescription(`All announcements and commands will be in reference to **${group.name}**`)
+        .setDescription(`All broadcasts and commands will be in reference to **${group.name}**`)
         .addFields({ name: 'Page URL', value: `https://wiseoldman.net/groups/${groupId}` });
 
       message.respond(response);

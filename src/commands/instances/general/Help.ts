@@ -1,8 +1,9 @@
 import { MessageEmbed } from 'discord.js';
 import { fetchGroupDetails } from '../../../api/modules/groups';
 import config from '../../../config';
-import { Command, ParsedMessage } from '../../../types';
-import { getEmoji } from '../../../utils';
+import { getChannelPreferences } from '../../../database/services/channelPreferences';
+import { BroadcastType, Command, ParsedMessage } from '../../../types';
+import { getBroadcastName, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
 const BOT_URL = 'https://bot.wiseoldman.net';
@@ -27,32 +28,28 @@ class Help implements Command {
   }
 
   async execute(message: ParsedMessage) {
-    const { originServer } = message;
+    if (!message.originServer) return;
+    const { groupId, guildId, prefix, botChannelId } = message.originServer;
 
     try {
-      const groupId = message.originServer?.groupId || -1;
-      const prefix = originServer?.prefix || config.defaultPrefix;
-      const announcementChannelId = originServer?.botChannelId;
       const group = groupId > -1 ? await fetchGroupDetails(groupId) : null;
+      const channelPreferences = await getChannelPreferences(guildId);
+
+      const fields = [
+        { name: 'Prefix', value: prefix || config.defaultPrefix },
+        { name: 'Tracked group', value: group ? group.name : 'none' },
+        { name: 'Default Broadcast Channel', value: botChannelId ? `<#${botChannelId}>` : 'none' },
+        ...channelPreferences.map(pref => ({
+          name: `"${getBroadcastName(pref.type as BroadcastType)}" Broadcast Channel`,
+          value: pref.channelId ? `<#${pref.channelId}>` : '`DISABLED`'
+        }))
+      ];
 
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
         .setTitle(`${getEmoji('info')} Need help?`)
         .setDescription(`${LINE_COMMANDS}\n\n${LINE_SUPPORT}\n\n${getEmoji('warning')}${LINE_PERMS}`)
-        .addFields([
-          {
-            name: 'Prefix',
-            value: prefix
-          },
-          {
-            name: 'Announcement Channel',
-            value: announcementChannelId ? `<#${announcementChannelId}>` : 'none'
-          },
-          {
-            name: 'Tracked group',
-            value: group ? group.name : 'none'
-          }
-        ]);
+        .addFields(fields);
 
       message.respond(response);
     } catch (error) {

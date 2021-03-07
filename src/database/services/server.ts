@@ -45,7 +45,7 @@ async function updatePrefix(guildId: string, prefix: string): Promise<Server> {
 }
 
 /**
- * Update the bot's announcement channel for a given guild.
+ * Update the bot's default broadcast channel for a given guild.
  */
 async function updateBotChannel(guildId: string, channelId: string): Promise<Server> {
   const server = await getServer(guildId);
