@@ -1,6 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import config from '../config';
-import { canManageMessages, isAdmin } from '../utils';
+import { isAdmin, getMissingPermissions } from '../utils';
 import CommandError from './CommandError';
 import commands from './instances';
 import * as parser from './parser';
@@ -16,6 +16,15 @@ export async function onMessageReceived(message: Message): Promise<void> {
   }
 
   const parsed = await parser.parse(message);
+  const missingPermissions = getMissingPermissions(message.guild?.me);
+
+  if (missingPermissions && missingPermissions.length > 0) {
+    return onError(
+      message,
+      `Error! Missing permissions: \n\n${missingPermissions.map(m => `\`${m}\``).join('\n')}`,
+      'Contact your server administrator for help.'
+    );
+  }
 
   commands.forEach(async c => {
     // If the message doesn't match the activation conditions
@@ -27,16 +36,6 @@ export async function onMessageReceived(message: Message): Promise<void> {
       return onError(
         message,
         'That command requires Admin permissions.',
-        'Contact your server administrator for help.'
-      );
-    }
-
-    // If the message requires pagination, the bot requires "Manage Messages"
-    // permissions to do the pagination via emoji reactions behaviour
-    if (c.requiresPagination && !canManageMessages(message.guild?.me)) {
-      return onError(
-        message,
-        'That command requires the bot to have "Manage Messages" permissions.',
         'Contact your server administrator for help.'
       );
     }

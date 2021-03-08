@@ -1,9 +1,8 @@
 import { MessageEmbed } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../config';
-import { getChannelIds } from '../../database/services/server';
-import { Event } from '../../types';
-import { getEmoji, propagate, toKMB } from '../../utils';
+import { BroadcastType, Event } from '../../types';
+import { getEmoji, toKMB, broadcastMessage } from '../../utils';
 
 interface CompetitionStanding {
   displayName: string;
@@ -34,15 +33,9 @@ class CompetitionEnded implements Event {
     const { groupId, competition, standings } = data;
     const { id, title } = competition;
 
-    const isTeamCompetition = competition.type === 'team';
-
     if (!groupId) return;
 
-    const channelIds = await getChannelIds(groupId);
-
-    // If no servers/channels care about this group
-    if (!channelIds || channelIds.length === 0) return;
-
+    const isTeamCompetition = competition.type === 'team';
     const url = `https://wiseoldman.net/competitions/${id}`;
 
     const message = new MessageEmbed()
@@ -56,7 +49,7 @@ class CompetitionEnded implements Event {
         }
       ]);
 
-    propagate(message, channelIds);
+    broadcastMessage(groupId, BroadcastType.CompetitionStatus, message);
   }
 }
 

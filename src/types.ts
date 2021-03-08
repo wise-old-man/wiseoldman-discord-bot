@@ -46,6 +46,14 @@ export interface TimeGap {
   days: number;
 }
 
+export enum BroadcastType {
+  CompetitionStatus = 'COMPETITION_STATUS',
+  MemberAchievements = 'MEMBER_ACHIEVEMENTS',
+  MemberNameChanged = 'MEMBER_NAME_CHANGED',
+  MemberHardcoreDied = 'MEMBER_HCIM_DIED',
+  MembersListChanged = 'MEMBERS_LIST_CHANGED'
+}
+
 export enum Emoji {
   // Skill emojis
   overall = '<:overall:720446212356177951>',
@@ -143,5 +151,6 @@ export enum Emoji {
   clock = '🕒',
   crown = '👑',
   heart = '❤️',
-  info = 'ℹ️'
+  info = 'ℹ️',
+  grave = '🪦'
 }

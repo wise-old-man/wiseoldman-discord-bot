@@ -1,8 +1,7 @@
 import { MessageEmbed } from 'discord.js';
 import config from '../../config';
-import { getChannelIds } from '../../database/services/server';
-import { Event } from '../../types';
-import { encodeURL, getEmoji, propagate } from '../../utils';
+import { BroadcastType, Event } from '../../types';
+import { encodeURL, getEmoji, broadcastMessage } from '../../utils';
 
 interface Player {
   id: number;
@@ -26,10 +25,8 @@ class MembersJoined implements Event {
 
     if (!groupId) return;
 
-    const channelIds = await getChannelIds(groupId);
     const message = this.buildMessage(data);
-
-    propagate(message, channelIds);
+    broadcastMessage(groupId, BroadcastType.MembersListChanged, message);
   }
 
   buildMessage(data: MembersJoinedData) {

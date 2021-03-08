@@ -10,8 +10,8 @@ import { encodeURL, round, toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 
-const RENDER_WIDTH = 282;
-const RENDER_HEIGHT = 355;
+const RENDER_WIDTH = 350;
+const RENDER_HEIGHT = 295;
 const RENDER_PADDING = 15;
 
 enum RenderVariant {
@@ -37,7 +37,7 @@ class PlayerBosses implements Command, Renderable {
     // Grab the username from the command's arguments or database alias
     const username = await this.getUsername(message);
 
-    // Grab (if it exists) the command variant from the command's arguments (--exp / --ranks)
+    // Grab (if it exists) the command variant from the command's arguments (--ehb / --ranks)
     const variant = this.getRenderVariant(message.command, message.args);
 
     if (!username) {
@@ -75,6 +75,14 @@ class PlayerBosses implements Command, Renderable {
     // Convert the snapshot into boss results
     const bossResults = <BossResult[]>toResults(player.latestSnapshot, MetricType.Boss);
 
+    bossResults.push({
+      name: 'ehb',
+      type: MetricType.Boss,
+      rank: player.latestSnapshot.ehb.rank,
+      kills: Math.floor(player.latestSnapshot.ehb.value),
+      ehb: player.latestSnapshot.ehb.value
+    });
+
     // Create a scaled empty canvas
     const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
 
@@ -87,8 +95,8 @@ class PlayerBosses implements Command, Renderable {
 
     // Player stats
     for (const [index, result] of bossResults.entries()) {
-      const x = Math.floor(index / 11);
-      const y = index % 11;
+      const x = Math.floor(index / 9);
+      const y = index % 9;
 
       const originX = RENDER_PADDING - 7 + x * 67;
       const originY = RENDER_PADDING - 5 + y * 31;

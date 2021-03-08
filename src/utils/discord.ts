@@ -1,6 +1,14 @@
-import { Guild, GuildChannel, GuildMember, StringResolvable, TextChannel } from 'discord.js';
+import {
+  Guild,
+  GuildChannel,
+  GuildMember,
+  PermissionResolvable,
+  StringResolvable,
+  TextChannel
+} from 'discord.js';
 import bot from '../bot';
 import { Emoji } from '../types';
+import config from '../config';
 import { getAbbreviation } from './metrics';
 
 export const MAX_FIELD_SIZE = 25;
@@ -9,8 +17,17 @@ export function isAdmin(member: GuildMember | null): boolean {
   return member ? member?.hasPermission('ADMINISTRATOR') : false;
 }
 
-export function canManageMessages(member: GuildMember | null | undefined): boolean {
-  return member ? member?.hasPermission('MANAGE_MESSAGES') : false;
+export function getMissingPermissions(member: GuildMember | null | undefined): string[] | null {
+  if (!member) return null;
+
+  return config.requiredPermissions.filter(
+    permission => !member?.hasPermission(permission as PermissionResolvable)
+  );
+}
+
+export function canDoPagination(member: GuildMember | null | undefined): boolean {
+  if (!member) return false;
+  return member?.hasPermission('MANAGE_MESSAGES') && member?.hasPermission('ADD_REACTIONS');
 }
 
 export function getEmoji(metric: string): string {
@@ -18,7 +35,7 @@ export function getEmoji(metric: string): string {
   return (<any>Emoji)[emojiKey] || '❌';
 }
 
-export function propagate(message: StringResolvable, channelIds: string[] | undefined): void {
+export function propagateMessage(message: StringResolvable, channelIds: string[] | undefined): void {
   if (!channelIds) {
     return;
   }
