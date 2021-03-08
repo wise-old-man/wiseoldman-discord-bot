@@ -8,6 +8,7 @@ export default {
   baseAPIUrl: 'https://api.wiseoldman.net',
   womGuildId: '679454777708380161',
   womFlagChannelId: '802680940835897384',
+  requiredPermissions: ['MANAGE_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES', 'ADD_REACTIONS'],
   visuals: {
     blue: '#2980b9',
     red: '#cc4242',
