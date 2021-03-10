@@ -18,7 +18,12 @@ class ConfigChannelPreference implements Command {
 
   activated(message: ParsedMessage) {
     const { command, args } = message;
-    return command === 'config' && args.length >= 2 && args[0].startsWith('channel:');
+    return (
+      command === 'config' &&
+      args.length >= 2 &&
+      args[0].startsWith('channel:') &&
+      args[0] !== 'channel:default'
+    );
   }
 
   async execute(message: ParsedMessage) {
