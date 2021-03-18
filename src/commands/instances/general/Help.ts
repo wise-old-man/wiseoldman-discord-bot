@@ -32,7 +32,7 @@ class Help implements Command {
     const { groupId, guildId, prefix, botChannelId } = message.originServer;
 
     try {
-      const group = groupId > -1 ? await fetchGroupDetails(groupId) : null;
+      const group = groupId && groupId > -1 ? await fetchGroupDetails(groupId) : null;
       const channelPreferences = await getChannelPreferences(guildId);
 
       const fields = [
