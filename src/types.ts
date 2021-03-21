@@ -115,6 +115,7 @@ export enum Emoji {
   sarachnis = '<:sarachnis:729840085377220628>',
   scorpia = '<:scorpia:729840084962115666>',
   skotizo = '<:skotizo:729840085398454273>',
+  tempoross = '<:tempoross:823292463456059452>',
   the_gauntlet = '<:the_gauntlet:729840085473820805>',
   the_corrupted_gauntlet = '<:the_corrupted_gauntlet:729840085159247873>',
   theatre_of_blood = '<:theatre_of_blood:729840085406711819>',
