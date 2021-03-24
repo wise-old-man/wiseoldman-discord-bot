@@ -190,6 +190,7 @@ export interface Snapshot {
   sarachnis: SnapshotBoss;
   scorpia: SnapshotBoss;
   skotizo: SnapshotBoss;
+  tempoross: SnapshotBoss;
   the_gauntlet: SnapshotBoss;
   the_corrupted_gauntlet: SnapshotBoss;
   theatre_of_blood: SnapshotBoss;

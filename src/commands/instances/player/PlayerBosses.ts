@@ -11,7 +11,7 @@ import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 
 const RENDER_WIDTH = 350;
-const RENDER_HEIGHT = 295;
+const RENDER_HEIGHT = 325;
 const RENDER_PADDING = 15;
 
 enum RenderVariant {
@@ -95,8 +95,8 @@ class PlayerBosses implements Command, Renderable {
 
     // Player stats
     for (const [index, result] of bossResults.entries()) {
-      const x = Math.floor(index / 9);
-      const y = index % 9;
+      const x = Math.floor(index / 10);
+      const y = index % 10;
 
       const originX = RENDER_PADDING - 7 + x * 67;
       const originY = RENDER_PADDING - 5 + y * 31;
