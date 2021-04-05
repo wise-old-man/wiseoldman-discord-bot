@@ -1,6 +1,6 @@
-import axios from 'axios';
 import config from '../../config';
 import { durationBetween } from '../../utils';
+import api from '../handler';
 import { Competition } from '../types';
 import { convertDates } from '../utils';
 
@@ -43,7 +43,7 @@ export function getCompetitionTimeLeft(competition: Competition): string {
  */
 export async function fetchCompetition(id: number): Promise<Competition> {
   const URL = `${config.baseAPIUrl}/competitions/${id}`;
-  const { data } = await axios.get(URL);
+  const { data } = await api.get(URL);
 
   // Convert date strings into date instances
   convertDates(data, ['createdAt', 'updatedAt', 'startsAt', 'endsAt']);

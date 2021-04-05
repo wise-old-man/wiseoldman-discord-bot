@@ -1,5 +1,5 @@
-import axios from 'axios';
 import config from '../../config';
+import api from '../handler';
 import {
   Competition,
   Group,
@@ -15,7 +15,7 @@ import { convertDates } from '../utils';
  */
 async function fetchGroupDetails(id: number): Promise<Group> {
   const URL = `${config.baseAPIUrl}/groups/${id}`;
-  const { data } = await axios.get(URL);
+  const { data } = await api.get(URL);
 
   // Convert date strings into date instances
   convertDates(data, ['createdAt', 'updatedAt']);
@@ -28,7 +28,7 @@ async function fetchGroupDetails(id: number): Promise<Group> {
  */
 async function fetchGroupMembers(id: number): Promise<Player[]> {
   const URL = `${config.baseAPIUrl}/groups/${id}/members`;
-  const { data } = await axios.get(URL);
+  const { data } = await api.get(URL);
 
   return data;
 }
@@ -38,7 +38,7 @@ async function fetchGroupMembers(id: number): Promise<Player[]> {
  */
 async function fetchGroupCompetitions(id: number): Promise<Competition[]> {
   const URL = `${config.baseAPIUrl}/groups/${id}/competitions`;
-  const { data } = await axios.get(URL);
+  const { data } = await api.get(URL);
 
   // Convert date strings into date instances
   convertDates(data, ['createdAt', 'updatedAt', 'startsAt', 'endsAt']);
@@ -52,7 +52,7 @@ async function fetchGroupCompetitions(id: number): Promise<Competition[]> {
 async function fetchGroupHiscores(id: number, metric: string): Promise<GroupHiscoresEntry[]> {
   const URL = `${config.baseAPIUrl}/groups/${id}/hiscores`;
   const params = { metric: metric.toLowerCase(), limit: 20 };
-  const { data } = await axios.get(URL, { params });
+  const { data } = await api.get(URL, { params });
 
   // Convert date strings into date instances
   // TODO: this isn't currently doing anything, but it's not affecting
@@ -72,7 +72,7 @@ async function fetchGroupGained(
 ): Promise<GroupGainedEntry[]> {
   const URL = `${config.baseAPIUrl}/groups/${id}/gained`;
   const params = { metric: metric.toLowerCase(), period: period.toLowerCase() };
-  const { data } = await axios.get(URL, { params });
+  const { data } = await api.get(URL, { params });
 
   // Convert date strings into date instances
   convertDates(data, ['startDate', 'endDate']);
@@ -90,7 +90,7 @@ async function fetchGroupRecords(
 ): Promise<GroupRecordEntry[]> {
   const URL = `${config.baseAPIUrl}/groups/${id}/records`;
   const params = { metric: metric.toLowerCase(), period: period.toLowerCase(), limit: 20 };
-  const { data } = await axios.get(URL, { params });
+  const { data } = await api.get(URL, { params });
 
   // Convert date strings into date instances
   // TODO: this isn't currently doing anything, but it's not affecting
