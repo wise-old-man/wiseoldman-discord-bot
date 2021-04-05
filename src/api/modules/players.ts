@@ -1,4 +1,3 @@
-import config from '../../config';
 import api from '../handler';
 import { Player, PlayerAchievement, PlayerGains, PlayerRecord } from '../types';
 import { convertDates } from '../utils';
@@ -7,7 +6,7 @@ import { convertDates } from '../utils';
  * Fetch the player details from the API.
  */
 async function fetchPlayer(username: string): Promise<Player> {
-  const URL = `${config.baseAPIUrl}/players/username/${username}`;
+  const URL = `/players/username/${username}`;
   const { data } = await api.get(URL);
 
   // Convert date strings into date instances
@@ -21,7 +20,7 @@ async function fetchPlayer(username: string): Promise<Player> {
  * Send an API request attempting to update a given username.
  */
 async function updatePlayer(username: string): Promise<Player> {
-  const URL = `${config.baseAPIUrl}/players/track`;
+  const URL = `/players/track`;
   const { data } = await api.post(URL, { username });
 
   // Convert date strings into date instances
@@ -35,7 +34,7 @@ async function updatePlayer(username: string): Promise<Player> {
  * Send an API request attempting to update a player's country
  */
 async function updateCountry(username: string, country: string): Promise<{ message: string }> {
-  const URL = `${config.baseAPIUrl}/players/username/${username}/country`;
+  const URL = `/players/username/${username}/country`;
   const adminPassword = process.env.ADMIN_PASSWORD;
 
   const { data } = await api.put(URL, { country, adminPassword });
@@ -47,7 +46,7 @@ async function updateCountry(username: string, country: string): Promise<{ messa
  * Fetch the player's gains from the API.
  */
 async function fetchPlayerGains(username: string, period: string): Promise<PlayerGains> {
-  const URL = `${config.baseAPIUrl}/players/username/${username}/gained`;
+  const URL = `/players/username/${username}/gained`;
   const { data } = await api.get(URL, { params: { period } });
 
   // Convert date strings into date instances
@@ -60,7 +59,7 @@ async function fetchPlayerGains(username: string, period: string): Promise<Playe
  * Fetch the player's records from the API.
  */
 async function fetchPlayerRecords(username: string, metric: string): Promise<PlayerRecord[]> {
-  const URL = `${config.baseAPIUrl}/players/username/${username}/records`;
+  const URL = `/players/username/${username}/records`;
   const { data } = await api.get(URL, { params: { metric } });
 
   // Convert date strings into date instances
@@ -73,7 +72,7 @@ async function fetchPlayerRecords(username: string, metric: string): Promise<Pla
  * Fetch the player's achievements from the API.
  */
 async function fetchPlayerAchievements(username: string, limit = 5): Promise<PlayerAchievement[]> {
-  const URL = `${config.baseAPIUrl}/players/username/${username}/achievements`;
+  const URL = `/players/username/${username}/achievements`;
   const { data } = await api.get(URL);
 
   if (!data) {

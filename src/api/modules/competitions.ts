@@ -1,4 +1,3 @@
-import config from '../../config';
 import { durationBetween } from '../../utils';
 import api from '../handler';
 import { Competition } from '../types';
@@ -42,7 +41,7 @@ export function getCompetitionTimeLeft(competition: Competition): string {
  * Fetch competition details from the API.
  */
 export async function fetchCompetition(id: number): Promise<Competition> {
-  const URL = `${config.baseAPIUrl}/competitions/${id}`;
+  const URL = `/competitions/${id}`;
   const { data } = await api.get(URL);
 
   // Convert date strings into date instances
