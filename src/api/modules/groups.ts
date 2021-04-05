@@ -1,5 +1,4 @@
-import axios from 'axios';
-import config from '../../config';
+import api from '../handler';
 import {
   Competition,
   Group,
@@ -14,8 +13,8 @@ import { convertDates } from '../utils';
  * Fetch the group details from the API.
  */
 async function fetchGroupDetails(id: number): Promise<Group> {
-  const URL = `${config.baseAPIUrl}/groups/${id}`;
-  const { data } = await axios.get(URL);
+  const URL = `/groups/${id}`;
+  const { data } = await api.get(URL);
 
   // Convert date strings into date instances
   convertDates(data, ['createdAt', 'updatedAt']);
@@ -27,8 +26,8 @@ async function fetchGroupDetails(id: number): Promise<Group> {
  * Fetch the group members from the API.
  */
 async function fetchGroupMembers(id: number): Promise<Player[]> {
-  const URL = `${config.baseAPIUrl}/groups/${id}/members`;
-  const { data } = await axios.get(URL);
+  const URL = `/groups/${id}/members`;
+  const { data } = await api.get(URL);
 
   return data;
 }
@@ -37,8 +36,8 @@ async function fetchGroupMembers(id: number): Promise<Player[]> {
  * Fetch all group competitions from the API.
  */
 async function fetchGroupCompetitions(id: number): Promise<Competition[]> {
-  const URL = `${config.baseAPIUrl}/groups/${id}/competitions`;
-  const { data } = await axios.get(URL);
+  const URL = `/groups/${id}/competitions`;
+  const { data } = await api.get(URL);
 
   // Convert date strings into date instances
   convertDates(data, ['createdAt', 'updatedAt', 'startsAt', 'endsAt']);
@@ -50,9 +49,9 @@ async function fetchGroupCompetitions(id: number): Promise<Competition[]> {
  * Fetch group hiscores from the API.
  */
 async function fetchGroupHiscores(id: number, metric: string): Promise<GroupHiscoresEntry[]> {
-  const URL = `${config.baseAPIUrl}/groups/${id}/hiscores`;
+  const URL = `/groups/${id}/hiscores`;
   const params = { metric: metric.toLowerCase(), limit: 20 };
-  const { data } = await axios.get(URL, { params });
+  const { data } = await api.get(URL, { params });
 
   // Convert date strings into date instances
   // TODO: this isn't currently doing anything, but it's not affecting
@@ -70,9 +69,9 @@ async function fetchGroupGained(
   period: string,
   metric: string
 ): Promise<GroupGainedEntry[]> {
-  const URL = `${config.baseAPIUrl}/groups/${id}/gained`;
+  const URL = `/groups/${id}/gained`;
   const params = { metric: metric.toLowerCase(), period: period.toLowerCase() };
-  const { data } = await axios.get(URL, { params });
+  const { data } = await api.get(URL, { params });
 
   // Convert date strings into date instances
   convertDates(data, ['startDate', 'endDate']);
@@ -88,9 +87,9 @@ async function fetchGroupRecords(
   period: string,
   metric: string
 ): Promise<GroupRecordEntry[]> {
-  const URL = `${config.baseAPIUrl}/groups/${id}/records`;
+  const URL = `/groups/${id}/records`;
   const params = { metric: metric.toLowerCase(), period: period.toLowerCase(), limit: 20 };
-  const { data } = await axios.get(URL, { params });
+  const { data } = await api.get(URL, { params });
 
   // Convert date strings into date instances
   // TODO: this isn't currently doing anything, but it's not affecting
