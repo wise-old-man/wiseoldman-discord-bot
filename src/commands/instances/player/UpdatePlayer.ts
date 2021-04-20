@@ -33,7 +33,8 @@ class UpdatePlayer implements Command {
 
       const response = new MessageEmbed()
         .setColor(config.visuals.green)
-        .setDescription(`Successfully updated **${result.displayName}**.`);
+        .setDescription(`Successfully updated **${result.displayName}**.`)
+        .setFooter('Tip: You can keep yourself automatically updated through Runelite by enabling Wise Old Man in the "XP Updater" plugin.');
 
       message.respond(response);
     } catch (e) {
