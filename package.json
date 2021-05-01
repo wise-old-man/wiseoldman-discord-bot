@@ -11,7 +11,7 @@
     "predev": "npm run build && sequelize db:migrate",
     "dev": "ts-node-dev --poll --respawn --transpile-only --ignore-watch node_modules src/index.ts",
     "migration:generate": "cross-env MIGRATING=false npx sequelize-cli migration:generate --name ",
-    "docker:dev": "docker-compose up --build"
+    "setup:docker": "docker-compose up --build"
   },
   "keywords": [
     "discord",
