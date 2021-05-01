@@ -1,6 +1,6 @@
 import { MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
-import { getCompetitionTimeLeft } from '../../../api/modules/competitions';
+import { getCompetitionStatus, getCompetitionTimeLeft } from '../../../api/modules/competitions';
 import { fetchGroupCompetitions, fetchGroupDetails } from '../../../api/modules/groups';
 import { Competition } from '../../../api/types';
 import config from '../../../config';
@@ -9,6 +9,8 @@ import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
 const MAX_COMPETITIONS = 5;
+
+const STATUS_ORDER = ['ongoing', 'upcoming', 'finished'];
 
 class GroupCompetitions implements Command {
   name: string;
@@ -48,7 +50,13 @@ class GroupCompetitions implements Command {
 
   buildCompetitionsList(competitions: Competition[]) {
     return competitions
-      .sort((a: Competition, b: Competition) => b.startsAt.getTime() - a.startsAt.getTime())
+      .map(c => ({ ...c, status: getCompetitionStatus(c) }))
+      .sort(
+        (a, b) =>
+          STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status) ||
+          a.startsAt.getTime() - b.startsAt.getTime() ||
+          a.endsAt.getTime() - b.endsAt.getTime()
+      )
       .slice(0, MAX_COMPETITIONS)
       .map(c => {
         const icon = getEmoji(c.metric);
