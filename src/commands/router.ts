@@ -1,6 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import config from '../config';
-import { isAdmin, getMissingPermissions } from '../utils';
+import { getMissingPermissions, isAdmin } from '../utils';
 import CommandError from './CommandError';
 import commands from './instances';
 import * as parser from './parser';

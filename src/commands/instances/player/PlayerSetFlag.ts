@@ -2,7 +2,7 @@ import { MessageEmbed } from 'discord.js';
 import { updateCountry } from '../../../api/modules/players';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
-import { getEmoji, countryCodeEmoji, emojiCountryCode } from '../../../utils';
+import { countryCodeEmoji, emojiCountryCode, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class PlayerSetFlag implements Command {
@@ -25,8 +25,8 @@ class PlayerSetFlag implements Command {
     const response = { message: '', isError: false };
 
     if (
-      message.sourceMessage?.guild?.id !== config.womGuildId ||
-      message.sourceMessage?.channel?.id !== config.womFlagChannelId
+      message.sourceMessage?.guild?.id !== config.discord.guildId ||
+      message.sourceMessage?.channel?.id !== config.discord.channels.flags
     ) {
       throw new CommandError(
         'This command only works in the **#change-flag** channel of the official Wise Old Man discord server.\
