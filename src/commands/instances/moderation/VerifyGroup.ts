@@ -22,7 +22,11 @@ class VerifyGroup implements Command {
   }
 
   activated(message: ParsedMessage) {
-    return message.command === 'verify-group' && message.args.length >= 2;
+    return (
+      message.command === 'verify-group' &&
+      message.args.length >= 2 &&
+      message.sourceMessage?.guild?.id === config.discord.guildId
+    );
   }
 
   async execute(message: ParsedMessage) {

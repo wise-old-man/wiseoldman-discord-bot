@@ -21,7 +21,11 @@ class ResetGroupCode implements Command {
   }
 
   activated(message: ParsedMessage) {
-    return message.command === 'reset-group-code' && message.args.length >= 2;
+    return (
+      message.command === 'reset-group-code' &&
+      message.args.length >= 2 &&
+      message.sourceMessage?.guild?.id === config.discord.guildId
+    );
   }
 
   async execute(message: ParsedMessage) {
