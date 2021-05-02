@@ -111,6 +111,18 @@ async function resetCode(groupId: number): Promise<{ newCode: string }> {
   return data;
 }
 
+/**
+ * Send an API request attempting to verify a group.
+ */
+async function verify(groupId: number): Promise<Group> {
+  const URL = `/groups/${groupId}/verify`;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  const { data } = await api.put(URL, { adminPassword });
+
+  return data;
+}
+
 export {
   fetchGroupDetails,
   fetchGroupMembers,
@@ -118,5 +130,6 @@ export {
   fetchGroupHiscores,
   fetchGroupGained,
   fetchGroupRecords,
-  resetCode
+  resetCode,
+  verify
 };

@@ -13,6 +13,7 @@ import GroupMembersCommand from './group/GroupMembers';
 import GroupRecordsCommand from './group/GroupRecords';
 import ResetCompetitionCode from './moderation/ResetCompetitionCode';
 import ResetGroupCode from './moderation/ResetGroupCode';
+import VerifyGroup from './moderation/VerifyGroup';
 import PlayerAchievements from './player/PlayerAchievements';
 import PlayerActivitiesCommand from './player/PlayerActivities';
 import PlayerBossesCommand from './player/PlayerBosses';
@@ -30,6 +31,7 @@ const commands: Command[] = [
   // moderation commands
   ResetGroupCode,
   ResetCompetitionCode,
+  VerifyGroup,
 
   // player commands
   PlayerStatsCommand,

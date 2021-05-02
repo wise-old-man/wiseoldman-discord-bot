@@ -13,9 +13,15 @@ export default {
     green: '#64d85b',
     orange: '#ecbf54'
   },
-  womGuild: {
-    id: '679454777708380161',
-    flagChannelId: '802680940835897384',
-    moderatorRoleId: '838198270601723915'
+  discord: {
+    guildId: '679454777708380161',
+    roles: {
+      moderator: '705821689526747136',
+      groupLeader: '705826389474934845'
+    },
+    channels: {
+      flags: '802680940835897384',
+      leadersLog: '830199626630955039'
+    }
   }
 };

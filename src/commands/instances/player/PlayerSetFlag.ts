@@ -25,8 +25,8 @@ class PlayerSetFlag implements Command {
     const response = { message: '', isError: false };
 
     if (
-      message.sourceMessage?.guild?.id !== config.womGuild.id ||
-      message.sourceMessage?.channel?.id !== config.womGuild.flagChannelId
+      message.sourceMessage?.guild?.id !== config.discord.guildId ||
+      message.sourceMessage?.channel?.id !== config.discord.channels.flags
     ) {
       throw new CommandError(
         'This command only works in the **#change-flag** channel of the official Wise Old Man discord server.\

@@ -21,7 +21,7 @@ export function hasModeratorRole(member: GuildMember | null): boolean {
   if (!member) return false;
   if (!member.roles || !member.roles.cache) return false;
 
-  return member.roles.cache.some(r => r.id === config.womGuild.moderatorRoleId);
+  return member.roles.cache.some(r => r.id === config.discord.roles.moderator);
 }
 
 export function getMissingPermissions(member: GuildMember | null | undefined): string[] | null {
