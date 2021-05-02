@@ -7,14 +7,21 @@ import {
   TextChannel
 } from 'discord.js';
 import bot from '../bot';
-import { Emoji } from '../types';
 import config from '../config';
+import { Emoji } from '../types';
 import { getAbbreviation } from './metrics';
 
 export const MAX_FIELD_SIZE = 25;
 
 export function isAdmin(member: GuildMember | null): boolean {
   return member ? member?.hasPermission('ADMINISTRATOR') : false;
+}
+
+export function hasModeratorRole(member: GuildMember | null): boolean {
+  if (!member) return false;
+  if (!member.roles || !member.roles.cache) return false;
+
+  return member.roles.cache.some(r => r.id === config.womGuild.moderatorRoleId);
 }
 
 export function getMissingPermissions(member: GuildMember | null | undefined): string[] | null {

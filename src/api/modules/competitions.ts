@@ -49,3 +49,15 @@ export async function fetchCompetition(id: number): Promise<Competition> {
 
   return data;
 }
+
+/**
+ * Send an API request attempting to reset a competition's verification code.
+ */
+export async function resetCode(competitionId: number): Promise<{ newCode: string }> {
+  const URL = `/competitions/${competitionId}/reset-code`;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  const { data } = await api.put(URL, { adminPassword });
+
+  return data;
+}
