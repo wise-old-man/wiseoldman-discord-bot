@@ -22,6 +22,8 @@ export function init(): Express {
       return res.status(401).json('Wrong API Token.');
     }
 
+    console.log('Event received: ', req.body);
+
     onEventReceived(req.body);
     return res.json('Event received.');
   });
