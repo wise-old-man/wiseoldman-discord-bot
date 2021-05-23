@@ -47,8 +47,8 @@ export function propagateMessage(message: StringResolvable, channelIds: string[]
     return;
   }
 
-  channelIds.forEach(id => {
-    const channel = bot.client.channels.cache.get(id);
+  channelIds.forEach(async id => {
+    const channel = await bot.client.channels.fetch(id, true);
 
     if (!channel) return;
     if (!((channel): channel is TextChannel => channel.type === 'text')(channel)) return;
