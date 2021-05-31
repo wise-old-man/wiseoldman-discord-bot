@@ -11,6 +11,12 @@ export interface Command {
   execute(message: ParsedMessage): void;
 }
 
+export interface CustomCommand {
+  command: string;
+  message: string;
+  image?: string;
+}
+
 export interface Event {
   type: string;
   execute(data: Object): void;
