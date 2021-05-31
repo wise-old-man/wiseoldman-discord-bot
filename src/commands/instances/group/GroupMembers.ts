@@ -51,6 +51,7 @@ class GroupMembers implements Command {
         .setArray(pages)
         .setChannel(<any>message.sourceMessage.channel)
         .setPageIndicator(true)
+        .setAuthorizedUsers([message.sourceMessage.author.id])
         .build();
     } catch (e) {
       throw new CommandError(e.response?.data?.message);
