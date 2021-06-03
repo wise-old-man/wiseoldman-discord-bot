@@ -119,6 +119,7 @@ export enum Emoji {
   the_gauntlet = '<:the_gauntlet:729840085473820805>',
   the_corrupted_gauntlet = '<:the_corrupted_gauntlet:729840085159247873>',
   theatre_of_blood = '<:theatre_of_blood:729840085406711819>',
+  theatre_of_blood_hard_mode = '<:theatre_of_blood_hard_mode:850017967164751933>',
   thermonuclear_smoke_devil = '<:thermonuclear_smoke_devil:729840085729673326>',
   tzkal_zuk = '<:tzkal_zuk:729840085373157497>',
   tztok_jad = '<:tztok_jad:729840085805170698>',

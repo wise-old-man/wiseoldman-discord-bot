@@ -194,6 +194,7 @@ export interface Snapshot {
   the_gauntlet: SnapshotBoss;
   the_corrupted_gauntlet: SnapshotBoss;
   theatre_of_blood: SnapshotBoss;
+  theatre_of_blood_hard_mode: SnapshotBoss;
   thermonuclear_smoke_devil: SnapshotBoss;
   tzkal_zuk: SnapshotBoss;
   tztok_jad: SnapshotBoss;
