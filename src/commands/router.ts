@@ -4,6 +4,8 @@ import { getMissingPermissions, isAdmin } from '../utils';
 import CommandError from './CommandError';
 import commands from './instances';
 import * as parser from './parser';
+import { customCommands } from './CustomCommands';
+import { CustomCommand } from '../types';
 
 export function onError(message: Message, title: string, tip?: string): void {
   const response = new MessageEmbed().setColor(config.visuals.red).setDescription(title);
@@ -24,6 +26,15 @@ export async function onMessageReceived(message: Message): Promise<void> {
       `Error! Missing permissions: \n\n${missingPermissions.map(m => `\`${m}\``).join('\n')}`,
       'Contact your server administrator for help.'
     );
+  }
+
+  // Check for custom commands
+  if (parsed.sourceMessage?.guild?.id === config.discord.guildId) {
+    customCommands.forEach( (c: CustomCommand) => {
+      if (c.command === parsed.command) {
+        parsed.respond(c.image === undefined ? c.message : c.message + "\n" + c.image);
+      }
+    });
   }
 
   commands.forEach(async c => {
