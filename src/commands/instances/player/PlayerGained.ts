@@ -61,6 +61,7 @@ class PlayerGained implements Command {
           .setArray(pages)
           .setChannel(<any>message.sourceMessage.channel)
           .setPageIndicator(true)
+          .setAuthorizedUsers([message.sourceMessage.author.id])
           .setColor(config.visuals.blue)
           .setTitle(`${player.displayName} gains (${period})`)
           .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
