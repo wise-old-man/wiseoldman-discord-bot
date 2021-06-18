@@ -11,8 +11,11 @@ import GroupGainedCommand from './group/GroupGained';
 import GroupHiscoresCommand from './group/GroupHiscores';
 import GroupMembersCommand from './group/GroupMembers';
 import GroupRecordsCommand from './group/GroupRecords';
+import ApproveNameChange from './moderation/ApproveNameChange';
+import DenyNameChange from './moderation/DenyNameChange';
 import ResetCompetitionCode from './moderation/ResetCompetitionCode';
 import ResetGroupCode from './moderation/ResetGroupCode';
+import ReviewNameChange from './moderation/ReviewNameChange';
 import VerifyGroup from './moderation/VerifyGroup';
 import PlayerAchievements from './player/PlayerAchievements';
 import PlayerActivitiesCommand from './player/PlayerActivities';
@@ -32,6 +35,9 @@ const commands: Command[] = [
   ResetGroupCode,
   ResetCompetitionCode,
   VerifyGroup,
+  ReviewNameChange,
+  ApproveNameChange,
+  DenyNameChange,
 
   // player commands
   PlayerStatsCommand,
