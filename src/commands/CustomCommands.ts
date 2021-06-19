@@ -21,6 +21,6 @@ export const customCommands: Array<CustomCommand> = [
   },
   {
     command: "flag",
-    message: "**How to give your profile a country flag:**\n**Step 1-** Join our discord server: https://discord.gg/kJPakrJ2kW\n**Step 2-** Make sure you are in the `#change-flag` channel\n**Step 3-** Use the command `!setflag {username} {country_code / flag_emoji}`, replacing the brackets with your information\n**Examples:**\n- !setflag Psikoi PT\n- !setflag Zulu 🇺🇸\n\nFor a full list of supported country codes please see: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2"
+    message: "**How to give your profile a country flag:**\n**Step 1-** Join our discord server: https://discord.gg/kJPakrJ2kW\n**Step 2-** Make sure you are in the `#change-flag` channel\n**Step 3-** Use the command `!setflag {username} {country_code / flag_emoji}`, replacing the brackets with your information\n**Examples:**\n- !setflag Psikoi PT\n- !setflag Zulu 🇺🇸\n\nFor a full list of supported country codes please see: <https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2>"
   }
 ]
