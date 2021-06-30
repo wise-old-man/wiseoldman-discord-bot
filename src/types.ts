@@ -117,6 +117,7 @@ export enum Emoji {
   kril_tsutsaroth = '<:kril_tsutsaroth:729840084781760574>',
   mimic = '<:mimic:730169728357761145>',
   nightmare = '<:nightmare:729840084844675103>',
+  phosanis_nightmare = '<:phosanis_nightmare:859756301651148850>',
   obor = '<:obor:729840084907589674>',
   sarachnis = '<:sarachnis:729840085377220628>',
   scorpia = '<:scorpia:729840084962115666>',
