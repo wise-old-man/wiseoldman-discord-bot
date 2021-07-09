@@ -29,13 +29,11 @@ export async function onMessageReceived(message: Message): Promise<void> {
   }
 
   // Check for custom commands
-  if (parsed.sourceMessage?.guild?.id === config.discord.guildId) {
-    customCommands.forEach( (c: CustomCommand) => {
-      if (c.command === parsed.command) {
-        parsed.respond(c.image === undefined ? c.message : c.message + "\n" + c.image);
-      }
-    });
-  }
+  customCommands.forEach( (c: CustomCommand) => {
+    if (c.command === parsed.command && (c.public || parsed.sourceMessage?.guild?.id === config.discord.guildId)) {
+      parsed.respond(c.image === undefined ? c.message : c.message + "\n" + c.image);
+    }
+  });
 
   commands.forEach(async c => {
     // If the message doesn't match the activation conditions

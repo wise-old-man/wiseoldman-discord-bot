@@ -15,6 +15,7 @@ export interface CustomCommand {
   command: string;
   message: string;
   image?: string;
+  public: boolean;
 }
 
 export interface Event {
