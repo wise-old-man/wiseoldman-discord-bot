@@ -71,6 +71,7 @@ const BOSSES_MAP = [
   { key: 'kril_tsutsaroth', name: "K'ril Tsutsaroth" },
   { key: 'mimic', name: 'Mimic' },
   { key: 'nightmare', name: 'Nightmare' },
+  { key: 'phosanis_nightmare', name: "Phosani's Nightmare" },
   { key: 'obor', name: 'Obor' },
   { key: 'sarachnis', name: 'Sarachnis' },
   { key: 'scorpia', name: 'Scorpia' },
@@ -172,6 +173,7 @@ export function getMetricName(metric: string): string {
 
 export function getAbbreviation(abbr: string): string {
   switch (abbr) {
+   // Bosses
     case 'sire':
       return 'abyssal_sire';
 
@@ -263,20 +265,44 @@ export function getAbbreviation(abbr: string): string {
 
     case 'gaunt':
     case 'gauntlet':
+    case 'the-gauntlet':
       return 'the_gauntlet';
 
     case 'cgaunt':
     case 'cgauntlet':
     case 'corrupted':
     case 'corrupted-gauntlet':
+    case 'the-corrupted-gauntlet':
       return 'the_corrupted_gauntlet';
 
     case 'tob':
     case 'theatre':
     case 'verzik':
+    case 'tob-normal':
       return 'theatre_of_blood';
+      
+    case 'tob-hm':
+    case 'tob-cm':
+    case 'tob-hard-mode':
+    case 'tob-hard':
+      return 'theatre_of_blood_hard_mode';
+      
+    case 'nm':
+    case 'tnm':
+    case 'nmare':
+    case 'the-nightmare':
+      return 'nightmare';
+      
+    case 'pnm':
+    case 'phosani':
+    case 'phosanis':
+    case 'phosani-nm':
+    case 'phosani-nightmare':
+    case 'phosanis nightmare':
+      return 'phosanis_nightmare';
 
     case 'thermy':
+    case 'smoke-devil':
       return 'thermonuclear_smoke_devil';
 
     case 'zuk':
@@ -349,7 +375,7 @@ export function getAbbreviation(abbr: string): string {
 
     case 'sw':
     case 'zeal':
-    case 'soul_wars':
+    case 'soul-wars':
       return 'soul_wars_zeal';
 
     // Skills
