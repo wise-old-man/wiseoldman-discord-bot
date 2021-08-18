@@ -9,7 +9,7 @@ export const customCommands: Array<CustomCommand> = [
   },
   {
     command: "verified",
-    message: "To verify your group, please DM any Mod/Admin with a screenshot to prove ownership. We have attached an example screenshot below. This must contain:\n\n- Your WOM group number, Discord name, and today’s date typed in the chatbox.\n- The Clan tab open showing your rank. **For clans, you must be Owner or Deputy Owner to verify the group.** For the old clan chat, you must be Owner or General(gold star).\n\nAfter verification is complete, we can reset the verification code for you if needed.\n**Example:**",
+    message: "To verify your group, please privately message any Moderator (Psikoi#4925, sethmare#1280, or Boom#0675) with a screenshot to prove ownership. We have attached an example of what we need to see below. The screenshot must contain:\n\n- Your WOM group number, Discord ID, and today’s date typed into your in-game chatbox.\n- Your Clan tab open showing your rank. **For clans, you must be Owner or Deputy Owner to verify the group.** For the old clan chat, you must be Owner or General(gold star).\n\nAfter verification is complete, we can reset the verification code for you if needed.\n**Example:**",
     image: "https://imgur.com/ULvoPlH",
     public: false
   },
