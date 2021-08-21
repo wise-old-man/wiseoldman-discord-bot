@@ -9,8 +9,7 @@ export const customCommands: Array<CustomCommand> = [
   },
   {
     command: "sync",
-    message: "The Wise Old Man plugin makes managing groups easy. With just a few clicks, group leaders can synchronize their clan list with their Wise Old Man group. Syncing cross references your clan members with your WOM group, then gives you the option to either add new members or overwrite the whole group.\nTo use this feature, make sure you have your plugin configured correctly. Check the “Sync Clan Button” box, enter your group number (ID), and your group’s verification code. **The sync button will not appear if your group number and verification code are incorrect.**\n**Example:**",
-    image: "https://imgur.com/STTVZ6S",
+    message: "The Wise Old Man plugin makes managing groups easy. With just a few clicks, group leaders can synchronize their clan list with their Wise Old Man group. Syncing cross references your clan members with your WOM group, then gives you the option to either add new members or overwrite the whole group.\nTo use this feature, make sure you have your plugin configured correctly. Check the “Sync Clan Button” box, enter your group number (ID), and your group’s verification code. **The sync button will not appear if your group number and verification code are incorrect.**\n**Example:** https://imgur.com/STTVZ6S",
     image: "https://imgur.com/5KY526c",
     public: true
   },
