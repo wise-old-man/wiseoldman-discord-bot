@@ -52,7 +52,10 @@ class PlayerSetFlag implements Command {
           ? `${getEmoji('error')} Failed to update flag`
           : `${countryCodeEmoji(countryCode)} Player flag updated!`
       )
-      .setDescription(response.message)
+      .setDescription(
+        !response.isError
+          ? `${message.sourceMessage.author.toString()} changed \`${username}\`'s country to ${response.message.match('\\: (.*?) \\(.{2}\\)')?.[1]}`
+          : response.message)
       .addFields([
         { name: 'Username', value: username },
         { name: 'Country Code:', value: countryCode }
