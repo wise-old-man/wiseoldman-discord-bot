@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { QueryInterface } from 'sequelize/types';
 
-function up(queryInterface: QueryInterface, dataTypes: any): Promise<void> {
+function up(queryInterface: QueryInterface, dataTypes: any) {
   return queryInterface.createTable('servers', {
     guildId: {
       type: dataTypes.STRING(256),
@@ -29,7 +29,7 @@ function up(queryInterface: QueryInterface, dataTypes: any): Promise<void> {
   });
 }
 
-function down(queryInterface: QueryInterface): Promise<void> {
+function down(queryInterface: QueryInterface) {
   return queryInterface.dropTable('servers');
 }
 

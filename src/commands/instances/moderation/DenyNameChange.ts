@@ -24,7 +24,7 @@ class DenyNameChange implements Command {
 
   async execute(message: ParsedMessage) {
     if (!hasModeratorRole(message.sourceMessage.member)) {
-      message.respond('Nice try. This command is reserved for Moderators and Admins.');
+      message.respond({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
       return;
     }
 
@@ -41,7 +41,7 @@ class DenyNameChange implements Command {
           `${getEmoji('success')} Name change denied: ${nameChange.oldName} → ${nameChange.newName}`
         );
 
-      message.respond(response);
+      message.respond({ embeds: [response] });
     } catch (error) {
       throw new CommandError('Failed to deny name change.');
     }

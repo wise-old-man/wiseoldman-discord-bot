@@ -34,12 +34,15 @@ class UpdatePlayer implements Command {
       const response = new MessageEmbed()
         .setColor(config.visuals.green)
         .setDescription(`Successfully updated **${result.displayName}**.`)
-        .setFooter('Tip: You can keep yourself automatically updated through Runelite by enabling Wise Old Man in the "XP Updater" plugin.');
+        .setFooter({
+          text:
+            'Tip: You can keep yourself automatically updated through Runelite by enabling Wise Old Man in the "XP Updater" plugin.'
+        });
 
-      message.respond(response);
-    } catch (e) {
+      message.respond({ embeds: [response] });
+    } catch (e: any) {
       if (e.response?.status === 500) {
-        throw new CommandError('Failed to update: OSRS Hiscores are unavailable.'); 
+        throw new CommandError('Failed to update: OSRS Hiscores are unavailable.');
       } else {
         throw new CommandError(e.response?.data?.message || `Failed to update **${username}**.`);
       }

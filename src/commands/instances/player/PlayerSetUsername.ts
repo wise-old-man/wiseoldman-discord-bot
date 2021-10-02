@@ -33,10 +33,10 @@ class PlayerSetUsername implements Command {
         .setTitle('Player alias updated!')
         .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
         .setDescription(`<@${userId}> is now associated with the username \`${player.displayName}\`.`)
-        .setFooter(`They can now call any player command without including the username.`);
+        .setFooter({ text: `They can now call any player command without including the username.` });
 
-      message.respond(response);
-    } catch (e) {
+      message.respond({ embeds: [response] });
+    } catch (e: any) {
       if (e.response?.status === 400) {
         throw new CommandError(
           `Failed to find player with username \`${username}\``,

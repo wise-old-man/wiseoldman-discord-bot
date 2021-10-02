@@ -37,13 +37,13 @@ class GroupDetails implements Command {
         .setURL(pageURL)
         .addFields([
           { name: 'Clan chat', value: group.clanChat || '---' },
-          { name: 'Members', value: group.memberCount || 0 },
+          { name: 'Members', value: group.memberCount?.toString() || '0' },
           { name: 'Created at', value: formatDate(group.createdAt, 'DD MMM, YYYY') },
           { name: '\u200B', value: verification }
         ]);
 
-      message.respond(response);
-    } catch (e) {
+      message.respond({ embeds: [response] });
+    } catch (e: any) {
       throw new CommandError(e.response?.data?.message);
     }
   }

@@ -1,4 +1,4 @@
-import { Message, MessageAttachment, StringResolvable } from 'discord.js';
+import { Message, MessageAttachment, MessageOptions } from 'discord.js';
 import { Server } from './database';
 
 export interface Command {
@@ -8,7 +8,7 @@ export interface Command {
   requiresGroup?: boolean;
   requiresPagination?: boolean;
   activated(message: ParsedMessage): boolean;
-  execute(message: ParsedMessage): void;
+  execute(message: ParsedMessage): Promise<void>;
 }
 
 export interface CustomCommand {
@@ -43,7 +43,7 @@ export interface ParsedMessage {
   prefix: string;
   command: string;
   args: string[];
-  respond(response: StringResolvable): void;
+  respond(response: MessageOptions): void;
 }
 
 export interface TimeGap {

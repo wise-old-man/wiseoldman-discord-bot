@@ -24,7 +24,7 @@ class DeletePlayer implements Command {
 
   async execute(message: ParsedMessage) {
     if (!hasModeratorRole(message.sourceMessage.member)) {
-      message.respond('Nice try. This command is reserved for Moderators and Admins.');
+      message.respond({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
       return;
     }
 
@@ -38,7 +38,7 @@ class DeletePlayer implements Command {
         .setColor(config.visuals.green)
         .setDescription(`${getEmoji('success')} \`${username}\` has been successfully deleted!`);
 
-      message.respond(response);
+      message.respond({ embeds: [response] });
     } catch (error) {
       throw new CommandError('Failed to delete player.');
     }

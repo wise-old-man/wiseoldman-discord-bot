@@ -30,7 +30,7 @@ class ResetGroupCode implements Command {
 
   async execute(message: ParsedMessage) {
     if (!hasModeratorRole(message.sourceMessage.member)) {
-      message.respond('Nice try. This command is reserved for Moderators and Admins.');
+      message.respond({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
       return;
     }
 
@@ -53,7 +53,7 @@ class ResetGroupCode implements Command {
         .setColor(config.visuals.green)
         .setDescription(CHAT_MESSAGE(userId));
 
-      message.respond(response);
+      message.respond({ embeds: [response] });
     } catch (error) {
       throw new CommandError('Failed to reset group verification code.');
     }

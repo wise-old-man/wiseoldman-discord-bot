@@ -40,8 +40,8 @@ class ConfigGroup implements Command {
         .setDescription(`All broadcasts and commands will be in reference to **${group.name}**`)
         .addFields({ name: 'Page URL', value: `https://wiseoldman.net/groups/${groupId}` });
 
-      message.respond(response);
-    } catch (e) {
+      message.respond({ embeds: [response] });
+    } catch (e: any) {
       if (e.response?.data?.message) {
         throw new CommandError(e.response?.data?.message);
       } else {

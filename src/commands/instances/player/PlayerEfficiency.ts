@@ -33,7 +33,9 @@ class PlayerEfficiency implements Command {
       const player = await fetchPlayer(username);
 
       if (player.ehp === 0 && player.tt200m === 0) {
-        throw new CommandError(`This player is outdated. Please try "${message.prefix}update ${username}" first.`);
+        throw new CommandError(
+          `This player is outdated. Please try "${message.prefix}update ${username}" first.`
+        );
       }
 
       const embed = new MessageEmbed()
@@ -62,11 +64,11 @@ class PlayerEfficiency implements Command {
             value: player.exp ? toKMB(player.exp, 2) : '---'
           }
         ])
-        .setFooter('Last updated')
+        .setFooter({ text: 'Last updated' })
         .setTimestamp(player.updatedAt);
 
-      message.respond(embed);
-    } catch (e) {
+      message.respond({ embeds: [embed] });
+    } catch (e: any) {
       if (e instanceof CommandError) throw e;
 
       const errorMessage = `**${username}** is not being tracked yet.`;
