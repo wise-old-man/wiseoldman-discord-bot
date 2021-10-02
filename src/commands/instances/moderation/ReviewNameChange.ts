@@ -1,4 +1,5 @@
-import { MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { reviewNameChange } from '../../../api/modules/names';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
@@ -8,10 +9,17 @@ import CommandError from '../../CommandError';
 class ReviewNameChange implements Command {
   name: string;
   template: string;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
     this.name = 'Review a name change request';
     this.template = '!review-name {nameChangeId}';
+    this.slashCommand = new SlashCommandBuilder()
+      .addIntegerOption(option =>
+        option.setName('id').setDescription('Name change id').setRequired(true)
+      )
+      .setName('review-name')
+      .setDescription('Review a name change request');
   }
 
   activated(message: ParsedMessage) {
@@ -22,27 +30,31 @@ class ReviewNameChange implements Command {
     );
   }
 
-  async execute(message: ParsedMessage) {
-    const nameChangeId = this.getNameChangeId(message);
+  async execute(message: ParsedMessage | CommandInteraction) {
+    if (message instanceof CommandInteraction) {
+      const nameChangeId = message.options.getInteger('id', true);
+      try {
+        const reviewData = await reviewNameChange(nameChangeId);
 
-    if (!nameChangeId) throw new CommandError('Invalid name change id.');
+        if (reviewData.status !== 0) {
+          throw new CommandError('This name change is not pending.');
+        }
 
-    try {
-      const reviewData = await reviewNameChange(nameChangeId);
+        const response = new MessageEmbed()
+          .setColor(config.visuals.blue)
+          .setTitle(`Name change review: ${reviewData.oldName} → ${reviewData.newName}`)
+          .setDescription(this.buildReviewMessage(reviewData));
 
-      if (reviewData.status !== 0) {
-        throw new CommandError('This name change is not pending.');
+        message.reply({ embeds: [response] });
+      } catch (error) {
+        if (error instanceof CommandError) throw error;
+        throw new CommandError('Failed to review name change.');
       }
-
-      const response = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setTitle(`Name change review: ${reviewData.oldName} → ${reviewData.newName}`)
-        .setDescription(this.buildReviewMessage(reviewData));
-
-      message.respond({ embeds: [response] });
-    } catch (error) {
-      if (error instanceof CommandError) throw error;
-      throw new CommandError('Failed to review name change.');
+    } else {
+      throw new CommandError(
+        'This command has been changed to a slash command!',
+        'Try /review-name {id}'
+      );
     }
   }
 

@@ -1,4 +1,11 @@
-import { GuildMember, MessageEmbed, TextChannel } from 'discord.js';
+import {
+  CommandInteraction,
+  GuildChannelManager,
+  GuildMember,
+  MessageEmbed,
+  TextChannel
+} from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { verify } from '../../../api/modules/groups';
 import { Group } from '../../../api/types';
 import config from '../../../config';
@@ -15,10 +22,18 @@ const LOG_MESSAGE = (groupId: number, groupName: string, userId: string) =>
 class VerifyGroup implements Command {
   name: string;
   template: string;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
     this.name = 'Set a group as verified.';
     this.template = '!verify-group {groupId} {userTag}';
+    this.slashCommand = new SlashCommandBuilder()
+      .addIntegerOption(option => option.setName('id').setDescription('Group id').setRequired(true))
+      .addUserOption(option =>
+        option.setName('user').setDescription('Discord user tag').setRequired(true)
+      )
+      .setName('verify-group')
+      .setDescription('Set a group as verified');
   }
 
   activated(message: ParsedMessage) {
@@ -29,35 +44,39 @@ class VerifyGroup implements Command {
     );
   }
 
-  async execute(message: ParsedMessage) {
-    if (!hasModeratorRole(message.sourceMessage.member)) {
-      message.respond({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
-      return;
-    }
+  async execute(message: ParsedMessage | CommandInteraction) {
+    if (message instanceof CommandInteraction) {
+      if (!hasModeratorRole(message.member as GuildMember)) {
+        message.reply({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
+        return;
+      }
+      const groupId = message.options.getInteger('id', true);
+      const userId = message.options.getUser('user', true).id;
+      const user = message.guild?.members.cache.find(m => m.id === userId);
 
-    const groupId = this.getGroupId(message);
-    const userId = this.getUserId(message);
-    const user = this.getMember(message, userId);
+      if (!user) throw new CommandError('Failed to find user from tag.');
 
-    if (!groupId) throw new CommandError('Invalid group id.');
-    if (!userId) throw new CommandError('Invalid user tag.');
-    if (!user) throw new CommandError('Failed to find user from tag.');
+      try {
+        const group = await verify(groupId);
 
-    try {
-      const group = await verify(groupId);
+        // Respond on the WOM discord chat with a success status
+        const response = new MessageEmbed()
+          .setColor(config.visuals.green)
+          .setDescription(CHAT_MESSAGE(group.name));
 
-      // Respond on the WOM discord chat with a success status
-      const response = new MessageEmbed()
-        .setColor(config.visuals.green)
-        .setDescription(CHAT_MESSAGE(group.name));
+        message.reply({ embeds: [response] });
 
-      message.respond({ embeds: [response] });
-
-      this.sendConfirmationLog(message, group, userId);
-      this.addRole(user);
-    } catch (error) {
-      console.log(error);
-      throw new CommandError('Failed to reset group verification code.');
+        this.sendConfirmationLog(message.guild?.channels, group, userId);
+        this.addRole(user);
+      } catch (error) {
+        console.log(error);
+        throw new CommandError('Failed to verify group.');
+      }
+    } else {
+      throw new CommandError(
+        'This command has been changed to a slash command!',
+        'Try /verify-group {id} {user}'
+      );
     }
   }
 
@@ -65,10 +84,8 @@ class VerifyGroup implements Command {
     user.roles.add(config.discord.roles.groupLeader).catch(console.log);
   }
 
-  sendConfirmationLog(message: ParsedMessage, group: Group, userId: string) {
-    const leadersLogChannel = message.sourceMessage.guild?.channels.cache.get(
-      config.discord.channels.leadersLog
-    );
+  sendConfirmationLog(channels: GuildChannelManager | undefined, group: Group, userId: string) {
+    const leadersLogChannel = channels?.cache.get(config.discord.channels.leadersLog);
 
     if (!leadersLogChannel) return;
     if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(leadersLogChannel)) return;

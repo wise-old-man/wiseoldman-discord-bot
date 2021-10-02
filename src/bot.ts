@@ -24,6 +24,9 @@ class Bot {
       // Init bot properties
       this.client.user?.setActivity('bot.wiseoldman.net');
 
+      // Send received interaction to the command router
+      this.client.on('interactionCreate', router.onInteractionReceived);
+
       // Send received messages to the command router
       this.client.on('messageCreate', router.onMessageReceived);
 

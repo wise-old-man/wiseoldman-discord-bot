@@ -1,14 +1,17 @@
-import { Message, MessageAttachment, MessageOptions } from 'discord.js';
+import { CommandInteraction, Message, MessageAttachment, MessageOptions } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { Server } from './database';
 
 export interface Command {
   name: string;
   template: string;
+  slashCommand?: SlashCommandBuilder;
   requiresAdmin?: boolean;
   requiresGroup?: boolean;
   requiresPagination?: boolean;
+  global?: boolean;
   activated(message: ParsedMessage): boolean;
-  execute(message: ParsedMessage): Promise<void>;
+  execute(message: ParsedMessage | CommandInteraction): Promise<void>;
 }
 
 export interface CustomCommand {

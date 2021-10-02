@@ -15,6 +15,7 @@ export default {
   },
   discord: {
     guildId: '679454777708380161',
+    clientId: '719720369241718837',
     roles: {
       moderator: '705821689526747136',
       groupLeader: '705826389474934845'

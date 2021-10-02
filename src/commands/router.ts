@@ -1,4 +1,4 @@
-import { Message, MessageEmbed } from 'discord.js';
+import { Interaction, Message, MessageEmbed } from 'discord.js';
 import config from '../config';
 import { getMissingPermissions, isAdmin } from '../utils';
 import CommandError from './CommandError';
@@ -7,9 +7,42 @@ import * as parser from './parser';
 import { customCommands } from './CustomCommands';
 import { CustomCommand } from '../types';
 
-export function onError(message: Message, title: string, tip?: string): void {
-  const response = new MessageEmbed().setColor(config.visuals.red).setDescription(title);
-  message.channel.send({ embeds: [tip ? response.setFooter({ text: tip }) : response] });
+export function onError(options: {
+  message?: Message;
+  interaction?: Interaction;
+  title: string;
+  tip?: string;
+}): void {
+  const response = new MessageEmbed().setColor(config.visuals.red).setDescription(options.title);
+  response.setFooter({ text: options.tip ? options.tip : '' });
+  if (options.message) {
+    options.message.channel.send({ embeds: [response] });
+    return;
+  } else if (options.interaction && options.interaction.isCommand()) {
+    options.interaction.reply({ embeds: [response] });
+  }
+}
+
+export async function onInteractionReceived(interaction: Interaction): Promise<void> {
+  if (!interaction.isCommand()) {
+    return;
+  }
+
+  const { commandName } = interaction;
+
+  commands.forEach(async c => {
+    if (c.slashCommand?.name !== commandName) return;
+    try {
+      interaction.channel?.sendTyping();
+
+      await c.execute(interaction);
+    } catch (e) {
+      // If a command error was thrown during execution, handle the response here.
+      if (e instanceof CommandError) {
+        return onError({ interaction: interaction, title: e.message, tip: e.tip });
+      }
+    }
+  });
 }
 
 export async function onMessageReceived(message: Message): Promise<void> {
@@ -21,11 +54,11 @@ export async function onMessageReceived(message: Message): Promise<void> {
   const missingPermissions = getMissingPermissions(message.guild?.me);
 
   if (missingPermissions && missingPermissions.length > 0) {
-    return onError(
-      message,
-      `Error! Missing permissions: \n\n${missingPermissions.map(m => `\`${m}\``).join('\n')}`,
-      'Contact your server administrator for help.'
-    );
+    return onError({
+      message: message,
+      title: `Error! Missing permissions: \n\n${missingPermissions.map(m => `\`${m}\``).join('\n')}`,
+      tip: 'Contact your server administrator for help.'
+    });
   }
 
   // Check for custom commands
@@ -45,21 +78,21 @@ export async function onMessageReceived(message: Message): Promise<void> {
     // If the message requires admin permissions and the
     // member who sent it is not an admin
     if (c.requiresAdmin && !isAdmin(message.member)) {
-      return onError(
-        message,
-        'That command requires Admin permissions.',
-        'Contact your server administrator for help.'
-      );
+      return onError({
+        message: message,
+        title: 'That command requires Admin permissions.',
+        tip: 'Contact your server administrator for help.'
+      });
     }
 
     // If the message requires a group to be setup, and no group is defined
     // for the message's origin server
     if (c.requiresGroup && !(parsed.originServer && parsed.originServer.groupId)) {
-      return onError(
-        message,
-        'That command requires a group to be configured.',
-        `Start the group setup with ${parsed.prefix}config group *groupId*`
-      );
+      return onError({
+        message: message,
+        title: 'That command requires a group to be configured.',
+        tip: `Start the group setup with ${parsed.prefix}config group *groupId*`
+      });
     }
 
     try {
@@ -70,7 +103,7 @@ export async function onMessageReceived(message: Message): Promise<void> {
     } catch (e) {
       // If a command error was thrown during execution, handle the response here.
       if (e instanceof CommandError) {
-        return onError(message, e.message, e.tip);
+        return onError({ message: message, title: e.message, tip: e.tip });
       }
     }
   });

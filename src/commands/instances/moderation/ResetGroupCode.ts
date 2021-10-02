@@ -1,4 +1,5 @@
-import { GuildMember, MessageEmbed } from 'discord.js';
+import { CommandInteraction, GuildMember, MessageEmbed } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { resetCode } from '../../../api/modules/groups';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
@@ -14,10 +15,18 @@ const CHAT_MESSAGE = (userId: string) =>
 class ResetGroupCode implements Command {
   name: string;
   template: string;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
     this.name = "Reset a group's verification code";
     this.template = '!reset-group-code {groupId} {userTag}';
+    this.slashCommand = new SlashCommandBuilder()
+      .addIntegerOption(option => option.setName('id').setDescription('Group id').setRequired(true))
+      .addUserOption(option =>
+        option.setName('user').setDescription('Discord user tag').setRequired(true)
+      )
+      .setName('reset-group-code')
+      .setDescription("Reset a group's verification code");
   }
 
   activated(message: ParsedMessage) {
@@ -28,34 +37,38 @@ class ResetGroupCode implements Command {
     );
   }
 
-  async execute(message: ParsedMessage) {
-    if (!hasModeratorRole(message.sourceMessage.member)) {
-      message.respond({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
-      return;
-    }
+  async execute(message: ParsedMessage | CommandInteraction) {
+    if (message instanceof CommandInteraction) {
+      if (!hasModeratorRole(message.member as GuildMember)) {
+        message.reply({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
+        return;
+      }
+      const groupId = message.options.getInteger('id', true);
+      const userId = message.options.getUser('user', true).id;
+      const user = message.guild?.members.cache.find(m => m.id === userId);
 
-    const groupId = this.getGroupId(message);
-    const userId = this.getUserId(message);
-    const user = this.getMember(message, userId);
+      if (!user) throw new CommandError('Failed to find user from tag.');
 
-    if (!groupId) throw new CommandError('Invalid group id.');
-    if (!userId) throw new CommandError('Invalid user tag.');
-    if (!user) throw new CommandError('Failed to find user from tag.');
+      try {
+        const { newCode } = await resetCode(groupId);
 
-    try {
-      const { newCode } = await resetCode(groupId);
+        // DM the user back with the new verification code
+        await user.send(DM_MESSAGE(newCode));
 
-      // DM the user back with the new verification code
-      await user.send(DM_MESSAGE(newCode));
+        // Respond on the WOM discord chat with a success status
+        const response = new MessageEmbed()
+          .setColor(config.visuals.green)
+          .setDescription(CHAT_MESSAGE(userId));
 
-      // Respond on the WOM discord chat with a success status
-      const response = new MessageEmbed()
-        .setColor(config.visuals.green)
-        .setDescription(CHAT_MESSAGE(userId));
-
-      message.respond({ embeds: [response] });
-    } catch (error) {
-      throw new CommandError('Failed to reset group verification code.');
+        message.reply({ embeds: [response] });
+      } catch (error) {
+        throw new CommandError('Failed to reset group verification code.');
+      }
+    } else {
+      throw new CommandError(
+        'This command has been changed to a slash command!',
+        'Try /reset-group-code {id} {user}'
+      );
     }
   }
 
