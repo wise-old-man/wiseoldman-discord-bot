@@ -172,7 +172,9 @@ export function getMetricName(metric: string): string {
 }
 
 export function getAbbreviation(abbr: string): string {
-  switch (abbr) {
+  const abbreviation = abbr.toLowerCase();
+
+  switch (abbreviation) {
    // Bosses
     case 'sire':
       return 'abyssal_sire';
