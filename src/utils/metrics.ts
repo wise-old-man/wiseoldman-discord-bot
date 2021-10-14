@@ -175,7 +175,7 @@ export function getAbbreviation(abbr: string): string {
   const abbreviation = abbr.toLowerCase();
 
   switch (abbreviation) {
-   // Bosses
+    // Bosses
     case 'sire':
       return 'abyssal_sire';
 
@@ -282,19 +282,19 @@ export function getAbbreviation(abbr: string): string {
     case 'verzik':
     case 'tob-normal':
       return 'theatre_of_blood';
-      
+
     case 'tob-hm':
     case 'tob-cm':
     case 'tob-hard-mode':
     case 'tob-hard':
       return 'theatre_of_blood_hard_mode';
-      
+
     case 'nm':
     case 'tnm':
     case 'nmare':
     case 'the-nightmare':
       return 'nightmare';
-      
+
     case 'pnm':
     case 'phosani':
     case 'phosanis':
@@ -463,6 +463,6 @@ export function getAbbreviation(abbr: string): string {
       return 'construction';
 
     default:
-      return abbr;
+      return abbreviation;
   }
 }
