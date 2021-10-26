@@ -3,14 +3,20 @@ import { CustomCommand } from '../types';
 export const customCommands: Array<CustomCommand> = [
   {
     command: "runelite",
-    message: "Enabling the XP Updater plugin on Runelite is an easy, reliable way to keep your Wise Old Man profile up to date.",
+    message: "Enabling the XP Updater plugin on Runelite is a fast, easy, reliable way to keep your Wise Old Man profile up to date. See below for help enabling it.\n*(We have also created our very own plugin to do this and much more! For more information, use the `!plugin` command.)*",
     image: "https://imgur.com/tv0Jro8",
     public: true
   },
   {
+    command: "plugin",
+    message: "We have created a plugin for Runelite that allows players to easily track progress, manage groups, see upcoming and current competitions, and much more!\nTo download, navigate to the Plugin Hub, and type “Wise Old Man” into the search bar. After installing, you will need to ensure the plugin is enabled. See below for a walkthrough."
+    image: "<https://imgur.com/a/VJEpwaV>",
+    public: true
+  },
+  {
     command: "sync",
-    message: "The Wise Old Man plugin makes managing groups easy. With just a few clicks, group leaders can synchronize their clan list with their Wise Old Man group. Syncing cross references your clan members with your WOM group, then gives you the option to either add new members or overwrite the whole group.\nTo use this feature, make sure you have your plugin configured correctly. Check the “Sync Clan Button” box, enter your group number (ID), and your group’s verification code. **The sync button will not appear if your group number and verification code are incorrect.**\n**Example:** https://imgur.com/STTVZ6S",
-    image: "https://imgur.com/5KY526c",
+    message: "The Wise Old Man plugin makes managing groups easy. With just a few clicks, group leaders can synchronize their clan list with their Wise Old Man group. Syncing lets you add new members or overwrite the whole group.\nTo use this feature, make sure you have your plugin configured correctly. Check the “Sync Clan Button” box, enter your group number (ID), and your group’s verification code. **The sync button will not appear if “group number” and “verification code” are blank.**\n**Example part 1:**\n<https://imgur.com/STTVZ6S>\n**Example part 2:**",
+    image: "<https://imgur.com/5KY526c>",
     public: true
   },
   {
@@ -22,7 +28,7 @@ export const customCommands: Array<CustomCommand> = [
   {
     command: "permissions",
     message: "Is the bot not responding, or saying 'missing permissions'? Check out this guide: <https://github.com/wise-old-man/wise-old-man/wiki/User-Guide:-How-To-Configure-The-Bot%27s-Required-Permissions>",
-    public: false
+    public: true
   },
   {
     command: "faq",
