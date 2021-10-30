@@ -9,7 +9,7 @@ export const customCommands: Array<CustomCommand> = [
   },
   {
     command: "plugin",
-    message: "We have created a plugin for Runelite that allows players to easily track progress, manage groups, see upcoming and current competitions, and much more!\nTo download, navigate to the Plugin Hub, and type “Wise Old Man” into the search bar. After installing, you will need to ensure the plugin is enabled. See below for a walkthrough."
+    message: "We have created a plugin for Runelite that allows players to easily track progress, manage groups, see upcoming and current competitions, and much more!\nTo download, navigate to the Plugin Hub, and type “Wise Old Man” into the search bar. After installing, you will need to ensure the plugin is enabled. See below for a walkthrough.",
     image: "<https://imgur.com/a/VJEpwaV>",
     public: true
   },
