@@ -17,6 +17,7 @@ import ResetCompetitionCode from './moderation/ResetCompetitionCode';
 import ResetGroupCode from './moderation/ResetGroupCode';
 import ReviewNameChange from './moderation/ReviewNameChange';
 import VerifyGroup from './moderation/VerifyGroup';
+import DeletePlayer from './moderation/DeletePlayer';
 import PlayerAchievements from './player/PlayerAchievements';
 import PlayerActivitiesCommand from './player/PlayerActivities';
 import PlayerBossesCommand from './player/PlayerBosses';
@@ -38,6 +39,7 @@ const commands: Command[] = [
   ReviewNameChange,
   ApproveNameChange,
   DenyNameChange,
+  DeletePlayer,
 
   // player commands
   PlayerStatsCommand,
