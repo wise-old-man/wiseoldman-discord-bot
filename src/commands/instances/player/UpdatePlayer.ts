@@ -11,11 +11,11 @@ class UpdatePlayer implements Command {
 
   constructor() {
     this.name = 'Update player';
-    this.template = '!update {username}';
+    this.template = '![update/track] {username}';
   }
 
   activated(message: ParsedMessage) {
-    return message.command === 'update';
+    return message.command === 'update' || message.command === 'track';
   }
 
   async execute(message: ParsedMessage) {
