@@ -196,6 +196,7 @@ export interface Snapshot {
   kreearra: SnapshotBoss;
   kril_tsutsaroth: SnapshotBoss;
   mimic: SnapshotBoss;
+  nex: SnapshotBoss;
   nightmare: SnapshotBoss;
   phosanis_nightmare: SnapshotBoss;
   obor: SnapshotBoss;
