@@ -12,3 +12,5 @@ COPY . .
 COPY wait-for-it.sh .
 
 RUN npm run build
+
+CMD ["npm", "start"]
