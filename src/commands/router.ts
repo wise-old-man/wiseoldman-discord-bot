@@ -6,6 +6,7 @@ import commands from './instances';
 import * as parser from './parser';
 import { customCommands } from './CustomCommands';
 import { CustomCommand } from '../types';
+import { COUNTRIES } from '../utils/countries';
 
 export function onError(options: {
   message?: Message;
@@ -24,6 +25,30 @@ export function onError(options: {
 }
 
 export async function onInteractionReceived(interaction: Interaction): Promise<void> {
+  // Provide auto completion options for setflag command
+  if (interaction.isAutocomplete()) {
+    const currentInput = interaction.options.getFocused().toString();
+    if (interaction.commandName === 'setflag') {
+      const options = COUNTRIES.filter(country =>
+        !currentInput
+          ? false
+          : [country.name.toLowerCase(), country.code.toLowerCase()].some(str =>
+              str.includes(currentInput.toLowerCase())
+            )
+      ).map(c => ({ name: c.name, value: c.code }));
+      interaction.respond(options.slice(0, 25));
+    } else if (interaction.commandName === 'gained') {
+      const options = ['6h', 'Day', 'Week', 'Month', 'Year']
+        .filter(period =>
+          !currentInput
+            ? true
+            : [period.toLowerCase()].some(str => str.includes(currentInput.toLowerCase()))
+        )
+        .map(p => ({ name: p, value: p.toLowerCase() }));
+      interaction.respond(options);
+    }
+  }
+
   if (!interaction.isCommand()) {
     return;
   }

@@ -1,4 +1,5 @@
-import { MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { fetchPlayer } from '../../../api/modules/players';
 import config from '../../../config';
 import { updateUsername } from '../../../database/services/alias';
@@ -9,42 +10,58 @@ import CommandError from '../../CommandError';
 class PlayerSetUsername implements Command {
   name: string;
   template: string;
+  slashCommand: SlashCommandBuilder;
+  global: boolean;
 
   constructor() {
     this.name = 'Set player username (alias)';
     this.template = '!setrsn {username}';
+    this.slashCommand = new SlashCommandBuilder()
+      .addStringOption(option =>
+        option.setName('username').setDescription('In-game username').setRequired(true)
+      )
+      .setName('setrsn')
+      .setDescription('Set player username (alias)');
+    this.global = true;
   }
 
   activated(message: ParsedMessage) {
     return message.command === 'setrsn';
   }
 
-  async execute(message: ParsedMessage) {
-    const username = message.args.join(' ');
-    const userId = message.sourceMessage.author.id;
+  async execute(message: ParsedMessage | CommandInteraction) {
+    if (message instanceof CommandInteraction) {
+      const username = message.options.getString('username', true);
+      const userId = message.user.id;
 
-    try {
-      const player = await fetchPlayer(username);
+      try {
+        const player = await fetchPlayer(username);
 
-      await updateUsername(userId, player.displayName);
+        await updateUsername(userId, player.displayName);
 
-      const response = new MessageEmbed()
-        .setColor(config.visuals.green)
-        .setTitle('Player alias updated!')
-        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
-        .setDescription(`<@${userId}> is now associated with the username \`${player.displayName}\`.`)
-        .setFooter({ text: `They can now call any player command without including the username.` });
+        const response = new MessageEmbed()
+          .setColor(config.visuals.green)
+          .setTitle('Player alias updated!')
+          .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
+          .setDescription(`<@${userId}> is now associated with the username \`${player.displayName}\`.`)
+          .setFooter({ text: `They can now call any player command without including the username.` });
 
-      message.respond({ embeds: [response] });
-    } catch (e: any) {
-      if (e.response?.status === 400) {
-        throw new CommandError(
-          `Failed to find player with username \`${username}\``,
-          'Maybe try to update that username first?'
-        );
-      } else {
-        throw new CommandError('Failed to update player alias.');
+        message.reply({ embeds: [response] });
+      } catch (e: any) {
+        if (e.response?.status === 400) {
+          throw new CommandError(
+            `Failed to find player with username \`${username}\``,
+            'Maybe try to update that username with /update first?'
+          );
+        } else {
+          throw new CommandError('Failed to update player alias.');
+        }
       }
+    } else {
+      throw new CommandError(
+        'This command has been changed to a slash command!',
+        'Try /setrsn {username}'
+      );
     }
   }
 }

@@ -1,5 +1,6 @@
 import Canvas from 'canvas';
-import { MessageAttachment, MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { fetchPlayer } from '../../../api/modules/players';
 import { toResults } from '../../../api/modules/snapshots';
 import { BossResult, MetricType, Player } from '../../../api/types';
@@ -23,48 +24,71 @@ enum RenderVariant {
 class PlayerBosses implements Command, Renderable {
   name: string;
   template: string;
+  slashCommand: SlashCommandBuilder;
+  global: boolean;
 
   constructor() {
     this.name = 'View player bosses';
     this.template = '![bosses/ehb] {username} [--ranks/--ehb]';
+    this.slashCommand = new SlashCommandBuilder()
+      .addStringOption(option =>
+        option
+          .setName('variant')
+          .setDescription('The variant to show stats for')
+          .setRequired(true)
+          .addChoices([
+            ['Kill Counts', RenderVariant.Kills],
+            ['Ranks', RenderVariant.Ranks],
+            ['Efficient Hours Bossed', RenderVariant.EHB]
+          ])
+      )
+      .addStringOption(option => option.setName('username').setDescription('In-game username'))
+      .setName('bosses')
+      .setDescription('View player bosses');
+    this.global = true;
   }
 
   activated(message: ParsedMessage) {
     return message.command === 'bosses' || message.command === 'ehb';
   }
 
-  async execute(message: ParsedMessage) {
-    // Grab the username from the command's arguments or database alias
-    const username = await this.getUsername(message);
+  async execute(message: ParsedMessage | CommandInteraction) {
+    if (message instanceof CommandInteraction) {
+      // Grab the username from the command's arguments or database alias
+      const username = await this.getUsername(message);
+      const variant = message.options.getString('variant', true) as RenderVariant;
 
-    // Grab (if it exists) the command variant from the command's arguments (--ehb / --ranks)
-    const variant = this.getRenderVariant(message.command, message.args);
+      if (!username) {
+        throw new CommandError(
+          'This commands requires a username. Set a default by using the `setrsn` command.'
+        );
+      }
 
-    if (!username) {
+      try {
+        const player = await fetchPlayer(username);
+
+        const { attachment, fileName } = await this.render({ player, variant });
+
+        const embed = new MessageEmbed()
+          .setColor(config.visuals.blue)
+          .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/overview/bossing`))
+          .setTitle(`${player.displayName} - Boss ${variant}`)
+          .setImage(`attachment://${fileName}`)
+          .setFooter({ text: 'Last updated' })
+          .setTimestamp(player.updatedAt);
+
+        message.reply({ embeds: [embed], files: [attachment] });
+      } catch (e: any) {
+        const errorMessage = `**${username}** is not being tracked yet.`;
+        const errorTip = `Try /update ${username}`;
+
+        throw new CommandError(errorMessage, errorTip);
+      }
+    } else {
       throw new CommandError(
-        'This commands requires a username. Set a default by using the `setrsn` command.'
+        'This command has been changed to a slash command!',
+        'Try /bosses [kills/ranks/ehb] {username}'
       );
-    }
-
-    try {
-      const player = await fetchPlayer(username);
-
-      const { attachment, fileName } = await this.render({ player, variant });
-
-      const embed = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/overview/bossing`))
-        .setTitle(`${player.displayName} - Boss ${variant}`)
-        .setImage(`attachment://${fileName}`)
-        .setFooter({ text: 'Last updated' })
-        .setTimestamp(player.updatedAt);
-
-      message.respond({ embeds: [embed], files: [attachment] });
-    } catch (e: any) {
-      const errorMessage = `**${username}** is not being tracked yet.`;
-      const errorTip = `Try ${message.prefix}update ${username}`;
-
-      throw new CommandError(errorMessage, errorTip);
     }
   }
 
@@ -144,42 +168,23 @@ class PlayerBosses implements Command, Renderable {
     return { attachment, fileName };
   }
 
-  async getUsername(message: ParsedMessage): Promise<string | undefined | null> {
-    const explicitUsername = message.args.filter(a => !a.startsWith('--')).join(' ');
+  async getUsername(message: CommandInteraction): Promise<string | undefined | null> {
+    const username = message.options.getString('username', false);
+    if (username) return username;
 
-    if (explicitUsername) {
-      return explicitUsername;
-    }
-
-    const inferedUsername = await getUsername(message.sourceMessage.author.id);
-
-    return inferedUsername;
+    const inferredUsername = await getUsername(message.user.id);
+    return inferredUsername;
   }
 
-  getRenderVariant(command: string, args: string[]): RenderVariant {
-    if (command === 'ehb') {
-      return RenderVariant.EHB;
+  getRenderVariant(subCommand: string): RenderVariant {
+    switch (subCommand) {
+      case 'ranks':
+        return RenderVariant.Ranks;
+      case 'ehb':
+        return RenderVariant.EHB;
+      default:
+        return RenderVariant.Kills;
     }
-
-    if (!args || args.length === 0) {
-      return RenderVariant.Kills;
-    }
-
-    const variantArg = args.find(a => a.startsWith('--'));
-
-    if (!variantArg) {
-      return RenderVariant.Kills;
-    }
-
-    if (variantArg === '--rank' || variantArg === '--ranks') {
-      return RenderVariant.Ranks;
-    }
-
-    if (variantArg === '--ehb' || variantArg === '--hours') {
-      return RenderVariant.EHB;
-    }
-
-    return RenderVariant.Kills;
   }
 }
 

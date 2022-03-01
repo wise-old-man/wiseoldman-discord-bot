@@ -6,6 +6,7 @@ export interface Command {
   name: string;
   template: string;
   slashCommand?: SlashCommandBuilder;
+
   requiresAdmin?: boolean;
   requiresGroup?: boolean;
   requiresPagination?: boolean;

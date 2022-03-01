@@ -1,5 +1,6 @@
 import Canvas from 'canvas';
-import { MessageAttachment, MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { fetchPlayer, fetchPlayerAchievements } from '../../../api/modules/players';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
@@ -15,54 +16,68 @@ const RENDER_PADDING = 15;
 class PlayerAchievements implements Command, Renderable {
   name: string;
   template: string;
+  slashCommand: SlashCommandBuilder;
+  global: boolean;
 
   constructor() {
     this.name = 'View player recent achievements';
     this.template = '!achievements {username}';
+    this.slashCommand = new SlashCommandBuilder()
+      .addStringOption(option => option.setName('username').setDescription('In-game username'))
+      .setName('achievements')
+      .setDescription('View player recent achievements');
+    this.global = true;
   }
 
   activated(message: ParsedMessage) {
     return message.command === 'achievements';
   }
 
-  async execute(message: ParsedMessage) {
-    // Grab the username from the command's arguments or database alias
-    const username = await this.getUsername(message);
+  async execute(message: ParsedMessage | CommandInteraction) {
+    if (message instanceof CommandInteraction) {
+      // Grab the username from the command's arguments or database alias
+      const username = await this.getUsername(message);
 
-    if (!username) {
+      if (!username) {
+        throw new CommandError(
+          'This commands requires a username. Set a default by using the `setrsn` command.'
+        );
+      }
+
+      try {
+        const player = await fetchPlayer(username);
+        const achievements = await fetchPlayerAchievements(username);
+
+        if (!achievements || achievements.length === 0) {
+          throw new Error(`${player.displayName} has no achievements.`);
+        }
+
+        const { attachment, fileName } = await this.render({ player, achievements });
+
+        const embed = new MessageEmbed()
+          .setColor(config.visuals.blue)
+          .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements/`))
+          .setTitle(`${player.displayName} - Recent achievements`)
+          .setImage(`attachment://${fileName}`)
+          .setFooter({ text: 'Last updated' })
+          .setTimestamp(player.updatedAt);
+
+        message.reply({ embeds: [embed], files: [attachment] });
+      } catch (e: any) {
+        if (e.message.includes('achievements')) {
+          throw new CommandError(e.message);
+        } else {
+          const errorMessage = `**${username}** is not being tracked yet.`;
+          const errorTip = `Try /update ${username}`;
+
+          throw new CommandError(errorMessage, errorTip);
+        }
+      }
+    } else {
       throw new CommandError(
-        'This commands requires a username. Set a default by using the `setrsn` command.'
+        'This command has been changed to a slash command!',
+        'Try /activities [scores/ranks] {username}'
       );
-    }
-
-    try {
-      const player = await fetchPlayer(username);
-      const achievements = await fetchPlayerAchievements(username);
-
-      if (!achievements || achievements.length === 0) {
-        throw new Error(`${player.displayName} has no achievements.`);
-      }
-
-      const { attachment, fileName } = await this.render({ player, achievements });
-
-      const embed = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements/`))
-        .setTitle(`${player.displayName} - Recent achievements`)
-        .setImage(`attachment://${fileName}`)
-        .setFooter({ text: 'Last updated' })
-        .setTimestamp(player.updatedAt);
-
-      message.respond({ embeds: [embed], files: [attachment] });
-    } catch (e: any) {
-      if (e.message.includes('achievements')) {
-        throw new CommandError(e.message);
-      } else {
-        const errorMessage = `**${username}** is not being tracked yet.`;
-        const errorTip = `Try ${message.prefix}update ${username}`;
-
-        throw new CommandError(errorMessage, errorTip);
-      }
     }
   }
 
@@ -109,16 +124,12 @@ class PlayerAchievements implements Command, Renderable {
     return { attachment, fileName };
   }
 
-  async getUsername(message: ParsedMessage): Promise<string | undefined | null> {
-    const explicitUsername = message.args.filter(a => !a.startsWith('--')).join(' ');
+  async getUsername(message: CommandInteraction): Promise<string | undefined | null> {
+    const username = message.options.getString('username', false);
+    if (username) return username;
 
-    if (explicitUsername) {
-      return explicitUsername;
-    }
-
-    const inferedUsername = await getUsername(message.sourceMessage.author.id);
-
-    return inferedUsername;
+    const inferredUsername = await getUsername(message.user.id);
+    return inferredUsername;
   }
 }
 

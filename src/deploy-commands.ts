@@ -35,7 +35,7 @@ if (globalCommands.length > 0) {
     rest.put(Routes.applicationCommands(config.discord.clientId), {
       body: globalCommands
     });
-    console.log(`Successfully registered ${guildCommands.length} global slash commands.`);
+    console.log(`Successfully registered ${globalCommands.length} global slash commands.`);
   } catch (e) {
     console.log(e);
   }
