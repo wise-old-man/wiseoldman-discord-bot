@@ -1,18 +1,31 @@
 import { CommandInteraction, Message, MessageAttachment, MessageOptions } from 'discord.js';
-import { SlashCommandBuilder } from '@discordjs/builders';
+import {
+  SlashCommandBuilder,
+  SlashCommandSubcommandsOnlyBuilder,
+  SlashCommandSubcommandBuilder
+} from '@discordjs/builders';
 import { Server } from './database';
 
 export interface Command {
   name: string;
   template: string;
-  slashCommand?: SlashCommandBuilder;
+  slashCommand?:
+    | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>
+    | SlashCommandBuilder
+    | SlashCommandSubcommandBuilder
+    | SlashCommandSubcommandsOnlyBuilder;
 
   requiresAdmin?: boolean;
   requiresGroup?: boolean;
   requiresPagination?: boolean;
   global?: boolean;
+  subcommand?: boolean;
   activated(message: ParsedMessage): boolean;
   execute(message: ParsedMessage | CommandInteraction): Promise<void>;
+}
+
+export interface SubCommand extends Command {
+  slashCommand?: SlashCommandSubcommandBuilder;
 }
 
 export interface CustomCommand {

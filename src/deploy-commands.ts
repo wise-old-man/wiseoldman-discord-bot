@@ -8,7 +8,7 @@ const guildCommands = [];
 
 for (const command of commands) {
   const slashCommand = command.slashCommand;
-  if (slashCommand) {
+  if (slashCommand && !command.subcommand) {
     if (command.global) {
       globalCommands.push(slashCommand.toJSON());
     } else {

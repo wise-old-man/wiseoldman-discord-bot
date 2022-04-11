@@ -4,6 +4,7 @@ import ConfigDefaultChannel from './config/ConfigDefaultChannel';
 import ConfigGroup from './config/ConfigGroup';
 import ConfigPrefix from './config/ConfigPrefix';
 import HelpCommand from './general/Help';
+import GroupCommand from './group/Group';
 import GroupCompetitionCommand from './group/GroupCompetition';
 import GroupCompetitionsCommand from './group/GroupCompetitions';
 import GroupDetailsCommand from './group/GroupDetails';
@@ -53,6 +54,7 @@ const commands: Command[] = [
   PlayerSetFlag,
 
   // group commands
+  GroupCommand,
   GroupDetailsCommand,
   GroupMembersCommand,
   GroupHiscoresCommand,

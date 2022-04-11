@@ -7,6 +7,7 @@ import * as parser from './parser';
 import { customCommands } from './CustomCommands';
 import { CustomCommand } from '../types';
 import { COUNTRIES } from '../utils/countries';
+import { ALL_METRICS } from '../utils';
 
 export function onError(options: {
   message?: Message;
@@ -25,27 +26,34 @@ export function onError(options: {
 }
 
 export async function onInteractionReceived(interaction: Interaction): Promise<void> {
-  // Provide auto completion options for setflag command
   if (interaction.isAutocomplete()) {
-    const currentInput = interaction.options.getFocused().toString();
-    if (interaction.commandName === 'setflag') {
+    const focused = interaction.options.getFocused(true);
+    const currentValue = focused.value.toString();
+    if (focused.name === 'country') {
       const options = COUNTRIES.filter(country =>
-        !currentInput
+        !currentValue
           ? false
           : [country.name.toLowerCase(), country.code.toLowerCase()].some(str =>
-              str.includes(currentInput.toLowerCase())
+              str.includes(currentValue.toLowerCase())
             )
       ).map(c => ({ name: c.name, value: c.code }));
       interaction.respond(options.slice(0, 25));
-    } else if (interaction.commandName === 'gained') {
+    } else if (focused.name === 'period') {
       const options = ['6h', 'Day', 'Week', 'Month', 'Year']
         .filter(period =>
-          !currentInput
+          !currentValue
             ? true
-            : [period.toLowerCase()].some(str => str.includes(currentInput.toLowerCase()))
+            : [period.toLowerCase()].some(str => str.includes(currentValue.toLowerCase()))
         )
         .map(p => ({ name: p, value: p.toLowerCase() }));
       interaction.respond(options);
+    } else if (focused.name === 'metric') {
+      const options = ALL_METRICS.filter(metric =>
+        !currentValue
+          ? true
+          : [metric.name.toLowerCase(), metric.key].some(str => str.includes(currentValue.toLowerCase()))
+      ).map(m => ({ name: m.name, value: m.key }));
+      interaction.respond(options.slice(0, 25));
     }
   }
 

@@ -1,28 +1,35 @@
-import { MessageEmbed } from 'discord.js';
+import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { fetchGroupDetails, fetchGroupHiscores } from '../../../api/modules/groups';
 import { GroupHiscoresEntry } from '../../../api/types';
 import config from '../../../config';
-import { Command, ParsedMessage } from '../../../types';
-import {
-  getAbbreviation,
-  getEmoji,
-  getMetricName,
-  isActivity,
-  isBoss,
-  isSkill,
-  toKMB
-} from '../../../utils';
+import { getServer } from '../../../database/services/server';
+import { SubCommand, ParsedMessage } from '../../../types';
+import { getEmoji, getMetricName, isActivity, isBoss, isSkill, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class GroupHiscores implements Command {
+class GroupHiscores implements SubCommand {
   name: string;
   template: string;
   requiresGroup?: boolean | undefined;
+  slashCommand?: SlashCommandSubcommandBuilder;
+  subcommand?: boolean | undefined;
 
   constructor() {
     this.name = 'View group hiscores';
     this.template = '!group hiscores {metric}?';
     this.requiresGroup = true;
+    this.slashCommand = new SlashCommandSubcommandBuilder()
+      .addStringOption(option =>
+        option
+          .setName('metric')
+          .setDescription('The category to show hiscoes for')
+          .setAutocomplete(true)
+          .setRequired(true)
+      )
+      .setName('hiscores')
+      .setDescription('View group hiscores');
+    this.subcommand = true;
   }
 
   activated(message: ParsedMessage) {
@@ -30,24 +37,33 @@ class GroupHiscores implements Command {
     return command === 'group' && args.length >= 1 && args[0] === 'hiscores';
   }
 
-  async execute(message: ParsedMessage) {
-    const groupId = message.originServer?.groupId || -1;
-    const metric = this.getMetricArg(message.args);
+  async execute(message: ParsedMessage | CommandInteraction) {
+    if (message instanceof CommandInteraction) {
+      const guildId = message.guild?.id;
+      const server = await getServer(guildId); // maybe cache it so we don't have to do this
+      const groupId = server?.groupId || -1;
+      const metric = message.options.getString('metric', true);
 
-    try {
-      const group = await fetchGroupDetails(groupId);
-      const hiscores = await fetchGroupHiscores(groupId, metric);
+      try {
+        const group = await fetchGroupDetails(groupId);
+        const hiscores = await fetchGroupHiscores(groupId, metric);
 
-      const response = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} hiscores`)
-        .setDescription(this.buildList(metric, hiscores))
-        .setURL(`https://wiseoldman.net/groups/${groupId}/hiscores/`)
-        .setFooter({ text: `Tip: Try ${message.prefix}group hiscores zulrah` });
+        const response = new MessageEmbed()
+          .setColor(config.visuals.blue)
+          .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} hiscores`)
+          .setDescription(this.buildList(metric, hiscores))
+          .setURL(`https://wiseoldman.net/groups/${groupId}/hiscores/`)
+          .setFooter({ text: `Tip: Try /group hiscores metric: zulrah` });
 
-      message.respond({ embeds: [response] });
-    } catch (e: any) {
-      throw new CommandError(e.response?.data?.message);
+        message.reply({ embeds: [response] });
+      } catch (e: any) {
+        throw new CommandError(e.response?.data?.message);
+      }
+    } else {
+      throw new CommandError(
+        'This command has been changed to a slash command!',
+        'Try /group hiscores metric: zulrah'
+      );
     }
   }
 
@@ -71,10 +87,6 @@ class GroupHiscores implements Command {
     }
 
     return `${result.value || 0}`;
-  }
-
-  getMetricArg(args: string[]): string {
-    return args.length >= 2 ? getAbbreviation(args[1]) : 'overall';
   }
 }
 

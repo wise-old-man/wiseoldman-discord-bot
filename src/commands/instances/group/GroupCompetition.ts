@@ -1,55 +1,80 @@
-import { MessageEmbed } from 'discord.js';
+import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { capitalize, uniq } from 'lodash';
 import { fetchCompetition, getCompetitionStatus } from '../../../api/modules/competitions';
 import { fetchGroupCompetitions } from '../../../api/modules/groups';
 import { Competition } from '../../../api/types';
 import config from '../../../config';
-import { Command, ParsedMessage } from '../../../types';
+import { getServer } from '../../../database/services/server';
+import { SubCommand, ParsedMessage } from '../../../types';
 import { getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class GroupCompetition implements Command {
+class GroupCompetition implements SubCommand {
   name: string;
   template: string;
   requiresGroup?: boolean | undefined;
+  slashCommand?: SlashCommandSubcommandBuilder;
+  subcommand?: boolean | undefined;
 
   constructor() {
     this.name = "View a group's ongoing/upcoming competition";
     this.template = '!group competition [--ongoing/--upcoming]';
     this.requiresGroup = true;
+    this.slashCommand = new SlashCommandSubcommandBuilder()
+      .addStringOption(option =>
+        option
+          .setName('status')
+          .setDescription('View an ongoing or upcoming group competition')
+          .addChoices([
+            ['Ongoing', 'ongoing'],
+            ['Upcoming', 'upcoming']
+          ])
+      )
+      .addIntegerOption(option => option.setName('competition_id').setDescription('Competition id'))
+      .setName('competition')
+      .setDescription("View a group's ongoing/upcoming competition");
+    this.subcommand = true;
   }
 
   activated(message: ParsedMessage) {
     return message.command === 'group' && message.args.length > 0 && message.args[0] === 'competition';
   }
 
-  async execute(message: ParsedMessage) {
-    const groupId = message.originServer?.groupId || -1;
-    const status = this.getStatusArgs(message.args);
+  async execute(message: ParsedMessage | CommandInteraction) {
+    if (message instanceof CommandInteraction) {
+      const guildId = message.guild?.id;
+      const server = await getServer(guildId); // maybe cache it so we don't have to do this
+      const groupId = server?.groupId || -1;
 
-    try {
-      const competitions = await fetchGroupCompetitions(groupId);
-      const competitionId =
-        Number(message.args[1]) || this.getSelectedCompetitionId(competitions, status, message.prefix);
-      const competition = await fetchCompetition(competitionId);
-
-      const pageURL = `https://wiseoldman.net/competitions/${competition.id}/`;
-
-      const response = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setTitle(competition.title)
-        .setURL(pageURL)
-        .setDescription(this.buildContent(competition))
-        .setTimestamp(this.getFooterDate(competition))
-        .setFooter({ text: this.getFooterLabel(competition) });
-
-      message.respond({ embeds: [response] });
-    } catch (e: any) {
-      if (e.response?.data?.message) {
-        throw new CommandError(e.response?.data?.message);
-      } else {
-        throw new CommandError(e.message, e.tip);
+      const status = message.options.getString('status') || 'ongoing';
+      try {
+        const competitions = await fetchGroupCompetitions(groupId);
+        const competitionId =
+          message.options.getInteger('competition_id') ||
+          this.getSelectedCompetitionId(competitions, status);
+        const competition = await fetchCompetition(competitionId);
+        const pageURL = `https://wiseoldman.net/competitions/${competition.id}/`;
+        const response = new MessageEmbed()
+          .setColor(config.visuals.blue)
+          .setTitle(competition.title)
+          .setURL(pageURL)
+          .setDescription(this.buildContent(competition))
+          .setTimestamp(this.getFooterDate(competition))
+          .setFooter({ text: this.getFooterLabel(competition) });
+        message.reply({ embeds: [response] });
+      } catch (e: any) {
+        if (e.response?.data?.message) {
+          throw new CommandError(e.response?.data?.message);
+        } else {
+          throw new CommandError(e.message, e.tip);
+        }
       }
+    } else {
+      throw new CommandError(
+        'This command has been changed to a slash command!',
+        'Try /group competition {status: ongoing/upcoming} {competition_id: 137}'
+      );
     }
   }
 
@@ -125,14 +150,14 @@ class GroupCompetition implements Command {
       .map(p => `${p.displayName} - **${toKMB(p.progress.gained)}**`);
   }
 
-  getSelectedCompetitionId(competitions: Competition[], status: string, prefix: string) {
+  getSelectedCompetitionId(competitions: Competition[], status: string) {
     if (status === 'ongoing') {
       const ongoing = competitions.find(c => getCompetitionStatus(c) === 'ongoing');
 
       if (!ongoing) {
         throw new CommandError(
           'There are no ongoing competitions for this group.',
-          `Try ${prefix}group competition --upcoming`
+          `Try /group competition status: upcoming`
         );
       }
 
@@ -143,7 +168,7 @@ class GroupCompetition implements Command {
       if (!upcoming) {
         throw new CommandError(
           'There are no upcoming competitions for this group.',
-          `Try ${prefix}group competition --ongoing`
+          `Try /group competition status: ongoing`
         );
       }
 
