@@ -39,7 +39,8 @@ const ACTIVITIES_MAP = [
   { key: 'clue_scrolls_elite', name: 'Clue Scrolls (Elite)' },
   { key: 'clue_scrolls_master', name: 'Clue Scrolls (Master)' },
   { key: 'clue_scrolls_all', name: 'Clue Scrolls (All)' },
-  { key: 'soul_wars_zeal', name: 'Soul Wars Zeal' }
+  { key: 'soul_wars_zeal', name: 'Soul Wars Zeal' },
+  { key: 'guardians_of_the_rift', name: 'Guardians of the Rift' }
 ];
 
 const BOSSES_MAP = [

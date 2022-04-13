@@ -10,7 +10,7 @@ import { ACTIVITIES, encodeURL, toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 
-const RENDER_WIDTH = 287;
+const RENDER_WIDTH = 357;
 const RENDER_HEIGHT = 100;
 const RENDER_PADDING = 15;
 

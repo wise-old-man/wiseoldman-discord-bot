@@ -231,6 +231,7 @@ export interface Snapshot {
   clue_scrolls_master: SnapshotActivity;
   last_man_standing: SnapshotActivity;
   soul_wars_zeal: SnapshotActivity;
+  guardians_of_the_rift: SnapshotActivity;
 
   // Virtuals
   ehp: VirtualActivity;
