@@ -4,20 +4,16 @@ import { fetchGroupDetails, fetchGroupHiscores } from '../../../api/modules/grou
 import { GroupHiscoresEntry } from '../../../api/types';
 import config from '../../../config';
 import { getServer } from '../../../database/services/server';
-import { SubCommand, ParsedMessage } from '../../../types';
+import { SubCommand } from '../../../types';
 import { getEmoji, getMetricName, isActivity, isBoss, isSkill, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class GroupHiscores implements SubCommand {
-  name: string;
-  template: string;
   requiresGroup?: boolean | undefined;
   slashCommand?: SlashCommandSubcommandBuilder;
   subcommand?: boolean | undefined;
 
   constructor() {
-    this.name = 'View group hiscores';
-    this.template = '!group hiscores {metric}?';
     this.requiresGroup = true;
     this.slashCommand = new SlashCommandSubcommandBuilder()
       .addStringOption(option =>
@@ -32,42 +28,31 @@ class GroupHiscores implements SubCommand {
     this.subcommand = true;
   }
 
-  activated(message: ParsedMessage) {
-    const { command, args } = message;
-    return command === 'group' && args.length >= 1 && args[0] === 'hiscores';
-  }
+  async execute(message: CommandInteraction) {
+    const guildId = message.guild?.id;
+    const server = await getServer(guildId); // maybe cache it so we don't have to do this
+    const groupId = server?.groupId || -1;
+    const metric = message.options.getString('metric', true);
 
-  async execute(message: ParsedMessage | CommandInteraction) {
-    if (message instanceof CommandInteraction) {
-      const guildId = message.guild?.id;
-      const server = await getServer(guildId); // maybe cache it so we don't have to do this
-      const groupId = server?.groupId || -1;
-      const metric = message.options.getString('metric', true);
+    try {
+      await message.deferReply(); // defer because things take time
+      const group = await fetchGroupDetails(groupId);
+      const hiscores = await fetchGroupHiscores(groupId, metric);
 
-      try {
-        const group = await fetchGroupDetails(groupId);
-        const hiscores = await fetchGroupHiscores(groupId, metric);
+      const response = new MessageEmbed()
+        .setColor(config.visuals.blue)
+        .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} hiscores`)
+        .setDescription(this.buildList(metric, hiscores))
+        .setURL(`https://wiseoldman.net/groups/${groupId}/hiscores/`)
+        .setFooter({ text: `Tip: Try /group hiscores metric: zulrah` });
 
-        const response = new MessageEmbed()
-          .setColor(config.visuals.blue)
-          .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} hiscores`)
-          .setDescription(this.buildList(metric, hiscores))
-          .setURL(`https://wiseoldman.net/groups/${groupId}/hiscores/`)
-          .setFooter({ text: `Tip: Try /group hiscores metric: zulrah` });
-
-        message.reply({ embeds: [response] });
-      } catch (e: any) {
-        throw new CommandError(e.response?.data?.message);
-      }
-    } else {
-      throw new CommandError(
-        'This command has been changed to a slash command!',
-        'Try /group hiscores metric: zulrah'
-      );
+      await message.editReply({ embeds: [response] });
+    } catch (e: any) {
+      throw new CommandError(e.response?.data?.message);
     }
   }
 
-  buildList(metric: string, hiscores: GroupHiscoresEntry[]) {
+  buildList(metric: string, hiscores: GroupHiscoresEntry[]): string {
     return hiscores
       .map((g, i) => `${i + 1}. **${g.player.displayName}** - ${this.getValue(metric, g)}`)
       .join('\n');

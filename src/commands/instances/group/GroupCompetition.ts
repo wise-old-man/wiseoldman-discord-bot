@@ -6,20 +6,16 @@ import { fetchGroupCompetitions } from '../../../api/modules/groups';
 import { Competition } from '../../../api/types';
 import config from '../../../config';
 import { getServer } from '../../../database/services/server';
-import { SubCommand, ParsedMessage } from '../../../types';
+import { SubCommand } from '../../../types';
 import { getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class GroupCompetition implements SubCommand {
-  name: string;
-  template: string;
   requiresGroup?: boolean | undefined;
   slashCommand?: SlashCommandSubcommandBuilder;
   subcommand?: boolean | undefined;
 
   constructor() {
-    this.name = "View a group's ongoing/upcoming competition";
-    this.template = '!group competition [--ongoing/--upcoming]';
     this.requiresGroup = true;
     this.slashCommand = new SlashCommandSubcommandBuilder()
       .addStringOption(option =>
@@ -37,44 +33,33 @@ class GroupCompetition implements SubCommand {
     this.subcommand = true;
   }
 
-  activated(message: ParsedMessage) {
-    return message.command === 'group' && message.args.length > 0 && message.args[0] === 'competition';
-  }
+  async execute(message: CommandInteraction) {
+    const guildId = message.guild?.id;
+    const server = await getServer(guildId); // maybe cache it so we don't have to do this
+    const groupId = server?.groupId || -1;
 
-  async execute(message: ParsedMessage | CommandInteraction) {
-    if (message instanceof CommandInteraction) {
-      const guildId = message.guild?.id;
-      const server = await getServer(guildId); // maybe cache it so we don't have to do this
-      const groupId = server?.groupId || -1;
-
-      const status = message.options.getString('status') || 'ongoing';
-      try {
-        const competitions = await fetchGroupCompetitions(groupId);
-        const competitionId =
-          message.options.getInteger('competition_id') ||
-          this.getSelectedCompetitionId(competitions, status);
-        const competition = await fetchCompetition(competitionId);
-        const pageURL = `https://wiseoldman.net/competitions/${competition.id}/`;
-        const response = new MessageEmbed()
-          .setColor(config.visuals.blue)
-          .setTitle(competition.title)
-          .setURL(pageURL)
-          .setDescription(this.buildContent(competition))
-          .setTimestamp(this.getFooterDate(competition))
-          .setFooter({ text: this.getFooterLabel(competition) });
-        message.reply({ embeds: [response] });
-      } catch (e: any) {
-        if (e.response?.data?.message) {
-          throw new CommandError(e.response?.data?.message);
-        } else {
-          throw new CommandError(e.message, e.tip);
-        }
+    const status = message.options.getString('status') || 'ongoing';
+    try {
+      const competitions = await fetchGroupCompetitions(groupId);
+      const competitionId =
+        message.options.getInteger('competition_id') ||
+        this.getSelectedCompetitionId(competitions, status);
+      const competition = await fetchCompetition(competitionId);
+      const pageURL = `https://wiseoldman.net/competitions/${competition.id}/`;
+      const response = new MessageEmbed()
+        .setColor(config.visuals.blue)
+        .setTitle(competition.title)
+        .setURL(pageURL)
+        .setDescription(this.buildContent(competition))
+        .setTimestamp(this.getFooterDate(competition))
+        .setFooter({ text: this.getFooterLabel(competition) });
+      message.reply({ embeds: [response] });
+    } catch (e: any) {
+      if (e.response?.data?.message) {
+        throw new CommandError(e.response?.data?.message);
+      } else {
+        throw new CommandError(e.message, e.tip);
       }
-    } else {
-      throw new CommandError(
-        'This command has been changed to a slash command!',
-        'Try /group competition {status: ongoing/upcoming} {competition_id: 137}'
-      );
     }
   }
 
@@ -176,10 +161,6 @@ class GroupCompetition implements SubCommand {
     } else {
       throw new CommandError(`${status} is not a valid status.`, 'Try --ongoing or --upcoming');
     }
-  }
-
-  getStatusArgs(args: string[]): string {
-    return args.find(a => a.startsWith('--'))?.replace('--', '') || 'ongoing';
   }
 }
 

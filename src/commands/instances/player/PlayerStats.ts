@@ -6,7 +6,7 @@ import { toResults } from '../../../api/modules/snapshots';
 import { MetricType, Player, SkillResult } from '../../../api/types';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
-import { CanvasAttachment, Command, ParsedMessage, Renderable } from '../../../types';
+import { CanvasAttachment, Command, Renderable } from '../../../types';
 import { encodeURL, round, SKILLS, toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
@@ -23,14 +23,10 @@ enum RenderVariant {
 }
 
 class PlayerStats implements Command, Renderable {
-  name: string;
-  template: string;
   slashCommand: SlashCommandBuilder;
   global: boolean;
 
   constructor() {
-    this.name = 'View player stats';
-    this.template = '![stats/ehp] {username} [--exp/--ranks/--ehp]';
     this.slashCommand = new SlashCommandBuilder()
       .addStringOption(option =>
         option
@@ -50,48 +46,37 @@ class PlayerStats implements Command, Renderable {
     this.global = true;
   }
 
-  activated(message: ParsedMessage) {
-    return message.command === 'stats' || message.command === 'ehp';
-  }
+  async execute(message: CommandInteraction) {
+    // Grab the username from the command's arguments or database alias
+    const username = await this.getUsername(message);
 
-  async execute(message: ParsedMessage | CommandInteraction) {
-    if (message instanceof CommandInteraction) {
-      // Grab the username from the command's arguments or database alias
-      const username = await this.getUsername(message);
+    const variant = message.options.getString('variant') as RenderVariant;
 
-      const variant = message.options.getString('variant') as RenderVariant;
-
-      if (!username) {
-        throw new CommandError(
-          'This commands requires a username. Set a default by using the `setrsn` command.'
-        );
-      }
-
-      try {
-        const player = await fetchPlayer(username);
-
-        const { attachment, fileName } = await this.render({ player, variant });
-
-        const embed = new MessageEmbed()
-          .setColor(config.visuals.blue)
-          .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
-          .setTitle(`${player.displayName} (Combat ${player.combatLevel}) - ${variant}`)
-          .setImage(`attachment://${fileName}`)
-          .setFooter({ text: 'Last updated' })
-          .setTimestamp(player.updatedAt);
-
-        message.reply({ embeds: [embed], files: [attachment] });
-      } catch (e: any) {
-        const errorMessage = `**${username}** is not being tracked yet.`;
-        const errorTip = `Try /update ${username}`;
-
-        throw new CommandError(errorMessage, errorTip);
-      }
-    } else {
+    if (!username) {
       throw new CommandError(
-        'This command has been changed to a slash command!',
-        'Try /stats [levels/exp/ranks/ehp] {username}'
+        'This commands requires a username. Set a default by using the `setrsn` command.'
       );
+    }
+
+    try {
+      const player = await fetchPlayer(username);
+
+      const { attachment, fileName } = await this.render({ player, variant });
+
+      const embed = new MessageEmbed()
+        .setColor(config.visuals.blue)
+        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
+        .setTitle(`${player.displayName} (Combat ${player.combatLevel}) - ${variant}`)
+        .setImage(`attachment://${fileName}`)
+        .setFooter({ text: 'Last updated' })
+        .setTimestamp(player.updatedAt);
+
+      message.reply({ embeds: [embed], files: [attachment] });
+    } catch (e: any) {
+      const errorMessage = `**${username}** is not being tracked yet.`;
+      const errorTip = `Try /update ${username}`;
+
+      throw new CommandError(errorMessage, errorTip);
     }
   }
 

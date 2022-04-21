@@ -1,6 +1,6 @@
 import { SlashCommandSubcommandsOnlyBuilder, SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction } from 'discord.js';
-import { Command, SubCommand, ParsedMessage } from '../../../types';
+import { Command, SubCommand } from '../../../types';
 import CommandError from '../../CommandError';
 import { onError } from '../../router';
 
@@ -23,15 +23,11 @@ const groupCommands: SubCommand[] = [
 ];
 
 class Group implements Command {
-  name: string;
-  template: string;
   requiresGroup?: boolean | undefined;
   slashCommand?: SlashCommandSubcommandsOnlyBuilder;
   global?: boolean | undefined;
 
   constructor() {
-    this.name = 'View information about a group';
-    this.template = '/group';
     this.requiresGroup = true;
     this.slashCommand = new SlashCommandBuilder()
       .setName('group')
@@ -43,10 +39,6 @@ class Group implements Command {
     });
 
     this.global = true;
-  }
-
-  activated(message: ParsedMessage) {
-    return message.command === 'group';
   }
 
   async execute(message: CommandInteraction) {

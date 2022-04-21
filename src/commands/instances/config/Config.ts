@@ -1,6 +1,6 @@
 import { SlashCommandSubcommandsOnlyBuilder, SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction } from 'discord.js';
-import { Command, SubCommand, ParsedMessage } from '../../../types';
+import { Command, SubCommand } from '../../../types';
 import CommandError from '../../CommandError';
 import { onError } from '../../router';
 
@@ -10,15 +10,11 @@ import ConfigGroup from './ConfigGroup';
 const configCommands: SubCommand[] = [ConfigChannel, ConfigGroup];
 
 class Config implements Command {
-  name: string;
-  template: string;
   requiresAdmin: boolean;
   slashCommand?: SlashCommandSubcommandsOnlyBuilder;
   global?: boolean | undefined;
 
   constructor() {
-    this.name = 'Configure various things';
-    this.template = '/config';
     this.requiresAdmin = true;
     this.slashCommand = new SlashCommandBuilder()
       .setName('config')
@@ -29,10 +25,6 @@ class Config implements Command {
       }
     });
     this.global = true;
-  }
-
-  activated(message: ParsedMessage) {
-    return message.command === 'group';
   }
 
   async execute(message: CommandInteraction) {

@@ -4,7 +4,7 @@ import { fetchPlayer, fetchPlayerGains } from '../../../api/modules/players';
 import { PlayerGains } from '../../../api/types';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
-import { Command, ParsedMessage } from '../../../types';
+import { Command } from '../../../types';
 import { encodeURL, getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
@@ -12,14 +12,10 @@ import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 const GAINS_PER_PAGE = 10;
 
 class PlayerGained implements Command {
-  name: string;
-  template: string;
   slashCommand: SlashCommandBuilder;
   global: true;
 
   constructor() {
-    this.name = 'View player gains';
-    this.template = '!gained {username} [--6h/--day/--week/--month/--year/--1y6d5h]';
     this.slashCommand = new SlashCommandBuilder()
       .addStringOption(option =>
         option
@@ -34,103 +30,92 @@ class PlayerGained implements Command {
     this.global = true;
   }
 
-  activated(message: ParsedMessage) {
-    return message.command === 'gained';
-  }
+  async execute(message: CommandInteraction) {
+    // Grab the username from the command's arguments or database alias
+    const username = await this.getUsername(message);
 
-  async execute(message: ParsedMessage | CommandInteraction) {
-    if (message instanceof CommandInteraction) {
-      // Grab the username from the command's arguments or database alias
-      const username = await this.getUsername(message);
+    // Grab the period from the command's arguments
+    const period = message.options.getString('period', true);
 
-      // Grab the period from the command's arguments
-      const period = message.options.getString('period', true);
+    const footer = `Tip: You can use custom periods with this format: /gained period: 2m6d7h`;
 
-      const footer = `Tip: You can use custom periods with this format: /gained period: 2m6d7h`;
+    if (!username) {
+      throw new CommandError(
+        'This commands requires a username. Set a default by using the `setrsn` command.'
+      );
+    }
 
-      if (!username) {
-        throw new CommandError(
-          'This commands requires a username. Set a default by using the `setrsn` command.'
-        );
+    try {
+      const player = await fetchPlayer(username);
+      const playerGains = await fetchPlayerGains(username, period);
+
+      if (!playerGains || !playerGains.startsAt || !playerGains.endsAt) {
+        throw new Error(`${player.displayName} has no ${period} gains.`);
       }
 
-      try {
-        const player = await fetchPlayer(username);
-        const playerGains = await fetchPlayerGains(username, period);
+      const pages = this.buildPages(player.displayName, period, playerGains);
 
-        if (!playerGains || !playerGains.startsAt || !playerGains.endsAt) {
-          throw new Error(`${player.displayName} has no ${period} gains.`);
-        }
+      if (pages.length === 1) {
+        const response = pages[0]
+          .setColor(config.visuals.blue)
+          .setTitle(`${player.displayName} gains (${period})`)
+          .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
+          .setFooter({ text: footer });
 
-        const pages = this.buildPages(player.displayName, period, playerGains);
-
-        if (pages.length === 1) {
-          const response = pages[0]
+        message.reply({ embeds: [response] });
+      } else {
+        const paginatedMessage = new PaginatedMessage({
+          pageIndexPrefix: 'Page',
+          embedFooterSeparator: '|',
+          actions: [
+            {
+              customId: 'CustomPreviousAction',
+              type: Constants.MessageComponentTypes.BUTTON,
+              style: 'PRIMARY',
+              label: '<',
+              run: ({ handler }) => {
+                if (handler.index === 0) handler.index = handler.pages.length - 1;
+                else --handler.index;
+              }
+            },
+            {
+              customId: 'CustomNextAction',
+              type: Constants.MessageComponentTypes.BUTTON,
+              style: 'PRIMARY',
+              label: '>',
+              run: ({ handler }) => {
+                if (handler.index === handler.pages.length - 1) handler.index = 0;
+                else ++handler.index;
+              }
+            }
+          ],
+          template: new MessageEmbed()
             .setColor(config.visuals.blue)
             .setTitle(`${player.displayName} gains (${period})`)
             .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
-            .setFooter({ text: footer });
+            .setFooter({ text: footer })
+        });
 
-          message.reply({ embeds: [response] });
-        } else {
-          const paginatedMessage = new PaginatedMessage({
-            pageIndexPrefix: 'Page',
-            embedFooterSeparator: '|',
-            actions: [
-              {
-                customId: 'CustomPreviousAction',
-                type: Constants.MessageComponentTypes.BUTTON,
-                style: 'PRIMARY',
-                label: '<',
-                run: ({ handler }) => {
-                  if (handler.index === 0) handler.index = handler.pages.length - 1;
-                  else --handler.index;
-                }
-              },
-              {
-                customId: 'CustomNextAction',
-                type: Constants.MessageComponentTypes.BUTTON,
-                style: 'PRIMARY',
-                label: '>',
-                run: ({ handler }) => {
-                  if (handler.index === handler.pages.length - 1) handler.index = 0;
-                  else ++handler.index;
-                }
-              }
-            ],
-            template: new MessageEmbed()
-              .setColor(config.visuals.blue)
-              .setTitle(`${player.displayName} gains (${period})`)
-              .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
-              .setFooter({ text: footer })
-          });
-
-          for (const page of pages) {
-            paginatedMessage.addPageEmbed(page);
-          }
-
-          paginatedMessage.idle = 30000;
-          paginatedMessage.run(message);
+        for (const page of pages) {
+          paginatedMessage.addPageEmbed(page);
         }
-      } catch (e: any) {
-        if (e.message.includes('gains')) {
-          throw new CommandError(e.message);
-        } else {
-          if (e.response?.data?.message.includes('tracked')) {
-            const errorMessage = `**${username}** is not being tracked yet.`;
-            const errorTip = `Try /update ${username}`;
 
-            throw new CommandError(errorMessage, errorTip);
-          } else {
-            throw new CommandError(e.response?.data?.message);
-          }
+        paginatedMessage.idle = 120000;
+        paginatedMessage.run(message);
+      }
+    } catch (e: any) {
+      if (e.message.includes('gains')) {
+        throw new CommandError(e.message);
+      } else {
+        if (e.response?.data?.message.includes('tracked')) {
+          const errorMessage = `**${username}** is not being tracked yet.`;
+          const errorTip = `Try /update ${username}`;
+
+          throw new CommandError(errorMessage, errorTip);
+        } else {
+          throw new CommandError(e.response?.data?.message);
         }
       }
-    } else {
-      throw new CommandError(
-        'This command has been changed to a slash command!',
-        'Try /gained [6h/day/week/month/year/custom] {username}'
-      );
     }
   }
 

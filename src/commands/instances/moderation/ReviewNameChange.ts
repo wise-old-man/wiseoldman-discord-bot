@@ -2,18 +2,14 @@ import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { reviewNameChange } from '../../../api/modules/names';
 import config from '../../../config';
-import { Command, ParsedMessage } from '../../../types';
+import { Command } from '../../../types';
 import { getEmoji } from '../../../utils/discord';
 import CommandError from '../../CommandError';
 
 class ReviewNameChange implements Command {
-  name: string;
-  template: string;
   slashCommand: SlashCommandBuilder;
 
   constructor() {
-    this.name = 'Review a name change request';
-    this.template = '!review-name {nameChangeId}';
     this.slashCommand = new SlashCommandBuilder()
       .addIntegerOption(option =>
         option.setName('id').setDescription('Name change id').setRequired(true)
@@ -22,39 +18,24 @@ class ReviewNameChange implements Command {
       .setDescription('Review a name change request');
   }
 
-  activated(message: ParsedMessage) {
-    return (
-      message.command === 'review-name' &&
-      message.args.length >= 1 &&
-      message.sourceMessage?.guild?.id === config.discord.guildId
-    );
-  }
+  async execute(message: CommandInteraction) {
+    const nameChangeId = message.options.getInteger('id', true);
+    try {
+      const reviewData = await reviewNameChange(nameChangeId);
 
-  async execute(message: ParsedMessage | CommandInteraction) {
-    if (message instanceof CommandInteraction) {
-      const nameChangeId = message.options.getInteger('id', true);
-      try {
-        const reviewData = await reviewNameChange(nameChangeId);
-
-        if (reviewData.status !== 0) {
-          throw new CommandError('This name change is not pending.');
-        }
-
-        const response = new MessageEmbed()
-          .setColor(config.visuals.blue)
-          .setTitle(`Name change review: ${reviewData.oldName} → ${reviewData.newName}`)
-          .setDescription(this.buildReviewMessage(reviewData));
-
-        message.reply({ embeds: [response] });
-      } catch (error) {
-        if (error instanceof CommandError) throw error;
-        throw new CommandError('Failed to review name change.');
+      if (reviewData.status !== 0) {
+        throw new CommandError('This name change is not pending.');
       }
-    } else {
-      throw new CommandError(
-        'This command has been changed to a slash command!',
-        'Try /review-name {id}'
-      );
+
+      const response = new MessageEmbed()
+        .setColor(config.visuals.blue)
+        .setTitle(`Name change review: ${reviewData.oldName} → ${reviewData.newName}`)
+        .setDescription(this.buildReviewMessage(reviewData));
+
+      message.reply({ embeds: [response] });
+    } catch (error) {
+      if (error instanceof CommandError) throw error;
+      throw new CommandError('Failed to review name change.');
     }
   }
 
@@ -82,11 +63,6 @@ class ReviewNameChange implements Command {
     lines.push(`New total level? \`${newTotalLevel}\``);
 
     return lines.join('\n');
-  }
-
-  getNameChangeId(message: ParsedMessage): number | null {
-    const match = message.args.find(a => !isNaN(Number(a)));
-    return match ? parseInt(match, 10) : null;
   }
 }
 

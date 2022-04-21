@@ -1,27 +1,21 @@
-import { CommandInteraction, Message, MessageAttachment, MessageOptions } from 'discord.js';
+import { CommandInteraction, MessageAttachment } from 'discord.js';
 import {
   SlashCommandBuilder,
   SlashCommandSubcommandsOnlyBuilder,
   SlashCommandSubcommandBuilder
 } from '@discordjs/builders';
-import { Server } from './database';
 
 export interface Command {
-  name: string;
-  template: string;
   slashCommand?:
-    | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>
     | SlashCommandBuilder
     | SlashCommandSubcommandBuilder
     | SlashCommandSubcommandsOnlyBuilder;
 
   requiresAdmin?: boolean;
   requiresGroup?: boolean;
-  requiresPagination?: boolean;
   global?: boolean;
   subcommand?: boolean;
-  activated(message: ParsedMessage): boolean;
-  execute(message: ParsedMessage | CommandInteraction): Promise<void>;
+  execute(message: CommandInteraction): Promise<void>;
 }
 
 export interface SubCommand extends Command {
@@ -52,15 +46,6 @@ export interface CanvasAttachment {
 
 export interface Renderable {
   render(props: any): Promise<CanvasAttachment>;
-}
-
-export interface ParsedMessage {
-  sourceMessage: Message;
-  originServer?: Server;
-  prefix: string;
-  command: string;
-  args: string[];
-  respond(response: MessageOptions): void;
 }
 
 export interface TimeGap {

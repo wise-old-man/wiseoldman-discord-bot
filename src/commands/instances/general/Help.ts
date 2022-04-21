@@ -1,8 +1,10 @@
-import { MessageEmbed } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { fetchGroupDetails } from '../../../api/modules/groups';
 import config from '../../../config';
 import { getChannelPreferences } from '../../../database/services/channelPreferences';
-import { BroadcastType, Command, ParsedMessage } from '../../../types';
+import { getServer } from '../../../database/services/server';
+import { BroadcastType, Command } from '../../../types';
 import { getBroadcastName, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
@@ -15,28 +17,26 @@ const LINE_PERMS =
   "If some commands don't seem to be responding, it might be a permission related issue. Try to kick the bot and invite it back again. (link above)";
 
 class Help implements Command {
-  name: string;
-  template: string;
+  slashCommand?: SlashCommandBuilder;
+  global?: boolean | undefined;
 
   constructor() {
-    this.name = 'Ask for help.';
-    this.template = 'wom!help';
+    this.slashCommand = new SlashCommandBuilder().setName('help').setDescription('Ask for help');
+    this.global = true;
   }
 
-  activated(message: ParsedMessage) {
-    return message.sourceMessage.content.startsWith(config.helpCommand);
-  }
-
-  async execute(message: ParsedMessage) {
-    if (!message.originServer) return;
-    const { groupId, guildId, prefix, botChannelId } = message.originServer;
+  async execute(message: CommandInteraction) {
+    if (!message.guild) return;
+    const guildId = message.guild?.id;
+    const server = await getServer(guildId); // maybe cache it so we don't have to do this
+    const groupId = server?.groupId || -1;
+    const botChannelId = server?.botChannelId;
 
     try {
       const group = groupId && groupId > -1 ? await fetchGroupDetails(groupId) : null;
       const channelPreferences = await getChannelPreferences(guildId);
 
       const fields = [
-        { name: 'Prefix', value: prefix || config.defaultPrefix },
         { name: 'Tracked group', value: group ? group.name : 'none' },
         { name: 'Default Broadcast Channel', value: botChannelId ? `<#${botChannelId}>` : 'none' },
         ...channelPreferences.map(pref => ({
@@ -51,7 +51,7 @@ class Help implements Command {
         .setDescription(`${LINE_COMMANDS}\n\n${LINE_SUPPORT}\n\n${getEmoji('warning')}${LINE_PERMS}`)
         .addFields(fields);
 
-      message.respond({ embeds: [response] });
+      message.reply({ embeds: [response] });
     } catch (error) {
       throw new CommandError('Failed to load server settings.');
     }

@@ -27,9 +27,6 @@ class Bot {
       // Send received interaction to the command router
       this.client.on('interactionCreate', router.onInteractionReceived);
 
-      // Send received messages to the command router
-      this.client.on('messageCreate', router.onMessageReceived);
-
       this.client.on('guildCreate', guild => {
         const openChannel = <TextChannel>findOpenChannel(guild);
         if (openChannel) openChannel.send({ embeds: [buildJoinMessage()] });

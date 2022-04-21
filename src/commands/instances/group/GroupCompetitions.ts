@@ -5,7 +5,7 @@ import { getCompetitionStatus, getCompetitionTimeLeft } from '../../../api/modul
 import { fetchGroupCompetitions, fetchGroupDetails } from '../../../api/modules/groups';
 import { Competition } from '../../../api/types';
 import config from '../../../config';
-import { SubCommand, ParsedMessage } from '../../../types';
+import { SubCommand } from '../../../types';
 import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 import { getServer } from '../../../database/services/server';
@@ -15,15 +15,11 @@ const MAX_COMPETITIONS = 5;
 const STATUS_ORDER = ['ongoing', 'upcoming', 'finished'];
 
 class GroupCompetitions implements SubCommand {
-  name: string;
-  template: string;
   requiresGroup?: boolean | undefined;
   slashCommand?: SlashCommandSubcommandBuilder;
   subcommand?: boolean | undefined;
 
   constructor() {
-    this.name = 'View group competitions';
-    this.template = '!group competitions';
     this.requiresGroup = true;
     this.slashCommand = new SlashCommandSubcommandBuilder()
       .setName('competitions')
@@ -31,37 +27,26 @@ class GroupCompetitions implements SubCommand {
     this.subcommand = true;
   }
 
-  activated(message: ParsedMessage) {
-    return message.command === 'group' && message.args.length > 0 && message.args[0] === 'competitions';
-  }
+  async execute(message: CommandInteraction) {
+    const guildId = message.guild?.id;
+    const server = await getServer(guildId); // maybe cache it so we don't have to do this
+    const groupId = server?.groupId || -1;
 
-  async execute(message: ParsedMessage | CommandInteraction) {
-    if (message instanceof CommandInteraction) {
-      const guildId = message.guild?.id;
-      const server = await getServer(guildId); // maybe cache it so we don't have to do this
-      const groupId = server?.groupId || -1;
+    try {
+      const group = await fetchGroupDetails(groupId);
+      const competitions = await fetchGroupCompetitions(groupId);
+      const fields = this.buildCompetitionsList(competitions);
+      const pageURL = `https://wiseoldman.net/groups/${groupId}/competitions`;
 
-      try {
-        const group = await fetchGroupDetails(groupId);
-        const competitions = await fetchGroupCompetitions(groupId);
-        const fields = this.buildCompetitionsList(competitions);
-        const pageURL = `https://wiseoldman.net/groups/${groupId}/competitions`;
+      const response = new MessageEmbed()
+        .setColor(config.visuals.blue)
+        .setTitle(`${group.name} competitions`)
+        .setURL(pageURL)
+        .addFields(fields);
 
-        const response = new MessageEmbed()
-          .setColor(config.visuals.blue)
-          .setTitle(`${group.name} competitions`)
-          .setURL(pageURL)
-          .addFields(fields);
-
-        message.reply({ embeds: [response] });
-      } catch (e: any) {
-        throw new CommandError(e.response?.data?.message);
-      }
-    } else {
-      throw new CommandError(
-        'This command has been changed to a slash command!',
-        'Try /group competitions'
-      );
+      message.reply({ embeds: [response] });
+    } catch (e: any) {
+      throw new CommandError(e.response?.data?.message);
     }
   }
 
