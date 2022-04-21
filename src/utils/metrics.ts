@@ -382,6 +382,11 @@ export function getAbbreviation(abbr: string): string {
     case 'soul-wars':
       return 'soul_wars_zeal';
 
+    case 'rifts-closed':
+    case 'gotr':
+    case 'rifts':
+      return 'guardians_of_the_rift';
+
     // Skills
 
     case 'runecraft':
