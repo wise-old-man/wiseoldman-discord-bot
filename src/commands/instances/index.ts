@@ -1,8 +1,7 @@
 import { Command } from '../../types';
-import ConfigChannelPreference from './config/ConfigChannelPreference';
-import ConfigDefaultChannel from './config/ConfigDefaultChannel';
+import ConfigCommand from './config/Config';
+import ConfigChannelCommand from './config/ConfigChannel';
 import ConfigGroup from './config/ConfigGroup';
-import ConfigPrefix from './config/ConfigPrefix';
 import HelpCommand from './general/Help';
 import GroupCommand from './group/Group';
 import GroupCompetitionCommand from './group/GroupCompetition';
@@ -64,9 +63,8 @@ const commands: Command[] = [
   GroupCompetitionsCommand,
 
   // config commands
-  ConfigPrefix,
-  ConfigDefaultChannel,
-  ConfigChannelPreference,
+  ConfigCommand,
+  ConfigChannelCommand,
   ConfigGroup
 ];
 

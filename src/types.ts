@@ -71,6 +71,7 @@ export interface TimeGap {
 }
 
 export enum BroadcastType {
+  Default = 'DEFAULT',
   CompetitionStatus = 'COMPETITION_STATUS',
   MemberAchievements = 'MEMBER_ACHIEVEMENTS',
   MemberNameChanged = 'MEMBER_NAME_CHANGED',

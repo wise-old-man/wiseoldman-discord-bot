@@ -3,14 +3,14 @@ import { Routes } from 'discord-api-types/v9';
 import commands from './commands/instances';
 import config from './config';
 
-const globalCommands = [];
+const globalCommands: string | any[] = [];
 const guildCommands = [];
 
 for (const command of commands) {
   const slashCommand = command.slashCommand;
   if (slashCommand && !command.subcommand) {
     if (command.global) {
-      globalCommands.push(slashCommand.toJSON());
+      guildCommands.push(slashCommand.toJSON());
     } else {
       guildCommands.push(slashCommand.toJSON());
     }

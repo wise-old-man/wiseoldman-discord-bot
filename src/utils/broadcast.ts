@@ -23,6 +23,8 @@ function getBroadcastName(type: BroadcastType): string {
       return 'Member Name Changed';
     case BroadcastType.MembersListChanged:
       return 'Members List Changed';
+    default:
+      return 'Default';
   }
 }
 

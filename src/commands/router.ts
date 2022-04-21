@@ -1,4 +1,4 @@
-import { Interaction, Message, MessageEmbed } from 'discord.js';
+import { Interaction, Message, MessageEmbed, GuildMember } from 'discord.js';
 import config from '../config';
 import { getMissingPermissions, isAdmin } from '../utils';
 import CommandError from './CommandError';
@@ -25,6 +25,7 @@ export function onError(options: {
   }
 }
 
+// Slash commands
 export async function onInteractionReceived(interaction: Interaction): Promise<void> {
   if (interaction.isAutocomplete()) {
     const focused = interaction.options.getFocused(true);
@@ -64,7 +65,21 @@ export async function onInteractionReceived(interaction: Interaction): Promise<v
   const { commandName } = interaction;
 
   commands.forEach(async c => {
-    if (c.slashCommand?.name !== commandName) return;
+    //TODO: when removing support for prefix commands the subcommand check can be removed
+    // because only top level commands will be in the commands list.
+    if (c.slashCommand?.name !== commandName || c.subcommand) return;
+
+    //TODO: check for admin permissions in a better way
+    if (c.requiresAdmin && !isAdmin(interaction.member as GuildMember)) {
+      return onError({
+        interaction: interaction,
+        title: 'That command requires Admin permissions.',
+        tip: 'Contact your server administrator for help.'
+      });
+    }
+
+    // TODO: Show a proper error when guild isn't configured yet
+
     try {
       interaction.channel?.sendTyping();
 
@@ -124,7 +139,7 @@ export async function onMessageReceived(message: Message): Promise<void> {
       return onError({
         message: message,
         title: 'That command requires a group to be configured.',
-        tip: `Start the group setup with ${parsed.prefix}config group *groupId*`
+        tip: `Start the group setup with /config group *groupId*`
       });
     }
 

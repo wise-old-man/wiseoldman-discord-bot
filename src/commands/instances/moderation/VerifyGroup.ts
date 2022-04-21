@@ -69,7 +69,6 @@ class VerifyGroup implements Command {
         this.sendConfirmationLog(message.guild?.channels, group, userId);
         this.addRole(user);
       } catch (error) {
-        console.log(error);
         throw new CommandError('Failed to verify group.');
       }
     } else {

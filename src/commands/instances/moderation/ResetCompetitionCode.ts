@@ -65,7 +65,6 @@ class ResetCompetitionCode implements Command {
 
         message.reply({ embeds: [response] });
       } catch (error) {
-        console.log(error);
         throw new CommandError('Failed to reset competition verification code.');
       }
     } else {
