@@ -23,10 +23,10 @@ export interface SubCommand extends Command {
 }
 
 export interface CustomCommand {
+  name: string;
   command: string;
   message: string;
   image?: string;
-  public: boolean;
 }
 
 export interface Event {

@@ -12,14 +12,14 @@ class PlayerSetFlag implements Command {
   constructor() {
     this.slashCommand = new SlashCommandBuilder()
       .addStringOption(option =>
+        option.setName('username').setDescription('In-game username').setRequired(true)
+      )
+      .addStringOption(option =>
         option
           .setName('country')
           .setDescription('Start typing your country name')
           .setRequired(true)
           .setAutocomplete(true)
-      )
-      .addStringOption(option =>
-        option.setName('username').setDescription('In-game username').setRequired(true)
       )
       .setName('setflag')
       .setDescription('Set player username (alias)');

@@ -5,6 +5,7 @@ import CommandError from './CommandError';
 import commands from './instances';
 import { COUNTRIES } from '../utils/countries';
 import { ALL_METRICS } from '../utils';
+import { customCommands } from './CustomCommands';
 
 export function onError(options: {
   message?: Message;
@@ -60,6 +61,14 @@ export async function onInteractionReceived(interaction: Interaction): Promise<v
           : [metric.name.toLowerCase(), metric.key].some(str => str.includes(currentValue.toLowerCase()))
       ).map(m => ({ name: m.name, value: m.key }));
       interaction.respond(options.slice(0, 25));
+    } else if (focused.name === 'category') {
+      // for custom commands
+      const options = customCommands
+        .filter(command =>
+          !currentValue ? true : [command.command].some(str => str.includes(currentValue.toLowerCase()))
+        )
+        .map(c => ({ name: c.name, value: c.command }));
+      interaction.respond(options);
     }
   }
 
