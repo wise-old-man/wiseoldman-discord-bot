@@ -19,6 +19,8 @@ class UpdatePlayer implements Command {
   }
 
   async execute(message: CommandInteraction) {
+    await message.deferReply();
+
     // Grab the username from the command's arguments or database alias
     const username = await this.getUsername(message);
 
@@ -38,7 +40,7 @@ class UpdatePlayer implements Command {
           text: 'Tip: You can keep yourself automatically updated through Runelite by enabling Wise Old Man in the "XP Updater" plugin.'
         });
 
-      message.reply({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (e: any) {
       if (e.response?.status === 500) {
         throw new CommandError('Failed to update: OSRS Hiscores are unavailable.');

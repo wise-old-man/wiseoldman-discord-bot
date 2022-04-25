@@ -33,6 +33,8 @@ class Help implements Command {
 
   async execute(message: CommandInteraction) {
     if (!message.guild) return;
+    await message.deferReply();
+
     const guildId = message.guild?.id;
     const server = await getServer(guildId); // maybe cache it so we don't have to do this
     const groupId = server?.groupId || -1;
@@ -41,9 +43,11 @@ class Help implements Command {
 
     try {
       if (category) {
-        customCommands.forEach((c: CustomCommand) => {
+        customCommands.forEach(async (c: CustomCommand) => {
           if (c.command === category) {
-            message.reply(c.image === undefined ? c.message : c.message + '\n' + c.image);
+            await message.editReply({
+              content: c.image === undefined ? c.message : c.message + '\n' + c.image
+            });
           }
         });
       } else {
@@ -65,7 +69,7 @@ class Help implements Command {
           .setDescription(`${LINE_COMMANDS}\n\n${LINE_SUPPORT}\n\n${getEmoji('warning')}${LINE_PERMS}`)
           .addFields(fields);
 
-        message.reply({ embeds: [response] });
+        await message.editReply({ embeds: [response] });
       }
     } catch (error) {
       throw new CommandError('Failed to load server settings.');

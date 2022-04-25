@@ -26,6 +26,7 @@ class PlayerSetFlag implements Command {
   }
 
   async execute(message: CommandInteraction) {
+    await message.deferReply();
     const username = message.options.getString('username', true);
     const countryCode = message.options.getString('country', true);
 
@@ -75,7 +76,7 @@ class PlayerSetFlag implements Command {
       embed.setFooter({ text: 'The correct command format is: !setflag {username} {country_code}' });
     }
 
-    message.reply({ embeds: [embed] });
+    await message.editReply({ embeds: [embed] });
   }
 }
 

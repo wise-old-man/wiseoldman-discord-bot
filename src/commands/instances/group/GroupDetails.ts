@@ -21,6 +21,8 @@ class GroupDetails implements SubCommand {
   }
 
   async execute(message: CommandInteraction) {
+    await message.deferReply();
+
     const guildId = message.guild?.id;
     const server = await getServer(guildId); // maybe cache it so we don't have to do this
     const groupId = server?.groupId || -1;
@@ -44,7 +46,7 @@ class GroupDetails implements SubCommand {
           { name: '\u200B', value: verification }
         ]);
 
-      message.reply({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (e: any) {
       throw new CommandError(e.response?.data?.message);
     }

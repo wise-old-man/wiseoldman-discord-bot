@@ -27,6 +27,8 @@ class DenyNameChange implements Command {
     const nameChangeId = message.options.getInteger('id', true);
 
     try {
+      await message.deferReply();
+
       const nameChange = await deny(nameChangeId);
 
       const response = new MessageEmbed()
@@ -35,7 +37,7 @@ class DenyNameChange implements Command {
           `${getEmoji('success')} Name change denied: ${nameChange.oldName} → ${nameChange.newName}`
         );
 
-      message.reply({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (error) {
       throw new CommandError('Failed to deny name change.');
     }

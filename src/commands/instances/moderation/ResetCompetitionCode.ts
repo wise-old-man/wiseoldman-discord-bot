@@ -28,6 +28,8 @@ class ResetCompetitionCode implements Command {
   }
 
   async execute(message: CommandInteraction) {
+    await message.deferReply();
+
     if (!hasModeratorRole(message.member as GuildMember)) {
       message.reply({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
       return;
@@ -50,7 +52,7 @@ class ResetCompetitionCode implements Command {
         .setColor(config.visuals.green)
         .setDescription(CHAT_MESSAGE(userId));
 
-      message.reply({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (error) {
       throw new CommandError('Failed to reset competition verification code.');
     }

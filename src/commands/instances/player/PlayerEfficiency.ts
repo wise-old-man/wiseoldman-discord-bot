@@ -20,6 +20,8 @@ class PlayerEfficiency implements Command {
   }
 
   async execute(message: CommandInteraction) {
+    await message.deferReply();
+
     // Grab the username from the command's arguments or database alias
     const username = await this.getUsername(message);
 
@@ -65,7 +67,7 @@ class PlayerEfficiency implements Command {
         .setFooter({ text: 'Last updated' })
         .setTimestamp(player.updatedAt);
 
-      message.reply({ embeds: [embed] });
+      await message.editReply({ embeds: [embed] });
     } catch (e: any) {
       if (e instanceof CommandError) throw e;
 

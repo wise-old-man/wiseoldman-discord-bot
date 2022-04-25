@@ -53,12 +53,14 @@ class ConfigChannel implements SubCommand {
   }
 
   async execute(message: CommandInteraction) {
+    const guildId = message.guildId || '';
+    const channelType = message.options.getString('broadcast_type', true);
+    const announcementChannel = message.options.getChannel('broadcast_channel', true);
+    const status = message.options.getString('status');
+    const broadcastName = getBroadcastName(channelType as BroadcastType);
+
     try {
-      const guildId = message.guildId || '';
-      const channelType = message.options.getString('broadcast_type', true);
-      const announcementChannel = message.options.getChannel('broadcast_channel', true);
-      const status = message.options.getString('status');
-      const broadcastName = getBroadcastName(channelType as BroadcastType);
+      await message.deferReply();
 
       let description = '';
       if (channelType === BroadcastType.Default) {
@@ -79,16 +81,9 @@ class ConfigChannel implements SubCommand {
         .setTitle(`${getEmoji('success')} Channel Preferences Updated`)
         .setDescription(description);
 
-      message.reply({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (error: any) {
-      if (error.message === "Couldn't find any valid channel argument.") {
-        throw new CommandError(
-          `Couldn't find channel.`,
-          `You can tag a channel using # (Ex: #general).`
-        );
-      } else {
-        throw new CommandError('Failed to update channel preferences.');
-      }
+      throw new CommandError('Failed to update channel preferences.');
     }
   }
 }

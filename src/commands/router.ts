@@ -1,4 +1,4 @@
-import { Interaction, Message, MessageEmbed, GuildMember } from 'discord.js';
+import { Interaction, MessageEmbed, GuildMember, CommandInteraction } from 'discord.js';
 import config from '../config';
 import { isAdmin } from '../utils';
 import CommandError from './CommandError';
@@ -6,20 +6,28 @@ import commands from './instances';
 import { COUNTRIES } from '../utils/countries';
 import { ALL_METRICS } from '../utils';
 import { customCommands } from './CustomCommands';
+import { SubCommand } from '../types';
 
-export function onError(options: {
-  message?: Message;
-  interaction?: Interaction;
-  title: string;
-  tip?: string;
-}): void {
+export function onError(options: { interaction: Interaction; title: string; tip?: string }): void {
   const response = new MessageEmbed().setColor(config.visuals.red).setDescription(options.title);
   response.setFooter({ text: options.tip ? options.tip : '' });
-  if (options.message) {
-    options.message.channel.send({ embeds: [response] });
-    return;
-  } else if (options.interaction && options.interaction.isCommand()) {
-    options.interaction.reply({ embeds: [response] });
+
+  if (options.interaction && options.interaction.isCommand()) {
+    options.interaction.followUp({ embeds: [response] });
+  }
+}
+
+export async function executeSubCommand(
+  message: CommandInteraction,
+  subcommand: string,
+  candidates: SubCommand[]
+): Promise<void> {
+  try {
+    await candidates.find(c => c.slashCommand?.name === subcommand)?.execute(message);
+  } catch (e) {
+    if (e instanceof CommandError) {
+      return onError({ interaction: message, title: e.message, tip: e.tip });
+    }
   }
 }
 

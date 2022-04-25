@@ -26,6 +26,7 @@ class PlayerSetUsername implements Command {
     const userId = message.user.id;
 
     try {
+      await message.deferReply();
       const player = await fetchPlayer(username);
 
       await updateUsername(userId, player.displayName);
@@ -37,7 +38,7 @@ class PlayerSetUsername implements Command {
         .setDescription(`<@${userId}> is now associated with the username \`${player.displayName}\`.`)
         .setFooter({ text: `They can now call any player command without including the username.` });
 
-      message.reply({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (e: any) {
       if (e.response?.status === 400) {
         throw new CommandError(

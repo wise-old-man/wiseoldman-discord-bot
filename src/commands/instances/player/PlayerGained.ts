@@ -31,6 +31,8 @@ class PlayerGained implements Command {
   }
 
   async execute(message: CommandInteraction) {
+    await message.deferReply();
+
     // Grab the username from the command's arguments or database alias
     const username = await this.getUsername(message);
 
@@ -62,7 +64,7 @@ class PlayerGained implements Command {
           .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
           .setFooter({ text: footer });
 
-        message.reply({ embeds: [response] });
+        await message.editReply({ embeds: [response] });
       } else {
         const paginatedMessage = new PaginatedMessage({
           pageIndexPrefix: 'Page',

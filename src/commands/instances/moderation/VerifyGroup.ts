@@ -33,6 +33,8 @@ class VerifyGroup implements Command {
   }
 
   async execute(message: CommandInteraction) {
+    await message.deferReply();
+
     if (!hasModeratorRole(message.member as GuildMember)) {
       message.reply({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
       return;
@@ -51,7 +53,7 @@ class VerifyGroup implements Command {
         .setColor(config.visuals.green)
         .setDescription(CHAT_MESSAGE(group.name));
 
-      message.reply({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
 
       this.sendConfirmationLog(message.guild?.channels, group, userId);
       this.addRole(user);

@@ -42,6 +42,8 @@ class GroupRecords implements SubCommand {
   }
 
   async execute(message: CommandInteraction) {
+    await message.deferReply();
+
     const guildId = message.guild?.id;
     const server = await getServer(guildId); // maybe cache it so we don't have to do this
     const groupId = server?.groupId || -1;
@@ -49,7 +51,6 @@ class GroupRecords implements SubCommand {
     const period = message.options.getString('period', true);
 
     try {
-      message.deferReply();
       const group = await fetchGroupDetails(groupId);
       const records = await fetchGroupRecords(groupId, period, metric);
 
@@ -60,7 +61,7 @@ class GroupRecords implements SubCommand {
         .setURL(`https://wiseoldman.net/groups/${groupId}/records/`)
         .setFooter({ text: `Tip: Try /group records metric: zulrah period: day` });
 
-      message.editReply({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (e: any) {
       throw new CommandError(e.response?.data?.message);
     }

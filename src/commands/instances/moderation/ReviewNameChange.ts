@@ -21,6 +21,7 @@ class ReviewNameChange implements Command {
   async execute(message: CommandInteraction) {
     const nameChangeId = message.options.getInteger('id', true);
     try {
+      await message.deferReply();
       const reviewData = await reviewNameChange(nameChangeId);
 
       if (reviewData.status !== 0) {
@@ -32,7 +33,7 @@ class ReviewNameChange implements Command {
         .setTitle(`Name change review: ${reviewData.oldName} → ${reviewData.newName}`)
         .setDescription(this.buildReviewMessage(reviewData));
 
-      message.reply({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (error) {
       if (error instanceof CommandError) throw error;
       throw new CommandError('Failed to review name change.');

@@ -27,6 +27,8 @@ class ConfigGroup implements Command {
     const groupId = message.options.getInteger('group_id', true);
 
     try {
+      await message.deferReply();
+
       const group = await fetchGroupDetails(groupId);
 
       const guildId = message.guild?.id || '';
@@ -38,7 +40,7 @@ class ConfigGroup implements Command {
         .setDescription(`All broadcasts and commands will be in reference to **${group.name}**`)
         .addFields({ name: 'Page URL', value: `https://wiseoldman.net/groups/${groupId}` });
 
-      message.reply({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (e: any) {
       if (e.response?.data?.message) {
         throw new CommandError(e.response?.data?.message);

@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
-    "@discordjs/rest": "^0.1.0-canary.0",
+    "@discordjs/rest": "^0.4.1",
     "@sapphire/discord.js-utilities": "^4.8.0",
     "@types/bluebird": "^3.5.32",
     "@types/validator": "^13.0.0",

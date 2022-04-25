@@ -27,6 +27,8 @@ class DeletePlayer implements Command {
     const username = message.options.getString('username', true);
 
     try {
+      await message.deferReply();
+
       await deletePlayer(username);
 
       // Respond on the WOM discord chat with a success status
@@ -34,7 +36,7 @@ class DeletePlayer implements Command {
         .setColor(config.visuals.green)
         .setDescription(`${getEmoji('success')} \`${username}\` has been successfully deleted!`);
 
-      message.reply({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (error) {
       throw new CommandError('Failed to delete player.');
     }

@@ -1,8 +1,7 @@
 import { SlashCommandSubcommandsOnlyBuilder, SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction } from 'discord.js';
 import { Command, SubCommand } from '../../../types';
-import CommandError from '../../CommandError';
-import { onError } from '../../router';
+import { executeSubCommand } from '../../router';
 
 import GroupCompetition from './GroupCompetition';
 import GroupCompetitions from './GroupCompetitions';
@@ -43,17 +42,7 @@ class Group implements Command {
 
   async execute(message: CommandInteraction) {
     const subcommand = message.options.getSubcommand();
-    groupCommands.forEach(async c => {
-      if (c.slashCommand?.name !== subcommand) return;
-      try {
-        await c.execute(message);
-      } catch (e) {
-        // If a command error was thrown during execution, handle the response here.
-        if (e instanceof CommandError) {
-          return onError({ interaction: message, title: e.message, tip: e.tip });
-        }
-      }
-    });
+    await executeSubCommand(message, subcommand, groupCommands);
   }
 }
 

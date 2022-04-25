@@ -29,13 +29,14 @@ class GroupHiscores implements SubCommand {
   }
 
   async execute(message: CommandInteraction) {
+    await message.deferReply(); // defer because things take time
+
     const guildId = message.guild?.id;
     const server = await getServer(guildId); // maybe cache it so we don't have to do this
     const groupId = server?.groupId || -1;
     const metric = message.options.getString('metric', true);
 
     try {
-      await message.deferReply(); // defer because things take time
       const group = await fetchGroupDetails(groupId);
       const hiscores = await fetchGroupHiscores(groupId, metric);
 

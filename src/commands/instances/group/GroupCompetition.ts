@@ -34,6 +34,8 @@ class GroupCompetition implements SubCommand {
   }
 
   async execute(message: CommandInteraction) {
+    await message.deferReply();
+
     const guildId = message.guild?.id;
     const server = await getServer(guildId); // maybe cache it so we don't have to do this
     const groupId = server?.groupId || -1;
@@ -53,7 +55,7 @@ class GroupCompetition implements SubCommand {
         .setDescription(this.buildContent(competition))
         .setTimestamp(this.getFooterDate(competition))
         .setFooter({ text: this.getFooterLabel(competition) });
-      message.reply({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (e: any) {
       if (e.response?.data?.message) {
         throw new CommandError(e.response?.data?.message);

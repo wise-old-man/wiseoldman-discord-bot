@@ -47,6 +47,8 @@ class PlayerStats implements Command, Renderable {
   }
 
   async execute(message: CommandInteraction) {
+    await message.deferReply();
+
     // Grab the username from the command's arguments or database alias
     const username = await this.getUsername(message);
 
@@ -71,7 +73,7 @@ class PlayerStats implements Command, Renderable {
         .setFooter({ text: 'Last updated' })
         .setTimestamp(player.updatedAt);
 
-      message.reply({ embeds: [embed], files: [attachment] });
+      await message.editReply({ embeds: [embed], files: [attachment] });
     } catch (e: any) {
       const errorMessage = `**${username}** is not being tracked yet.`;
       const errorTip = `Try /update ${username}`;
