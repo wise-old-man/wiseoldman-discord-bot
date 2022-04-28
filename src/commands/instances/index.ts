@@ -2,12 +2,10 @@ import { Command } from '../../types';
 import ConfigCommand from './config/Config';
 import HelpCommand from './general/Help';
 import GroupCommand from './group/Group';
-import ApproveNameChange from './moderation/ApproveNameChange';
-import DenyNameChange from './moderation/DenyNameChange';
 import ResetCompetitionCode from './moderation/ResetCompetitionCode';
 import ResetGroupCode from './moderation/ResetGroupCode';
-import ReviewNameChange from './moderation/ReviewNameChange';
 import VerifyGroup from './moderation/VerifyGroup';
+import NameChange from './moderation/NameChange';
 import DeletePlayer from './moderation/DeletePlayer';
 import PlayerAchievements from './player/PlayerAchievements';
 import PlayerActivitiesCommand from './player/PlayerActivities';
@@ -27,9 +25,7 @@ const commands: Command[] = [
   ResetGroupCode,
   ResetCompetitionCode,
   VerifyGroup,
-  ReviewNameChange,
-  ApproveNameChange,
-  DenyNameChange,
+  NameChange,
   DeletePlayer,
 
   // player commands

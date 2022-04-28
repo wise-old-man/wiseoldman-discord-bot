@@ -10,7 +10,6 @@ export interface Command {
     | SlashCommandBuilder
     | SlashCommandSubcommandBuilder
     | SlashCommandSubcommandsOnlyBuilder;
-
   requiresAdmin?: boolean;
   requiresGroup?: boolean;
   global?: boolean;
