@@ -142,6 +142,7 @@ export enum Emoji {
   // Activity emojis
   league_points = '<:league_points:729840084865515593>',
   last_man_standing = '<:last_man_standing:729840085176025088>',
+  pvp_arena = '<:pvp_arena:996966253765853244>',
   bounty_hunter_hunter = '<:bounty_hunter_hunter:730171196410298378>',
   bounty_hunter_rogue = '<:bounty_hunter_rogue:730171196561293392>',
   clue = '<:clue_scrolls_all:729844134004785204>',
