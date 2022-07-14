@@ -30,6 +30,7 @@ const SKILLS_MAP = [
 const ACTIVITIES_MAP = [
   { key: 'league_points', name: 'League Points' },
   { key: 'last_man_standing', name: 'Last Man Standing' },
+  { key: 'pvp_arena', name: 'Pvp Arena' },
   { key: 'bounty_hunter_hunter', name: 'Bounty Hunter (Hunter)' },
   { key: 'bounty_hunter_rogue', name: 'Bounty Hunter (Rogue)' },
   { key: 'clue_scrolls_beginner', name: 'Clue Scrolls (Beginner)' },
