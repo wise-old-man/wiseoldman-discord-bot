@@ -7,7 +7,7 @@ class Bot {
   client: Client;
 
   constructor() {
-    this.client = new Client();
+    this.client = new Client({ shards: 'auto' });
   }
 
   init() {
