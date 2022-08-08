@@ -43,7 +43,7 @@ class CompetitionCreated implements Event {
       .setTitle(`${getEmoji('tada')} New competition created!`)
       .setURL(url)
       .addFields(fields)
-      .setFooter('Starts at')
+      .setFooter({ text: 'Starts at' })
       .setTimestamp(new Date(startsAt));
 
     broadcastMessage(groupId, BroadcastType.CompetitionStatus, message);

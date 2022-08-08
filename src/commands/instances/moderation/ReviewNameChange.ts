@@ -39,7 +39,7 @@ class ReviewNameChange implements Command {
         .setTitle(`Name change review: ${reviewData.oldName} → ${reviewData.newName}`)
         .setDescription(this.buildReviewMessage(reviewData));
 
-      message.respond(response);
+      message.respond({ embeds: [response] });
     } catch (error) {
       if (error instanceof CommandError) throw error;
       throw new CommandError('Failed to review name change.');

@@ -45,8 +45,8 @@ class ConfigChannelPreference implements Command {
         .setTitle(`${getEmoji('success')} Channel Preference updated`)
         .setDescription(description);
 
-      message.respond(response);
-    } catch (error) {
+      message.respond({ embeds: [response] });
+    } catch (error: any) {
       console.log(error);
       this.handleFailure(error);
     }

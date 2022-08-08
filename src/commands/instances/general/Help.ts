@@ -51,7 +51,7 @@ class Help implements Command {
         .setDescription(`${LINE_COMMANDS}\n\n${LINE_SUPPORT}\n\n${getEmoji('warning')}${LINE_PERMS}`)
         .addFields(fields);
 
-      message.respond(response);
+      message.respond({ embeds: [response] });
     } catch (error) {
       throw new CommandError('Failed to load server settings.');
     }

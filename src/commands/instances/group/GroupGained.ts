@@ -36,10 +36,10 @@ class GroupGained implements Command {
         .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} gains (${period})`)
         .setDescription(this.buildList(gained))
         .setURL(`https://wiseoldman.net/groups/${groupId}/gained/`)
-        .setFooter(`Tip: Try ${message.prefix}group gained zulrah --day`);
+        .setFooter({ text: `Tip: Try ${message.prefix}group gained zulrah --day` });
 
-      message.respond(response);
-    } catch (e) {
+      message.respond({ embeds: [response] });
+    } catch (e: any) {
       throw new CommandError(e.response?.data?.message);
     }
   }

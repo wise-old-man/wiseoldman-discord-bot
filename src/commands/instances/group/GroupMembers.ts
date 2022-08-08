@@ -1,11 +1,11 @@
-import { Embeds } from 'discord-paginationembed';
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed, Constants } from 'discord.js';
 import { fetchGroupDetails, fetchGroupMembers } from '../../../api/modules/groups';
 import { Player } from '../../../api/types';
 import config from '../../../config';
 import { Command, ParsedMessage } from '../../../types';
 import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
+import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 
 const RESULTS_PER_PAGE = 20;
 
@@ -34,26 +34,47 @@ class GroupMembers implements Command {
       const group = await fetchGroupDetails(groupId);
       const members = await fetchGroupMembers(groupId);
 
-      const pageCount = Math.ceil(members.length / RESULTS_PER_PAGE);
-      const pages = [];
+      // Restrict to 25 pages because that's the limit on a paginated message
+      const pageCount = Math.min(25, Math.ceil(members.length / RESULTS_PER_PAGE));
 
-      for (let i = 0; i < pageCount; i++) {
-        const response = new MessageEmbed()
+      const paginatedMessage = new PaginatedMessage({
+        pageIndexPrefix: 'Page',
+        embedFooterSeparator: '|',
+        actions: [
+          {
+            customId: 'CustomPreviousAction',
+            type: Constants.MessageComponentTypes.BUTTON,
+            style: 'PRIMARY',
+            label: '<',
+            run: ({ handler }) => {
+              if (handler.index === 0) handler.index = handler.pages.length - 1;
+              else --handler.index;
+            }
+          },
+          {
+            customId: 'CustomNextAction',
+            type: Constants.MessageComponentTypes.BUTTON,
+            style: 'PRIMARY',
+            label: '>',
+            run: ({ handler }) => {
+              if (handler.index === handler.pages.length - 1) handler.index = 0;
+              else ++handler.index;
+            }
+          }
+        ],
+        template: new MessageEmbed()
           .setColor(config.visuals.blue)
           .setTitle(`${group.name} members list`)
-          .setDescription(this.buildList(members, i))
-          .setURL(`https://wiseoldman.net/groups/${groupId}/members/`);
+          .setURL(`https://wiseoldman.net/groups/${groupId}/members/`)
+      });
 
-        pages.push(response);
+      for (let i = 0; i < pageCount; i++) {
+        paginatedMessage.addPageEmbed(new MessageEmbed().setDescription(this.buildList(members, i)));
       }
 
-      new Embeds()
-        .setArray(pages)
-        .setChannel(<any>message.sourceMessage.channel)
-        .setPageIndicator(true)
-        .setAuthorizedUsers([message.sourceMessage.author.id])
-        .build();
-    } catch (e) {
+      paginatedMessage.idle = 30000;
+      paginatedMessage.run(message.sourceMessage);
+    } catch (e: any) {
       throw new CommandError(e.response?.data?.message);
     }
   }
@@ -61,7 +82,12 @@ class GroupMembers implements Command {
   buildList(members: Player[], page: number) {
     return members
       .slice(page * RESULTS_PER_PAGE, page * RESULTS_PER_PAGE + RESULTS_PER_PAGE)
-      .map((g, i) => `${page * RESULTS_PER_PAGE + i + 1}. **${g.displayName}** ${g.role === 'leader' ? getEmoji('crown') : ''} `)
+      .map(
+        (g, i) =>
+          `${page * RESULTS_PER_PAGE + i + 1}. **${g.displayName}** ${
+            g.role === 'leader' ? getEmoji('crown') : ''
+          } `
+      )
       .join('\n');
   }
 }

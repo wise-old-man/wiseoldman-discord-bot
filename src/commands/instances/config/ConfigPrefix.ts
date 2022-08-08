@@ -42,8 +42,8 @@ class ConfigPrefix implements Command {
           `Prefix has been changed to **${prefix}** \n Example: \`${prefix}stats Zezima\``
         );
 
-      message.respond(response);
-    } catch (e) {
+      message.respond({ embeds: [response] });
+    } catch (e: any) {
       throw new CommandError("Failed to update the server's Wise Old Man command prefix.");
     }
   }

@@ -2,8 +2,8 @@ import {
   Guild,
   GuildChannel,
   GuildMember,
+  MessageEmbed,
   PermissionResolvable,
-  StringResolvable,
   TextChannel
 } from 'discord.js';
 import bot from '../bot';
@@ -14,7 +14,7 @@ import { getAbbreviation } from './metrics';
 export const MAX_FIELD_SIZE = 25;
 
 export function isAdmin(member: GuildMember | null): boolean {
-  return member ? member?.hasPermission('ADMINISTRATOR') : false;
+  return member ? member?.permissions.has('ADMINISTRATOR') : false;
 }
 
 export function hasModeratorRole(member: GuildMember | null): boolean {
@@ -28,13 +28,13 @@ export function getMissingPermissions(member: GuildMember | null | undefined): s
   if (!member) return null;
 
   return config.requiredPermissions.filter(
-    permission => !member?.hasPermission(permission as PermissionResolvable)
+    permission => !member?.permissions.has(permission as PermissionResolvable)
   );
 }
 
 export function canDoPagination(member: GuildMember | null | undefined): boolean {
   if (!member) return false;
-  return member?.hasPermission('MANAGE_MESSAGES') && member?.hasPermission('ADD_REACTIONS');
+  return member?.permissions.has('MANAGE_MESSAGES') && member?.permissions.has('ADD_REACTIONS');
 }
 
 export function getEmoji(metric: string): string {
@@ -42,18 +42,18 @@ export function getEmoji(metric: string): string {
   return (<any>Emoji)[emojiKey] || '❌';
 }
 
-export function propagateMessage(message: StringResolvable, channelIds: string[] | undefined): void {
+export function propagateMessage(message: MessageEmbed, channelIds: string[] | undefined): void {
   if (!channelIds) {
     return;
   }
 
   channelIds.forEach(async id => {
-    const channel = await bot.client.channels.fetch(id, true);
+    const channel = await bot.client.channels.fetch(id);
 
     if (!channel) return;
-    if (!((channel): channel is TextChannel => channel.type === 'text')(channel)) return;
+    if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(channel)) return;
 
-    channel.send(message);
+    channel.send({ embeds: [message] });
   });
 }
 
@@ -63,8 +63,8 @@ export function propagateMessage(message: StringResolvable, channelIds: string[]
  */
 export function findOpenChannel(guild: Guild): GuildChannel | undefined {
   const channel = guild.channels.cache.find(channel => {
-    return !!(channel.type === 'text' && guild.me?.hasPermission('SEND_MESSAGES'));
+    return !!(channel.type === 'GUILD_TEXT' && guild.me?.permissions.has('SEND_MESSAGES'));
   });
 
-  return channel;
+  return channel as TextChannel;
 }

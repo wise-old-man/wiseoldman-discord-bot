@@ -38,7 +38,7 @@ class PlayerSetFlag implements Command {
       const result = await updateCountry(username, countryCode);
       response.message = result.message;
       response.isError = false;
-    } catch (e) {
+    } catch (e: any) {
       // The API's error message references country name, and this command
       // is restricted to country codes (for now), so let's hide that part of the message
       response.message = e.response?.data?.message?.replace(' or name', '') || 'Failed to update flag.';
@@ -54,18 +54,21 @@ class PlayerSetFlag implements Command {
       )
       .setDescription(
         !response.isError
-          ? `${message.sourceMessage.author.toString()} changed \`${username}\`'s country to ${response.message.match('\\: (.*?) \\(.{2}\\)')?.[1]}`
-          : response.message)
+          ? `${message.sourceMessage.author.toString()} changed \`${username}\`'s country to ${
+              response.message.match('\\: (.*?) \\(.{2}\\)')?.[1]
+            }`
+          : response.message
+      )
       .addFields([
         { name: 'Username', value: username },
         { name: 'Country Code:', value: countryCode }
       ]);
 
     if (response.isError) {
-      embed.setFooter('The correct command format is: !setflag {username} {country_code}');
+      embed.setFooter({ text: 'The correct command format is: !setflag {username} {country_code}' });
     }
 
-    message.respond(embed);
+    message.respond({ embeds: [embed] });
   }
 
   getUsername(message: ParsedMessage): string {

@@ -31,7 +31,7 @@ class VerifyGroup implements Command {
 
   async execute(message: ParsedMessage) {
     if (!hasModeratorRole(message.sourceMessage.member)) {
-      message.respond('Nice try. This command is reserved for Moderators and Admins.');
+      message.respond({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
       return;
     }
 
@@ -51,7 +51,7 @@ class VerifyGroup implements Command {
         .setColor(config.visuals.green)
         .setDescription(CHAT_MESSAGE(group.name));
 
-      message.respond(response);
+      message.respond({ embeds: [response] });
 
       this.sendConfirmationLog(message, group, userId);
       this.addRole(user);
@@ -71,7 +71,7 @@ class VerifyGroup implements Command {
     );
 
     if (!leadersLogChannel) return;
-    if (!((channel): channel is TextChannel => channel.type === 'text')(leadersLogChannel)) return;
+    if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(leadersLogChannel)) return;
 
     leadersLogChannel.send(LOG_MESSAGE(group.id, group.name, userId));
   }

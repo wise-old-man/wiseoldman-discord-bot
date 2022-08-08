@@ -1,5 +1,4 @@
-import { Embeds } from 'discord-paginationembed';
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed, Constants } from 'discord.js';
 import { fetchPlayer, fetchPlayerGains } from '../../../api/modules/players';
 import { PlayerGains } from '../../../api/types';
 import config from '../../../config';
@@ -7,6 +6,7 @@ import { getUsername } from '../../../database/services/alias';
 import { Command, ParsedMessage } from '../../../types';
 import { encodeURL, getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
+import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 
 const GAINS_PER_PAGE = 10;
 
@@ -53,22 +53,50 @@ class PlayerGained implements Command {
           .setColor(config.visuals.blue)
           .setTitle(`${player.displayName} gains (${period})`)
           .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
-          .setFooter(footer);
+          .setFooter({ text: footer });
 
-        message.respond(response);
+        message.respond({ embeds: [response] });
       } else {
-        new Embeds()
-          .setArray(pages)
-          .setChannel(<any>message.sourceMessage.channel)
-          .setPageIndicator(true)
-          .setAuthorizedUsers([message.sourceMessage.author.id])
-          .setColor(config.visuals.blue)
-          .setTitle(`${player.displayName} gains (${period})`)
-          .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
-          .setFooter(footer)
-          .build();
+        const paginatedMessage = new PaginatedMessage({
+          pageIndexPrefix: 'Page',
+          embedFooterSeparator: '|',
+          actions: [
+            {
+              customId: 'CustomPreviousAction',
+              type: Constants.MessageComponentTypes.BUTTON,
+              style: 'PRIMARY',
+              label: '<',
+              run: ({ handler }) => {
+                if (handler.index === 0) handler.index = handler.pages.length - 1;
+                else --handler.index;
+              }
+            },
+            {
+              customId: 'CustomNextAction',
+              type: Constants.MessageComponentTypes.BUTTON,
+              style: 'PRIMARY',
+              label: '>',
+              run: ({ handler }) => {
+                if (handler.index === handler.pages.length - 1) handler.index = 0;
+                else ++handler.index;
+              }
+            }
+          ],
+          template: new MessageEmbed()
+            .setColor(config.visuals.blue)
+            .setTitle(`${player.displayName} gains (${period})`)
+            .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
+            .setFooter({ text: footer })
+        });
+
+        for (const page of pages) {
+          paginatedMessage.addPageEmbed(page);
+        }
+
+        paginatedMessage.idle = 30000;
+        paginatedMessage.run(message.sourceMessage);
       }
-    } catch (e) {
+    } catch (e: any) {
       if (e.message.includes('gains')) {
         throw new CommandError(e.message);
       } else {
@@ -96,7 +124,11 @@ class PlayerGained implements Command {
 
     for (let i = 0; i < pageCount; i++) {
       const pageGains = gainsList.slice(i * GAINS_PER_PAGE, i * GAINS_PER_PAGE + GAINS_PER_PAGE);
-      pages.push(new MessageEmbed().setDescription(pageGains));
+      pages.push(
+        new MessageEmbed()
+          .setTitle(`${displayName} gains (${period})`)
+          .setDescription(pageGains.join('\n'))
+      );
     }
 
     return pages;

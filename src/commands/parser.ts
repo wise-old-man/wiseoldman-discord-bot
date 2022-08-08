@@ -1,4 +1,4 @@
-import { Message, StringResolvable } from 'discord.js';
+import { Message, MessageOptions } from 'discord.js';
 import config from '../config';
 import { getServer } from '../database/services/server';
 import { ParsedMessage } from '../types';
@@ -29,7 +29,7 @@ export async function parse(message: Message): Promise<ParsedMessage> {
   const command = split[0].toLowerCase();
   const args = split.slice(1, split.length);
 
-  const respond = (response: StringResolvable | StringResolvable[]) => {
+  const respond = (response: MessageOptions | MessageOptions[]) => {
     if (Array.isArray(response)) {
       response.forEach(r => message.channel.send(r));
     } else {

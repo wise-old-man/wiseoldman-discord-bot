@@ -9,7 +9,7 @@ import { CustomCommand } from '../types';
 
 export function onError(message: Message, title: string, tip?: string): void {
   const response = new MessageEmbed().setColor(config.visuals.red).setDescription(title);
-  message.channel.send(tip ? response.setFooter(tip) : response);
+  message.channel.send({ embeds: [tip ? response.setFooter({ text: tip }) : response] });
 }
 
 export async function onMessageReceived(message: Message): Promise<void> {
@@ -29,9 +29,12 @@ export async function onMessageReceived(message: Message): Promise<void> {
   }
 
   // Check for custom commands
-  customCommands.forEach( (c: CustomCommand) => {
-    if (c.command === parsed.command && (c.public || parsed.sourceMessage?.guild?.id === config.discord.guildId)) {
-      parsed.respond(c.image === undefined ? c.message : c.message + "\n" + c.image);
+  customCommands.forEach((c: CustomCommand) => {
+    if (
+      c.command === parsed.command &&
+      (c.public || parsed.sourceMessage?.guild?.id === config.discord.guildId)
+    ) {
+      parsed.respond({ content: c.image === undefined ? c.message : c.message + '\n' + c.image });
     }
   });
 
@@ -61,7 +64,7 @@ export async function onMessageReceived(message: Message): Promise<void> {
 
     try {
       // Display bot is typing... indicator.
-      message.channel.startTyping();
+      message.channel.sendTyping();
       // All conditions are met, execute the command
       await c.execute(parsed);
     } catch (e) {
@@ -69,8 +72,6 @@ export async function onMessageReceived(message: Message): Promise<void> {
       if (e instanceof CommandError) {
         return onError(message, e.message, e.tip);
       }
-    } finally {
-      message.channel.stopTyping();
     }
   });
 }

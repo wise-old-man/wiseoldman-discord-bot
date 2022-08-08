@@ -50,12 +50,11 @@ class PlayerAchievements implements Command, Renderable {
         .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements/`))
         .setTitle(`${player.displayName} - Recent achievements`)
         .setImage(`attachment://${fileName}`)
-        .setFooter('Last updated')
-        .setTimestamp(player.updatedAt)
-        .attachFiles([attachment]);
+        .setFooter({ text: 'Last updated' })
+        .setTimestamp(player.updatedAt);
 
-      message.respond(embed);
-    } catch (e) {
+      message.respond({ embeds: [embed], files: [attachment] });
+    } catch (e: any) {
       if (e.message.includes('achievements')) {
         throw new CommandError(e.message);
       } else {

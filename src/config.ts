@@ -8,10 +8,10 @@ export default {
   baseAPIUrl: 'https://api.wiseoldman.net',
   requiredPermissions: ['MANAGE_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES', 'ADD_REACTIONS'],
   visuals: {
-    blue: '#2980b9',
-    red: '#cc4242',
-    green: '#64d85b',
-    orange: '#ecbf54'
+    blue: 0x2980b9,
+    red: 0xcc4242,
+    green: 0x64d85b,
+    orange: 0xecbf54
   },
   discord: {
     guildId: '679454777708380161',

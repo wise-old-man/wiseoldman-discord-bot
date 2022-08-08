@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:16.14.0
 
 WORKDIR /wise-old-man/discord-bot
 

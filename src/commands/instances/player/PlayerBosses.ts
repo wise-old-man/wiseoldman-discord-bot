@@ -56,12 +56,11 @@ class PlayerBosses implements Command, Renderable {
         .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/overview/bossing`))
         .setTitle(`${player.displayName} - Boss ${variant}`)
         .setImage(`attachment://${fileName}`)
-        .setFooter('Last updated')
-        .setTimestamp(player.updatedAt)
-        .attachFiles([attachment]);
+        .setFooter({ text: 'Last updated' })
+        .setTimestamp(player.updatedAt);
 
-      message.respond(embed);
-    } catch (e) {
+      message.respond({ embeds: [embed], files: [attachment] });
+    } catch (e: any) {
       const errorMessage = `**${username}** is not being tracked yet.`;
       const errorTip = `Try ${message.prefix}update ${username}`;
 

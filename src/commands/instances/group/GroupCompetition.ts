@@ -29,7 +29,8 @@ class GroupCompetition implements Command {
 
     try {
       const competitions = await fetchGroupCompetitions(groupId);
-      const competitionId = Number(message.args[1]) || this.getSelectedCompetitionId(competitions, status, message.prefix);
+      const competitionId =
+        Number(message.args[1]) || this.getSelectedCompetitionId(competitions, status, message.prefix);
       const competition = await fetchCompetition(competitionId);
 
       const pageURL = `https://wiseoldman.net/competitions/${competition.id}/`;
@@ -40,10 +41,10 @@ class GroupCompetition implements Command {
         .setURL(pageURL)
         .setDescription(this.buildContent(competition))
         .setTimestamp(this.getFooterDate(competition))
-        .setFooter(this.getFooterLabel(competition));
+        .setFooter({ text: this.getFooterLabel(competition) });
 
-      message.respond(response);
-    } catch (e) {
+      message.respond({ embeds: [response] });
+    } catch (e: any) {
       if (e.response?.data?.message) {
         throw new CommandError(e.response?.data?.message);
       } else {

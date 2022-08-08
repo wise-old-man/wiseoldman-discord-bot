@@ -32,12 +32,13 @@ class ConfigChannel implements Command {
         .setColor(config.visuals.green)
         .setTitle(`${getEmoji('success')} Default Channel Updated`)
         .setDescription(`All group-related broadcasts will be sent to <#${channelId}> by default.`)
-        .setFooter(
-          'You can customise these broadcasts further by using the !config channel:... commands. Visit bot.wiseoldman.net for more details.'
-        );
+        .setFooter({
+          text:
+            'You can customise these broadcasts further by using the !config channel:... commands. Visit bot.wiseoldman.net for more details.'
+        });
 
-      message.respond(response);
-    } catch (error) {
+      message.respond({ embeds: [response] });
+    } catch (error: any) {
       if (error.message === "Couldn't find any valid channel argument.") {
         throw new CommandError(
           `Couldn't find channel.`,
