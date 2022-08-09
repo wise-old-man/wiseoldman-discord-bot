@@ -48,7 +48,7 @@ class GroupCompetition implements Command {
       if (e.response?.data?.message) {
         throw new CommandError(e.response?.data?.message);
       } else {
-        throw new CommandError(e.message, e.tip);
+        throw new CommandError(e.name, e.message);
       }
     }
   }

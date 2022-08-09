@@ -40,7 +40,11 @@ class GroupRecords implements Command {
 
       message.respond({ embeds: [response] });
     } catch (e: any) {
-      throw new CommandError(e.response?.data?.message);
+      if (e.response?.data?.message) {
+        throw new CommandError(e.response?.data?.message);
+      } else {
+        throw new CommandError(e.name, e.message);
+      }
     }
   }
 

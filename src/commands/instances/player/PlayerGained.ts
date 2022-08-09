@@ -99,7 +99,7 @@ class PlayerGained implements Command {
     } catch (e: any) {
       if (e.message.includes('gains')) {
         throw new CommandError(e.message);
-      } else {
+      } else if (e.response?.data?.message) {
         if (e.response?.data?.message.includes('tracked')) {
           const errorMessage = `**${username}** is not being tracked yet.`;
           const errorTip = `Try ${message.prefix}update ${username}`;
@@ -108,6 +108,8 @@ class PlayerGained implements Command {
         } else {
           throw new CommandError(e.response?.data?.message);
         }
+      } else {
+        throw new CommandError(e.name, e.message);
       }
     }
   }
