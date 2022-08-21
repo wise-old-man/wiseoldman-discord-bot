@@ -37,6 +37,16 @@ export async function parse(message: Message): Promise<ParsedMessage> {
     }
   };
 
+  const warningMessage = `⚠️ **Attention!** ⚠️
+From *September 1st* and forward this bot will **only** support slash commands.
+
+- Slash commands are integrated into Discord and we are **required** to use them.
+- Slash commands should be easier to use as you can use auto completion to quickly select options.
+- Try this command with \`/${command}\`.
+
+You can read more about this decision at <https://bit.ly/3AD4zsM>`;
+  respond({ content: warningMessage });
+
   return { sourceMessage, originServer, prefix, command, args, respond };
 }
 
