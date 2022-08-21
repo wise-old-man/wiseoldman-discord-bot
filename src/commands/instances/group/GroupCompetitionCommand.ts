@@ -1,37 +1,55 @@
-import { MessageEmbed } from 'discord.js';
+import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { capitalize, uniq } from 'lodash';
 import { fetchCompetition, getCompetitionStatus } from '../../../api/modules/competitions';
 import { fetchGroupCompetitions } from '../../../api/modules/groups';
 import { Competition } from '../../../api/types';
 import config from '../../../config';
-import { Command, ParsedMessage } from '../../../types';
+import { getServer } from '../../../database/services/server';
+import { SubCommand } from '../../../types';
 import { getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class GroupCompetition implements Command {
-  name: string;
-  template: string;
+class GroupCompetitionCommand implements SubCommand {
+  subcommand?: boolean | undefined;
   requiresGroup?: boolean | undefined;
+  slashCommand?: SlashCommandSubcommandBuilder;
 
   constructor() {
-    this.name = "View a group's ongoing/upcoming competition";
-    this.template = '!group competition [--ongoing/--upcoming]';
+    this.subcommand = true;
     this.requiresGroup = true;
+
+    this.slashCommand = new SlashCommandSubcommandBuilder()
+      .addStringOption(option =>
+        option
+          .setName('status')
+          .setDescription('View an ongoing or upcoming group competition.')
+          .addChoices([
+            ['Ongoing', 'ongoing'],
+            ['Upcoming', 'upcoming']
+          ])
+      )
+      .addIntegerOption(option => option.setName('competition_id').setDescription('Competition id'))
+      .setName('competition')
+      .setDescription("View a group's ongoing/upcoming competition");
   }
 
-  activated(message: ParsedMessage) {
-    return message.command === 'group' && message.args.length > 0 && message.args[0] === 'competition';
-  }
+  async execute(message: CommandInteraction) {
+    await message.deferReply();
 
-  async execute(message: ParsedMessage) {
-    const groupId = message.originServer?.groupId || -1;
-    const status = this.getStatusArgs(message.args);
+    const guildId = message.guild?.id;
+    const server = await getServer(guildId); // maybe cache it so we don't have to do this
+    const groupId = server?.groupId || -1;
+
+    const status = message.options.getString('status') || 'ongoing';
 
     try {
       const competitions = await fetchGroupCompetitions(groupId);
-      const competitionId =
-        Number(message.args[1]) || this.getSelectedCompetitionId(competitions, status, message.prefix);
-      const competition = await fetchCompetition(competitionId);
+
+      const competition = await fetchCompetition(
+        message.options.getInteger('competition_id') ||
+          this.getSelectedCompetitionId(competitions, status)
+      );
 
       const pageURL = `https://wiseoldman.net/competitions/${competition.id}/`;
 
@@ -43,7 +61,7 @@ class GroupCompetition implements Command {
         .setTimestamp(this.getFooterDate(competition))
         .setFooter({ text: this.getFooterLabel(competition) });
 
-      message.respond({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (e: any) {
       if (e.response?.data?.message) {
         throw new CommandError(e.response?.data?.message);
@@ -125,14 +143,14 @@ class GroupCompetition implements Command {
       .map(p => `${p.displayName} - **${toKMB(p.progress.gained)}**`);
   }
 
-  getSelectedCompetitionId(competitions: Competition[], status: string, prefix: string) {
+  getSelectedCompetitionId(competitions: Competition[], status: string) {
     if (status === 'ongoing') {
       const ongoing = competitions.find(c => getCompetitionStatus(c) === 'ongoing');
 
       if (!ongoing) {
         throw new CommandError(
           'There are no ongoing competitions for this group.',
-          `Try ${prefix}group competition --upcoming`
+          `Try /group competition status: upcoming`
         );
       }
 
@@ -143,7 +161,7 @@ class GroupCompetition implements Command {
       if (!upcoming) {
         throw new CommandError(
           'There are no upcoming competitions for this group.',
-          `Try ${prefix}group competition --ongoing`
+          `Try /group competition status: ongoing`
         );
       }
 
@@ -152,10 +170,6 @@ class GroupCompetition implements Command {
       throw new CommandError(`${status} is not a valid status.`, 'Try --ongoing or --upcoming');
     }
   }
-
-  getStatusArgs(args: string[]): string {
-    return args.find(a => a.startsWith('--'))?.replace('--', '') || 'ongoing';
-  }
 }
 
-export default new GroupCompetition();
+export default new GroupCompetitionCommand();

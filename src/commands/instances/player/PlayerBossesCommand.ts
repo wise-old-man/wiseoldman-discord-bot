@@ -1,11 +1,12 @@
 import Canvas from 'canvas';
-import { MessageAttachment, MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { fetchPlayer } from '../../../api/modules/players';
 import { toResults } from '../../../api/modules/snapshots';
 import { BossResult, MetricType, Player } from '../../../api/types';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
-import { CanvasAttachment, Command, ParsedMessage, Renderable } from '../../../types';
+import { CanvasAttachment, Command, Renderable } from '../../../types';
 import { encodeURL, round, toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
@@ -20,25 +21,35 @@ enum RenderVariant {
   EHB = 'EHB'
 }
 
-class PlayerBosses implements Command, Renderable {
-  name: string;
-  template: string;
+class PlayerBossesCommand implements Command, Renderable {
+  global: boolean;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
-    this.name = 'View player bosses';
-    this.template = '![bosses/ehb] {username} [--ranks/--ehb]';
+    this.global = true;
+    this.slashCommand = new SlashCommandBuilder()
+      .addStringOption(option =>
+        option
+          .setName('variant')
+          .setDescription('The variant to show stats for')
+          .setRequired(true)
+          .addChoices([
+            ['Kill Counts', RenderVariant.Kills],
+            ['Ranks', RenderVariant.Ranks],
+            ['Efficient Hours Bossed', RenderVariant.EHB]
+          ])
+      )
+      .addStringOption(option => option.setName('username').setDescription('In-game username'))
+      .setName('bosses')
+      .setDescription('View player bosses');
   }
 
-  activated(message: ParsedMessage) {
-    return message.command === 'bosses' || message.command === 'ehb';
-  }
+  async execute(message: CommandInteraction) {
+    await message.deferReply();
 
-  async execute(message: ParsedMessage) {
     // Grab the username from the command's arguments or database alias
     const username = await this.getUsername(message);
-
-    // Grab (if it exists) the command variant from the command's arguments (--ehb / --ranks)
-    const variant = this.getRenderVariant(message.command, message.args);
+    const variant = message.options.getString('variant', true) as RenderVariant;
 
     if (!username) {
       throw new CommandError(
@@ -59,10 +70,10 @@ class PlayerBosses implements Command, Renderable {
         .setFooter({ text: 'Last updated' })
         .setTimestamp(player.updatedAt);
 
-      message.respond({ embeds: [embed], files: [attachment] });
+      await message.editReply({ embeds: [embed], files: [attachment] });
     } catch (e: any) {
       const errorMessage = `**${username}** is not being tracked yet.`;
-      const errorTip = `Try ${message.prefix}update ${username}`;
+      const errorTip = `Try /update ${username}`;
 
       throw new CommandError(errorMessage, errorTip);
     }
@@ -144,43 +155,24 @@ class PlayerBosses implements Command, Renderable {
     return { attachment, fileName };
   }
 
-  async getUsername(message: ParsedMessage): Promise<string | undefined | null> {
-    const explicitUsername = message.args.filter(a => !a.startsWith('--')).join(' ');
+  async getUsername(message: CommandInteraction): Promise<string | undefined | null> {
+    const username = message.options.getString('username', false);
+    if (username) return username;
 
-    if (explicitUsername) {
-      return explicitUsername;
-    }
-
-    const inferedUsername = await getUsername(message.sourceMessage.author.id);
-
-    return inferedUsername;
+    const inferredUsername = await getUsername(message.user.id);
+    return inferredUsername;
   }
 
-  getRenderVariant(command: string, args: string[]): RenderVariant {
-    if (command === 'ehb') {
-      return RenderVariant.EHB;
+  getRenderVariant(subCommand: string): RenderVariant {
+    switch (subCommand) {
+      case 'ranks':
+        return RenderVariant.Ranks;
+      case 'ehb':
+        return RenderVariant.EHB;
+      default:
+        return RenderVariant.Kills;
     }
-
-    if (!args || args.length === 0) {
-      return RenderVariant.Kills;
-    }
-
-    const variantArg = args.find(a => a.startsWith('--'));
-
-    if (!variantArg) {
-      return RenderVariant.Kills;
-    }
-
-    if (variantArg === '--rank' || variantArg === '--ranks') {
-      return RenderVariant.Ranks;
-    }
-
-    if (variantArg === '--ehb' || variantArg === '--hours') {
-      return RenderVariant.EHB;
-    }
-
-    return RenderVariant.Kills;
   }
 }
 
-export default new PlayerBosses();
+export default new PlayerBossesCommand();

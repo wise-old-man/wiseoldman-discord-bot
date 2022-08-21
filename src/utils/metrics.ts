@@ -104,7 +104,7 @@ export const SKILLS = SKILLS_MAP.map(s => s.key);
 export const ACTIVITIES = ACTIVITIES_MAP.map(s => s.key);
 export const BOSSES = BOSSES_MAP.map(s => s.key);
 export const VIRTUALS = VIRTUALS_MAP.map(s => s.key);
-export const ALL_METRICS = [...SKILLS, ...ACTIVITIES, ...BOSSES, ...VIRTUALS];
+export const ALL_METRICS = [...SKILLS_MAP, ...ACTIVITIES_MAP, ...BOSSES_MAP, ...VIRTUALS_MAP];
 
 export function isSkill(metric: string): boolean {
   return SKILLS.includes(metric);

@@ -1,34 +1,34 @@
-import { MessageEmbed, Constants } from 'discord.js';
+import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
+import { CommandInteraction, MessageEmbed, Constants } from 'discord.js';
 import { fetchGroupDetails, fetchGroupMembers } from '../../../api/modules/groups';
 import { Player } from '../../../api/types';
 import config from '../../../config';
-import { Command, ParsedMessage } from '../../../types';
+import { SubCommand } from '../../../types';
 import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
+import { getServer } from '../../../database/services/server';
 
 const RESULTS_PER_PAGE = 20;
 
-class GroupMembers implements Command {
-  name: string;
-  template: string;
+class GroupMembersCommand implements SubCommand {
+  subcommand?: boolean | undefined;
   requiresGroup?: boolean | undefined;
-  requiresPagination?: boolean | undefined;
+  slashCommand?: SlashCommandSubcommandBuilder;
 
   constructor() {
-    this.name = 'View group members list';
-    this.template = '!group members';
+    this.subcommand = true;
     this.requiresGroup = true;
-    this.requiresPagination = true;
+
+    this.slashCommand = new SlashCommandSubcommandBuilder()
+      .setName('members')
+      .setDescription("View the group's members list.");
   }
 
-  activated(message: ParsedMessage) {
-    const { command, args } = message;
-    return command === 'group' && args.length >= 1 && args[0] === 'members';
-  }
-
-  async execute(message: ParsedMessage) {
-    const groupId = message.originServer?.groupId || -1;
+  async execute(message: CommandInteraction) {
+    const guildId = message.guild?.id;
+    const server = await getServer(guildId); // maybe cache it so we don't have to do this
+    const groupId = server?.groupId || -1;
 
     try {
       const group = await fetchGroupDetails(groupId);
@@ -66,14 +66,15 @@ class GroupMembers implements Command {
           .setColor(config.visuals.blue)
           .setTitle(`${group.name} members list`)
           .setURL(`https://wiseoldman.net/groups/${groupId}/members/`)
+          .setFooter({ text: members.length > 500 ? 'Click the title to view full list' : '' })
       });
 
       for (let i = 0; i < pageCount; i++) {
         paginatedMessage.addPageEmbed(new MessageEmbed().setDescription(this.buildList(members, i)));
       }
 
-      paginatedMessage.idle = 30000;
-      paginatedMessage.run(message.sourceMessage);
+      paginatedMessage.idle = 120000;
+      paginatedMessage.run(message);
     } catch (e: any) {
       if (e.response?.data?.message) {
         throw new CommandError(e.response?.data?.message);
@@ -96,4 +97,4 @@ class GroupMembers implements Command {
   }
 }
 
-export default new GroupMembers();
+export default new GroupMembersCommand();

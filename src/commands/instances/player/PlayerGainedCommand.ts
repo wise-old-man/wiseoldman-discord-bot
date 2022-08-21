@@ -1,36 +1,45 @@
-import { MessageEmbed, Constants } from 'discord.js';
+import { CommandInteraction, MessageEmbed, Constants } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { fetchPlayer, fetchPlayerGains } from '../../../api/modules/players';
 import { PlayerGains } from '../../../api/types';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
-import { Command, ParsedMessage } from '../../../types';
+import { Command } from '../../../types';
 import { encodeURL, getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 
 const GAINS_PER_PAGE = 10;
 
-class PlayerGained implements Command {
-  name: string;
-  template: string;
+class PlayerGainedCommand implements Command {
+  global: true;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
-    this.name = 'View player gains';
-    this.template = '!gained {username} [--6h/--day/--week/--month/--year/--1y6d5h]';
+    this.global = true;
+    this.slashCommand = new SlashCommandBuilder()
+      .addStringOption(option =>
+        option
+          .setName('period')
+          .setDescription('You can use custom periods with this format: 1y6d5h')
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addStringOption(option => option.setName('username').setDescription('In-game username'))
+      .setName('gained')
+      .setDescription('View player gains');
   }
 
-  activated(message: ParsedMessage) {
-    return message.command === 'gained';
-  }
+  async execute(message: CommandInteraction) {
+    await message.deferReply();
 
-  async execute(message: ParsedMessage) {
     // Grab the username from the command's arguments or database alias
     const username = await this.getUsername(message);
 
     // Grab the period from the command's arguments
-    const period = this.getPeriodArg(message.args);
+    const period = message.options.getString('period', true);
 
-    const footer = `Tip: You can use custom periods with this format: ${message.prefix}gained --2m6d7h`;
+    const footer = `Tip: You can use custom periods with this format: /gained period: 2m6d7h`;
 
     if (!username) {
       throw new CommandError(
@@ -55,7 +64,7 @@ class PlayerGained implements Command {
           .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
           .setFooter({ text: footer });
 
-        message.respond({ embeds: [response] });
+        await message.editReply({ embeds: [response] });
       } else {
         const paginatedMessage = new PaginatedMessage({
           pageIndexPrefix: 'Page',
@@ -93,8 +102,8 @@ class PlayerGained implements Command {
           paginatedMessage.addPageEmbed(page);
         }
 
-        paginatedMessage.idle = 30000;
-        paginatedMessage.run(message.sourceMessage);
+        paginatedMessage.idle = 120000;
+        paginatedMessage.run(message);
       }
     } catch (e: any) {
       if (e.message.includes('gains')) {
@@ -102,7 +111,7 @@ class PlayerGained implements Command {
       } else if (e.response?.data?.message) {
         if (e.response?.data?.message.includes('tracked')) {
           const errorMessage = `**${username}** is not being tracked yet.`;
-          const errorTip = `Try ${message.prefix}update ${username}`;
+          const errorTip = `Try /update ${username}`;
 
           throw new CommandError(errorMessage, errorTip);
         } else {
@@ -170,21 +179,13 @@ class PlayerGained implements Command {
     });
   }
 
-  async getUsername(message: ParsedMessage): Promise<string | undefined | null> {
-    const explicitUsername = message.args.filter(a => !a.startsWith('--')).join(' ');
+  async getUsername(message: CommandInteraction): Promise<string | undefined | null> {
+    const username = message.options.getString('username', false);
+    if (username) return username;
 
-    if (explicitUsername) {
-      return explicitUsername;
-    }
-
-    const inferedUsername = await getUsername(message.sourceMessage.author.id);
-
-    return inferedUsername;
-  }
-
-  getPeriodArg(args: string[]): string {
-    return args.find(a => a.startsWith('--'))?.replace('--', '') || 'week';
+    const inferredUsername = await getUsername(message.user.id);
+    return inferredUsername;
   }
 }
 
-export default new PlayerGained();
+export default new PlayerGainedCommand();

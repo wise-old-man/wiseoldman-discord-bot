@@ -1,36 +1,44 @@
-import { MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { updateCountry } from '../../../api/modules/players';
 import config from '../../../config';
-import { Command, ParsedMessage } from '../../../types';
-import { countryCodeEmoji, emojiCountryCode, getEmoji } from '../../../utils';
+import { Command } from '../../../types';
+import { countryCodeEmoji, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class PlayerSetFlag implements Command {
-  name: string;
-  template: string;
+class PlayerSetFlagCommand implements Command {
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
-    this.name = 'Set player flag (country)';
-    this.template = '!setflag {country_code} {username}';
+    this.slashCommand = new SlashCommandBuilder()
+      .addStringOption(option =>
+        option.setName('username').setDescription('In-game username').setRequired(true)
+      )
+      .addStringOption(option =>
+        option
+          .setName('country')
+          .setDescription('Start typing your country name')
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .setName('setflag')
+      .setDescription('Set player username (alias)');
   }
 
-  activated(message: ParsedMessage) {
-    return message.command === 'setflag' && message.args.length >= 2;
-  }
-
-  async execute(message: ParsedMessage) {
-    const username = this.getUsername(message);
-    const countryCode = this.getCountryCode(message);
+  async execute(message: CommandInteraction) {
+    await message.deferReply();
+    const username = message.options.getString('username', true);
+    const countryCode = message.options.getString('country', true);
 
     const response = { message: '', isError: false };
 
     if (
-      message.sourceMessage?.guild?.id !== config.discord.guildId ||
-      message.sourceMessage?.channel?.id !== config.discord.channels.flags
+      message.guild?.id !== config.discord.guildId ||
+      message.channel?.id !== config.discord.channels.flags
     ) {
       throw new CommandError(
         'This command only works in the **#change-flag** channel of the official Wise Old Man discord server.\
-        You can join at https://wiseoldman.net/discord'
+          You can join at https://wiseoldman.net/discord'
       );
     }
 
@@ -54,7 +62,7 @@ class PlayerSetFlag implements Command {
       )
       .setDescription(
         !response.isError
-          ? `${message.sourceMessage.author.toString()} changed \`${username}\`'s country to ${
+          ? `${message.user.toString()} changed \`${username}\`'s country to ${
               response.message.match('\\: (.*?) \\(.{2}\\)')?.[1]
             }`
           : response.message
@@ -68,23 +76,8 @@ class PlayerSetFlag implements Command {
       embed.setFooter({ text: 'The correct command format is: !setflag {username} {country_code}' });
     }
 
-    message.respond({ embeds: [embed] });
-  }
-
-  getUsername(message: ParsedMessage): string {
-    const usernameArgs = message.args.slice(0, message.args.length - 1);
-    return usernameArgs.join(' ');
-  }
-
-  getCountryCode(message: ParsedMessage): string {
-    const code = message.args[message.args.length - 1];
-
-    if (code.length === 4) {
-      return emojiCountryCode(code);
-    }
-
-    return code.toUpperCase();
+    await message.editReply({ embeds: [embed] });
   }
 }
 
-export default new PlayerSetFlag();
+export default new PlayerSetFlagCommand();

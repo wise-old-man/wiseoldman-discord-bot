@@ -24,8 +24,8 @@ class Bot {
       // Init bot properties
       this.client.user?.setActivity('bot.wiseoldman.net');
 
-      // Send received messages to the command router
-      this.client.on('messageCreate', router.onMessageReceived);
+      // Send received interaction to the command router
+      this.client.on('interactionCreate', router.onInteractionReceived);
 
       this.client.on('guildCreate', guild => {
         const openChannel = <TextChannel>findOpenChannel(guild);

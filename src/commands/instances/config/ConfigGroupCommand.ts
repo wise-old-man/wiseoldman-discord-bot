@@ -1,37 +1,38 @@
-import { MessageEmbed } from 'discord.js';
+import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { fetchGroupDetails } from '../../../api/modules/groups';
 import config from '../../../config';
 import { updateGroup } from '../../../database/services/server';
-import { Command, ParsedMessage } from '../../../types';
+import { Command } from '../../../types';
 import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class ConfigGroup implements Command {
-  name: string;
-  template: string;
+class ConfigGroupCommand implements Command {
+  subcommand?: boolean;
   requiresAdmin: boolean;
+  slashCommand?: SlashCommandSubcommandBuilder;
 
   constructor() {
-    this.name = "Configure the server's Wise Old Man group.";
-    this.template = '!config group {groupId}';
+    this.subcommand = true;
     this.requiresAdmin = true;
+
+    this.slashCommand = new SlashCommandSubcommandBuilder()
+      .addIntegerOption(option =>
+        option.setName('group_id').setDescription('Group id').setRequired(true)
+      )
+      .setName('group')
+      .setDescription("Configure the server's Wise Old Man group");
   }
 
-  activated(message: ParsedMessage) {
-    return message.command === 'config' && message.args.length >= 2 && message.args[0] === 'group';
-  }
-
-  async execute(message: ParsedMessage) {
-    const groupId = this.getGroupId(message);
-
-    if (groupId === -1) {
-      throw new CommandError(`Invalid group id.`, 'Group Id must be a valid number.');
-    }
+  async execute(message: CommandInteraction) {
+    const groupId = message.options.getInteger('group_id', true);
 
     try {
+      await message.deferReply();
+
       const group = await fetchGroupDetails(groupId);
 
-      const guildId = message.sourceMessage.guild?.id || '';
+      const guildId = message.guild?.id || '';
       await updateGroup(guildId, groupId);
 
       const response = new MessageEmbed()
@@ -40,7 +41,7 @@ class ConfigGroup implements Command {
         .setDescription(`All broadcasts and commands will be in reference to **${group.name}**`)
         .addFields({ name: 'Page URL', value: `https://wiseoldman.net/groups/${groupId}` });
 
-      message.respond({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (e: any) {
       if (e.response?.data?.message) {
         throw new CommandError(e.response?.data?.message);
@@ -49,11 +50,6 @@ class ConfigGroup implements Command {
       }
     }
   }
-
-  getGroupId(message: ParsedMessage): number {
-    const match = message.args.find(a => a !== 'group' && !isNaN(Number(a)));
-    return match ? parseInt(match, 10) : -1;
-  }
 }
 
-export default new ConfigGroup();
+export default new ConfigGroupCommand();

@@ -1,9 +1,10 @@
 import Canvas from 'canvas';
-import { MessageAttachment, MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { fetchPlayer, fetchPlayerAchievements } from '../../../api/modules/players';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
-import { CanvasAttachment, Command, ParsedMessage, Renderable } from '../../../types';
+import { CanvasAttachment, Command, Renderable } from '../../../types';
 import { encodeURL, formatDate } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
@@ -12,20 +13,21 @@ const RENDER_WIDTH = 280;
 const RENDER_HEIGHT = 165;
 const RENDER_PADDING = 15;
 
-class PlayerAchievements implements Command, Renderable {
-  name: string;
-  template: string;
+class PlayerAchievementsCommand implements Command, Renderable {
+  global: boolean;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
-    this.name = 'View player recent achievements';
-    this.template = '!achievements {username}';
+    this.global = true;
+    this.slashCommand = new SlashCommandBuilder()
+      .addStringOption(option => option.setName('username').setDescription('In-game username'))
+      .setName('achievements')
+      .setDescription('View player recent achievements');
   }
 
-  activated(message: ParsedMessage) {
-    return message.command === 'achievements';
-  }
+  async execute(message: CommandInteraction) {
+    await message.deferReply();
 
-  async execute(message: ParsedMessage) {
     // Grab the username from the command's arguments or database alias
     const username = await this.getUsername(message);
 
@@ -53,13 +55,13 @@ class PlayerAchievements implements Command, Renderable {
         .setFooter({ text: 'Last updated' })
         .setTimestamp(player.updatedAt);
 
-      message.respond({ embeds: [embed], files: [attachment] });
+      await message.editReply({ embeds: [embed], files: [attachment] });
     } catch (e: any) {
       if (e.message.includes('achievements')) {
         throw new CommandError(e.message);
       } else {
         const errorMessage = `**${username}** is not being tracked yet.`;
-        const errorTip = `Try ${message.prefix}update ${username}`;
+        const errorTip = `Try /update ${username}`;
 
         throw new CommandError(errorMessage, errorTip);
       }
@@ -109,17 +111,13 @@ class PlayerAchievements implements Command, Renderable {
     return { attachment, fileName };
   }
 
-  async getUsername(message: ParsedMessage): Promise<string | undefined | null> {
-    const explicitUsername = message.args.filter(a => !a.startsWith('--')).join(' ');
+  async getUsername(message: CommandInteraction): Promise<string | undefined | null> {
+    const username = message.options.getString('username', false);
+    if (username) return username;
 
-    if (explicitUsername) {
-      return explicitUsername;
-    }
-
-    const inferedUsername = await getUsername(message.sourceMessage.author.id);
-
-    return inferedUsername;
+    const inferredUsername = await getUsername(message.user.id);
+    return inferredUsername;
   }
 }
 
-export default new PlayerAchievements();
+export default new PlayerAchievementsCommand();

@@ -1,27 +1,32 @@
-import { MessageEmbed } from 'discord.js';
+import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { fetchGroupDetails } from '../../../api/modules/groups';
 import config from '../../../config';
-import { Command, ParsedMessage } from '../../../types';
+import { getServer } from '../../../database/services/server';
+import { SubCommand } from '../../../types';
 import { formatDate, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class GroupDetails implements Command {
-  name: string;
-  template: string;
+class GroupDetailsCommand implements SubCommand {
+  subcommand?: boolean | undefined;
   requiresGroup?: boolean | undefined;
+  slashCommand?: SlashCommandSubcommandBuilder;
 
   constructor() {
-    this.name = 'View group details';
-    this.template = '!group details';
+    this.subcommand = true;
     this.requiresGroup = true;
+
+    this.slashCommand = new SlashCommandSubcommandBuilder()
+      .setName('details')
+      .setDescription("View the group's details.");
   }
 
-  activated(message: ParsedMessage) {
-    return message.command === 'group' && message.args.length > 0 && message.args[0] === 'details';
-  }
+  async execute(message: CommandInteraction) {
+    await message.deferReply();
 
-  async execute(message: ParsedMessage) {
-    const groupId = message.originServer?.groupId || -1;
+    const guildId = message.guild?.id;
+    const server = await getServer(guildId); // maybe cache it so we don't have to do this
+    const groupId = server?.groupId || -1;
 
     try {
       const group = await fetchGroupDetails(groupId);
@@ -42,7 +47,7 @@ class GroupDetails implements Command {
           { name: '\u200B', value: verification }
         ]);
 
-      message.respond({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (e: any) {
       if (e.response?.data?.message) {
         throw new CommandError(e.response?.data?.message);
@@ -53,4 +58,4 @@ class GroupDetails implements Command {
   }
 }
 
-export default new GroupDetails();
+export default new GroupDetailsCommand();

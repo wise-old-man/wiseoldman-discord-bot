@@ -1,21 +1,31 @@
-import { Message, MessageAttachment, MessageOptions } from 'discord.js';
-import { Server } from './database';
+import { CommandInteraction, MessageAttachment } from 'discord.js';
+import {
+  SlashCommandBuilder,
+  SlashCommandSubcommandsOnlyBuilder,
+  SlashCommandSubcommandBuilder
+} from '@discordjs/builders';
 
 export interface Command {
-  name: string;
-  template: string;
+  slashCommand?:
+    | SlashCommandBuilder
+    | SlashCommandSubcommandBuilder
+    | SlashCommandSubcommandsOnlyBuilder;
   requiresAdmin?: boolean;
   requiresGroup?: boolean;
-  requiresPagination?: boolean;
-  activated(message: ParsedMessage): boolean;
-  execute(message: ParsedMessage): Promise<void>;
+  global?: boolean;
+  subcommand?: boolean;
+  execute(message: CommandInteraction): Promise<void>;
+}
+
+export interface SubCommand extends Command {
+  slashCommand?: SlashCommandSubcommandBuilder;
 }
 
 export interface CustomCommand {
+  name: string;
   command: string;
   message: string;
   image?: string;
-  public: boolean;
 }
 
 export interface Event {
@@ -37,15 +47,6 @@ export interface Renderable {
   render(props: any): Promise<CanvasAttachment>;
 }
 
-export interface ParsedMessage {
-  sourceMessage: Message;
-  originServer?: Server;
-  prefix: string;
-  command: string;
-  args: string[];
-  respond(response: MessageOptions): void;
-}
-
 export interface TimeGap {
   seconds: number;
   minutes: number;
@@ -54,6 +55,7 @@ export interface TimeGap {
 }
 
 export enum BroadcastType {
+  Default = 'DEFAULT',
   CompetitionStatus = 'COMPETITION_STATUS',
   MemberAchievements = 'MEMBER_ACHIEVEMENTS',
   MemberNameChanged = 'MEMBER_NAME_CHANGED',

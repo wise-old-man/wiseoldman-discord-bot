@@ -1,25 +1,27 @@
-import { MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { fetchPlayer } from '../../../api/modules/players';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
-import { Command, ParsedMessage } from '../../../types';
+import { Command } from '../../../types';
 import { encodeURL, round, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class PlayerEfficiency implements Command {
-  name: string;
-  template: string;
+class PlayerEfficiencyCommand implements Command {
+  global: boolean;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
-    this.name = 'View player efficiency stats';
-    this.template = '![ttm/max] {username}';
+    this.global = true;
+    this.slashCommand = new SlashCommandBuilder()
+      .addStringOption(option => option.setName('username').setDescription('In-game username'))
+      .setName('ttm')
+      .setDescription('View player efficiency stats');
   }
 
-  activated(message: ParsedMessage) {
-    return message.command === 'ttm' || message.command === 'max';
-  }
+  async execute(message: CommandInteraction) {
+    await message.deferReply();
 
-  async execute(message: ParsedMessage) {
     // Grab the username from the command's arguments or database alias
     const username = await this.getUsername(message);
 
@@ -33,9 +35,7 @@ class PlayerEfficiency implements Command {
       const player = await fetchPlayer(username);
 
       if (player.ehp === 0 && player.tt200m === 0) {
-        throw new CommandError(
-          `This player is outdated. Please try "${message.prefix}update ${username}" first.`
-        );
+        throw new CommandError(`This player is outdated. Please try "/update ${username}" first.`);
       }
 
       const embed = new MessageEmbed()
@@ -67,28 +67,24 @@ class PlayerEfficiency implements Command {
         .setFooter({ text: 'Last updated' })
         .setTimestamp(player.updatedAt);
 
-      message.respond({ embeds: [embed] });
+      await message.editReply({ embeds: [embed] });
     } catch (e: any) {
       if (e instanceof CommandError) throw e;
 
       const errorMessage = `**${username}** is not being tracked yet.`;
-      const errorTip = `Try ${message.prefix}update ${username}`;
+      const errorTip = `Try /update ${username}`;
 
       throw new CommandError(errorMessage, errorTip);
     }
   }
 
-  async getUsername(message: ParsedMessage): Promise<string | undefined | null> {
-    const explicitUsername = message.args.filter(a => !a.startsWith('--')).join(' ');
+  async getUsername(message: CommandInteraction): Promise<string | undefined | null> {
+    const username = message.options.getString('username', false);
+    if (username) return username;
 
-    if (explicitUsername) {
-      return explicitUsername;
-    }
-
-    const inferedUsername = await getUsername(message.sourceMessage.author.id);
-
-    return inferedUsername;
+    const inferredUsername = await getUsername(message.user.id);
+    return inferredUsername;
   }
 }
 
-export default new PlayerEfficiency();
+export default new PlayerEfficiencyCommand();

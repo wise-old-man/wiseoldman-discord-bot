@@ -32,11 +32,6 @@ export function getMissingPermissions(member: GuildMember | null | undefined): s
   );
 }
 
-export function canDoPagination(member: GuildMember | null | undefined): boolean {
-  if (!member) return false;
-  return member?.permissions.has('MANAGE_MESSAGES') && member?.permissions.has('ADD_REACTIONS');
-}
-
 export function getEmoji(metric: string): string {
   const emojiKey = metric.startsWith('clue') ? 'clue' : getAbbreviation(metric);
   return (<any>Emoji)[emojiKey] || '❌';

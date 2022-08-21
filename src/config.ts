@@ -5,8 +5,8 @@ export default {
   defaultPrefix: '!',
   validPrefixes: ['!', '-', '+', '++', '$'],
   helpCommand: 'wom!help',
-  baseAPIUrl: 'https://api.wiseoldman.net',
-  requiredPermissions: ['MANAGE_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES', 'ADD_REACTIONS'],
+  baseAPIUrl: process.env.DISCORD_DEV_API_URL || 'https://api.wiseoldman.net',
+  requiredPermissions: ['MANAGE_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES', 'USE_APPLICATION_COMMANDS'],
   visuals: {
     blue: 0x2980b9,
     red: 0xcc4242,
@@ -14,7 +14,8 @@ export default {
     orange: 0xecbf54
   },
   discord: {
-    guildId: '679454777708380161',
+    guildId: process.env.DISCORD_DEV_GUILD_ID || '679454777708380161',
+    clientId: process.env.DISCORD_DEV_CLIENT_ID || '719720369241718837',
     roles: {
       moderator: '705821689526747136',
       groupLeader: '705826389474934845'

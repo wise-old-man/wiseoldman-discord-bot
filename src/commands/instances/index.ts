@@ -1,45 +1,32 @@
 import { Command } from '../../types';
-import ConfigChannelPreference from './config/ConfigChannelPreference';
-import ConfigDefaultChannel from './config/ConfigDefaultChannel';
-import ConfigGroup from './config/ConfigGroup';
-import ConfigPrefix from './config/ConfigPrefix';
-import HelpCommand from './general/Help';
-import GroupCompetitionCommand from './group/GroupCompetition';
-import GroupCompetitionsCommand from './group/GroupCompetitions';
-import GroupDetailsCommand from './group/GroupDetails';
-import GroupGainedCommand from './group/GroupGained';
-import GroupHiscoresCommand from './group/GroupHiscores';
-import GroupMembersCommand from './group/GroupMembers';
-import GroupRecordsCommand from './group/GroupRecords';
-import ApproveNameChange from './moderation/ApproveNameChange';
-import DenyNameChange from './moderation/DenyNameChange';
-import ResetCompetitionCode from './moderation/ResetCompetitionCode';
-import ResetGroupCode from './moderation/ResetGroupCode';
-import ReviewNameChange from './moderation/ReviewNameChange';
-import VerifyGroup from './moderation/VerifyGroup';
-import DeletePlayer from './moderation/DeletePlayer';
-import PlayerAchievements from './player/PlayerAchievements';
-import PlayerActivitiesCommand from './player/PlayerActivities';
-import PlayerBossesCommand from './player/PlayerBosses';
-import PlayerEfficiencyCommand from './player/PlayerEfficiency';
-import PlayerGainedCommand from './player/PlayerGained';
-import PlayerSetFlag from './player/PlayerSetFlag';
-import PlayerSetUsername from './player/PlayerSetUsername';
-import PlayerStatsCommand from './player/PlayerStats';
-import PlayerUpdateCommand from './player/UpdatePlayer';
+import ConfigCommand from './config/ConfigRootCommand';
+import HelpCommand from './general/HelpCommand';
+import GroupCommand from './group/GroupRootCommand';
+import ResetCompetitionCodeCommand from './moderation/ResetCompetitionCodeCommand';
+import ResetGroupCodeCommand from './moderation/ResetGroupCodeCommand';
+import VerifyGroupCommand from './moderation/VerifyGroupCommand';
+import NameChangeCommand from './moderation/NameChangeCommand';
+import DeletePlayerCommand from './moderation/DeletePlayerCommand';
+import PlayerAchievements from './player/PlayerAchievementsCommand';
+import PlayerActivitiesCommand from './player/PlayerActivitiesCommand';
+import PlayerBossesCommand from './player/PlayerBossesCommand';
+import PlayerEfficiencyCommand from './player/PlayerEfficiencyCommand';
+import PlayerGainedCommand from './player/PlayerGainedCommand';
+import PlayerSetFlagCommand from './player/PlayerSetFlagCommand';
+import PlayerSetUsernameCommand from './player/PlayerSetUsernameCommand';
+import PlayerStatsCommand from './player/PlayerStatsCommand';
+import PlayerUpdateCommand from './player/UpdatePlayerCommand';
 
 const commands: Command[] = [
   // general commands
   HelpCommand,
 
   // moderation commands
-  ResetGroupCode,
-  ResetCompetitionCode,
-  VerifyGroup,
-  ReviewNameChange,
-  ApproveNameChange,
-  DenyNameChange,
-  DeletePlayer,
+  ResetGroupCodeCommand,
+  ResetCompetitionCodeCommand,
+  VerifyGroupCommand,
+  NameChangeCommand,
+  DeletePlayerCommand,
 
   // player commands
   PlayerStatsCommand,
@@ -49,23 +36,14 @@ const commands: Command[] = [
   PlayerUpdateCommand,
   PlayerGainedCommand,
   PlayerEfficiencyCommand,
-  PlayerSetUsername,
-  PlayerSetFlag,
+  PlayerSetUsernameCommand,
+  PlayerSetFlagCommand,
 
-  // group commands
-  GroupDetailsCommand,
-  GroupMembersCommand,
-  GroupHiscoresCommand,
-  GroupRecordsCommand,
-  GroupGainedCommand,
-  GroupCompetitionCommand,
-  GroupCompetitionsCommand,
+  // group command
+  GroupCommand,
 
-  // config commands
-  ConfigPrefix,
-  ConfigDefaultChannel,
-  ConfigChannelPreference,
-  ConfigGroup
+  // config command
+  ConfigCommand
 ];
 
 export default commands;

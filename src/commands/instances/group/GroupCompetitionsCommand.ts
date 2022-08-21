@@ -1,34 +1,38 @@
-import { MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { capitalize } from 'lodash';
 import { getCompetitionStatus, getCompetitionTimeLeft } from '../../../api/modules/competitions';
 import { fetchGroupCompetitions, fetchGroupDetails } from '../../../api/modules/groups';
 import { Competition } from '../../../api/types';
 import config from '../../../config';
-import { Command, ParsedMessage } from '../../../types';
+import { SubCommand } from '../../../types';
 import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
+import { getServer } from '../../../database/services/server';
 
 const MAX_COMPETITIONS = 5;
 
 const STATUS_ORDER = ['ongoing', 'upcoming', 'finished'];
 
-class GroupCompetitions implements Command {
-  name: string;
-  template: string;
+class GroupCompetitionsCommand implements SubCommand {
+  subcommand?: boolean | undefined;
   requiresGroup?: boolean | undefined;
+  slashCommand?: SlashCommandSubcommandBuilder;
 
   constructor() {
-    this.name = 'View group competitions';
-    this.template = '!group competitions';
+    this.subcommand = true;
     this.requiresGroup = true;
+
+    this.slashCommand = new SlashCommandSubcommandBuilder()
+      .setName('competitions')
+      .setDescription("View the group's competitions.");
   }
 
-  activated(message: ParsedMessage) {
-    return message.command === 'group' && message.args.length > 0 && message.args[0] === 'competitions';
-  }
-
-  async execute(message: ParsedMessage) {
-    const groupId = message.originServer?.groupId || -1;
+  async execute(message: CommandInteraction) {
+    await message.deferReply();
+    const guildId = message.guild?.id;
+    const server = await getServer(guildId); // maybe cache it so we don't have to do this
+    const groupId = server?.groupId || -1;
 
     try {
       const group = await fetchGroupDetails(groupId);
@@ -42,7 +46,7 @@ class GroupCompetitions implements Command {
         .setURL(pageURL)
         .addFields(fields);
 
-      message.respond({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (e: any) {
       if (e.response?.data?.message) {
         throw new CommandError(e.response?.data?.message);
@@ -77,4 +81,4 @@ class GroupCompetitions implements Command {
   }
 }
 
-export default new GroupCompetitions();
+export default new GroupCompetitionsCommand();

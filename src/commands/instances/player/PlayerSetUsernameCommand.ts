@@ -1,29 +1,32 @@
-import { MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { fetchPlayer } from '../../../api/modules/players';
 import config from '../../../config';
 import { updateUsername } from '../../../database/services/alias';
-import { Command, ParsedMessage } from '../../../types';
+import { Command } from '../../../types';
 import { encodeURL } from '../../../utils/strings';
 import CommandError from '../../CommandError';
 
-class PlayerSetUsername implements Command {
-  name: string;
-  template: string;
+class PlayerSetUsernameCommand implements Command {
+  global: boolean;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
-    this.name = 'Set player username (alias)';
-    this.template = '!setrsn {username}';
+    this.global = true;
+    this.slashCommand = new SlashCommandBuilder()
+      .addStringOption(option =>
+        option.setName('username').setDescription('In-game username').setRequired(true)
+      )
+      .setName('setrsn')
+      .setDescription('Set player username (alias)');
   }
 
-  activated(message: ParsedMessage) {
-    return message.command === 'setrsn';
-  }
-
-  async execute(message: ParsedMessage) {
-    const username = message.args.join(' ');
-    const userId = message.sourceMessage.author.id;
+  async execute(message: CommandInteraction) {
+    const username = message.options.getString('username', true);
+    const userId = message.user.id;
 
     try {
+      await message.deferReply();
       const player = await fetchPlayer(username);
 
       await updateUsername(userId, player.displayName);
@@ -35,12 +38,12 @@ class PlayerSetUsername implements Command {
         .setDescription(`<@${userId}> is now associated with the username \`${player.displayName}\`.`)
         .setFooter({ text: `They can now call any player command without including the username.` });
 
-      message.respond({ embeds: [response] });
+      await message.editReply({ embeds: [response] });
     } catch (e: any) {
       if (e.response?.status === 400) {
         throw new CommandError(
           `Failed to find player with username \`${username}\``,
-          'Maybe try to update that username first?'
+          'Maybe try to update that username with /update first?'
         );
       } else {
         throw new CommandError('Failed to update player alias.');
@@ -49,4 +52,4 @@ class PlayerSetUsername implements Command {
   }
 }
 
-export default new PlayerSetUsername();
+export default new PlayerSetUsernameCommand();

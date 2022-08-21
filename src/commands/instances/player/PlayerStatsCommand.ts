@@ -1,11 +1,12 @@
 import Canvas from 'canvas';
-import { MessageAttachment, MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
+import { SlashCommandBuilder } from '@discordjs/builders';
 import { fetchPlayer } from '../../../api/modules/players';
 import { toResults } from '../../../api/modules/snapshots';
 import { MetricType, Player, SkillResult } from '../../../api/types';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
-import { CanvasAttachment, Command, ParsedMessage, Renderable } from '../../../types';
+import { CanvasAttachment, Command, Renderable } from '../../../types';
 import { encodeURL, round, SKILLS, toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
@@ -21,25 +22,37 @@ enum RenderVariant {
   EHP = 'EHP'
 }
 
-class PlayerStats implements Command, Renderable {
-  name: string;
-  template: string;
+class PlayerStatsCommand implements Command, Renderable {
+  global: boolean;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
-    this.name = 'View player stats';
-    this.template = '![stats/ehp] {username} [--exp/--ranks/--ehp]';
+    this.global = true;
+    this.slashCommand = new SlashCommandBuilder()
+      .addStringOption(option =>
+        option
+          .setName('variant')
+          .setDescription('The variant to show stats for')
+          .setRequired(true)
+          .addChoices([
+            ['Levels', RenderVariant.Levels],
+            ['Ranks', RenderVariant.Ranks],
+            ['Experience', RenderVariant.Experience],
+            ['Efficient Hours Played', RenderVariant.EHP]
+          ])
+      )
+      .addStringOption(option => option.setName('username').setDescription('In-game username'))
+      .setName('stats')
+      .setDescription('View player stats');
   }
 
-  activated(message: ParsedMessage) {
-    return message.command === 'stats' || message.command === 'ehp';
-  }
+  async execute(message: CommandInteraction) {
+    await message.deferReply();
 
-  async execute(message: ParsedMessage) {
     // Grab the username from the command's arguments or database alias
     const username = await this.getUsername(message);
 
-    // Grab (if it exists) the command variant from the command's arguments (--exp / --ranks)
-    const variant = this.getRenderVariant(message.command, message.args);
+    const variant = message.options.getString('variant') as RenderVariant;
 
     if (!username) {
       throw new CommandError(
@@ -60,10 +73,10 @@ class PlayerStats implements Command, Renderable {
         .setFooter({ text: 'Last updated' })
         .setTimestamp(player.updatedAt);
 
-      message.respond({ embeds: [embed], files: [attachment] });
+      await message.editReply({ embeds: [embed], files: [attachment] });
     } catch (e: any) {
       const errorMessage = `**${username}** is not being tracked yet.`;
-      const errorTip = `Try ${message.prefix}update ${username}`;
+      const errorTip = `Try /update ${username}`;
 
       throw new CommandError(errorMessage, errorTip);
     }
@@ -148,47 +161,26 @@ class PlayerStats implements Command, Renderable {
     return { attachment, fileName };
   }
 
-  async getUsername(message: ParsedMessage): Promise<string | undefined | null> {
-    const explicitUsername = message.args.filter(a => !a.startsWith('--')).join(' ');
+  async getUsername(message: CommandInteraction): Promise<string | undefined | null> {
+    const username = message.options.getString('username', false);
+    if (username) return username;
 
-    if (explicitUsername) {
-      return explicitUsername;
-    }
-
-    const inferedUsername = await getUsername(message.sourceMessage.author.id);
-
-    return inferedUsername;
+    const inferredUsername = await getUsername(message.user.id);
+    return inferredUsername;
   }
 
-  getRenderVariant(command: string, args: string[]): RenderVariant {
-    if (command === 'ehp') {
-      return RenderVariant.EHP;
+  getRenderVariant(subCommand: string): RenderVariant {
+    switch (subCommand) {
+      case 'exp':
+        return RenderVariant.Experience;
+      case 'ranks':
+        return RenderVariant.Ranks;
+      case 'ehp':
+        return RenderVariant.EHP;
+      default:
+        return RenderVariant.Levels;
     }
-
-    if (!args || args.length === 0) {
-      return RenderVariant.Levels;
-    }
-
-    const variantArg = args.find(a => a.startsWith('--'));
-
-    if (!variantArg) {
-      return RenderVariant.Levels;
-    }
-
-    if (variantArg === '--exp' || variantArg === '--xp') {
-      return RenderVariant.Experience;
-    }
-
-    if (variantArg === '--rank' || variantArg === '--ranks') {
-      return RenderVariant.Ranks;
-    }
-
-    if (variantArg === '--ehp' || variantArg === '--hours') {
-      return RenderVariant.EHP;
-    }
-
-    return RenderVariant.Levels;
   }
 }
 
-export default new PlayerStats();
+export default new PlayerStatsCommand();
