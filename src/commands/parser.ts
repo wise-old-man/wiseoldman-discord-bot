@@ -37,6 +37,21 @@ export async function parse(message: Message): Promise<ParsedMessage> {
     }
   };
 
+  const warningMessage = `⚠️ **Attention!** ⚠️
+From *September 1st* and forward this bot will **only** support slash commands.
+
+- Slash commands are integrated into Discord and we are **required** to use them.
+- Slash commands should be easier to use as you can use auto completion to quickly select options.
+- Try this command with \`/${command}\`.
+
+You might need to update the bot's permissions. The easiest way to do this is to kick and re-invite the bot. You can do that by either:
+
+- Clicking the bot's name on Discord's right-side panel, and then clicking the "Add to Server" button.
+- Going to https://bot.wiseoldman.net/ and clicking the "Add to Discord" button.
+
+You can read more about this decision at <https://bit.ly/3AD4zsM>`;
+  respond({ content: warningMessage });
+
   return { sourceMessage, originServer, prefix, command, args, respond };
 }
 

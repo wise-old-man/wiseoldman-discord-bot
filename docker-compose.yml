@@ -1,6 +1,7 @@
 version: '3'
 services:
   db:
+    container_name: db
     image: postgres
     networks:
       - webnet
@@ -13,6 +14,7 @@ services:
       - '5432'
     command: postgres -c listen_addresses='*'
   pgadmin:
+    container_name: pgadmin
     image: dpage/pgadmin4
     env_file:
       - ./.env
@@ -26,6 +28,7 @@ services:
       - pgadminnet
   bot:
     build: .
+    container_name: bot
     expose:
       - '7000'
     ports:
