@@ -76,7 +76,11 @@ class GroupMembersCommand implements SubCommand {
       paginatedMessage.idle = 120000;
       paginatedMessage.run(message);
     } catch (e: any) {
-      throw new CommandError(e.response?.data?.message);
+      if (e.response?.data?.message) {
+        throw new CommandError(e.response?.data?.message);
+      } else {
+        throw new CommandError(e.name, e.message);
+      }
     }
   }
 
