@@ -13,12 +13,14 @@ export async function deployCommands(): Promise<void> {
     const slashCommand = command.slashCommand;
 
     if (slashCommand && !command.subcommand) {
-      if (command.global && !process.env.DISCORD_DEV_LOCAL) {
+      if (process.env.DISCORD_DEV_LOCAL) {
+        guildCommands.push(
+          slashCommand.setDescription(`[DEV 🧑‍💻]: ${slashCommand.description}`).toJSON()
+        );
+      } else if (command.global) {
         globalCommands.push(slashCommand.toJSON());
       } else {
-        // Add a [DEV 🧑‍💻] prefix to easily identify local commands during development
-        const modified = slashCommand.setDescription(`[DEV 🧑‍💻]: ${slashCommand.description}`);
-        guildCommands.push(modified.toJSON());
+        guildCommands.push(slashCommand.toJSON());
       }
     }
   }
