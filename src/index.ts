@@ -1,5 +1,10 @@
 import * as api from './api';
 import bot from './bot';
+import { deployCommands } from './deploy-commands';
 
-bot.init();
-api.init();
+(async function () {
+  await deployCommands();
+
+  bot.init();
+  api.init();
+})();
