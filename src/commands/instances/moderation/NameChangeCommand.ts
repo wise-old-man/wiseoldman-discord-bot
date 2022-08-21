@@ -13,7 +13,7 @@ import { Command } from '../../../types';
 import { getEmoji, hasModeratorRole } from '../../../utils/discord';
 import CommandError from '../../CommandError';
 
-class NameChange implements Command {
+class NameChangeCommand implements Command {
   slashCommand: SlashCommandBuilder;
 
   constructor() {
@@ -123,4 +123,4 @@ class NameChange implements Command {
   }
 }
 
-export default new NameChange();
+export default new NameChangeCommand();

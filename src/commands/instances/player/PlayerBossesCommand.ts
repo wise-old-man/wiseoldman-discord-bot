@@ -3,30 +3,30 @@ import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js'
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { fetchPlayer } from '../../../api/modules/players';
 import { toResults } from '../../../api/modules/snapshots';
-import { MetricType, Player, SkillResult } from '../../../api/types';
+import { BossResult, MetricType, Player } from '../../../api/types';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
-import { encodeURL, round, SKILLS, toKMB } from '../../../utils';
+import { encodeURL, round, toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 
-const RENDER_WIDTH = 215;
-const RENDER_HEIGHT = 260;
+const RENDER_WIDTH = 350;
+const RENDER_HEIGHT = 325;
 const RENDER_PADDING = 15;
 
 enum RenderVariant {
-  Levels = 'Levels',
+  Kills = 'Kills',
   Ranks = 'Ranks',
-  Experience = 'Experience',
-  EHP = 'EHP'
+  EHB = 'EHB'
 }
 
-class PlayerStats implements Command, Renderable {
-  slashCommand: SlashCommandBuilder;
+class PlayerBossesCommand implements Command, Renderable {
   global: boolean;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
+    this.global = true;
     this.slashCommand = new SlashCommandBuilder()
       .addStringOption(option =>
         option
@@ -34,16 +34,14 @@ class PlayerStats implements Command, Renderable {
           .setDescription('The variant to show stats for')
           .setRequired(true)
           .addChoices([
-            ['Levels', RenderVariant.Levels],
+            ['Kill Counts', RenderVariant.Kills],
             ['Ranks', RenderVariant.Ranks],
-            ['Experience', RenderVariant.Experience],
-            ['Efficient Hours Played', RenderVariant.EHP]
+            ['Efficient Hours Bossed', RenderVariant.EHB]
           ])
       )
       .addStringOption(option => option.setName('username').setDescription('In-game username'))
-      .setName('stats')
-      .setDescription('View player stats');
-    this.global = true;
+      .setName('bosses')
+      .setDescription('View player bosses');
   }
 
   async execute(message: CommandInteraction) {
@@ -51,8 +49,7 @@ class PlayerStats implements Command, Renderable {
 
     // Grab the username from the command's arguments or database alias
     const username = await this.getUsername(message);
-
-    const variant = message.options.getString('variant') as RenderVariant;
+    const variant = message.options.getString('variant', true) as RenderVariant;
 
     if (!username) {
       throw new CommandError(
@@ -67,8 +64,8 @@ class PlayerStats implements Command, Renderable {
 
       const embed = new MessageEmbed()
         .setColor(config.visuals.blue)
-        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
-        .setTitle(`${player.displayName} (Combat ${player.combatLevel}) - ${variant}`)
+        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/overview/bossing`))
+        .setTitle(`${player.displayName} - Boss ${variant}`)
         .setImage(`attachment://${fileName}`)
         .setFooter({ text: 'Last updated' })
         .setTimestamp(player.updatedAt);
@@ -85,13 +82,16 @@ class PlayerStats implements Command, Renderable {
   async render(props: { player: Player; variant: RenderVariant }): Promise<CanvasAttachment> {
     const { player, variant } = props;
 
-    // Convert the snapshot into skill results
-    // Sort them by the skill's name (to match the ingame stats interface)
-    const skillResults = <SkillResult[]>(
-      toResults(player.latestSnapshot, MetricType.Skill).sort(
-        (a, b) => SKILLS.indexOf(a.name) - SKILLS.indexOf(b.name)
-      )
-    );
+    // Convert the snapshot into boss results
+    const bossResults = <BossResult[]>toResults(player.latestSnapshot, MetricType.Boss);
+
+    bossResults.push({
+      name: 'ehb',
+      type: MetricType.Boss,
+      rank: player.latestSnapshot.ehb.rank,
+      kills: Math.floor(player.latestSnapshot.ehb.value),
+      ehb: player.latestSnapshot.ehb.value
+    });
 
     // Create a scaled empty canvas
     const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
@@ -104,54 +104,48 @@ class PlayerStats implements Command, Renderable {
     ctx.fillRect(0, 0, width, height);
 
     // Player stats
-    for (const [index, result] of skillResults.entries()) {
-      const x = Math.floor(index / 8);
-      const y = index % 8;
+    for (const [index, result] of bossResults.entries()) {
+      const x = Math.floor(index / 10);
+      const y = index % 10;
 
       const originX = RENDER_PADDING - 7 + x * 67;
       const originY = RENDER_PADDING - 5 + y * 31;
 
       const icon = await Canvas.loadImage(`./public/x2/${result.name}.png`);
 
-      // Badge background and skill icon
+      // Badge background and boss icon
       ctx.drawImage(badge, originX, originY, 64, 26);
-      ctx.drawImage(icon, originX + 1, originY, icon.width / 2, icon.height / 2);
+      ctx.drawImage(icon, originX, originY - 1, icon.width / 2, icon.height / 2);
 
-      ctx.fillStyle = '#ffffff';
+      const isRanked = result.kills && result.kills > -1;
 
-      if (variant === RenderVariant.Levels) {
-        ctx.font = '11px sans-serif';
+      if (variant === RenderVariant.Kills) {
+        ctx.font = '11px Arial';
 
-        const level = `${result.level || 1}`;
-        const lvlWidth = ctx.measureText(level).width;
+        const kills = `${isRanked ? (result.kills >= 10000 ? toKMB(result.kills) : result.kills) : '?'}`;
+        const killsWidth = ctx.measureText(kills).width;
 
-        // Skill level
-        ctx.fillText(level, originX + 42 - lvlWidth / 2, originY + 17);
-      } else if (variant === RenderVariant.Experience) {
-        const fontSize = result.name === 'overall' ? 9 : 10;
-        ctx.font = `${fontSize}px sans-serif`;
-
-        const exp = `${toKMB(result.experience, 1) || 0}`;
-        const expWidth = ctx.measureText(exp).width;
-
-        // Skill Experience
-        ctx.fillText(exp, originX + 44 - expWidth / 2, originY + 17);
+        // Boss kills
+        ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
+        ctx.fillText(kills, originX + 42 - killsWidth / 2, originY + 17);
       } else if (variant === RenderVariant.Ranks) {
-        ctx.font = '10px sans-serif';
+        ctx.font = '10px Arial';
 
-        const rank = `${toKMB(result.rank, 1) || 0}`;
+        const rank = `${isRanked ? toKMB(result.rank, 1) : '?'}`;
         const rankWidth = ctx.measureText(rank).width;
 
-        // Skill Rank
+        // Boss rank
+        ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
         ctx.fillText(rank, originX + 44 - rankWidth / 2, originY + 17);
-      } else if (variant === RenderVariant.EHP) {
-        ctx.font = '9px sans-serif';
+      } else if (variant === RenderVariant.EHB) {
+        ctx.font = '10px Arial';
 
-        const ehp = `${round(result.ehp || 0, 1)}`;
-        const ehpWidth = ctx.measureText(ehp).width;
+        const ehb = `${round(result.ehb, 1)}`;
+        const ehbWidth = ctx.measureText(ehb).width;
 
-        // Skill EHP
-        ctx.fillText(ehp, originX + 44 - ehpWidth / 2, originY + 16);
+        // Boss EHB
+        ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
+        ctx.fillText(ehb, originX + 44 - ehbWidth / 2, originY + 17);
       }
     }
 
@@ -171,16 +165,14 @@ class PlayerStats implements Command, Renderable {
 
   getRenderVariant(subCommand: string): RenderVariant {
     switch (subCommand) {
-      case 'exp':
-        return RenderVariant.Experience;
       case 'ranks':
         return RenderVariant.Ranks;
-      case 'ehp':
-        return RenderVariant.EHP;
+      case 'ehb':
+        return RenderVariant.EHB;
       default:
-        return RenderVariant.Levels;
+        return RenderVariant.Kills;
     }
   }
 }
 
-export default new PlayerStats();
+export default new PlayerBossesCommand();

@@ -11,11 +11,12 @@ import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 
 const GAINS_PER_PAGE = 10;
 
-class PlayerGained implements Command {
-  slashCommand: SlashCommandBuilder;
+class PlayerGainedCommand implements Command {
   global: true;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
+    this.global = true;
     this.slashCommand = new SlashCommandBuilder()
       .addStringOption(option =>
         option
@@ -27,7 +28,6 @@ class PlayerGained implements Command {
       .addStringOption(option => option.setName('username').setDescription('In-game username'))
       .setName('gained')
       .setDescription('View player gains');
-    this.global = true;
   }
 
   async execute(message: CommandInteraction) {
@@ -186,4 +186,4 @@ class PlayerGained implements Command {
   }
 }
 
-export default new PlayerGained();
+export default new PlayerGainedCommand();

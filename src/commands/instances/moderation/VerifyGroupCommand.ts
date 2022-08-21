@@ -19,7 +19,7 @@ const CHAT_MESSAGE = (groupName: string) =>
 const LOG_MESSAGE = (groupId: number, groupName: string, userId: string) =>
   `${groupName} (${groupId}) - <@${userId}>`;
 
-class VerifyGroup implements Command {
+class VerifyGroupCommand implements Command {
   slashCommand: SlashCommandBuilder;
 
   constructor() {
@@ -76,4 +76,4 @@ class VerifyGroup implements Command {
   }
 }
 
-export default new VerifyGroup();
+export default new VerifyGroupCommand();

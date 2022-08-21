@@ -3,10 +3,13 @@ import config from '../config';
 import { isAdmin } from '../utils';
 import CommandError from './CommandError';
 import commands from './instances';
-import { COUNTRIES } from '../utils/countries';
-import { ALL_METRICS } from '../utils';
-import { customCommands } from './CustomCommands';
 import { SubCommand } from '../types';
+import {
+  getCountryOptions,
+  getPeriodOptions,
+  getMetricOptions,
+  getHelpCategoryOptions
+} from '../utils/autocomplete';
 
 export function onError(options: { interaction: Interaction; title: string; tip?: string }): void {
   const response = new MessageEmbed().setColor(config.visuals.red).setDescription(options.title);
@@ -35,48 +38,17 @@ export async function executeSubCommand(
 export async function onInteractionReceived(interaction: Interaction): Promise<void> {
   if (interaction.isAutocomplete()) {
     const focused = interaction.options.getFocused(true);
-    const currentValue = focused.value.toString();
+    const currentValue = focused.value?.toString();
+
     if (focused.name === 'country') {
-      const options = COUNTRIES.filter(country =>
-        !currentValue
-          ? false
-          : [country.name.toLowerCase(), country.code.toLowerCase()].some(str =>
-              str.includes(currentValue.toLowerCase())
-            )
-      ).map(c => ({ name: c.name, value: c.code }));
-      interaction.respond(options.slice(0, 25));
+      interaction.respond(getCountryOptions(currentValue).slice(0, 25));
     } else if (focused.name === 'period') {
-      const options = [
-        { name: '5 Min', value: '5min' },
-        { name: 'Day', value: 'day' },
-        { name: 'Week', value: 'week' },
-        { name: 'Month', value: 'month' },
-        { name: 'Year', value: 'year' }
-      ]
-        .filter(period =>
-          !currentValue
-            ? true
-            : [period.name.toLowerCase(), period.value].some(str =>
-                str.includes(currentValue.toLowerCase())
-              )
-        )
-        .map(p => ({ name: p.name, value: p.value }));
-      interaction.respond(options);
+      interaction.respond(getPeriodOptions(currentValue));
     } else if (focused.name === 'metric') {
-      const options = ALL_METRICS.filter(metric =>
-        !currentValue
-          ? true
-          : [metric.name.toLowerCase(), metric.key].some(str => str.includes(currentValue.toLowerCase()))
-      ).map(m => ({ name: m.name, value: m.key }));
-      interaction.respond(options.slice(0, 25));
+      interaction.respond(getMetricOptions(currentValue).slice(0, 25));
     } else if (focused.name === 'category') {
       // for custom commands
-      const options = customCommands
-        .filter(command =>
-          !currentValue ? true : [command.command].some(str => str.includes(currentValue.toLowerCase()))
-        )
-        .map(c => ({ name: c.name, value: c.command }));
-      interaction.respond(options);
+      interaction.respond(getHelpCategoryOptions(currentValue));
     }
   }
 

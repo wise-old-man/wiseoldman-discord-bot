@@ -6,7 +6,7 @@ import { Command } from '../../../types';
 import { countryCodeEmoji, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class PlayerSetFlag implements Command {
+class PlayerSetFlagCommand implements Command {
   slashCommand: SlashCommandBuilder;
 
   constructor() {
@@ -80,4 +80,4 @@ class PlayerSetFlag implements Command {
   }
 }
 
-export default new PlayerSetFlag();
+export default new PlayerSetFlagCommand();

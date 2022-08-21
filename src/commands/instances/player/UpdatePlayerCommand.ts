@@ -6,16 +6,16 @@ import { getUsername } from '../../../database/services/alias';
 import { Command } from '../../../types';
 import CommandError from '../../CommandError';
 
-class UpdatePlayer implements Command {
-  slashCommand: SlashCommandBuilder;
+class UpdatePlayerCommand implements Command {
   global: boolean;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
+    this.global = true;
     this.slashCommand = new SlashCommandBuilder()
       .addStringOption(option => option.setName('username').setDescription('In-game username'))
       .setName('update')
       .setDescription('Update player');
-    this.global = true;
   }
 
   async execute(message: CommandInteraction) {
@@ -59,4 +59,4 @@ class UpdatePlayer implements Command {
   }
 }
 
-export default new UpdatePlayer();
+export default new UpdatePlayerCommand();

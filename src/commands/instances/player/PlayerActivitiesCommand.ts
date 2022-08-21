@@ -20,11 +20,12 @@ enum RenderVariant {
   Ranks = 'Ranks'
 }
 
-class PlayerActivities implements Command, Renderable {
-  slashCommand: SlashCommandBuilder;
+class PlayerActivitiesCommand implements Command, Renderable {
   global: boolean;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
+    this.global = true;
     this.slashCommand = new SlashCommandBuilder()
       .addStringOption(option =>
         option
@@ -39,7 +40,6 @@ class PlayerActivities implements Command, Renderable {
       .addStringOption(option => option.setName('username').setDescription('In-game username'))
       .setName('activities')
       .setDescription('View player activity score');
-    this.global = true;
   }
 
   async execute(message: CommandInteraction) {
@@ -160,4 +160,4 @@ class PlayerActivities implements Command, Renderable {
   }
 }
 
-export default new PlayerActivities();
+export default new PlayerActivitiesCommand();

@@ -7,20 +7,21 @@ import { Command } from '../../../types';
 import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class ConfigGroup implements Command {
+class ConfigGroupCommand implements Command {
+  subcommand?: boolean;
   requiresAdmin: boolean;
   slashCommand?: SlashCommandSubcommandBuilder;
-  subcommand?: boolean | undefined;
 
   constructor() {
+    this.subcommand = true;
     this.requiresAdmin = true;
+
     this.slashCommand = new SlashCommandSubcommandBuilder()
       .addIntegerOption(option =>
         option.setName('group_id').setDescription('Group id').setRequired(true)
       )
       .setName('group')
       .setDescription("Configure the server's Wise Old Man group");
-    this.subcommand = true;
   }
 
   async execute(message: CommandInteraction) {
@@ -51,4 +52,4 @@ class ConfigGroup implements Command {
   }
 }
 
-export default new ConfigGroup();
+export default new ConfigGroupCommand();

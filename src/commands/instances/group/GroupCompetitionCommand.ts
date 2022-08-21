@@ -10,18 +10,20 @@ import { SubCommand } from '../../../types';
 import { getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class GroupCompetition implements SubCommand {
+class GroupCompetitionCommand implements SubCommand {
+  subcommand?: boolean | undefined;
   requiresGroup?: boolean | undefined;
   slashCommand?: SlashCommandSubcommandBuilder;
-  subcommand?: boolean | undefined;
 
   constructor() {
+    this.subcommand = true;
     this.requiresGroup = true;
+
     this.slashCommand = new SlashCommandSubcommandBuilder()
       .addStringOption(option =>
         option
           .setName('status')
-          .setDescription('View an ongoing or upcoming group competition')
+          .setDescription('View an ongoing or upcoming group competition.')
           .addChoices([
             ['Ongoing', 'ongoing'],
             ['Upcoming', 'upcoming']
@@ -30,7 +32,6 @@ class GroupCompetition implements SubCommand {
       .addIntegerOption(option => option.setName('competition_id').setDescription('Competition id'))
       .setName('competition')
       .setDescription("View a group's ongoing/upcoming competition");
-    this.subcommand = true;
   }
 
   async execute(message: CommandInteraction) {
@@ -41,13 +42,17 @@ class GroupCompetition implements SubCommand {
     const groupId = server?.groupId || -1;
 
     const status = message.options.getString('status') || 'ongoing';
+
     try {
       const competitions = await fetchGroupCompetitions(groupId);
-      const competitionId =
+
+      const competition = await fetchCompetition(
         message.options.getInteger('competition_id') ||
-        this.getSelectedCompetitionId(competitions, status);
-      const competition = await fetchCompetition(competitionId);
+          this.getSelectedCompetitionId(competitions, status)
+      );
+
       const pageURL = `https://wiseoldman.net/competitions/${competition.id}/`;
+
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
         .setTitle(competition.title)
@@ -55,6 +60,7 @@ class GroupCompetition implements SubCommand {
         .setDescription(this.buildContent(competition))
         .setTimestamp(this.getFooterDate(competition))
         .setFooter({ text: this.getFooterLabel(competition) });
+
       await message.editReply({ embeds: [response] });
     } catch (e: any) {
       if (e.response?.data?.message) {
@@ -166,4 +172,4 @@ class GroupCompetition implements SubCommand {
   }
 }
 
-export default new GroupCompetition();
+export default new GroupCompetitionCommand();

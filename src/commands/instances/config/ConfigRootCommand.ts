@@ -3,27 +3,29 @@ import { CommandInteraction } from 'discord.js';
 import { Command, SubCommand } from '../../../types';
 import { executeSubCommand } from '../../router';
 
-import ConfigChannel from './ConfigChannel';
-import ConfigGroup from './ConfigGroup';
+import ConfigChannelCommand from './ConfigChannelCommand';
+import ConfigGroupCommand from './ConfigGroupCommand';
 
-const configCommands: SubCommand[] = [ConfigChannel, ConfigGroup];
+const configCommands: SubCommand[] = [ConfigChannelCommand, ConfigGroupCommand];
 
-class Config implements Command {
+class ConfigRootCommand implements Command {
+  global?: boolean;
   requiresAdmin: boolean;
   slashCommand?: SlashCommandBuilder;
-  global?: boolean | undefined;
 
   constructor() {
+    this.global = true;
     this.requiresAdmin = true;
+
     this.slashCommand = new SlashCommandBuilder()
       .setName('config')
       .setDescription('Configure various things');
+
     configCommands.forEach(configCommand => {
       if (configCommand.slashCommand) {
         this.slashCommand?.addSubcommand(configCommand.slashCommand);
       }
     });
-    this.global = true;
   }
 
   async execute(message: CommandInteraction) {
@@ -32,4 +34,4 @@ class Config implements Command {
   }
 }
 
-export default new Config();
+export default new ConfigRootCommand();

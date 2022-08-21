@@ -17,18 +17,18 @@ const LINE_SUPPORT = `If you need any help or would like to follow the developme
 const LINE_PERMS =
   "If some commands don't seem to be responding, it might be a permission related issue. Try to kick the bot and invite it back again. (link above)";
 
-class Help implements Command {
-  slashCommand?: SlashCommandBuilder;
+class HelpCommand implements Command {
   global?: boolean | undefined;
+  slashCommand?: SlashCommandBuilder;
 
   constructor() {
+    this.global = true;
     this.slashCommand = new SlashCommandBuilder()
       .addStringOption(option =>
         option.setName('category').setDescription('What do you need help with?').setAutocomplete(true)
       )
       .setName('help')
       .setDescription('Ask for help');
-    this.global = true;
   }
 
   async execute(message: CommandInteraction) {
@@ -77,4 +77,4 @@ class Help implements Command {
   }
 }
 
-export default new Help();
+export default new HelpCommand();

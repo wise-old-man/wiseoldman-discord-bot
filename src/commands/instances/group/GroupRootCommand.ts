@@ -3,41 +3,42 @@ import { CommandInteraction } from 'discord.js';
 import { Command, SubCommand } from '../../../types';
 import { executeSubCommand } from '../../router';
 
-import GroupCompetition from './GroupCompetition';
-import GroupCompetitions from './GroupCompetitions';
-import GroupDetails from './GroupDetails';
-import GroupGained from './GroupGained';
-import GroupHiscores from './GroupHiscores';
-import GroupMembers from './GroupMembers';
-import GroupRecords from './GroupRecords';
+import GroupCompetitionCommand from './GroupCompetitionCommand';
+import GroupCompetitionsCommand from './GroupCompetitionsCommand';
+import GroupDetailsCommand from './GroupDetailsCommand';
+import GroupGainedCommand from './GroupGainedCommand';
+import GroupHiscoresCommand from './GroupHiscoresCommand';
+import GroupMembersCommand from './GroupMembersCommand';
+import GroupRecordsCommand from './GroupRecordsCommand';
 
 const groupCommands: SubCommand[] = [
-  GroupCompetition,
-  GroupCompetitions,
-  GroupDetails,
-  GroupGained,
-  GroupHiscores,
-  GroupMembers,
-  GroupRecords
+  GroupCompetitionCommand,
+  GroupCompetitionsCommand,
+  GroupDetailsCommand,
+  GroupGainedCommand,
+  GroupHiscoresCommand,
+  GroupMembersCommand,
+  GroupRecordsCommand
 ];
 
-class Group implements Command {
+class GroupRootCommand implements Command {
+  global?: boolean | undefined;
   requiresGroup?: boolean | undefined;
   slashCommand?: SlashCommandSubcommandsOnlyBuilder;
-  global?: boolean | undefined;
 
   constructor() {
+    this.global = true;
     this.requiresGroup = true;
+
     this.slashCommand = new SlashCommandBuilder()
       .setName('group')
       .setDescription('View information about a group');
+
     groupCommands.forEach(groupCommand => {
       if (groupCommand.slashCommand) {
         this.slashCommand?.addSubcommand(groupCommand.slashCommand);
       }
     });
-
-    this.global = true;
   }
 
   async execute(message: CommandInteraction) {
@@ -46,4 +47,4 @@ class Group implements Command {
   }
 }
 
-export default new Group();
+export default new GroupRootCommand();

@@ -12,7 +12,7 @@ const DM_MESSAGE = (code: string) =>
 const CHAT_MESSAGE = (userId: string) =>
   `Verification code successfully reset. A DM has been sent to <@${userId}>.`;
 
-class ResetCompetitionCode implements Command {
+class ResetCompetitionCodeCommand implements Command {
   slashCommand: SlashCommandBuilder;
 
   constructor() {
@@ -59,4 +59,4 @@ class ResetCompetitionCode implements Command {
   }
 }
 
-export default new ResetCompetitionCode();
+export default new ResetCompetitionCodeCommand();

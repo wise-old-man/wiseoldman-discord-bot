@@ -7,16 +7,16 @@ import { Command } from '../../../types';
 import { encodeURL, round, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class PlayerEfficiency implements Command {
-  slashCommand: SlashCommandBuilder;
+class PlayerEfficiencyCommand implements Command {
   global: boolean;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
+    this.global = true;
     this.slashCommand = new SlashCommandBuilder()
       .addStringOption(option => option.setName('username').setDescription('In-game username'))
       .setName('ttm')
       .setDescription('View player efficiency stats');
-    this.global = true;
   }
 
   async execute(message: CommandInteraction) {
@@ -87,4 +87,4 @@ class PlayerEfficiency implements Command {
   }
 }
 
-export default new PlayerEfficiency();
+export default new PlayerEfficiencyCommand();

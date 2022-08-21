@@ -14,17 +14,18 @@ const MAX_COMPETITIONS = 5;
 
 const STATUS_ORDER = ['ongoing', 'upcoming', 'finished'];
 
-class GroupCompetitions implements SubCommand {
+class GroupCompetitionsCommand implements SubCommand {
+  subcommand?: boolean | undefined;
   requiresGroup?: boolean | undefined;
   slashCommand?: SlashCommandSubcommandBuilder;
-  subcommand?: boolean | undefined;
 
   constructor() {
+    this.subcommand = true;
     this.requiresGroup = true;
+
     this.slashCommand = new SlashCommandSubcommandBuilder()
       .setName('competitions')
-      .setDescription('View group competitions');
-    this.subcommand = true;
+      .setDescription("View the group's competitions.");
   }
 
   async execute(message: CommandInteraction) {
@@ -76,4 +77,4 @@ class GroupCompetitions implements SubCommand {
   }
 }
 
-export default new GroupCompetitions();
+export default new GroupCompetitionsCommand();

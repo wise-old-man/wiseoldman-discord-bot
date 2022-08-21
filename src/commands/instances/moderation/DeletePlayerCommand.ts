@@ -6,7 +6,7 @@ import { Command } from '../../../types';
 import { getEmoji, hasModeratorRole } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class DeletePlayer implements Command {
+class DeletePlayerCommand implements Command {
   slashCommand: SlashCommandBuilder;
 
   constructor() {
@@ -43,4 +43,4 @@ class DeletePlayer implements Command {
   }
 }
 
-export default new DeletePlayer();
+export default new DeletePlayerCommand();

@@ -8,13 +8,15 @@ import { SubCommand } from '../../../types';
 import { getEmoji, getMetricName, isActivity, isBoss, isSkill, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class GroupHiscores implements SubCommand {
+class GroupHiscoresCommand implements SubCommand {
+  subcommand?: boolean | undefined;
   requiresGroup?: boolean | undefined;
   slashCommand?: SlashCommandSubcommandBuilder;
-  subcommand?: boolean | undefined;
 
   constructor() {
+    this.subcommand = true;
     this.requiresGroup = true;
+
     this.slashCommand = new SlashCommandSubcommandBuilder()
       .addStringOption(option =>
         option
@@ -24,8 +26,7 @@ class GroupHiscores implements SubCommand {
           .setRequired(true)
       )
       .setName('hiscores')
-      .setDescription('View group hiscores');
-    this.subcommand = true;
+      .setDescription("View the group's hiscores.");
   }
 
   async execute(message: CommandInteraction) {
@@ -76,4 +77,4 @@ class GroupHiscores implements SubCommand {
   }
 }
 
-export default new GroupHiscores();
+export default new GroupHiscoresCommand();

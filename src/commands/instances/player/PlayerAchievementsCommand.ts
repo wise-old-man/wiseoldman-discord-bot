@@ -13,16 +13,16 @@ const RENDER_WIDTH = 280;
 const RENDER_HEIGHT = 165;
 const RENDER_PADDING = 15;
 
-class PlayerAchievements implements Command, Renderable {
-  slashCommand: SlashCommandBuilder;
+class PlayerAchievementsCommand implements Command, Renderable {
   global: boolean;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
+    this.global = true;
     this.slashCommand = new SlashCommandBuilder()
       .addStringOption(option => option.setName('username').setDescription('In-game username'))
       .setName('achievements')
       .setDescription('View player recent achievements');
-    this.global = true;
   }
 
   async execute(message: CommandInteraction) {
@@ -120,4 +120,4 @@ class PlayerAchievements implements Command, Renderable {
   }
 }
 
-export default new PlayerAchievements();
+export default new PlayerAchievementsCommand();

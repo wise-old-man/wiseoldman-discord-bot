@@ -1,32 +1,32 @@
 import { Command } from '../../types';
-import ConfigCommand from './config/Config';
-import HelpCommand from './general/Help';
-import GroupCommand from './group/Group';
-import ResetCompetitionCode from './moderation/ResetCompetitionCode';
-import ResetGroupCode from './moderation/ResetGroupCode';
-import VerifyGroup from './moderation/VerifyGroup';
-import NameChange from './moderation/NameChange';
-import DeletePlayer from './moderation/DeletePlayer';
-import PlayerAchievements from './player/PlayerAchievements';
-import PlayerActivitiesCommand from './player/PlayerActivities';
-import PlayerBossesCommand from './player/PlayerBosses';
-import PlayerEfficiencyCommand from './player/PlayerEfficiency';
-import PlayerGainedCommand from './player/PlayerGained';
-import PlayerSetFlag from './player/PlayerSetFlag';
-import PlayerSetUsername from './player/PlayerSetUsername';
-import PlayerStatsCommand from './player/PlayerStats';
-import PlayerUpdateCommand from './player/UpdatePlayer';
+import ConfigCommand from './config/ConfigRootCommand';
+import HelpCommand from './general/HelpCommand';
+import GroupCommand from './group/GroupRootCommand';
+import ResetCompetitionCodeCommand from './moderation/ResetCompetitionCodeCommand';
+import ResetGroupCodeCommand from './moderation/ResetGroupCodeCommand';
+import VerifyGroupCommand from './moderation/VerifyGroupCommand';
+import NameChangeCommand from './moderation/NameChangeCommand';
+import DeletePlayerCommand from './moderation/DeletePlayerCommand';
+import PlayerAchievements from './player/PlayerAchievementsCommand';
+import PlayerActivitiesCommand from './player/PlayerActivitiesCommand';
+import PlayerBossesCommand from './player/PlayerBossesCommand';
+import PlayerEfficiencyCommand from './player/PlayerEfficiencyCommand';
+import PlayerGainedCommand from './player/PlayerGainedCommand';
+import PlayerSetFlagCommand from './player/PlayerSetFlagCommand';
+import PlayerSetUsernameCommand from './player/PlayerSetUsernameCommand';
+import PlayerStatsCommand from './player/PlayerStatsCommand';
+import PlayerUpdateCommand from './player/UpdatePlayerCommand';
 
 const commands: Command[] = [
   // general commands
   HelpCommand,
 
   // moderation commands
-  ResetGroupCode,
-  ResetCompetitionCode,
-  VerifyGroup,
-  NameChange,
-  DeletePlayer,
+  ResetGroupCodeCommand,
+  ResetCompetitionCodeCommand,
+  VerifyGroupCommand,
+  NameChangeCommand,
+  DeletePlayerCommand,
 
   // player commands
   PlayerStatsCommand,
@@ -36,8 +36,8 @@ const commands: Command[] = [
   PlayerUpdateCommand,
   PlayerGainedCommand,
   PlayerEfficiencyCommand,
-  PlayerSetUsername,
-  PlayerSetFlag,
+  PlayerSetUsernameCommand,
+  PlayerSetFlagCommand,
 
   // group command
   GroupCommand,

@@ -7,17 +7,18 @@ import { SubCommand } from '../../../types';
 import { formatDate, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class GroupDetails implements SubCommand {
+class GroupDetailsCommand implements SubCommand {
+  subcommand?: boolean | undefined;
   requiresGroup?: boolean | undefined;
   slashCommand?: SlashCommandSubcommandBuilder;
-  subcommand?: boolean | undefined;
 
   constructor() {
+    this.subcommand = true;
     this.requiresGroup = true;
+
     this.slashCommand = new SlashCommandSubcommandBuilder()
       .setName('details')
-      .setDescription('View group details');
-    this.subcommand = true;
+      .setDescription("View the group's details.");
   }
 
   async execute(message: CommandInteraction) {
@@ -53,4 +54,4 @@ class GroupDetails implements SubCommand {
   }
 }
 
-export default new GroupDetails();
+export default new GroupDetailsCommand();

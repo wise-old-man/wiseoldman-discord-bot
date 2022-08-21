@@ -11,17 +11,18 @@ import { getServer } from '../../../database/services/server';
 
 const RESULTS_PER_PAGE = 20;
 
-class GroupMembers implements SubCommand {
+class GroupMembersCommand implements SubCommand {
+  subcommand?: boolean | undefined;
   requiresGroup?: boolean | undefined;
   slashCommand?: SlashCommandSubcommandBuilder;
-  subcommand?: boolean | undefined;
 
   constructor() {
+    this.subcommand = true;
     this.requiresGroup = true;
+
     this.slashCommand = new SlashCommandSubcommandBuilder()
       .setName('members')
-      .setDescription('View group members list');
-    this.subcommand = true;
+      .setDescription("View the group's members list.");
   }
 
   async execute(message: CommandInteraction) {
@@ -92,4 +93,4 @@ class GroupMembers implements SubCommand {
   }
 }
 
-export default new GroupMembers();
+export default new GroupMembersCommand();

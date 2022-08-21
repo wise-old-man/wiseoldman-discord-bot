@@ -1,44 +1,39 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { fetchGroupDetails, fetchGroupRecords } from '../../../api/modules/groups';
-import { GroupRecordEntry } from '../../../api/types';
+import { fetchGroupDetails, fetchGroupGained } from '../../../api/modules/groups';
+import { GroupGainedEntry } from '../../../api/types';
 import config from '../../../config';
 import { getServer } from '../../../database/services/server';
 import { SubCommand } from '../../../types';
 import { getEmoji, getMetricName, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class GroupRecords implements SubCommand {
+class GroupGainedCommand implements SubCommand {
+  subcommand?: boolean | undefined;
   requiresGroup?: boolean | undefined;
   slashCommand?: SlashCommandSubcommandBuilder;
-  subcommand?: boolean | undefined;
 
   constructor() {
+    this.subcommand = true;
     this.requiresGroup = true;
+
     this.slashCommand = new SlashCommandSubcommandBuilder()
       .addStringOption(option =>
         option
           .setName('metric')
-          .setDescription('The category to show records for')
+          .setDescription('The category to show gains for')
           .setAutocomplete(true)
           .setRequired(true)
       )
       .addStringOption(option =>
         option
           .setName('period')
-          .setDescription('The period to show records for')
-          .addChoices([
-            ['5 Min', '5min'],
-            ['Day', 'day'],
-            ['Week', 'week'],
-            ['Month', 'month'],
-            ['Year', 'year']
-          ])
+          .setDescription('You can use custom periods with this format: 1y6d5h')
+          .setAutocomplete(true)
           .setRequired(true)
       )
-      .setName('records')
-      .setDescription('View group records');
-    this.subcommand = true;
+      .setName('gained')
+      .setDescription("View the group's gains.");
   }
 
   async execute(message: CommandInteraction) {
@@ -52,14 +47,14 @@ class GroupRecords implements SubCommand {
 
     try {
       const group = await fetchGroupDetails(groupId);
-      const records = await fetchGroupRecords(groupId, period, metric);
+      const gained = await fetchGroupGained(groupId, period, metric);
 
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
-        .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} records (${period})`)
-        .setDescription(this.buildList(records))
-        .setURL(`https://wiseoldman.net/groups/${groupId}/records/`)
-        .setFooter({ text: `Tip: Try /group records metric: zulrah period: day` });
+        .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} gains (${period})`)
+        .setDescription(this.buildList(gained))
+        .setURL(`https://wiseoldman.net/groups/${groupId}/gained/`)
+        .setFooter({ text: `Tip: Try /group gained metric: zulrah period: day` });
 
       await message.editReply({ embeds: [response] });
     } catch (e: any) {
@@ -67,9 +62,9 @@ class GroupRecords implements SubCommand {
     }
   }
 
-  buildList(records: GroupRecordEntry[]) {
-    return records.map((g, i) => `${i + 1}. **${g.player.displayName}** - ${toKMB(g.value)}`).join('\n');
+  buildList(gained: GroupGainedEntry[]) {
+    return gained.map((g, i) => `${i + 1}. **${g.player.displayName}** - ${toKMB(g.gained)}`).join('\n');
   }
 }
 
-export default new GroupRecords();
+export default new GroupGainedCommand();

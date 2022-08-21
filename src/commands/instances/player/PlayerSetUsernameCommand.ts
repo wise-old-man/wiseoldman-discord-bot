@@ -7,18 +7,18 @@ import { Command } from '../../../types';
 import { encodeURL } from '../../../utils/strings';
 import CommandError from '../../CommandError';
 
-class PlayerSetUsername implements Command {
-  slashCommand: SlashCommandBuilder;
+class PlayerSetUsernameCommand implements Command {
   global: boolean;
+  slashCommand: SlashCommandBuilder;
 
   constructor() {
+    this.global = true;
     this.slashCommand = new SlashCommandBuilder()
       .addStringOption(option =>
         option.setName('username').setDescription('In-game username').setRequired(true)
       )
       .setName('setrsn')
       .setDescription('Set player username (alias)');
-    this.global = true;
   }
 
   async execute(message: CommandInteraction) {
@@ -52,4 +52,4 @@ class PlayerSetUsername implements Command {
   }
 }
 
-export default new PlayerSetUsername();
+export default new PlayerSetUsernameCommand();

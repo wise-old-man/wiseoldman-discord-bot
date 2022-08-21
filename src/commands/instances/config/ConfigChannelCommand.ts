@@ -7,13 +7,15 @@ import { SubCommand, BroadcastType } from '../../../types';
 import { getEmoji, getBroadcastName } from '../../../utils';
 import CommandError from '../../CommandError';
 
-class ConfigChannel implements SubCommand {
+class ConfigChannelCommand implements SubCommand {
+  subcommand?: boolean;
   requiresAdmin: boolean;
   slashCommand?: SlashCommandSubcommandBuilder;
-  subcommand?: boolean | undefined;
 
   constructor() {
+    this.subcommand = true;
     this.requiresAdmin = true;
+
     this.slashCommand = new SlashCommandSubcommandBuilder()
       .addStringOption(option =>
         option
@@ -49,7 +51,6 @@ class ConfigChannel implements SubCommand {
       )
       .setName('channel')
       .setDescription('Configure various broadcast channels');
-    this.subcommand = true;
   }
 
   async execute(message: CommandInteraction) {
@@ -88,4 +89,4 @@ class ConfigChannel implements SubCommand {
   }
 }
 
-export default new ConfigChannel();
+export default new ConfigChannelCommand();

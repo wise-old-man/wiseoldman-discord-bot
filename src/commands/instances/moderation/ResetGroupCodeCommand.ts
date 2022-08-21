@@ -12,7 +12,7 @@ const DM_MESSAGE = (code: string) =>
 const CHAT_MESSAGE = (userId: string) =>
   `Verification code successfully reset. A DM has been sent to <@${userId}>.`;
 
-class ResetGroupCode implements Command {
+class ResetGroupCodeCommand implements Command {
   slashCommand: SlashCommandBuilder;
 
   constructor() {
@@ -56,4 +56,4 @@ class ResetGroupCode implements Command {
   }
 }
 
-export default new ResetGroupCode();
+export default new ResetGroupCodeCommand();
