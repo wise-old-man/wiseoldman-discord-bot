@@ -47,7 +47,9 @@ From *September 1st* and forward this bot will **only** support slash commands.
 
 - Slash commands are integrated into Discord and we are **required** to use them.
 - Slash commands should be easier to use as you can use auto completion to quickly select options.
-- Try this command with \`/${parsed.command}\`.
+- Try this command with \`/${
+      ['womhelp', 'wom!help'].find(e => parsed.command === e) ? 'help' : parsed.command
+    }\`.
 
 You might need to update the bot's permissions. The easiest way to do this is to re-invite the bot. You can do that by either:
 
