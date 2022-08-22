@@ -29,17 +29,16 @@ export function getCountryOptions(currentValue: string): AutoCompleteOption[] {
 }
 
 export function getPeriodOptions(currentValue: string): AutoCompleteOption[] {
-  if (!currentValue) return [];
-  return PERIOD_OPTIONS.filter(p => matches(currentValue, p.name, p.value));
+  return PERIOD_OPTIONS.filter(p => (!currentValue ? true : matches(currentValue, p.name, p.value)));
 }
 
 export function getMetricOptions(currentValue: string): AutoCompleteOption[] {
-  if (!currentValue) return [];
-
-  return ALL_METRICS.filter(m => matches(currentValue, m.name, m.key)).map(m => ({
-    name: m.name,
-    value: m.key
-  }));
+  return ALL_METRICS.filter(m => (!currentValue ? true : matches(currentValue, m.name, m.key))).map(
+    m => ({
+      name: m.name,
+      value: m.key
+    })
+  );
 }
 
 export function getHelpCategoryOptions(currentValue: string): AutoCompleteOption[] {
