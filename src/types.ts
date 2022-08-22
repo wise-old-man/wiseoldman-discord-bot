@@ -61,6 +61,8 @@ export enum BroadcastType {
   MembersListChanged = 'MEMBERS_LIST_CHANGED'
 }
 
+// To find the ID of an emoji, type: \:emoji: in Discord chat
+// Ex: \:zulrah:
 export enum Emoji {
   // Skill emojis
   overall = '<:overall:720446212356177951>',
@@ -130,6 +132,8 @@ export enum Emoji {
   theatre_of_blood = '<:theatre_of_blood:729840085406711819>',
   theatre_of_blood_hard_mode = '<:theatre_of_blood_hard_mode:850017967164751933>',
   thermonuclear_smoke_devil = '<:thermonuclear_smoke_devil:729840085729673326>',
+  tombs_of_amascut = '<:tombs_of_amascut:1011399670125314108>',
+  tombs_of_amascut_expert = '<:tombs_of_amascut_expert:1011399690908078190>',
   tzkal_zuk = '<:tzkal_zuk:729840085373157497>',
   tztok_jad = '<:tztok_jad:729840085805170698>',
   venenatis = '<:venenatis:729840086795157595>',
