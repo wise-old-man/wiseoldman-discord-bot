@@ -32,7 +32,6 @@ class PlayerStatsCommand implements Command, Renderable {
         option
           .setName('variant')
           .setDescription('The variant to show stats for')
-          .setRequired(true)
           .addChoices([
             ['Levels', RenderVariant.Levels],
             ['Ranks', RenderVariant.Ranks],
@@ -51,7 +50,7 @@ class PlayerStatsCommand implements Command, Renderable {
     // Grab the username from the command's arguments or database alias
     const username = await this.getUsername(message);
 
-    const variant = message.options.getString('variant') as RenderVariant;
+    const variant = (message.options.getString('variant') as RenderVariant) || RenderVariant.Levels;
 
     if (!username) {
       throw new CommandError(

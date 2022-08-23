@@ -6,7 +6,8 @@ import {
   PlayerDeltasMap,
   getMetricName,
   formatNumber,
-  Metric
+  Metric,
+  Period
 } from '@wise-old-man/utils';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
@@ -28,7 +29,6 @@ class PlayerGainedCommand implements Command {
         option
           .setName('period')
           .setDescription('You can use custom periods with this format: 1y6d5h')
-          .setRequired(true)
           .setAutocomplete(true)
       )
       .addStringOption(option => option.setName('username').setDescription('In-game username'))
@@ -43,7 +43,7 @@ class PlayerGainedCommand implements Command {
     const username = await this.getUsername(message);
 
     // Grab the period from the command's arguments
-    const period = message.options.getString('period', true);
+    const period = message.options.getString('period') || Period.WEEK;
 
     const footer = `Tip: You can use custom periods with this format: /gained period: 2m6d7h`;
 

@@ -4,7 +4,8 @@ import {
   formatNumber,
   getMetricName,
   Metric,
-  parseMetricAbbreviation
+  parseMetricAbbreviation,
+  Period
 } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient from '../../../api/wom-api';
@@ -25,18 +26,13 @@ class GroupGainedCommand implements SubCommand {
 
     this.slashCommand = new SlashCommandSubcommandBuilder()
       .addStringOption(option =>
-        option
-          .setName('metric')
-          .setDescription('The category to show gains for')
-          .setAutocomplete(true)
-          .setRequired(true)
+        option.setName('metric').setDescription('The category to show gains for').setAutocomplete(true)
       )
       .addStringOption(option =>
         option
           .setName('period')
           .setDescription('You can use custom periods with this format: 1y6d5h')
           .setAutocomplete(true)
-          .setRequired(true)
       )
       .setName('gained')
       .setDescription("View the group's gains.");
@@ -48,8 +44,9 @@ class GroupGainedCommand implements SubCommand {
     const guildId = message.guild?.id;
     const server = await getServer(guildId); // maybe cache it so we don't have to do this
     const groupId = server?.groupId || -1;
-    const metric = parseMetricAbbreviation(message.options.getString('metric', true)) || Metric.OVERALL;
-    const period = message.options.getString('period', true);
+    const metric =
+      parseMetricAbbreviation(message.options.getString('metric') || 'overall') || Metric.OVERALL;
+    const period = message.options.getString('period') || Period.WEEK;
     try {
       const group = await womClient.groups.getGroupDetails(groupId);
       const gained = await womClient.groups.getGroupGains(groupId, { period, metric });

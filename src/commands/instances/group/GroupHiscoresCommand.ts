@@ -27,9 +27,8 @@ class GroupHiscoresCommand implements SubCommand {
       .addStringOption(option =>
         option
           .setName('metric')
-          .setDescription('The category to show hiscoes for')
+          .setDescription('The category to show hiscores for')
           .setAutocomplete(true)
-          .setRequired(true)
       )
       .setName('hiscores')
       .setDescription("View the group's hiscores.");
@@ -41,7 +40,8 @@ class GroupHiscoresCommand implements SubCommand {
     const guildId = message.guild?.id;
     const server = await getServer(guildId); // maybe cache it so we don't have to do this
     const groupId = server?.groupId || -1;
-    const metric = parseMetricAbbreviation(message.options.getString('metric', true)) || Metric.OVERALL;
+    const metric =
+      parseMetricAbbreviation(message.options.getString('metric') || 'overall') || Metric.OVERALL;
 
     try {
       const group = await womClient.groups.getGroupDetails(groupId);

@@ -28,18 +28,13 @@ class GroupRecordsCommand implements SubCommand {
 
     this.slashCommand = new SlashCommandSubcommandBuilder()
       .addStringOption(option =>
-        option
-          .setName('metric')
-          .setDescription('The category to show records for')
-          .setAutocomplete(true)
-          .setRequired(true)
+        option.setName('metric').setDescription('The category to show records for').setAutocomplete(true)
       )
       .addStringOption(option =>
         option
           .setName('period')
           .setDescription('The period to show records for')
           .addChoices(PERIODS.map(p => [PeriodProps[p].name, p]))
-          .setRequired(true)
       )
       .setName('records')
       .setDescription("View the group's records.");
@@ -51,8 +46,9 @@ class GroupRecordsCommand implements SubCommand {
     const guildId = message.guild?.id;
     const server = await getServer(guildId); // maybe cache it so we don't have to do this
     const groupId = server?.groupId || -1;
-    const metric = parseMetricAbbreviation(message.options.getString('metric', true)) || Metric.OVERALL;
-    const period = message.options.getString('period', true) as Period;
+    const metric =
+      parseMetricAbbreviation(message.options.getString('metric') || 'overall') || Metric.OVERALL;
+    const period = (message.options.getString('period') as Period) || Period.WEEK;
 
     try {
       const group = await womClient.groups.getGroupDetails(groupId);

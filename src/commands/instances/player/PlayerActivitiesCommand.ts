@@ -30,7 +30,6 @@ class PlayerActivitiesCommand implements Command, Renderable {
         option
           .setName('variant')
           .setDescription('The variant to show stats for')
-          .setRequired(true)
           .addChoices([
             ['Scores', RenderVariant.Scores],
             ['Ranks', RenderVariant.Ranks]
@@ -48,7 +47,7 @@ class PlayerActivitiesCommand implements Command, Renderable {
     const username = await this.getUsername(message);
 
     // Get the variant from subcommand
-    const variant = message.options.getString('variant', true) as RenderVariant;
+    const variant = (message.options.getString('variant') as RenderVariant) || RenderVariant.Scores;
 
     if (!username) {
       throw new CommandError(
