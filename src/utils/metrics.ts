@@ -163,11 +163,9 @@ export function getMetricName(metric: string): string {
     return 'Combat';
   }
 
-  const allMetricConfigs = [...SKILLS_MAP, ...ACTIVITIES_MAP, ...BOSSES_MAP, ...VIRTUALS_MAP];
-
-  for (let i = 0; i < allMetricConfigs.length; i += 1) {
-    if (allMetricConfigs[i].key === metric) {
-      return allMetricConfigs[i].name;
+  for (let i = 0; i < ALL_METRICS.length; i += 1) {
+    if (ALL_METRICS[i].key === getAbbreviation(metric)) {
+      return ALL_METRICS[i].name;
     }
   }
 
