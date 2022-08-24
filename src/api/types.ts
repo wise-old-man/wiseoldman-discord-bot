@@ -209,6 +209,8 @@ export interface Snapshot {
   theatre_of_blood: SnapshotBoss;
   theatre_of_blood_hard_mode: SnapshotBoss;
   thermonuclear_smoke_devil: SnapshotBoss;
+  tombs_of_amascut: SnapshotBoss;
+  tombs_of_amascut_expert: SnapshotBoss;
   tzkal_zuk: SnapshotBoss;
   tztok_jad: SnapshotBoss;
   venenatis: SnapshotBoss;
