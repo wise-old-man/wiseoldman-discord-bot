@@ -64,7 +64,7 @@ class NameChangeCommand implements Command {
             filter,
             componentType: 'BUTTON',
             max: 1,
-            time: 1000 * 15
+            time: 1000 * 300
           })
         : undefined;
 
