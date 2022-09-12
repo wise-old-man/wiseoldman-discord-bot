@@ -73,8 +73,6 @@ export async function onInteractionReceived(interaction: Interaction): Promise<v
     // TODO: Show a proper error when guild isn't configured yet
 
     try {
-      interaction.channel?.sendTyping();
-
       await c.execute(interaction);
     } catch (e) {
       // If a command error was thrown during execution, handle the response here.
