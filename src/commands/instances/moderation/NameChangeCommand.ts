@@ -1,5 +1,4 @@
 import {
-  ButtonInteraction,
   CommandInteraction,
   GuildMember,
   MessageActionRow,
@@ -7,7 +6,7 @@ import {
   MessageEmbed
 } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { approve, deny, reviewNameChange } from '../../../api/modules/names';
+import { reviewNameChange } from '../../../api/modules/names';
 import config from '../../../config';
 import { Command } from '../../../types';
 import { getEmoji, hasModeratorRole } from '../../../utils/discord';
@@ -41,54 +40,20 @@ class NameChangeCommand implements Command {
         .setDescription(this.buildReviewMessage(reviewData));
 
       const row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId('namechange_approve').setLabel('Approve').setStyle('SUCCESS'),
-        new MessageButton().setCustomId('namechange_deny').setLabel('Deny').setStyle('DANGER')
+        new MessageButton()
+          .setCustomId(`namechange_approve/${nameChangeId}`)
+          .setLabel('Approve')
+          .setStyle('SUCCESS'),
+        new MessageButton()
+          .setCustomId(`namechange_deny/${nameChangeId}`)
+          .setLabel('Deny')
+          .setStyle('DANGER'),
+        new MessageButton().setCustomId(`namechange_cancel`).setLabel('Cancel').setStyle('SECONDARY')
       );
 
       await message.editReply({
         embeds: [response],
         components: hasModeratorRole(message.member as GuildMember) ? [row] : []
-      });
-
-      const filter = async (buttonInteraction: ButtonInteraction) => {
-        if (message.user.id !== buttonInteraction.user.id) {
-          await buttonInteraction.reply({ content: 'These buttons are not for you!', ephemeral: true });
-          return false;
-        }
-        return true;
-      };
-
-      // Only create collector if moderator to not get the ugly (edited) tag on message
-      const collector = hasModeratorRole(message.member as GuildMember)
-        ? message.channel?.createMessageComponentCollector({
-            filter,
-            componentType: 'BUTTON',
-            max: 1,
-            time: 1000 * 300
-          })
-        : undefined;
-
-      collector?.on('end', async collection => {
-        const buttonClicked = collection.first()?.customId;
-        if (buttonClicked === 'namechange_approve') {
-          try {
-            await approve(nameChangeId);
-            response
-              .setFooter({ text: `Approved ${getEmoji('success')}` })
-              .setColor(config.visuals.green);
-          } catch (error) {
-            response.setFooter({ text: 'Failed to approve name change' }).setColor(config.visuals.red);
-          }
-        } else if (buttonClicked === 'namechange_deny') {
-          try {
-            await deny(nameChangeId);
-            response.setFooter({ text: `Denied ${getEmoji('error')}` }).setColor(config.visuals.red);
-          } catch (error) {
-            response.setFooter({ text: 'Failed to deny name change' }).setColor(config.visuals.red);
-          }
-        }
-
-        await message.editReply({ embeds: [response], components: [] });
       });
     } catch (error) {
       if (error instanceof CommandError) throw error;

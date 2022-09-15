@@ -1,6 +1,6 @@
 import { Interaction, MessageEmbed, GuildMember, CommandInteraction } from 'discord.js';
 import config from '../config';
-import { isAdmin } from '../utils';
+import { getEmoji, isAdmin } from '../utils';
 import CommandError from './CommandError';
 import commands from './instances';
 import { SubCommand } from '../types';
@@ -10,6 +10,7 @@ import {
   getMetricOptions,
   getHelpCategoryOptions
 } from '../utils/autocomplete';
+import { approve, deny } from '../api/modules/names';
 
 export function onError(options: { interaction: Interaction; title: string; tip?: string }): void {
   const response = new MessageEmbed().setColor(config.visuals.red).setDescription(options.title);
@@ -50,6 +51,37 @@ export async function onInteractionReceived(interaction: Interaction): Promise<v
       // for custom commands
       interaction.respond(getHelpCategoryOptions(currentValue));
     }
+  }
+
+  if (interaction.isButton() && interaction.inCachedGuild()) {
+    const [actionName, ...values] = interaction.customId.split('/');
+
+    // Prevents from interfering with paginated message buttons
+    if (!actionName.includes('namechange')) return;
+
+    const message = interaction.message;
+    const embed = new MessageEmbed(message.embeds[0]).setColor(config.visuals.red);
+    let decision = 'Canceled';
+    if (actionName === 'namechange_approve') {
+      try {
+        await approve(parseInt(values[0]));
+        embed.setFooter({ text: `Approved ${getEmoji('success')}` }).setColor(config.visuals.green);
+        decision = 'Approved';
+      } catch (error) {
+        embed.setFooter({ text: `${getEmoji('warning')} Failed to approve name change` });
+        decision = 'Unsuccessful';
+      }
+    } else if (actionName === 'namechange_deny') {
+      try {
+        await deny(parseInt(values[0]));
+        embed.setFooter({ text: `Denied ${getEmoji('error')}` });
+        decision = 'Denied';
+      } catch (error) {
+        embed.setFooter({ text: `${getEmoji('warning')} Failed to deny name change` });
+      }
+    }
+    message.edit({ embeds: [embed], components: [] });
+    await interaction.reply({ ephemeral: true, content: `The name change was **${decision}**` });
   }
 
   if (!interaction.isCommand()) {
