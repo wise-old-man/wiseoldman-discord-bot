@@ -30,7 +30,7 @@ class GroupRecordsCommand implements SubCommand {
           .setName('period')
           .setDescription('The period to show records for')
           .addChoices([
-            ['5 Min', '5min'],
+            ['5 Min', 'five_min'],
             ['Day', 'day'],
             ['Week', 'week'],
             ['Month', 'month'],

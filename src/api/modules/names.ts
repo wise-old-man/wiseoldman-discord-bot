@@ -23,15 +23,8 @@ export async function reviewNameChange(id: number): Promise<any> {
   const URL = `/names/${id}`;
   const { data } = await api.get(URL);
 
-  const {
-    isNewOnHiscores,
-    hasNegativeGains,
-    hoursDiff,
-    ehpDiff,
-    ehbDiff,
-    oldStats,
-    newStats
-  } = data.data;
+  const { isNewOnHiscores, hasNegativeGains, hoursDiff, ehpDiff, ehbDiff, oldStats, newStats } =
+    data.data;
 
   const expDiff = newStats && oldStats ? newStats.overall.experience - oldStats.overall.experience : 0;
 

@@ -5,6 +5,7 @@ import config from '../../../config';
 import { Command } from '../../../types';
 import { countryCodeEmoji, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
+import { COUNTRIES } from '../../../utils/countries';
 
 class PlayerSetFlagCommand implements Command {
   slashCommand: SlashCommandBuilder;
@@ -43,8 +44,11 @@ class PlayerSetFlagCommand implements Command {
     }
 
     try {
-      const result = await updateCountry(username, countryCode);
-      response.message = result.message;
+      await updateCountry(username, countryCode);
+
+      response.message = `${message.user} changed \`${username}\`'s country to ${
+        COUNTRIES.find(c => c.code === countryCode)?.name
+      }`;
       response.isError = false;
     } catch (e: any) {
       // The API's error message references country name, and this command
@@ -60,20 +64,14 @@ class PlayerSetFlagCommand implements Command {
           ? `${getEmoji('error')} Failed to update flag`
           : `${countryCodeEmoji(countryCode)} Player flag updated!`
       )
-      .setDescription(
-        !response.isError
-          ? `${message.user.toString()} changed \`${username}\`'s country to ${
-              response.message.match('\\: (.*?) \\(.{2}\\)')?.[1]
-            }`
-          : response.message
-      )
+      .setDescription(response.message)
       .addFields([
         { name: 'Username', value: username },
         { name: 'Country Code:', value: countryCode }
       ]);
 
     if (response.isError) {
-      embed.setFooter({ text: 'The correct command format is: !setflag {username} {country_code}' });
+      embed.setFooter({ text: 'The correct command format is: /setflag {username} {country_code}' });
     }
 
     await message.editReply({ embeds: [embed] });

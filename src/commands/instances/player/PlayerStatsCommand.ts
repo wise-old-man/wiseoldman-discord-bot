@@ -1,15 +1,13 @@
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { fetchPlayer } from '../../../api/modules/players';
-import { toResults } from '../../../api/modules/snapshots';
-import { MetricType, Player, SkillResult } from '../../../api/types';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
 import { encodeURL, round, SKILLS, toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
+import womClient from '../../../api/wom-api';
 
 const RENDER_WIDTH = 215;
 const RENDER_HEIGHT = 260;
@@ -61,9 +59,12 @@ class PlayerStatsCommand implements Command, Renderable {
     }
 
     try {
-      const player = await fetchPlayer(username);
-
-      const { attachment, fileName } = await this.render({ player, variant });
+      const player = await womClient.players.getPlayerDetails({ username });
+      const { attachment, fileName } = await this.render({
+        skills: player.latestSnapshot.data.skills,
+        username: player.username,
+        variant
+      });
 
       const embed = new MessageEmbed()
         .setColor(config.visuals.blue)
@@ -82,16 +83,12 @@ class PlayerStatsCommand implements Command, Renderable {
     }
   }
 
-  async render(props: { player: Player; variant: RenderVariant }): Promise<CanvasAttachment> {
-    const { player, variant } = props;
-
-    // Convert the snapshot into skill results
-    // Sort them by the skill's name (to match the ingame stats interface)
-    const skillResults = <SkillResult[]>(
-      toResults(player.latestSnapshot, MetricType.Skill).sort(
-        (a, b) => SKILLS.indexOf(a.name) - SKILLS.indexOf(b.name)
-      )
-    );
+  async render(props: {
+    skills: any;
+    username: string;
+    variant: RenderVariant;
+  }): Promise<CanvasAttachment> {
+    const { skills, username, variant } = props;
 
     // Create a scaled empty canvas
     const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
@@ -104,14 +101,16 @@ class PlayerStatsCommand implements Command, Renderable {
     ctx.fillRect(0, 0, width, height);
 
     // Player stats
-    for (const [index, result] of skillResults.entries()) {
+    for (const [index, skill] of Object.keys(skills)
+      .sort((a, b) => SKILLS.indexOf(a) - SKILLS.indexOf(b))
+      .entries()) {
       const x = Math.floor(index / 8);
       const y = index % 8;
 
       const originX = RENDER_PADDING - 7 + x * 67;
       const originY = RENDER_PADDING - 5 + y * 31;
 
-      const icon = await Canvas.loadImage(`./public/x2/${result.name}.png`);
+      const icon = await Canvas.loadImage(`./public/x2/${skill}.png`);
 
       // Badge background and skill icon
       ctx.drawImage(badge, originX, originY, 64, 26);
@@ -122,16 +121,16 @@ class PlayerStatsCommand implements Command, Renderable {
       if (variant === RenderVariant.Levels) {
         ctx.font = '11px sans-serif';
 
-        const level = `${result.level || 1}`;
+        const level = `${skills[skill].level || 1}`;
         const lvlWidth = ctx.measureText(level).width;
 
         // Skill level
         ctx.fillText(level, originX + 42 - lvlWidth / 2, originY + 17);
       } else if (variant === RenderVariant.Experience) {
-        const fontSize = result.name === 'overall' ? 9 : 10;
+        const fontSize = skill === 'overall' ? 9 : 10;
         ctx.font = `${fontSize}px sans-serif`;
 
-        const exp = `${toKMB(result.experience, 1) || 0}`;
+        const exp = `${toKMB(skills[skill].experience, 1) || 0}`;
         const expWidth = ctx.measureText(exp).width;
 
         // Skill Experience
@@ -139,7 +138,7 @@ class PlayerStatsCommand implements Command, Renderable {
       } else if (variant === RenderVariant.Ranks) {
         ctx.font = '10px sans-serif';
 
-        const rank = `${toKMB(result.rank, 1) || 0}`;
+        const rank = `${toKMB(skills[skill].rank, 1) || 0}`;
         const rankWidth = ctx.measureText(rank).width;
 
         // Skill Rank
@@ -147,7 +146,7 @@ class PlayerStatsCommand implements Command, Renderable {
       } else if (variant === RenderVariant.EHP) {
         ctx.font = '9px sans-serif';
 
-        const ehp = `${round(result.ehp || 0, 1)}`;
+        const ehp = `${round(skills[skill].ehp || 0, 1)}`;
         const ehpWidth = ctx.measureText(ehp).width;
 
         // Skill EHP
@@ -155,7 +154,7 @@ class PlayerStatsCommand implements Command, Renderable {
       }
     }
 
-    const fileName = `${Date.now()}-${player.username.replace(/ /g, '_')}-${variant}.jpeg`;
+    const fileName = `${Date.now()}-${username.replace(/ /g, '_')}-${variant}.jpeg`;
     const attachment = new MessageAttachment(canvas.toBuffer(), fileName);
 
     return { attachment, fileName };

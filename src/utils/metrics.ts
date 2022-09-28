@@ -1,5 +1,3 @@
-import { MetricType } from '../api/types';
-
 const SKILLS_MAP = [
   { key: 'attack', name: 'Attack' },
   { key: 'strength', name: 'Strength' },
@@ -122,26 +120,6 @@ export function isBoss(metric: string): boolean {
 
 export function isVirtual(metric: string): boolean {
   return VIRTUALS.includes(metric);
-}
-
-export function getType(metric: string): MetricType | null {
-  if (isSkill(metric)) {
-    return MetricType.Skill;
-  }
-
-  if (isActivity(metric)) {
-    return MetricType.Activity;
-  }
-
-  if (isBoss(metric)) {
-    return MetricType.Boss;
-  }
-
-  if (isVirtual(metric)) {
-    return MetricType.Virtual;
-  }
-
-  return null;
 }
 
 export function getMeasure(metric: string): string {

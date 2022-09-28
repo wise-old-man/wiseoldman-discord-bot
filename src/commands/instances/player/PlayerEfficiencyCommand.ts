@@ -1,11 +1,11 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { fetchPlayer } from '../../../api/modules/players';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { Command } from '../../../types';
 import { encodeURL, round, toKMB } from '../../../utils';
 import CommandError from '../../CommandError';
+import womClient from '../../../api/wom-api';
 
 class PlayerEfficiencyCommand implements Command {
   global: boolean;
@@ -32,7 +32,7 @@ class PlayerEfficiencyCommand implements Command {
     }
 
     try {
-      const player = await fetchPlayer(username);
+      const player = await womClient.players.getPlayerDetails({ username });
 
       if (player.ehp === 0 && player.tt200m === 0) {
         throw new CommandError(`This player is outdated. Please try "/update ${username}" first.`);

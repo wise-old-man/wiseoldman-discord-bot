@@ -3,7 +3,7 @@ import { COUNTRIES } from './countries';
 import { ALL_METRICS } from './metrics';
 
 const PERIOD_OPTIONS = [
-  { name: '5 Min', value: '5min' },
+  { name: '5 Min', value: 'five_min' },
   { name: 'Day', value: 'day' },
   { name: 'Week', value: 'week' },
   { name: 'Month', value: 'month' },

@@ -105,39 +105,6 @@ export interface GroupRecordEntry {
   updatedAt: Date;
 }
 
-export enum MetricType {
-  Skill = 'Skill',
-  Boss = 'Boss',
-  Activity = 'Activity',
-  Virtual = 'Virtual'
-}
-
-export interface SkillResult {
-  name: string;
-  type: MetricType;
-  rank: number;
-  experience: number;
-  ehp: number;
-  level?: number;
-}
-
-export interface BossResult {
-  name: string;
-  type: MetricType;
-  rank: number;
-  kills: number;
-  ehb: number;
-}
-
-export interface ActivityResult {
-  name: string;
-  type: MetricType;
-  rank: number;
-  score: number;
-}
-
-export type MetricResult = SkillResult | BossResult | ActivityResult;
-
 export interface Snapshot {
   createdAt: string;
   importedAt: string;
@@ -260,52 +227,6 @@ export interface SnapshotActivity {
 export interface VirtualActivity {
   rank: number;
   value: number;
-}
-
-export interface PlayerGains {
-  period: string;
-  startsAt: Date | null;
-  endsAt: Date | null;
-  data: {
-    [key: string]: {
-      rank: {
-        start: number;
-        end: number;
-        gained: number;
-      };
-      // Defined in skill gains
-      experience?: {
-        start: number;
-        end: number;
-        gained: number;
-      };
-      // Defined in boss gains
-      kills?: {
-        start: number;
-        end: number;
-        gained: number;
-      };
-      // Defined in activity gains
-      score?: {
-        start: number;
-        end: number;
-        gained: number;
-      };
-      // Defined in virtual gains
-      value?: {
-        start: number;
-        end: number;
-        gained: number;
-      };
-    };
-  };
-}
-
-export interface PlayerRecord {
-  value: number;
-  period: string;
-  metric: string;
-  updatedAt: Date;
 }
 
 export interface PlayerAchievement {

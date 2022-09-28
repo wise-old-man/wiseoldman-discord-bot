@@ -1,15 +1,13 @@
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { fetchPlayer } from '../../../api/modules/players';
-import { toResults } from '../../../api/modules/snapshots';
-import { ActivityResult, MetricType, Player } from '../../../api/types';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
 import { ACTIVITIES, encodeURL, toKMB } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
+import womClient from '../../../api/wom-api';
 
 const RENDER_WIDTH = 357;
 const RENDER_HEIGHT = 100;
@@ -58,9 +56,13 @@ class PlayerActivitiesCommand implements Command, Renderable {
     }
 
     try {
-      const player = await fetchPlayer(username);
+      const player = await womClient.players.getPlayerDetails({ username });
 
-      const { attachment, fileName } = await this.render({ player, variant });
+      const { attachment, fileName } = await this.render({
+        activities: player.latestSnapshot.data.activities,
+        username: player.username,
+        variant
+      });
 
       const embed = new MessageEmbed()
         .setColor(config.visuals.blue)
@@ -79,15 +81,12 @@ class PlayerActivitiesCommand implements Command, Renderable {
     }
   }
 
-  async render(props: { player: Player; variant: RenderVariant }): Promise<CanvasAttachment> {
-    const { player, variant } = props;
-
-    // Convert the snapshot into activity results
-    const activityResults = <ActivityResult[]>(
-      toResults(player.latestSnapshot, MetricType.Activity).sort(
-        (a, b) => ACTIVITIES.indexOf(a.name) - ACTIVITIES.indexOf(b.name)
-      )
-    );
+  async render(props: {
+    activities: any;
+    username: string;
+    variant: RenderVariant;
+  }): Promise<CanvasAttachment> {
+    const { activities, username, variant } = props;
 
     // Create a scaled empty canvas
     const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
@@ -99,26 +98,34 @@ class PlayerActivitiesCommand implements Command, Renderable {
     ctx.fillStyle = '#1d1d1d';
     ctx.fillRect(0, 0, width, height);
 
-    // Player stats
-    for (const [index, result] of activityResults.entries()) {
+    // Player activities
+    for (const [index, activity] of Object.keys(activities)
+      .sort((a, b) => ACTIVITIES.indexOf(a) - ACTIVITIES.indexOf(b))
+      .entries()) {
       const x = Math.floor(index / 3);
       const y = index % 3;
 
       const originX = RENDER_PADDING - 7 + x * 69;
       const originY = RENDER_PADDING - 8 + y * 31;
 
-      const icon = await Canvas.loadImage(`./public/x2/${result.name}.png`);
+      const icon = await Canvas.loadImage(`./public/x2/${activity}.png`);
 
       // Badge background and activity icon
       ctx.drawImage(badge, originX, originY, 64, 26);
       ctx.drawImage(icon, originX, originY, icon.width / 2, icon.height / 2);
 
-      const isRanked = result.score && result.score > -1;
+      const isRanked = activities[activity].score && activities[activity].score > -1;
 
       if (variant === RenderVariant.Scores) {
         ctx.font = '11px Arial';
 
-        const score = `${isRanked ? (result.score >= 10000 ? toKMB(result.score) : result.score) : '?'}`;
+        const score = `${
+          isRanked
+            ? activities[activity].score >= 10000
+              ? toKMB(activities[activity].score)
+              : activities[activity].score
+            : '?'
+        }`;
         const scoreWidth = ctx.measureText(score).width;
 
         // Activity score
@@ -127,7 +134,7 @@ class PlayerActivitiesCommand implements Command, Renderable {
       } else if (variant === RenderVariant.Ranks) {
         ctx.font = '10px Arial';
 
-        const rank = `${isRanked ? toKMB(result.rank, 1) : '?'}`;
+        const rank = `${isRanked ? toKMB(activities[activity].rank, 1) : '?'}`;
         const rankWidth = ctx.measureText(rank).width;
 
         // Activity rank
@@ -136,7 +143,7 @@ class PlayerActivitiesCommand implements Command, Renderable {
       }
     }
 
-    const fileName = `${Date.now()}-${player.username.replace(/ /g, '_')}-${variant}.jpeg`;
+    const fileName = `${Date.now()}-${username.replace(/ /g, '_')}-${variant}.jpeg`;
     const attachment = new MessageAttachment(canvas.toBuffer(), fileName);
 
     return { attachment, fileName };
