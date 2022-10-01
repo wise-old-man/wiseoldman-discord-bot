@@ -1,7 +1,7 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { fetchGroupDetails, fetchGroupHiscores } from '../../../api/modules/groups';
 import { GroupHiscoresEntry } from '../../../api/types';
+import womClient from '../../../api/wom-api';
 import config from '../../../config';
 import { getServer } from '../../../database/services/server';
 import { SubCommand } from '../../../types';
@@ -38,8 +38,8 @@ class GroupHiscoresCommand implements SubCommand {
     const metric = message.options.getString('metric', true);
 
     try {
-      const group = await fetchGroupDetails(groupId);
-      const hiscores = await fetchGroupHiscores(groupId, metric);
+      const group = await womClient.groups.getGroupDetails(groupId);
+      const hiscores: GroupHiscoresEntry[] = await womClient.groups.getGroupHiscores(groupId, metric);
 
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
@@ -66,18 +66,18 @@ class GroupHiscoresCommand implements SubCommand {
 
   getValue(metric: string, result: GroupHiscoresEntry): string {
     if (isSkill(metric)) {
-      return `${result.level} (${toKMB(result.experience || 0)})`;
+      return `${result.data.level} (${toKMB(result.data.experience || 0)})`;
     }
 
     if (isBoss(metric)) {
-      return `${toKMB(result.kills || 0)}`;
+      return `${toKMB(result.data.kills || 0)}`;
     }
 
     if (isActivity(metric)) {
-      return `${toKMB(result.score || 0)}`;
+      return `${toKMB(result.data.score || 0)}`;
     }
 
-    return `${result.value || 0}`;
+    return `${result.data.value || 0}`;
   }
 }
 

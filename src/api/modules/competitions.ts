@@ -1,9 +1,8 @@
+import { CompetitionDetails, CompetitionListItem } from '@wise-old-man/utils';
 import { durationBetween } from '../../utils';
 import api from '../handler';
-import { Competition } from '../types';
-import { convertDates } from '../utils';
 
-export function getCompetitionStatus(competition: Competition): string {
+export function getCompetitionStatus(competition: CompetitionDetails | CompetitionListItem): string {
   const now = new Date();
   const endsAt = competition.endsAt;
   const startsAt = competition.startsAt;
@@ -19,7 +18,7 @@ export function getCompetitionStatus(competition: Competition): string {
   return 'upcoming';
 }
 
-export function getCompetitionTimeLeft(competition: Competition): string {
+export function getCompetitionTimeLeft(competition: CompetitionDetails | CompetitionListItem): string {
   const now = new Date();
   const endsAt = competition.endsAt;
   const startsAt = competition.startsAt;
@@ -35,19 +34,6 @@ export function getCompetitionTimeLeft(competition: Competition): string {
 
   const timeLeft = durationBetween(now, startsAt, 2);
   return `Starting in ${timeLeft}`;
-}
-
-/**
- * Fetch competition details from the API.
- */
-export async function fetchCompetition(id: number): Promise<Competition> {
-  const URL = `/competitions/${id}`;
-  const { data } = await api.get(URL);
-
-  // Convert date strings into date instances
-  convertDates(data, ['createdAt', 'updatedAt', 'startsAt', 'endsAt']);
-
-  return data;
 }
 
 /**

@@ -1,13 +1,13 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed, Constants } from 'discord.js';
-import { fetchGroupDetails, fetchGroupMembers } from '../../../api/modules/groups';
-import { Player } from '../../../api/types';
 import config from '../../../config';
 import { SubCommand } from '../../../types';
 import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import { getServer } from '../../../database/services/server';
+import womClient from '../../../api/wom-api';
+import { MembershipWithPlayer } from '@wise-old-man/utils';
 
 const RESULTS_PER_PAGE = 20;
 
@@ -26,13 +26,14 @@ class GroupMembersCommand implements SubCommand {
   }
 
   async execute(message: CommandInteraction) {
+    await message.deferReply();
     const guildId = message.guild?.id;
     const server = await getServer(guildId); // maybe cache it so we don't have to do this
     const groupId = server?.groupId || -1;
 
     try {
-      const group = await fetchGroupDetails(groupId);
-      const members = await fetchGroupMembers(groupId);
+      const group = await womClient.groups.getGroupDetails(groupId);
+      const members = await womClient.groups.getGroupMembers(groupId);
 
       // Restrict to 25 pages because that's the limit on a paginated message
       const pageCount = Math.min(25, Math.ceil(members.length / RESULTS_PER_PAGE));
@@ -84,12 +85,12 @@ class GroupMembersCommand implements SubCommand {
     }
   }
 
-  buildList(members: Player[], page: number) {
+  buildList(members: MembershipWithPlayer[], page: number) {
     return members
       .slice(page * RESULTS_PER_PAGE, page * RESULTS_PER_PAGE + RESULTS_PER_PAGE)
       .map(
         (g, i) =>
-          `${page * RESULTS_PER_PAGE + i + 1}. **${g.displayName}** ${
+          `${page * RESULTS_PER_PAGE + i + 1}. **${g.player.displayName}** ${
             g.role === 'leader' ? getEmoji('crown') : ''
           } `
       )

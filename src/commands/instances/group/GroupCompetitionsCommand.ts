@@ -2,13 +2,13 @@ import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { capitalize } from 'lodash';
 import { getCompetitionStatus, getCompetitionTimeLeft } from '../../../api/modules/competitions';
-import { fetchGroupCompetitions, fetchGroupDetails } from '../../../api/modules/groups';
-import { Competition } from '../../../api/types';
 import config from '../../../config';
 import { SubCommand } from '../../../types';
 import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 import { getServer } from '../../../database/services/server';
+import womClient from '../../../api/wom-api';
+import { CompetitionListItem } from '@wise-old-man/utils';
 
 const MAX_COMPETITIONS = 5;
 
@@ -35,8 +35,9 @@ class GroupCompetitionsCommand implements SubCommand {
     const groupId = server?.groupId || -1;
 
     try {
-      const group = await fetchGroupDetails(groupId);
-      const competitions = await fetchGroupCompetitions(groupId);
+      const group = await womClient.groups.getGroupDetails(groupId);
+      const competitions = await womClient.groups.getGroupCompetitions(groupId);
+
       const fields = this.buildCompetitionsList(competitions);
       const pageURL = `https://wiseoldman.net/groups/${groupId}/competitions`;
 
@@ -56,7 +57,7 @@ class GroupCompetitionsCommand implements SubCommand {
     }
   }
 
-  buildCompetitionsList(competitions: Competition[]) {
+  buildCompetitionsList(competitions: CompetitionListItem[]) {
     return competitions
       .map(c => ({ ...c, status: getCompetitionStatus(c) }))
       .sort(

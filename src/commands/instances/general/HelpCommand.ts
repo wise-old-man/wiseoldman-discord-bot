@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { fetchGroupDetails } from '../../../api/modules/groups';
+import womClient from '../../../api/wom-api';
 import config from '../../../config';
 import { getChannelPreferences } from '../../../database/services/channelPreferences';
 import { getServer } from '../../../database/services/server';
@@ -51,7 +51,7 @@ class HelpCommand implements Command {
           }
         });
       } else {
-        const group = groupId && groupId > -1 ? await fetchGroupDetails(groupId) : null;
+        const group = groupId && groupId > -1 ? await womClient.groups.getGroupDetails(groupId) : null;
         const channelPreferences = await getChannelPreferences(guildId);
 
         const fields = [

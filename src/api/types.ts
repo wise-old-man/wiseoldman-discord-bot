@@ -4,11 +4,14 @@ export interface Player {
   displayName: string;
   type: string;
   build: string;
-  combatLevel: number;
+  country: string | null;
+  flagged: boolean;
+  combatLevel?: number;
   registeredAt: Date;
-  updatedAt: Date;
-  lastImportedAt?: Date;
-  latestSnapshot: Snapshot;
+  updatedAt: Date | null;
+  lastImportedAt?: Date | null;
+  lastChangedAt: Date | null;
+  latestSnapshot?: Snapshot;
   ttm: number;
   tt200m: number;
   ehp: number;
@@ -19,31 +22,15 @@ export interface Player {
   role?: string;
 }
 
-export interface Competition {
-  id: number;
-  title: string;
-  metric: string;
-  type: string;
-  score: number;
-  startsAt: Date;
-  endsAt: Date;
-  createdAt: Date;
-  updatedAt: Date;
-  duration?: string;
-  groupId?: number;
-  participantCount?: number;
-  totalGained?: number;
-  participants: Participant[];
-}
-
-export interface Participant {
-  id: number;
-  displayName: string;
-  teamName: string | null;
-  progress: {
-    start: number;
-    end: number;
-    gained: number;
+export interface GroupHiscoresEntry {
+  player: Player;
+  data: {
+    rank: number;
+    experience?: number;
+    level?: number;
+    kills?: number;
+    score?: number;
+    value?: number;
   };
 }
 
@@ -66,42 +53,6 @@ export interface NameChange {
   status: number;
   resolvedAt: Date;
   createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface GroupHiscoresEntry {
-  player: {
-    id: number;
-    username: string;
-    displayName: string;
-    type: string;
-    lastImportedAt?: Date;
-    registeredAt: Date;
-    updatedAt: Date;
-  };
-  rank: number;
-  experience?: number;
-  kills?: number;
-  score?: number;
-  level?: number;
-  value?: number;
-}
-
-export interface GroupGainedEntry {
-  startDate: Date;
-  endDate: Date;
-  gained: number;
-  player: Player;
-}
-
-export interface GroupRecordEntry {
-  player: {
-    username: string;
-    displayName: string;
-    type: string;
-  };
-  playerId: number;
-  value: number;
   updatedAt: Date;
 }
 

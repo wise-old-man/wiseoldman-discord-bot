@@ -1,7 +1,7 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
+import { DeltaLeaderboardEntry } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { fetchGroupDetails, fetchGroupGained } from '../../../api/modules/groups';
-import { GroupGainedEntry } from '../../../api/types';
+import womClient from '../../../api/wom-api';
 import config from '../../../config';
 import { getServer } from '../../../database/services/server';
 import { SubCommand } from '../../../types';
@@ -46,8 +46,8 @@ class GroupGainedCommand implements SubCommand {
     const period = message.options.getString('period', true);
 
     try {
-      const group = await fetchGroupDetails(groupId);
-      const gained = await fetchGroupGained(groupId, period, metric);
+      const group = await womClient.groups.getGroupDetails(groupId);
+      const gained = await womClient.groups.getGroupGains(groupId, { period, metric });
 
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
@@ -66,7 +66,7 @@ class GroupGainedCommand implements SubCommand {
     }
   }
 
-  buildList(gained: GroupGainedEntry[]) {
+  buildList(gained: DeltaLeaderboardEntry[]) {
     return gained.map((g, i) => `${i + 1}. **${g.player.displayName}** - ${toKMB(g.gained)}`).join('\n');
   }
 }

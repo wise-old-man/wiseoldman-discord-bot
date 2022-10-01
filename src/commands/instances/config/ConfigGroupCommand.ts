@@ -1,6 +1,6 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { fetchGroupDetails } from '../../../api/modules/groups';
+import womClient from '../../../api/wom-api';
 import config from '../../../config';
 import { updateGroup } from '../../../database/services/server';
 import { Command } from '../../../types';
@@ -30,7 +30,7 @@ class ConfigGroupCommand implements Command {
     try {
       await message.deferReply();
 
-      const group = await fetchGroupDetails(groupId);
+      const group = await womClient.groups.getGroupDetails(groupId);
 
       const guildId = message.guild?.id || '';
       await updateGroup(guildId, groupId);
