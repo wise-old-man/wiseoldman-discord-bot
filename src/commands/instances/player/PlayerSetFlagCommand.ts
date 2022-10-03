@@ -5,7 +5,7 @@ import config from '../../../config';
 import { Command } from '../../../types';
 import { countryCodeEmoji, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
-import { COUNTRIES } from '../../../utils/countries';
+import { CountryProps } from '@wise-old-man/utils';
 
 class PlayerSetFlagCommand implements Command {
   slashCommand: SlashCommandBuilder;
@@ -47,7 +47,9 @@ class PlayerSetFlagCommand implements Command {
       await updateCountry(username, countryCode);
 
       response.message = `${message.user} changed \`${username}\`'s country to ${
-        COUNTRIES.find(c => c.code === countryCode)?.name
+        Object.entries(CountryProps)
+          .map(value => value[1])
+          .find(c => c.code === countryCode)?.name
       }`;
       response.isError = false;
     } catch (e: any) {

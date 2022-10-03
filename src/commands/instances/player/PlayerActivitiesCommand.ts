@@ -4,10 +4,11 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
-import { ACTIVITIES, encodeURL, toKMB } from '../../../utils';
+import { encodeURL } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 import womClient from '../../../api/wom-api';
+import { ACTIVITIES, formatNumber } from '@wise-old-man/utils';
 
 const RENDER_WIDTH = 357;
 const RENDER_HEIGHT = 100;
@@ -122,7 +123,7 @@ class PlayerActivitiesCommand implements Command, Renderable {
         const score = `${
           isRanked
             ? activities[activity].score >= 10000
-              ? toKMB(activities[activity].score)
+              ? formatNumber(activities[activity].score, true)
               : activities[activity].score
             : '?'
         }`;
@@ -134,7 +135,7 @@ class PlayerActivitiesCommand implements Command, Renderable {
       } else if (variant === RenderVariant.Ranks) {
         ctx.font = '10px Arial';
 
-        const rank = `${isRanked ? toKMB(activities[activity].rank, 1) : '?'}`;
+        const rank = `${isRanked ? formatNumber(activities[activity].rank, true) : '?'}`; // TODO: decimalPrecision = 1
         const rankWidth = ctx.measureText(rank).width;
 
         // Activity rank

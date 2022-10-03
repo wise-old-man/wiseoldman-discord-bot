@@ -33,10 +33,9 @@ class GroupMembersCommand implements SubCommand {
 
     try {
       const group = await womClient.groups.getGroupDetails(groupId);
-      const members = await womClient.groups.getGroupMembers(groupId);
 
       // Restrict to 25 pages because that's the limit on a paginated message
-      const pageCount = Math.min(25, Math.ceil(members.length / RESULTS_PER_PAGE));
+      const pageCount = Math.min(25, Math.ceil(group.memberships.length / RESULTS_PER_PAGE));
 
       const paginatedMessage = new PaginatedMessage({
         pageIndexPrefix: 'Page',
@@ -67,11 +66,13 @@ class GroupMembersCommand implements SubCommand {
           .setColor(config.visuals.blue)
           .setTitle(`${group.name} members list`)
           .setURL(`https://wiseoldman.net/groups/${groupId}/members/`)
-          .setFooter({ text: members.length > 500 ? 'Click the title to view full list' : '' })
+          .setFooter({ text: group.memberships.length > 500 ? 'Click the title to view full list' : '' })
       });
 
       for (let i = 0; i < pageCount; i++) {
-        paginatedMessage.addPageEmbed(new MessageEmbed().setDescription(this.buildList(members, i)));
+        paginatedMessage.addPageEmbed(
+          new MessageEmbed().setDescription(this.buildList(group.memberships, i))
+        );
       }
 
       paginatedMessage.idle = 120000;

@@ -1,5 +1,10 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
-import { CompetitionDetails, CompetitionListItem } from '@wise-old-man/utils';
+import {
+  CompetitionDetails,
+  CompetitionListItem,
+  formatNumber,
+  getMetricName
+} from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { capitalize, uniq } from 'lodash';
 import { getCompetitionStatus, getCompetitionTimeLeft } from '../../../api/modules/competitions';
@@ -7,7 +12,7 @@ import womClient from '../../../api/wom-api';
 import config from '../../../config';
 import { getServer } from '../../../database/services/server';
 import { SubCommand } from '../../../types';
-import { getEmoji, getMetricName, toKMB } from '../../../utils';
+import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class GroupCompetitionCommand implements SubCommand {
@@ -108,19 +113,23 @@ class GroupCompetitionCommand implements SubCommand {
       const teamStandings = this.getTeamData(competition);
 
       lines.push(
-        `**Total gained:** ${toKMB(teamStandings.reduce((a, b) => a + b.totalGained, 0) || 0)}\n`
+        `**Total gained:** ${formatNumber(
+          teamStandings.reduce((a, b) => a + b.totalGained, 0) || 0,
+          true
+        )}\n`
       );
       lines.push('**Teams:**');
 
       lines.push(
         ...teamStandings
           .sort((a, b) => b.totalGained - a.totalGained)
-          .map(t => `${t.name} - **${toKMB(t.totalGained)}**`)
+          .map(t => `${t.name} - **${formatNumber(t.totalGained, true)}**`)
       );
     } else {
       lines.push(
-        `**Total gained:** ${toKMB(
-          competition.participations.reduce((a, b) => a + b.progress.gained, 0) || 0
+        `**Total gained:** ${formatNumber(
+          competition.participations.reduce((a, b) => a + b.progress.gained, 0) || 0,
+          true
         )}\n`
       );
 
@@ -153,7 +162,7 @@ class GroupCompetitionCommand implements SubCommand {
   getParticipantData(competition: CompetitionDetails) {
     return competition.participations
       .slice(0, 10)
-      .map(p => `${p.player.displayName} - **${toKMB(p.progress.gained)}**`);
+      .map(p => `${p.player.displayName} - **${formatNumber(p.progress.gained, true)}**`);
   }
 
   getSelectedCompetitionId(competitions: CompetitionListItem[], status: string) {

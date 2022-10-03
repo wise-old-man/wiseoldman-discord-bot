@@ -3,9 +3,10 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { Command } from '../../../types';
-import { encodeURL, round, toKMB } from '../../../utils';
+import { encodeURL } from '../../../utils';
 import CommandError from '../../CommandError';
 import womClient from '../../../api/wom-api';
+import { formatNumber, round } from '@wise-old-man/utils';
 
 class PlayerEfficiencyCommand implements Command {
   global: boolean;
@@ -53,15 +54,15 @@ class PlayerEfficiencyCommand implements Command {
           },
           {
             name: 'Efficient Hours Played',
-            value: player.ehp ? round(player.ehp, 2) : '---'
+            value: player.ehp ? `${round(player.ehp, 2)}` : '---'
           },
           {
             name: 'Efficient Hours Bossed',
-            value: player.ehb ? round(player.ehb, 2) : '---'
+            value: player.ehb ? `${round(player.ehb, 2)}` : '---'
           },
           {
             name: 'Total Experience',
-            value: player.exp ? toKMB(player.exp, 2) : '---'
+            value: player.exp ? `${formatNumber(player.exp, true)}` : '---'
           }
         ])
         .setFooter({ text: 'Last updated' })

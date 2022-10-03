@@ -4,10 +4,11 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
-import { encodeURL, round, toKMB } from '../../../utils';
+import { encodeURL } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 import womClient from '../../../api/wom-api';
+import { formatNumber, round } from '@wise-old-man/utils';
 
 const RENDER_WIDTH = 350;
 const RENDER_HEIGHT = 355;
@@ -60,7 +61,7 @@ class PlayerBossesCommand implements Command, Renderable {
 
       const { attachment, fileName } = await this.render({
         bosses: player.latestSnapshot.data.bosses,
-        computed: player.latestSnapshot.data.virtuals,
+        computed: player.latestSnapshot.data.computed,
         username: player.username,
         variant
       });
@@ -127,7 +128,11 @@ class PlayerBossesCommand implements Command, Renderable {
         ctx.font = '11px Arial';
 
         const kills = `${
-          isRanked ? (bosses[boss].kills >= 10000 ? toKMB(bosses[boss].kills) : bosses[boss].kills) : '?'
+          isRanked
+            ? bosses[boss].kills >= 10000
+              ? formatNumber(bosses[boss].kills, true)
+              : bosses[boss].kills
+            : '?'
         }`;
         const killsWidth = ctx.measureText(kills).width;
 
@@ -137,7 +142,7 @@ class PlayerBossesCommand implements Command, Renderable {
       } else if (variant === RenderVariant.Ranks) {
         ctx.font = '10px Arial';
 
-        const rank = `${isRanked ? toKMB(bosses[boss].rank, 1) : '?'}`;
+        const rank = `${isRanked ? formatNumber(bosses[boss].rank, true) : '?'}`; // TODO: decimalPrecision = 1
         const rankWidth = ctx.measureText(rank).width;
 
         // Boss rank

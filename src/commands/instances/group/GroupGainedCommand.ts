@@ -1,11 +1,11 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
-import { DeltaLeaderboardEntry } from '@wise-old-man/utils';
+import { DeltaLeaderboardEntry, formatNumber, getMetricName } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient from '../../../api/wom-api';
 import config from '../../../config';
 import { getServer } from '../../../database/services/server';
 import { SubCommand } from '../../../types';
-import { getEmoji, getMetricName, toKMB } from '../../../utils';
+import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class GroupGainedCommand implements SubCommand {
@@ -67,7 +67,9 @@ class GroupGainedCommand implements SubCommand {
   }
 
   buildList(gained: DeltaLeaderboardEntry[]) {
-    return gained.map((g, i) => `${i + 1}. **${g.player.displayName}** - ${toKMB(g.gained)}`).join('\n');
+    return gained
+      .map((g, i) => `${i + 1}. **${g.player.displayName}** - ${formatNumber(g.gained, true)}`)
+      .join('\n');
   }
 }
 

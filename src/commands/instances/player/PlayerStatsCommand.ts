@@ -4,10 +4,11 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
-import { encodeURL, round, SKILLS, toKMB } from '../../../utils';
+import { encodeURL, SKILLS } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 import womClient from '../../../api/wom-api';
+import { formatNumber, round } from '@wise-old-man/utils';
 
 const RENDER_WIDTH = 215;
 const RENDER_HEIGHT = 260;
@@ -102,7 +103,7 @@ class PlayerStatsCommand implements Command, Renderable {
 
     // Player stats
     for (const [index, skill] of Object.keys(skills)
-      .sort((a, b) => SKILLS.indexOf(a) - SKILLS.indexOf(b))
+      .sort((a, b) => Array.from(SKILLS).indexOf(a) - SKILLS.indexOf(b))
       .entries()) {
       const x = Math.floor(index / 8);
       const y = index % 8;
@@ -130,7 +131,7 @@ class PlayerStatsCommand implements Command, Renderable {
         const fontSize = skill === 'overall' ? 9 : 10;
         ctx.font = `${fontSize}px sans-serif`;
 
-        const exp = `${toKMB(skills[skill].experience, 1) || 0}`;
+        const exp = `${formatNumber(skills[skill].experience, true) || 0}`; // TODO: decimalPrecision = 1
         const expWidth = ctx.measureText(exp).width;
 
         // Skill Experience
@@ -138,7 +139,7 @@ class PlayerStatsCommand implements Command, Renderable {
       } else if (variant === RenderVariant.Ranks) {
         ctx.font = '10px sans-serif';
 
-        const rank = `${toKMB(skills[skill].rank, 1) || 0}`;
+        const rank = `${formatNumber(skills[skill].rank, true) || 0}`; // TODO: decimalPrecision = 1
         const rankWidth = ctx.measureText(rank).width;
 
         // Skill Rank

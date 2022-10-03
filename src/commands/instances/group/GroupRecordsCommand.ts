@@ -1,11 +1,11 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
-import { Period, RecordLeaderboardEntry } from '@wise-old-man/utils';
+import { Period, RecordLeaderboardEntry, getMetricName, formatNumber } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient from '../../../api/wom-api';
 import config from '../../../config';
 import { getServer } from '../../../database/services/server';
 import { SubCommand } from '../../../types';
-import { getEmoji, getMetricName, toKMB } from '../../../utils';
+import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class GroupRecordsCommand implements SubCommand {
@@ -73,7 +73,9 @@ class GroupRecordsCommand implements SubCommand {
   }
 
   buildList(records: RecordLeaderboardEntry[]) {
-    return records.map((g, i) => `${i + 1}. **${g.player.displayName}** - ${toKMB(g.value)}`).join('\n');
+    return records
+      .map((g, i) => `${i + 1}. **${g.player.displayName}** - ${formatNumber(g.value, true)}`)
+      .join('\n');
   }
 }
 

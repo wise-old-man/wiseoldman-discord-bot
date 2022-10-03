@@ -1,12 +1,12 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { GroupHiscoresEntry } from '../../../api/types';
 import womClient from '../../../api/wom-api';
 import config from '../../../config';
 import { getServer } from '../../../database/services/server';
 import { SubCommand } from '../../../types';
-import { getEmoji, getMetricName, isActivity, isBoss, isSkill, toKMB } from '../../../utils';
+import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
+import { GroupHiscoresEntry, getMetricName, formatNumber } from '@wise-old-man/utils';
 
 class GroupHiscoresCommand implements SubCommand {
   subcommand?: boolean | undefined;
@@ -30,7 +30,7 @@ class GroupHiscoresCommand implements SubCommand {
   }
 
   async execute(message: CommandInteraction) {
-    await message.deferReply(); // defer because things take time
+    await message.deferReply();
 
     const guildId = message.guild?.id;
     const server = await getServer(guildId); // maybe cache it so we don't have to do this
@@ -65,16 +65,16 @@ class GroupHiscoresCommand implements SubCommand {
   }
 
   getValue(metric: string, result: GroupHiscoresEntry): string {
-    if (isSkill(metric)) {
-      return `${result.data.level} (${toKMB(result.data.experience || 0)})`;
+    if ('level' in result.data) {
+      return `${result.data.level} (${formatNumber(result.data.experience || 0, true)})`;
     }
 
-    if (isBoss(metric)) {
-      return `${toKMB(result.data.kills || 0)}`;
+    if ('kills' in result.data) {
+      return `${formatNumber(result.data.kills || 0, true)}`;
     }
 
-    if (isActivity(metric)) {
-      return `${toKMB(result.data.score || 0)}`;
+    if ('score' in result.data) {
+      return `${formatNumber(result.data.score || 0, true)}`;
     }
 
     return `${result.data.value || 0}`;

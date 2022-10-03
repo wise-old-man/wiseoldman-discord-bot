@@ -1,5 +1,5 @@
+import { GroupDetails } from '@wise-old-man/utils';
 import api from '../handler';
-import { Group } from '../types';
 
 /**
  * Send an API request attempting to reset a group's verification code.
@@ -16,7 +16,7 @@ async function resetCode(groupId: number): Promise<{ newCode: string }> {
 /**
  * Send an API request attempting to verify a group.
  */
-async function verify(groupId: number): Promise<Group> {
+async function verify(groupId: number): Promise<GroupDetails> {
   const URL = `/groups/${groupId}/verify`;
   const adminPassword = process.env.ADMIN_PASSWORD;
 

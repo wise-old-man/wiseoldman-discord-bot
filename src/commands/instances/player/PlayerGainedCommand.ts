@@ -3,10 +3,15 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { Command } from '../../../types';
-import { encodeURL, getEmoji, getMetricName, toKMB } from '../../../utils';
+import { encodeURL, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
-import { GetPlayerGainsResponse, PlayerDeltasMap } from '@wise-old-man/utils';
+import {
+  GetPlayerGainsResponse,
+  PlayerDeltasMap,
+  getMetricName,
+  formatNumber
+} from '@wise-old-man/utils';
 import womClient from '../../../api/wom-api';
 
 const GAINS_PER_PAGE = 10;
@@ -146,7 +151,7 @@ class PlayerGainedCommand implements Command {
   }
 
   buildGainsList(displayName: string, period: string, gained: GetPlayerGainsResponse<PlayerDeltasMap>) {
-    const virtualGains = Array.from(Object.entries(gained.data.virtuals))
+    const computedGains = Array.from(Object.entries(gained.data.computed))
       .filter(([, e]) => e.value.gained > 0)
       .map(([key, val]) => ({ metric: key, gained: val.value.gained }))
       .sort((a, b) => b.gained - a.gained);
@@ -166,14 +171,14 @@ class PlayerGainedCommand implements Command {
       .map(([key, val]) => ({ metric: key, gained: val?.score.gained || 0 }))
       .sort((a, b) => b.gained - a.gained);
 
-    const valid = [...virtualGains, ...skillGains, ...bossGains, ...activityGains];
+    const valid = [...computedGains, ...skillGains, ...bossGains, ...activityGains];
 
     if (!valid || valid.length === 0) {
       throw new Error(`${displayName} has no ${period} gains.`);
     }
 
     return valid.map(({ metric, gained }) => {
-      return `${getEmoji(metric)} ${getMetricName(metric)} - **${toKMB(gained)}**`;
+      return `${getEmoji(metric)} ${getMetricName(metric)} - **${formatNumber(gained, true)}**`;
     });
   }
 

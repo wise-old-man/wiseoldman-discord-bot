@@ -8,7 +8,6 @@ import { encodeURL, formatDate } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 import womClient from '../../../api/wom-api';
-import { PlayerAchievement } from '../../../api/types';
 
 const RENDER_WIDTH = 280;
 const RENDER_HEIGHT = 165;
@@ -46,7 +45,7 @@ class PlayerAchievementsCommand implements Command, Renderable {
         throw new Error(`${player.displayName} has no achievements.`);
       }
 
-      const achievements: PlayerAchievement[] = data
+      const achievements = data
         .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
         .slice(0, 5);
 
