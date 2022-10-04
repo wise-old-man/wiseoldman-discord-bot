@@ -1,14 +1,7 @@
-import { getMetricName, METRICS } from '@wise-old-man/utils';
+import { getMetricName, METRICS, PeriodProps, PERIODS, CountryProps } from '@wise-old-man/utils';
 import { customCommands } from '../commands/CustomCommands';
-import { CountryProps } from '@wise-old-man/utils';
 
-const PERIOD_OPTIONS = [
-  { name: '5 Min', value: 'five_min' },
-  { name: 'Day', value: 'day' },
-  { name: 'Week', value: 'week' },
-  { name: 'Month', value: 'month' },
-  { name: 'Year', value: 'year' }
-];
+const PERIOD_OPTIONS = PERIODS.map(p => ({ name: PeriodProps[p].name, value: p }));
 
 interface AutoCompleteOption {
   name: string;

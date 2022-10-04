@@ -1,12 +1,12 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { formatNumber, round } from '@wise-old-man/utils';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { Command } from '../../../types';
 import { encodeURL } from '../../../utils';
 import CommandError from '../../CommandError';
 import womClient from '../../../api/wom-api';
-import { formatNumber, round } from '@wise-old-man/utils';
 
 class PlayerEfficiencyCommand implements Command {
   global: boolean;

@@ -1,6 +1,7 @@
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { formatNumber, round } from '@wise-old-man/utils';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
@@ -8,7 +9,6 @@ import { encodeURL, SKILLS } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 import womClient from '../../../api/wom-api';
-import { formatNumber, round } from '@wise-old-man/utils';
 
 const RENDER_WIDTH = 215;
 const RENDER_HEIGHT = 260;

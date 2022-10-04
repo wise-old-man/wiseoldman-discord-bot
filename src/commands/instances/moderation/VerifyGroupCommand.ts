@@ -6,12 +6,12 @@ import {
   TextChannel
 } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { GroupListItem } from '@wise-old-man/utils';
 import { verify } from '../../../api/modules/groups';
 import config from '../../../config';
 import { Command } from '../../../types';
 import { getEmoji, hasModeratorRole } from '../../../utils';
 import CommandError from '../../CommandError';
-import { GroupDetails } from '@wise-old-man/utils';
 
 const CHAT_MESSAGE = (groupName: string) =>
   `${getEmoji('success')} \`${groupName}\` has been successfully verified!`;
@@ -67,7 +67,7 @@ class VerifyGroupCommand implements Command {
     user.roles.add(config.discord.roles.groupLeader).catch(console.log);
   }
 
-  sendConfirmationLog(channels: GuildChannelManager | undefined, group: GroupDetails, userId: string) {
+  sendConfirmationLog(channels: GuildChannelManager | undefined, group: GroupListItem, userId: string) {
     const leadersLogChannel = channels?.cache.get(config.discord.channels.leadersLog);
 
     if (!leadersLogChannel) return;

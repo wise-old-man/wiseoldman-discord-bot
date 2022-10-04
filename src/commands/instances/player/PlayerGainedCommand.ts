@@ -1,10 +1,5 @@
 import { CommandInteraction, MessageEmbed, Constants } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import config from '../../../config';
-import { getUsername } from '../../../database/services/alias';
-import { Command } from '../../../types';
-import { encodeURL, getEmoji } from '../../../utils';
-import CommandError from '../../CommandError';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import {
   GetPlayerGainsResponse,
@@ -12,6 +7,11 @@ import {
   getMetricName,
   formatNumber
 } from '@wise-old-man/utils';
+import config from '../../../config';
+import { getUsername } from '../../../database/services/alias';
+import { Command } from '../../../types';
+import { encodeURL, getEmoji } from '../../../utils';
+import CommandError from '../../CommandError';
 import womClient from '../../../api/wom-api';
 
 const GAINS_PER_PAGE = 10;

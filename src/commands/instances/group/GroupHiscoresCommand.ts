@@ -1,12 +1,12 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { GroupHiscoresEntry, getMetricName, formatNumber } from '@wise-old-man/utils';
 import womClient from '../../../api/wom-api';
 import config from '../../../config';
 import { getServer } from '../../../database/services/server';
 import { SubCommand } from '../../../types';
 import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
-import { GroupHiscoresEntry, getMetricName, formatNumber } from '@wise-old-man/utils';
 
 class GroupHiscoresCommand implements SubCommand {
   subcommand?: boolean | undefined;
@@ -39,7 +39,7 @@ class GroupHiscoresCommand implements SubCommand {
 
     try {
       const group = await womClient.groups.getGroupDetails(groupId);
-      const hiscores: GroupHiscoresEntry[] = await womClient.groups.getGroupHiscores(groupId, metric);
+      const hiscores = await womClient.groups.getGroupHiscores(groupId, metric);
 
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)

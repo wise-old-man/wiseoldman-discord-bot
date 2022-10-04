@@ -1,5 +1,12 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
-import { Period, RecordLeaderboardEntry, getMetricName, formatNumber } from '@wise-old-man/utils';
+import {
+  Period,
+  RecordLeaderboardEntry,
+  getMetricName,
+  formatNumber,
+  PERIODS,
+  PeriodProps
+} from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient from '../../../api/wom-api';
 import config from '../../../config';
@@ -29,13 +36,7 @@ class GroupRecordsCommand implements SubCommand {
         option
           .setName('period')
           .setDescription('The period to show records for')
-          .addChoices([
-            ['5 Min', Period.FIVE_MIN],
-            ['Day', Period.DAY],
-            ['Week', Period.WEEK],
-            ['Month', Period.MONTH],
-            ['Year', Period.YEAR]
-          ])
+          .addChoices(PERIODS.map(p => [PeriodProps[p].name, p]))
           .setRequired(true)
       )
       .setName('records')

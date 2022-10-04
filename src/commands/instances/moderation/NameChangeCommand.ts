@@ -7,12 +7,12 @@ import {
   MessageEmbed
 } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { NameChangeStatus } from '@wise-old-man/utils';
 import { approve, deny } from '../../../api/modules/names';
 import config from '../../../config';
 import { Command } from '../../../types';
 import { getEmoji, hasModeratorRole } from '../../../utils/discord';
 import CommandError from '../../CommandError';
-import { NameChangeStatus } from '@wise-old-man/utils';
 import womClient from '../../../api/wom-api';
 
 class NameChangeCommand implements Command {

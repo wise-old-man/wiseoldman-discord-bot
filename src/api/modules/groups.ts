@@ -1,4 +1,4 @@
-import { GroupDetails } from '@wise-old-man/utils';
+import { GroupListItem } from '@wise-old-man/utils';
 import api from '../handler';
 
 /**
@@ -16,7 +16,7 @@ async function resetCode(groupId: number): Promise<{ newCode: string }> {
 /**
  * Send an API request attempting to verify a group.
  */
-async function verify(groupId: number): Promise<GroupDetails> {
+async function verify(groupId: number): Promise<GroupListItem> {
   const URL = `/groups/${groupId}/verify`;
   const adminPassword = process.env.ADMIN_PASSWORD;
 

@@ -1,6 +1,7 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { capitalize } from 'lodash';
+import { CompetitionListItem } from '@wise-old-man/utils';
 import { getCompetitionStatus, getCompetitionTimeLeft } from '../../../api/modules/competitions';
 import config from '../../../config';
 import { SubCommand } from '../../../types';
@@ -8,7 +9,6 @@ import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 import { getServer } from '../../../database/services/server';
 import womClient from '../../../api/wom-api';
-import { CompetitionListItem } from '@wise-old-man/utils';
 
 const MAX_COMPETITIONS = 5;
 

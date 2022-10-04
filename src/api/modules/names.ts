@@ -1,5 +1,5 @@
+import { NameChange } from '@wise-old-man/utils';
 import api from '../handler';
-import { NameChange } from '../types';
 
 export async function approve(id: number): Promise<NameChange> {
   const URL = `/names/${id}/approve`;

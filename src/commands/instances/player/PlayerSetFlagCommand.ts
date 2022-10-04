@@ -1,11 +1,11 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { Country, CountryProps } from '@wise-old-man/utils';
 import { updateCountry } from '../../../api/modules/players';
 import config from '../../../config';
 import { Command } from '../../../types';
 import { countryCodeEmoji, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
-import { CountryProps } from '@wise-old-man/utils';
 
 class PlayerSetFlagCommand implements Command {
   slashCommand: SlashCommandBuilder;
@@ -47,9 +47,7 @@ class PlayerSetFlagCommand implements Command {
       await updateCountry(username, countryCode);
 
       response.message = `${message.user} changed \`${username}\`'s country to ${
-        Object.entries(CountryProps)
-          .map(value => value[1])
-          .find(c => c.code === countryCode)?.name
+        CountryProps[countryCode as Country].name
       }`;
       response.isError = false;
     } catch (e: any) {

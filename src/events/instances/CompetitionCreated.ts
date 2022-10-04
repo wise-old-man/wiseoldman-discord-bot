@@ -1,9 +1,9 @@
 import { MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
+import { getMetricName } from '@wise-old-man/utils';
 import config from '../../config';
 import { BroadcastType, Event } from '../../types';
 import { getEmoji, broadcastMessage } from '../../utils';
-import { getMetricName } from '@wise-old-man/utils';
 
 interface CompetitionCreatedData {
   groupId: number;
