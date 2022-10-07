@@ -1,7 +1,7 @@
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { formatNumber, round } from '@wise-old-man/utils';
+import { formatNumber, MapOf, round, Skill, SkillValue } from '@wise-old-man/utils';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
@@ -85,7 +85,7 @@ class PlayerStatsCommand implements Command, Renderable {
   }
 
   async render(props: {
-    skills: any;
+    skills: MapOf<Skill, SkillValue>;
     username: string;
     variant: RenderVariant;
   }): Promise<CanvasAttachment> {
@@ -102,8 +102,8 @@ class PlayerStatsCommand implements Command, Renderable {
     ctx.fillRect(0, 0, width, height);
 
     // Player stats
-    for (const [index, skill] of Object.keys(skills)
-      .sort((a, b) => Array.from(SKILLS).indexOf(a) - SKILLS.indexOf(b))
+    for (const [index, skill] of (Object.keys(skills) as Skill[])
+      .sort((a, b) => SKILLS.indexOf(a) - SKILLS.indexOf(b))
       .entries()) {
       const x = Math.floor(index / 8);
       const y = index % 8;

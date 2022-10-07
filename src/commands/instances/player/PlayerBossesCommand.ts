@@ -1,7 +1,15 @@
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { formatNumber, round } from '@wise-old-man/utils';
+import {
+  Boss,
+  BossValue,
+  ComputedMetric,
+  ComputedMetricValue,
+  formatNumber,
+  MapOf,
+  round
+} from '@wise-old-man/utils';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
@@ -84,19 +92,14 @@ class PlayerBossesCommand implements Command, Renderable {
   }
 
   async render(props: {
-    bosses: any;
-    computed: any;
+    bosses: MapOf<Boss, BossValue>;
+    computed: MapOf<ComputedMetric, ComputedMetricValue>;
     username: string;
     variant: RenderVariant;
   }): Promise<CanvasAttachment> {
     const { bosses, computed, username, variant } = props;
 
-    bosses['ehb'] = {
-      metric: 'ehb',
-      kills: Math.floor(computed['ehb'].value),
-      rank: computed['ehb'].rank,
-      ehb: computed['ehb'].value
-    };
+    // TODO: Add EHB to the rendered image
 
     // Create a scaled empty canvas
     const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
@@ -109,7 +112,7 @@ class PlayerBossesCommand implements Command, Renderable {
     ctx.fillRect(0, 0, width, height);
 
     // Player bosses
-    for (const [index, boss] of Object.keys(bosses).entries()) {
+    for (const [index, boss] of (Object.keys(bosses) as Boss[]).entries()) {
       const x = Math.floor(index / 11);
       const y = index % 11;
 
@@ -122,16 +125,17 @@ class PlayerBossesCommand implements Command, Renderable {
       ctx.drawImage(badge, originX, originY, 64, 26);
       ctx.drawImage(icon, originX, originY - 1, icon.width / 2, icon.height / 2);
 
-      const isRanked = bosses[boss].kills && bosses[boss].kills > -1;
+      const bossValue = bosses[boss];
+      const isRanked = bossValue.kills && bossValue.kills > -1;
 
       if (variant === RenderVariant.Kills) {
         ctx.font = '11px Arial';
 
         const kills = `${
           isRanked
-            ? bosses[boss].kills >= 10000
-              ? formatNumber(bosses[boss].kills, true)
-              : bosses[boss].kills
+            ? bossValue.kills >= 10000
+              ? formatNumber(bossValue.kills, true)
+              : bossValue.kills
             : '?'
         }`;
         const killsWidth = ctx.measureText(kills).width;
@@ -142,7 +146,7 @@ class PlayerBossesCommand implements Command, Renderable {
       } else if (variant === RenderVariant.Ranks) {
         ctx.font = '10px Arial';
 
-        const rank = `${isRanked ? formatNumber(bosses[boss].rank, true) : '?'}`; // TODO: decimalPrecision = 1
+        const rank = `${isRanked ? formatNumber(bossValue.rank, true) : '?'}`; // TODO: decimalPrecision = 1
         const rankWidth = ctx.measureText(rank).width;
 
         // Boss rank
@@ -151,7 +155,7 @@ class PlayerBossesCommand implements Command, Renderable {
       } else if (variant === RenderVariant.EHB) {
         ctx.font = '10px Arial';
 
-        const ehb = `${round(bosses[boss].ehb, 1)}`;
+        const ehb = `${round(bossValue.ehb ? bossValue.ehb : 0, 1)}`;
         const ehbWidth = ctx.measureText(ehb).width;
 
         // Boss EHB

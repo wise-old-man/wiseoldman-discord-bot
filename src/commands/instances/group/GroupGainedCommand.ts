@@ -1,5 +1,11 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
-import { DeltaLeaderboardEntry, formatNumber, getMetricName } from '@wise-old-man/utils';
+import {
+  DeltaLeaderboardEntry,
+  formatNumber,
+  getMetricName,
+  Metric,
+  parseMetricAbbreviation
+} from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient from '../../../api/wom-api';
 import config from '../../../config';
@@ -42,11 +48,11 @@ class GroupGainedCommand implements SubCommand {
     const guildId = message.guild?.id;
     const server = await getServer(guildId); // maybe cache it so we don't have to do this
     const groupId = server?.groupId || -1;
-    const metric = message.options.getString('metric', true);
+    const metric = parseMetricAbbreviation(message.options.getString('metric', true)) as Metric;
     const period = message.options.getString('period', true);
-
     try {
       const group = await womClient.groups.getGroupDetails(groupId);
+
       const gained = await womClient.groups.getGroupGains(groupId, { period, metric });
 
       const response = new MessageEmbed()

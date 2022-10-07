@@ -1,6 +1,12 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { GroupHiscoresEntry, getMetricName, formatNumber } from '@wise-old-man/utils';
+import {
+  GroupHiscoresEntry,
+  getMetricName,
+  formatNumber,
+  Metric,
+  parseMetricAbbreviation
+} from '@wise-old-man/utils';
 import womClient from '../../../api/wom-api';
 import config from '../../../config';
 import { getServer } from '../../../database/services/server';
@@ -35,7 +41,7 @@ class GroupHiscoresCommand implements SubCommand {
     const guildId = message.guild?.id;
     const server = await getServer(guildId); // maybe cache it so we don't have to do this
     const groupId = server?.groupId || -1;
-    const metric = message.options.getString('metric', true);
+    const metric = parseMetricAbbreviation(message.options.getString('metric', true)) as Metric;
 
     try {
       const group = await womClient.groups.getGroupDetails(groupId);

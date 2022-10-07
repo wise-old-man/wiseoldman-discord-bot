@@ -5,7 +5,8 @@ import {
   GetPlayerGainsResponse,
   PlayerDeltasMap,
   getMetricName,
-  formatNumber
+  formatNumber,
+  Metric
 } from '@wise-old-man/utils';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
@@ -178,7 +179,10 @@ class PlayerGainedCommand implements Command {
     }
 
     return valid.map(({ metric, gained }) => {
-      return `${getEmoji(metric)} ${getMetricName(metric)} - **${formatNumber(gained, true)}**`;
+      return `${getEmoji(metric)} ${getMetricName(metric as Metric)} - **${formatNumber(
+        gained,
+        true
+      )}**`;
     });
   }
 

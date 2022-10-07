@@ -5,7 +5,7 @@ export default {
   defaultPrefix: '!',
   validPrefixes: ['!', '-', '+', '++', '$'],
   helpCommand: 'wom!help',
-  baseAPIUrl: process.env.DISCORD_DEV_API_URL || 'https://api.wiseoldman.net',
+  baseAPIUrl: process.env.DISCORD_DEV_API_URL || 'https://api.wiseoldman.net/v2',
   requiredPermissions: ['MANAGE_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES', 'USE_APPLICATION_COMMANDS'],
   visuals: {
     blue: 0x2980b9,

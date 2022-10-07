@@ -1,6 +1,6 @@
 import { MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
-import { getMetricName } from '@wise-old-man/utils';
+import { getMetricName, Metric } from '@wise-old-man/utils';
 import config from '../../config';
 import { BroadcastType, Event } from '../../types';
 import { getEmoji, broadcastMessage } from '../../utils';
@@ -9,7 +9,7 @@ interface CompetitionCreatedData {
   groupId: number;
   competition: {
     id: number;
-    metric: string;
+    metric: Metric;
     type: string;
     title: string;
     duration: string;

@@ -1,7 +1,7 @@
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { ACTIVITIES, formatNumber } from '@wise-old-man/utils';
+import { Activity, ActivityValue, formatNumber, MapOf } from '@wise-old-man/utils';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
@@ -83,7 +83,7 @@ class PlayerActivitiesCommand implements Command, Renderable {
   }
 
   async render(props: {
-    activities: any;
+    activities: MapOf<Activity, ActivityValue>;
     username: string;
     variant: RenderVariant;
   }): Promise<CanvasAttachment> {
@@ -99,10 +99,7 @@ class PlayerActivitiesCommand implements Command, Renderable {
     ctx.fillStyle = '#1d1d1d';
     ctx.fillRect(0, 0, width, height);
 
-    // Player activities
-    for (const [index, activity] of Object.keys(activities)
-      .sort((a, b) => ACTIVITIES.indexOf(a) - ACTIVITIES.indexOf(b))
-      .entries()) {
+    for (const [index, activity] of (Object.keys(activities) as Activity[]).entries()) {
       const x = Math.floor(index / 3);
       const y = index % 3;
 
@@ -115,16 +112,17 @@ class PlayerActivitiesCommand implements Command, Renderable {
       ctx.drawImage(badge, originX, originY, 64, 26);
       ctx.drawImage(icon, originX, originY, icon.width / 2, icon.height / 2);
 
-      const isRanked = activities[activity].score && activities[activity].score > -1;
+      const activityValue = activities[activity];
+      const isRanked = activityValue.score && activityValue.score > -1;
 
       if (variant === RenderVariant.Scores) {
         ctx.font = '11px Arial';
 
         const score = `${
           isRanked
-            ? activities[activity].score >= 10000
-              ? formatNumber(activities[activity].score, true)
-              : activities[activity].score
+            ? activityValue.score >= 10000
+              ? formatNumber(activityValue.score, true)
+              : activityValue.score
             : '?'
         }`;
         const scoreWidth = ctx.measureText(score).width;
@@ -135,7 +133,7 @@ class PlayerActivitiesCommand implements Command, Renderable {
       } else if (variant === RenderVariant.Ranks) {
         ctx.font = '10px Arial';
 
-        const rank = `${isRanked ? formatNumber(activities[activity].rank, true) : '?'}`; // TODO: decimalPrecision = 1
+        const rank = `${isRanked ? formatNumber(activityValue.rank, true) : '?'}`; // TODO: decimalPrecision = 1
         const rankWidth = ctx.measureText(rank).width;
 
         // Activity rank
