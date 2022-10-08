@@ -133,7 +133,7 @@ class PlayerActivitiesCommand implements Command, Renderable {
       } else if (variant === RenderVariant.Ranks) {
         ctx.font = '10px Arial';
 
-        const rank = `${isRanked ? formatNumber(activityValue.rank, true) : '?'}`; // TODO: decimalPrecision = 1
+        const rank = `${isRanked ? formatNumber(activityValue.rank, true, 1) : '?'}`;
         const rankWidth = ctx.measureText(rank).width;
 
         // Activity rank

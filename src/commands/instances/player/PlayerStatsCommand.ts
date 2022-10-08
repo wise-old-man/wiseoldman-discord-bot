@@ -131,7 +131,7 @@ class PlayerStatsCommand implements Command, Renderable {
         const fontSize = skill === 'overall' ? 9 : 10;
         ctx.font = `${fontSize}px sans-serif`;
 
-        const exp = `${formatNumber(skills[skill].experience, true) || 0}`; // TODO: decimalPrecision = 1
+        const exp = `${formatNumber(skills[skill].experience, true, 1) || 0}`;
         const expWidth = ctx.measureText(exp).width;
 
         // Skill Experience
@@ -139,7 +139,7 @@ class PlayerStatsCommand implements Command, Renderable {
       } else if (variant === RenderVariant.Ranks) {
         ctx.font = '10px sans-serif';
 
-        const rank = `${formatNumber(skills[skill].rank, true) || 0}`; // TODO: decimalPrecision = 1
+        const rank = `${formatNumber(skills[skill].rank, true, 1) || 0}`;
         const rankWidth = ctx.measureText(rank).width;
 
         // Skill Rank

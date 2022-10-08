@@ -146,7 +146,7 @@ class PlayerBossesCommand implements Command, Renderable {
       } else if (variant === RenderVariant.Ranks) {
         ctx.font = '10px Arial';
 
-        const rank = `${isRanked ? formatNumber(bossValue.rank, true) : '?'}`; // TODO: decimalPrecision = 1
+        const rank = `${isRanked ? formatNumber(bossValue.rank, true, 1) : '?'}`;
         const rankWidth = ctx.measureText(rank).width;
 
         // Boss rank

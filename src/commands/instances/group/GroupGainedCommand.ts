@@ -48,11 +48,10 @@ class GroupGainedCommand implements SubCommand {
     const guildId = message.guild?.id;
     const server = await getServer(guildId); // maybe cache it so we don't have to do this
     const groupId = server?.groupId || -1;
-    const metric = parseMetricAbbreviation(message.options.getString('metric', true)) as Metric;
+    const metric = parseMetricAbbreviation(message.options.getString('metric', true)) || Metric.OVERALL;
     const period = message.options.getString('period', true);
     try {
       const group = await womClient.groups.getGroupDetails(groupId);
-
       const gained = await womClient.groups.getGroupGains(groupId, { period, metric });
 
       const response = new MessageEmbed()
