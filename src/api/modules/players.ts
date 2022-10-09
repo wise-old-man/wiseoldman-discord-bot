@@ -1,3 +1,4 @@
+import { Player } from '@wise-old-man/utils';
 import api from '../handler';
 
 /**
@@ -15,7 +16,7 @@ async function deletePlayer(username: string): Promise<{ message: string }> {
 /**
  * Send an API request attempting to update a player's country
  */
-async function updateCountry(username: string, country: string): Promise<{ message: string }> {
+async function updateCountry(username: string, country: string): Promise<Player> {
   const URL = `/players/${username}/country`;
   const adminPassword = process.env.ADMIN_PASSWORD;
 

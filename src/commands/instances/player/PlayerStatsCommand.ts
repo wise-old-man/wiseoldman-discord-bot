@@ -1,11 +1,11 @@
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { formatNumber, MapOf, round, Skill, SkillValue } from '@wise-old-man/utils';
+import { formatNumber, isSkill, MapOf, round, Skill, SkillValue } from '@wise-old-man/utils';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
-import { encodeURL, SKILLS } from '../../../utils';
+import { encodeURL, INGAME_SKILL_ORDER } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
 import womClient from '../../../api/wom-api';
@@ -102,9 +102,11 @@ class PlayerStatsCommand implements Command, Renderable {
     ctx.fillRect(0, 0, width, height);
 
     // Player stats
-    for (const [index, skill] of (Object.keys(skills) as Skill[])
-      .sort((a, b) => SKILLS.indexOf(a) - SKILLS.indexOf(b))
+    for (const [index, skill] of Object.keys(skills)
+      .sort((a, b) => INGAME_SKILL_ORDER.indexOf(a) - INGAME_SKILL_ORDER.indexOf(b))
       .entries()) {
+      if (!isSkill(skill)) continue;
+
       const x = Math.floor(index / 8);
       const y = index % 8;
 

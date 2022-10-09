@@ -1,7 +1,7 @@
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { Activity, ActivityValue, formatNumber, MapOf } from '@wise-old-man/utils';
+import { Activity, ActivityValue, formatNumber, isActivity, MapOf } from '@wise-old-man/utils';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
@@ -99,7 +99,9 @@ class PlayerActivitiesCommand implements Command, Renderable {
     ctx.fillStyle = '#1d1d1d';
     ctx.fillRect(0, 0, width, height);
 
-    for (const [index, activity] of (Object.keys(activities) as Activity[]).entries()) {
+    for (const [index, activity] of Object.keys(activities).entries()) {
+      if (!isActivity(activity)) continue;
+
       const x = Math.floor(index / 3);
       const y = index % 3;
 

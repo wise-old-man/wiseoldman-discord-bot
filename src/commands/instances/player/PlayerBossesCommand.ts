@@ -7,7 +7,9 @@ import {
   ComputedMetric,
   ComputedMetricValue,
   formatNumber,
+  isBoss,
   MapOf,
+  Metric,
   round
 } from '@wise-old-man/utils';
 import config from '../../../config';
@@ -99,8 +101,6 @@ class PlayerBossesCommand implements Command, Renderable {
   }): Promise<CanvasAttachment> {
     const { bosses, computed, username, variant } = props;
 
-    // TODO: Add EHB to the rendered image
-
     // Create a scaled empty canvas
     const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
 
@@ -111,58 +111,71 @@ class PlayerBossesCommand implements Command, Renderable {
     ctx.fillStyle = '#1d1d1d';
     ctx.fillRect(0, 0, width, height);
 
-    // Player bosses
-    for (const [index, boss] of (Object.keys(bosses) as Boss[]).entries()) {
+    async function renderMetricSlot(
+      index: number,
+      metric: Metric,
+      value: number,
+      rank: number,
+      ehb?: number
+    ) {
       const x = Math.floor(index / 11);
       const y = index % 11;
 
       const originX = RENDER_PADDING - 7 + x * 67;
       const originY = RENDER_PADDING - 5 + y * 31;
 
-      const icon = await Canvas.loadImage(`./public/x2/${boss}.png`);
+      const icon = await Canvas.loadImage(`./public/x2/${metric}.png`);
 
       // Badge background and boss icon
       ctx.drawImage(badge, originX, originY, 64, 26);
       ctx.drawImage(icon, originX, originY - 1, icon.width / 2, icon.height / 2);
 
-      const bossValue = bosses[boss];
-      const isRanked = bossValue.kills && bossValue.kills > -1;
+      const isRanked = value > -1;
 
       if (variant === RenderVariant.Kills) {
         ctx.font = '11px Arial';
 
-        const kills = `${
-          isRanked
-            ? bossValue.kills >= 10000
-              ? formatNumber(bossValue.kills, true)
-              : bossValue.kills
-            : '?'
-        }`;
-        const killsWidth = ctx.measureText(kills).width;
+        const killsLabel = `${isRanked ? formatNumber(value, true, 1) : '?'}`;
+        const killsWidth = ctx.measureText(killsLabel).width;
 
         // Boss kills
         ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
-        ctx.fillText(kills, originX + 42 - killsWidth / 2, originY + 17);
+        ctx.fillText(killsLabel, originX + 42 - killsWidth / 2, originY + 17);
       } else if (variant === RenderVariant.Ranks) {
         ctx.font = '10px Arial';
 
-        const rank = `${isRanked ? formatNumber(bossValue.rank, true, 1) : '?'}`;
-        const rankWidth = ctx.measureText(rank).width;
+        const rankLabel = `${isRanked ? formatNumber(rank, true, 1) : '?'}`;
+        const rankWidth = ctx.measureText(rankLabel).width;
 
         // Boss rank
         ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
-        ctx.fillText(rank, originX + 44 - rankWidth / 2, originY + 17);
+        ctx.fillText(rankLabel, originX + 44 - rankWidth / 2, originY + 17);
       } else if (variant === RenderVariant.EHB) {
         ctx.font = '10px Arial';
 
-        const ehb = `${round(bossValue.ehb ? bossValue.ehb : 0, 1)}`;
-        const ehbWidth = ctx.measureText(ehb).width;
+        const ehbLabel = `${round(ehb ? ehb : 0, 1)}`;
+        const ehbWidth = ctx.measureText(ehbLabel).width;
 
         // Boss EHB
         ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
-        ctx.fillText(ehb, originX + 44 - ehbWidth / 2, originY + 17);
+        ctx.fillText(ehbLabel, originX + 44 - ehbWidth / 2, originY + 17);
       }
     }
+
+    // Player bosses
+    for (const [index, boss] of Object.keys(bosses).entries()) {
+      if (!isBoss(boss)) continue;
+
+      await renderMetricSlot(index, boss, bosses[boss].kills, bosses[boss].rank, bosses[boss].ehb);
+    }
+
+    await renderMetricSlot(
+      Object.keys(bosses).length,
+      Metric.EHB,
+      computed.ehb.value,
+      computed.ehb.rank,
+      computed.ehb.value
+    );
 
     const fileName = `${Date.now()}-${username.replace(/ /g, '_')}-${variant}.jpeg`;
     const attachment = new MessageAttachment(canvas.toBuffer(), fileName);

@@ -9,6 +9,7 @@ export async function approve(id: number): Promise<NameChange> {
 
   return data;
 }
+
 export async function deny(id: number): Promise<NameChange> {
   const URL = `/names/${id}/deny`;
   const adminPassword = process.env.ADMIN_PASSWORD;

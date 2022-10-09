@@ -50,7 +50,7 @@ class GroupHiscoresCommand implements SubCommand {
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
         .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} hiscores`)
-        .setDescription(this.buildList(metric, hiscores))
+        .setDescription(this.buildList(hiscores))
         .setURL(`https://wiseoldman.net/groups/${groupId}/hiscores/`)
         .setFooter({ text: `Tip: Try /group hiscores metric: zulrah` });
 
@@ -64,13 +64,13 @@ class GroupHiscoresCommand implements SubCommand {
     }
   }
 
-  buildList(metric: string, hiscores: GroupHiscoresEntry[]): string {
+  buildList(hiscores: GroupHiscoresEntry[]): string {
     return hiscores
-      .map((g, i) => `${i + 1}. **${g.player.displayName}** - ${this.getValue(metric, g)}`)
+      .map((g, i) => `${i + 1}. **${g.player.displayName}** - ${this.getValue(g)}`)
       .join('\n');
   }
 
-  getValue(metric: string, result: GroupHiscoresEntry): string {
+  getValue(result: GroupHiscoresEntry): string {
     if ('level' in result.data) {
       return `${result.data.level} (${formatNumber(result.data.experience || 0, true)})`;
     }
