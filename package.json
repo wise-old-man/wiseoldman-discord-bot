@@ -46,7 +46,7 @@
     "@sapphire/discord.js-utilities": "^4.8.0",
     "@types/bluebird": "^3.5.32",
     "@types/validator": "^13.0.0",
-    "@wise-old-man/utils": "^2.0.0-beta.7",
+    "@wise-old-man/utils": "^2.0.0-beta.8",
     "axios": "^0.19.2",
     "canvas": "^2.6.1",
     "cors": "^2.8.5",
