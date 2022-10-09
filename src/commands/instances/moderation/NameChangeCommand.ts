@@ -34,12 +34,12 @@ class NameChangeCommand implements Command {
 
       const reviewData = await womClient.nameChanges.getNameChangeDetails(nameChangeId);
 
-      if (!reviewData.data) {
-        throw new CommandError('Name change data was not found.');
-      }
-
       if (reviewData.nameChange.status !== NameChangeStatus.PENDING) {
         throw new CommandError('This name change is not pending.');
+      }
+
+      if (!reviewData.data) {
+        throw new CommandError('Name change data was not found.');
       }
 
       const response = new MessageEmbed()
@@ -100,6 +100,8 @@ class NameChangeCommand implements Command {
         await message.editReply({ embeds: [response], components: [] });
       });
     } catch (error) {
+      console.log(error);
+
       if (error instanceof CommandError) throw error;
       throw new CommandError('Failed to review name change.');
     }
