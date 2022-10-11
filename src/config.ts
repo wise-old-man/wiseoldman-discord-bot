@@ -2,10 +2,8 @@ import 'dotenv/config';
 
 export default {
   token: process.env.DISCORD_TOKEN,
-  defaultPrefix: '!',
-  validPrefixes: ['!', '-', '+', '++', '$'],
-  helpCommand: 'wom!help',
-  baseAPIUrl: process.env.DISCORD_DEV_API_URL || 'https://api.wiseoldman.net',
+  apiKey: process.env.WOM_BOT_API_KEY,
+  baseAPIUrl: process.env.DISCORD_DEV_API_URL || 'https://api.wiseoldman.net/v2',
   requiredPermissions: ['MANAGE_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES', 'USE_APPLICATION_COMMANDS'],
   visuals: {
     blue: 0x2980b9,

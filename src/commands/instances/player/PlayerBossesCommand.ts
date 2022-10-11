@@ -1,15 +1,24 @@
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { fetchPlayer } from '../../../api/modules/players';
-import { toResults } from '../../../api/modules/snapshots';
-import { BossResult, MetricType, Player } from '../../../api/types';
+import {
+  Boss,
+  BossValue,
+  ComputedMetric,
+  ComputedMetricValue,
+  formatNumber,
+  isBoss,
+  MapOf,
+  Metric,
+  round
+} from '@wise-old-man/utils';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
-import { encodeURL, round, toKMB } from '../../../utils';
+import { encodeURL } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
+import womClient from '../../../api/wom-api';
 
 const RENDER_WIDTH = 350;
 const RENDER_HEIGHT = 355;
@@ -58,9 +67,14 @@ class PlayerBossesCommand implements Command, Renderable {
     }
 
     try {
-      const player = await fetchPlayer(username);
+      const player = await womClient.players.getPlayerDetails({ username });
 
-      const { attachment, fileName } = await this.render({ player, variant });
+      const { attachment, fileName } = await this.render({
+        bosses: player.latestSnapshot.data.bosses,
+        computed: player.latestSnapshot.data.computed,
+        username: player.username,
+        variant
+      });
 
       const embed = new MessageEmbed()
         .setColor(config.visuals.blue)
@@ -79,19 +93,13 @@ class PlayerBossesCommand implements Command, Renderable {
     }
   }
 
-  async render(props: { player: Player; variant: RenderVariant }): Promise<CanvasAttachment> {
-    const { player, variant } = props;
-
-    // Convert the snapshot into boss results
-    const bossResults = <BossResult[]>toResults(player.latestSnapshot, MetricType.Boss);
-
-    bossResults.push({
-      name: 'ehb',
-      type: MetricType.Boss,
-      rank: player.latestSnapshot.ehb.rank,
-      kills: Math.floor(player.latestSnapshot.ehb.value),
-      ehb: player.latestSnapshot.ehb.value
-    });
+  async render(props: {
+    bosses: MapOf<Boss, BossValue>;
+    computed: MapOf<ComputedMetric, ComputedMetricValue>;
+    username: string;
+    variant: RenderVariant;
+  }): Promise<CanvasAttachment> {
+    const { bosses, computed, username, variant } = props;
 
     // Create a scaled empty canvas
     const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
@@ -103,53 +111,73 @@ class PlayerBossesCommand implements Command, Renderable {
     ctx.fillStyle = '#1d1d1d';
     ctx.fillRect(0, 0, width, height);
 
-    // Player stats
-    for (const [index, result] of bossResults.entries()) {
+    async function renderMetricSlot(
+      index: number,
+      metric: Metric,
+      value: number,
+      rank: number,
+      ehb?: number
+    ) {
       const x = Math.floor(index / 11);
       const y = index % 11;
 
       const originX = RENDER_PADDING - 7 + x * 67;
       const originY = RENDER_PADDING - 5 + y * 31;
 
-      const icon = await Canvas.loadImage(`./public/x2/${result.name}.png`);
+      const icon = await Canvas.loadImage(`./public/x2/${metric}.png`);
 
       // Badge background and boss icon
       ctx.drawImage(badge, originX, originY, 64, 26);
       ctx.drawImage(icon, originX, originY - 1, icon.width / 2, icon.height / 2);
 
-      const isRanked = result.kills && result.kills > -1;
+      const isRanked = value > -1;
 
       if (variant === RenderVariant.Kills) {
         ctx.font = '11px Arial';
 
-        const kills = `${isRanked ? (result.kills >= 10000 ? toKMB(result.kills) : result.kills) : '?'}`;
-        const killsWidth = ctx.measureText(kills).width;
+        const killsLabel = `${isRanked ? formatNumber(value, true, 1) : '?'}`;
+        const killsWidth = ctx.measureText(killsLabel).width;
 
         // Boss kills
         ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
-        ctx.fillText(kills, originX + 42 - killsWidth / 2, originY + 17);
+        ctx.fillText(killsLabel, originX + 42 - killsWidth / 2, originY + 17);
       } else if (variant === RenderVariant.Ranks) {
         ctx.font = '10px Arial';
 
-        const rank = `${isRanked ? toKMB(result.rank, 1) : '?'}`;
-        const rankWidth = ctx.measureText(rank).width;
+        const rankLabel = `${isRanked ? formatNumber(rank, true, 1) : '?'}`;
+        const rankWidth = ctx.measureText(rankLabel).width;
 
         // Boss rank
         ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
-        ctx.fillText(rank, originX + 44 - rankWidth / 2, originY + 17);
+        ctx.fillText(rankLabel, originX + 44 - rankWidth / 2, originY + 17);
       } else if (variant === RenderVariant.EHB) {
         ctx.font = '10px Arial';
 
-        const ehb = `${round(result.ehb, 1)}`;
-        const ehbWidth = ctx.measureText(ehb).width;
+        const ehbLabel = `${round(ehb ? ehb : 0, 1)}`;
+        const ehbWidth = ctx.measureText(ehbLabel).width;
 
         // Boss EHB
         ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
-        ctx.fillText(ehb, originX + 44 - ehbWidth / 2, originY + 17);
+        ctx.fillText(ehbLabel, originX + 44 - ehbWidth / 2, originY + 17);
       }
     }
 
-    const fileName = `${Date.now()}-${player.username.replace(/ /g, '_')}-${variant}.jpeg`;
+    // Player bosses
+    for (const [index, boss] of Object.keys(bosses).entries()) {
+      if (!isBoss(boss)) continue;
+
+      await renderMetricSlot(index, boss, bosses[boss].kills, bosses[boss].rank, bosses[boss].ehb);
+    }
+
+    await renderMetricSlot(
+      Object.keys(bosses).length,
+      Metric.EHB,
+      computed.ehb.value,
+      computed.ehb.rank,
+      computed.ehb.value
+    );
+
+    const fileName = `${Date.now()}-${username.replace(/ /g, '_')}-${variant}.jpeg`;
     const attachment = new MessageAttachment(canvas.toBuffer(), fileName);
 
     return { attachment, fileName };

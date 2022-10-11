@@ -1,8 +1,9 @@
+import { formatNumber } from '@wise-old-man/utils';
 import { MessageEmbed } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../config';
 import { BroadcastType, Event } from '../../types';
-import { getEmoji, toKMB, broadcastMessage } from '../../utils';
+import { getEmoji, broadcastMessage } from '../../utils';
 
 interface CompetitionStanding {
   displayName: string;
@@ -67,14 +68,20 @@ function getTeamStandings(standings: CompetitionStanding[]): string {
   return teamStandings
     .sort((a, b) => b.totalGained - a.totalGained)
     .slice(0, 3)
-    .map((t, i) => `${getStandingEmoji(i + 1)} ${i + 1}. ${t.name} - **${toKMB(t.totalGained)}**`)
+    .map(
+      (t, i) =>
+        `${getStandingEmoji(i + 1)} ${i + 1}. ${t.name} - **${formatNumber(t.totalGained, true)}**`
+    )
     .join('\n');
 }
 
 function getStandings(standings: CompetitionStanding[]): string {
   return standings
     .slice(0, 3)
-    .map((s, i) => `${getStandingEmoji(i + 1)} ${i + 1}. ${s.displayName} - **${toKMB(s.gained)}**`)
+    .map(
+      (s, i) =>
+        `${getStandingEmoji(i + 1)} ${i + 1}. ${s.displayName} - **${formatNumber(s.gained, true)}**`
+    )
     .join('\n');
 }
 

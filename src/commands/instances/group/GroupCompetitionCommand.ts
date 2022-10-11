@@ -1,13 +1,18 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
+import {
+  CompetitionDetails,
+  CompetitionListItem,
+  formatNumber,
+  getMetricName
+} from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { capitalize, uniq } from 'lodash';
-import { fetchCompetition, getCompetitionStatus } from '../../../api/modules/competitions';
-import { fetchGroupCompetitions } from '../../../api/modules/groups';
-import { Competition } from '../../../api/types';
+import { getCompetitionStatus, getCompetitionTimeLeft } from '../../../api/modules/competitions';
+import womClient from '../../../api/wom-api';
 import config from '../../../config';
 import { getServer } from '../../../database/services/server';
 import { SubCommand } from '../../../types';
-import { getEmoji, getMetricName, toKMB } from '../../../utils';
+import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class GroupCompetitionCommand implements SubCommand {
@@ -44,9 +49,9 @@ class GroupCompetitionCommand implements SubCommand {
     const status = message.options.getString('status') || 'ongoing';
 
     try {
-      const competitions = await fetchGroupCompetitions(groupId);
+      const competitions = await womClient.groups.getGroupCompetitions(groupId);
 
-      const competition = await fetchCompetition(
+      const competition = await womClient.competitions.getCompetitionDetails(
         message.options.getInteger('competition_id') ||
           this.getSelectedCompetitionId(competitions, status)
       );
@@ -71,7 +76,7 @@ class GroupCompetitionCommand implements SubCommand {
     }
   }
 
-  getFooterDate(competition: Competition) {
+  getFooterDate(competition: CompetitionDetails) {
     const status = getCompetitionStatus(competition);
 
     if (status === 'upcoming') {
@@ -81,7 +86,7 @@ class GroupCompetitionCommand implements SubCommand {
     }
   }
 
-  getFooterLabel(competition: Competition) {
+  getFooterLabel(competition: CompetitionDetails) {
     const status = getCompetitionStatus(competition);
 
     if (status === 'upcoming') {
@@ -93,22 +98,41 @@ class GroupCompetitionCommand implements SubCommand {
     }
   }
 
-  buildContent(competition: Competition) {
+  buildContent(competition: CompetitionDetails) {
     const isTeamCompetition = competition.type === 'team';
+    const timeLeft = getCompetitionTimeLeft(competition).split(' ');
 
     const lines = [
-      `**Metric:**: ${getEmoji(competition.metric)} ${getMetricName(competition.metric)}`,
-      `**Type:**: ${capitalize(competition.type)}`,
-      `**Participants:** ${competition.participants.length}`,
-      `**Duration:** ${competition.duration}`,
-      `**Total gained:** ${toKMB(competition.totalGained || 0)}`,
-      ''
+      `**Metric:** ${getEmoji(competition.metric)} ${getMetricName(competition.metric)}`,
+      `**Type:** ${capitalize(competition.type)}`,
+      `**Participants:** ${competition.participantCount}`,
+      `**${timeLeft.slice(0, 2).join(' ')}:** ${timeLeft.slice(2).join(' ')}`
     ];
 
     if (isTeamCompetition) {
+      const teamStandings = this.getTeamData(competition);
+
+      lines.push(
+        `**Total gained:** ${formatNumber(
+          teamStandings.reduce((a, b) => a + b.totalGained, 0) || 0,
+          true
+        )}\n`
+      );
       lines.push('**Teams:**');
-      lines.push(...this.getTeamData(competition));
+
+      lines.push(
+        ...teamStandings
+          .sort((a, b) => b.totalGained - a.totalGained)
+          .map(t => `${t.name} - **${formatNumber(t.totalGained, true)}**`)
+      );
     } else {
+      lines.push(
+        `**Total gained:** ${formatNumber(
+          competition.participations.reduce((a, b) => a + b.progress.gained, 0) || 0,
+          true
+        )}\n`
+      );
+
       lines.push('**Top Participants:**');
       lines.push(...this.getParticipantData(competition));
     }
@@ -116,8 +140,8 @@ class GroupCompetitionCommand implements SubCommand {
     return lines.join('\n');
   }
 
-  getTeamData(competition: Competition) {
-    const { participants } = competition;
+  getTeamData(competition: CompetitionDetails) {
+    const participants = competition.participations;
 
     if (!participants || participants.length === 0) return [];
 
@@ -132,18 +156,16 @@ class GroupCompetitionCommand implements SubCommand {
     const teamStandings = Object.entries(teamTally).map(t => ({ name: t[0], totalGained: t[1] }));
 
     // Sort teams by most total gained
-    return teamStandings
-      .sort((a, b) => b.totalGained - a.totalGained)
-      .map(t => `${t.name} - **${toKMB(t.totalGained)}**`);
+    return teamStandings;
   }
 
-  getParticipantData(competition: Competition) {
-    return competition.participants
+  getParticipantData(competition: CompetitionDetails) {
+    return competition.participations
       .slice(0, 10)
-      .map(p => `${p.displayName} - **${toKMB(p.progress.gained)}**`);
+      .map(p => `${p.player.displayName} - **${formatNumber(p.progress.gained, true)}**`);
   }
 
-  getSelectedCompetitionId(competitions: Competition[], status: string) {
+  getSelectedCompetitionId(competitions: CompetitionListItem[], status: string) {
     if (status === 'ongoing') {
       const ongoing = competitions.find(c => getCompetitionStatus(c) === 'ongoing');
 

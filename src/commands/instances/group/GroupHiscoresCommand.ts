@@ -1,11 +1,17 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { fetchGroupDetails, fetchGroupHiscores } from '../../../api/modules/groups';
-import { GroupHiscoresEntry } from '../../../api/types';
+import {
+  GroupHiscoresEntry,
+  getMetricName,
+  formatNumber,
+  Metric,
+  parseMetricAbbreviation
+} from '@wise-old-man/utils';
+import womClient from '../../../api/wom-api';
 import config from '../../../config';
 import { getServer } from '../../../database/services/server';
 import { SubCommand } from '../../../types';
-import { getEmoji, getMetricName, isActivity, isBoss, isSkill, toKMB } from '../../../utils';
+import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class GroupHiscoresCommand implements SubCommand {
@@ -30,21 +36,21 @@ class GroupHiscoresCommand implements SubCommand {
   }
 
   async execute(message: CommandInteraction) {
-    await message.deferReply(); // defer because things take time
+    await message.deferReply();
 
     const guildId = message.guild?.id;
     const server = await getServer(guildId); // maybe cache it so we don't have to do this
     const groupId = server?.groupId || -1;
-    const metric = message.options.getString('metric', true);
+    const metric = parseMetricAbbreviation(message.options.getString('metric', true)) || Metric.OVERALL;
 
     try {
-      const group = await fetchGroupDetails(groupId);
-      const hiscores = await fetchGroupHiscores(groupId, metric);
+      const group = await womClient.groups.getGroupDetails(groupId);
+      const hiscores = await womClient.groups.getGroupHiscores(groupId, metric);
 
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
         .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} hiscores`)
-        .setDescription(this.buildList(metric, hiscores))
+        .setDescription(this.buildList(hiscores))
         .setURL(`https://wiseoldman.net/groups/${groupId}/hiscores/`)
         .setFooter({ text: `Tip: Try /group hiscores metric: zulrah` });
 
@@ -58,26 +64,26 @@ class GroupHiscoresCommand implements SubCommand {
     }
   }
 
-  buildList(metric: string, hiscores: GroupHiscoresEntry[]): string {
+  buildList(hiscores: GroupHiscoresEntry[]): string {
     return hiscores
-      .map((g, i) => `${i + 1}. **${g.player.displayName}** - ${this.getValue(metric, g)}`)
+      .map((g, i) => `${i + 1}. **${g.player.displayName}** - ${this.getValue(g)}`)
       .join('\n');
   }
 
-  getValue(metric: string, result: GroupHiscoresEntry): string {
-    if (isSkill(metric)) {
-      return `${result.level} (${toKMB(result.experience || 0)})`;
+  getValue(result: GroupHiscoresEntry): string {
+    if ('level' in result.data) {
+      return `${result.data.level} (${formatNumber(result.data.experience || 0, true)})`;
     }
 
-    if (isBoss(metric)) {
-      return `${toKMB(result.kills || 0)}`;
+    if ('kills' in result.data) {
+      return `${formatNumber(result.data.kills || 0, true)}`;
     }
 
-    if (isActivity(metric)) {
-      return `${toKMB(result.score || 0)}`;
+    if ('score' in result.data) {
+      return `${formatNumber(result.data.score || 0, true)}`;
     }
 
-    return `${result.value || 0}`;
+    return `${result.data.value || 0}`;
   }
 }
 

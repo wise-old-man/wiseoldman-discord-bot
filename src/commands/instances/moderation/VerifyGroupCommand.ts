@@ -6,8 +6,8 @@ import {
   TextChannel
 } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { GroupListItem } from '@wise-old-man/utils';
 import { verify } from '../../../api/modules/groups';
-import { Group } from '../../../api/types';
 import config from '../../../config';
 import { Command } from '../../../types';
 import { getEmoji, hasModeratorRole } from '../../../utils';
@@ -33,12 +33,13 @@ class VerifyGroupCommand implements Command {
   }
 
   async execute(message: CommandInteraction) {
-    await message.deferReply();
-
     if (!hasModeratorRole(message.member as GuildMember)) {
       message.reply({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
       return;
     }
+
+    await message.deferReply();
+
     const groupId = message.options.getInteger('id', true);
     const userId = message.options.getUser('user', true).id;
     const user = message.guild?.members.cache.find(m => m.id === userId);
@@ -53,7 +54,7 @@ class VerifyGroupCommand implements Command {
         .setColor(config.visuals.green)
         .setDescription(CHAT_MESSAGE(group.name));
 
-      await message.editReply({ embeds: [response] });
+      await message.followUp({ embeds: [response] });
 
       this.sendConfirmationLog(message.guild?.channels, group, userId);
       this.addRole(user);
@@ -66,7 +67,7 @@ class VerifyGroupCommand implements Command {
     user.roles.add(config.discord.roles.groupLeader).catch(console.log);
   }
 
-  sendConfirmationLog(channels: GuildChannelManager | undefined, group: Group, userId: string) {
+  sendConfirmationLog(channels: GuildChannelManager | undefined, group: GroupListItem, userId: string) {
     const leadersLogChannel = channels?.cache.get(config.discord.channels.leadersLog);
 
     if (!leadersLogChannel) return;

@@ -1,6 +1,6 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { fetchGroupDetails } from '../../../api/modules/groups';
+import womClient from '../../../api/wom-api';
 import config from '../../../config';
 import { getServer } from '../../../database/services/server';
 import { SubCommand } from '../../../types';
@@ -29,7 +29,7 @@ class GroupDetailsCommand implements SubCommand {
     const groupId = server?.groupId || -1;
 
     try {
-      const group = await fetchGroupDetails(groupId);
+      const group = await womClient.groups.getGroupDetails(groupId);
       const pageURL = `https://wiseoldman.net/groups/${group.id}`;
 
       const verification = group.verified

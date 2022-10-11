@@ -7,11 +7,13 @@ import {
   MessageEmbed
 } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { approve, deny, reviewNameChange } from '../../../api/modules/names';
+import { NameChangeStatus } from '@wise-old-man/utils';
+import { approve, deny } from '../../../api/modules/names';
 import config from '../../../config';
 import { Command } from '../../../types';
 import { getEmoji, hasModeratorRole } from '../../../utils/discord';
 import CommandError from '../../CommandError';
+import womClient from '../../../api/wom-api';
 
 class NameChangeCommand implements Command {
   slashCommand: SlashCommandBuilder;
@@ -29,16 +31,23 @@ class NameChangeCommand implements Command {
     const nameChangeId = message.options.getInteger('name_change_id', true);
     try {
       await message.deferReply();
-      const reviewData = await reviewNameChange(nameChangeId);
 
-      if (reviewData.status !== 0) {
+      const reviewData = await womClient.nameChanges.getNameChangeDetails(nameChangeId);
+
+      if (reviewData.nameChange.status !== NameChangeStatus.PENDING) {
         throw new CommandError('This name change is not pending.');
+      }
+
+      if (!reviewData.data) {
+        throw new CommandError('Name change data was not found.');
       }
 
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
-        .setTitle(`Name change review: ${reviewData.oldName} → ${reviewData.newName}`)
-        .setDescription(this.buildReviewMessage(reviewData));
+        .setTitle(
+          `Name change review: ${reviewData.nameChange.oldName} → ${reviewData.nameChange.newName}`
+        )
+        .setDescription(this.buildReviewMessage(reviewData.data));
 
       const row = new MessageActionRow().addComponents(
         new MessageButton().setCustomId('namechange_approve').setLabel('Approve').setStyle('SUCCESS'),
@@ -91,22 +100,21 @@ class NameChangeCommand implements Command {
         await message.editReply({ embeds: [response], components: [] });
       });
     } catch (error) {
+      console.log(error);
+
       if (error instanceof CommandError) throw error;
       throw new CommandError('Failed to review name change.');
     }
   }
 
   buildReviewMessage(data: any): string {
-    const {
-      isNewOnHiscores,
-      hasNegativeGains,
-      hoursDiff,
-      ehpDiff,
-      ehbDiff,
-      expDiff,
-      oldTotalLevel,
-      newTotalLevel
-    } = data;
+    const { isNewOnHiscores, hasNegativeGains, hoursDiff, ehpDiff, ehbDiff, oldStats, newStats } = data;
+    const expDiff =
+      newStats.data.skills.overall && oldStats.data.skills.overall
+        ? newStats.data.skills.overall.experience - oldStats.data.skills.overall.experience
+        : 0;
+    const oldTotalLevel = oldStats.data.skills.overall?.level;
+    const newTotalLevel = newStats.data.skills.overall?.level;
 
     const lines = [];
 

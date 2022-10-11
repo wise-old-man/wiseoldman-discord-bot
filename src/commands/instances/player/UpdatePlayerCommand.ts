@@ -1,10 +1,10 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { updatePlayer } from '../../../api/modules/players';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { Command } from '../../../types';
 import CommandError from '../../CommandError';
+import womClient from '../../../api/wom-api';
 
 class UpdatePlayerCommand implements Command {
   global: boolean;
@@ -31,7 +31,7 @@ class UpdatePlayerCommand implements Command {
     }
 
     try {
-      const result = await updatePlayer(username);
+      const result = await womClient.players.updatePlayer({ username });
 
       const response = new MessageEmbed()
         .setColor(config.visuals.green)

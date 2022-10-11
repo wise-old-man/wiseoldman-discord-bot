@@ -1,11 +1,17 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
+import {
+  DeltaLeaderboardEntry,
+  formatNumber,
+  getMetricName,
+  Metric,
+  parseMetricAbbreviation
+} from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { fetchGroupDetails, fetchGroupGained } from '../../../api/modules/groups';
-import { GroupGainedEntry } from '../../../api/types';
+import womClient from '../../../api/wom-api';
 import config from '../../../config';
 import { getServer } from '../../../database/services/server';
 import { SubCommand } from '../../../types';
-import { getEmoji, getMetricName, toKMB } from '../../../utils';
+import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class GroupGainedCommand implements SubCommand {
@@ -42,12 +48,11 @@ class GroupGainedCommand implements SubCommand {
     const guildId = message.guild?.id;
     const server = await getServer(guildId); // maybe cache it so we don't have to do this
     const groupId = server?.groupId || -1;
-    const metric = message.options.getString('metric', true);
+    const metric = parseMetricAbbreviation(message.options.getString('metric', true)) || Metric.OVERALL;
     const period = message.options.getString('period', true);
-
     try {
-      const group = await fetchGroupDetails(groupId);
-      const gained = await fetchGroupGained(groupId, period, metric);
+      const group = await womClient.groups.getGroupDetails(groupId);
+      const gained = await womClient.groups.getGroupGains(groupId, { period, metric });
 
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
@@ -66,8 +71,10 @@ class GroupGainedCommand implements SubCommand {
     }
   }
 
-  buildList(gained: GroupGainedEntry[]) {
-    return gained.map((g, i) => `${i + 1}. **${g.player.displayName}** - ${toKMB(g.gained)}`).join('\n');
+  buildList(gained: DeltaLeaderboardEntry[]) {
+    return gained
+      .map((g, i) => `${i + 1}. **${g.player.displayName}** - ${formatNumber(g.gained, true)}`)
+      .join('\n');
   }
 }
 

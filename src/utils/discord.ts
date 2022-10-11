@@ -1,3 +1,4 @@
+import { parseMetricAbbreviation } from '@wise-old-man/utils';
 import {
   Guild,
   GuildChannel,
@@ -9,7 +10,6 @@ import {
 import bot from '../bot';
 import config from '../config';
 import { Emoji } from '../types';
-import { getAbbreviation } from './metrics';
 
 export const MAX_FIELD_SIZE = 25;
 
@@ -33,7 +33,9 @@ export function getMissingPermissions(member: GuildMember | null | undefined): s
 }
 
 export function getEmoji(metric: string): string {
-  const emojiKey = metric.startsWith('clue') ? 'clue' : getAbbreviation(metric);
+  const emojiKey = metric.startsWith('clue')
+    ? 'clue'
+    : parseMetricAbbreviation(metric) || metric.toLocaleLowerCase();
   return (<any>Emoji)[emojiKey] || '❌';
 }
 

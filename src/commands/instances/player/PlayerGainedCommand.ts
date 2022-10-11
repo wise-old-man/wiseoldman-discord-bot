@@ -1,13 +1,19 @@
 import { CommandInteraction, MessageEmbed, Constants } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { fetchPlayer, fetchPlayerGains } from '../../../api/modules/players';
-import { PlayerGains } from '../../../api/types';
+import { PaginatedMessage } from '@sapphire/discord.js-utilities';
+import {
+  GetPlayerGainsResponse,
+  PlayerDeltasMap,
+  getMetricName,
+  formatNumber,
+  Metric
+} from '@wise-old-man/utils';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { Command } from '../../../types';
-import { encodeURL, getEmoji, getMetricName, toKMB } from '../../../utils';
+import { encodeURL, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
-import { PaginatedMessage } from '@sapphire/discord.js-utilities';
+import womClient from '../../../api/wom-api';
 
 const GAINS_PER_PAGE = 10;
 
@@ -48,8 +54,8 @@ class PlayerGainedCommand implements Command {
     }
 
     try {
-      const player = await fetchPlayer(username);
-      const playerGains = await fetchPlayerGains(username, period);
+      const player = await womClient.players.getPlayerDetails({ username });
+      const playerGains = await womClient.players.getPlayerGains({ username }, { period });
 
       if (!playerGains || !playerGains.startsAt || !playerGains.endsAt) {
         throw new Error(`${player.displayName} has no ${period} gains.`);
@@ -123,7 +129,7 @@ class PlayerGainedCommand implements Command {
     }
   }
 
-  buildPages(displayName: string, period: string, gained: PlayerGains) {
+  buildPages(displayName: string, period: string, gained: GetPlayerGainsResponse<PlayerDeltasMap>) {
     const gainsList = this.buildGainsList(displayName, period, gained);
     const pageCount = Math.ceil(gainsList.length / GAINS_PER_PAGE);
 
@@ -145,37 +151,38 @@ class PlayerGainedCommand implements Command {
     return pages;
   }
 
-  buildGainsList(displayName: string, period: string, gained: PlayerGains) {
-    const gainedArray = Array.from(Object.entries(gained.data));
+  buildGainsList(displayName: string, period: string, gained: GetPlayerGainsResponse<PlayerDeltasMap>) {
+    const computedGains = Array.from(Object.entries(gained.data.computed))
+      .filter(([, e]) => e.value.gained > 0)
+      .map(([key, val]) => ({ metric: key, gained: val.value.gained }))
+      .sort((a, b) => b.gained - a.gained);
 
-    const virtualGains = gainedArray
-      .filter(([, e]) => e.value && e.value.gained > 0)
-      .map(([key, val]) => ({ metric: key, gained: val.value?.gained || 0 }))
-      .sort((a: any, b: any) => b.gained - a.gained);
+    const skillGains = Array.from(Object.entries(gained.data.skills))
+      .filter(([, e]) => e.experience.gained > 0)
+      .map(([key, val]) => ({ metric: key, gained: val.experience.gained }))
+      .sort((a, b) => b.gained - a.gained);
 
-    const skillGains = gainedArray
-      .filter(([, e]) => e.experience && e.experience.gained > 0)
-      .map(([key, val]) => ({ metric: key, gained: val.experience?.gained || 0 }))
-      .sort((a: any, b: any) => b.gained - a.gained);
+    const bossGains = Array.from(Object.entries(gained.data.bosses))
+      .filter(([, e]) => e.kills.gained > 0)
+      .map(([key, val]) => ({ metric: key, gained: val.kills.gained }))
+      .sort((a, b) => b.gained - a.gained);
 
-    const bossGains = gainedArray
-      .filter(([, e]) => e.kills && e.kills.gained > 0)
-      .map(([key, val]) => ({ metric: key, gained: val.kills?.gained || 0 }))
-      .sort((a: any, b: any) => b.gained - a.gained);
+    const activityGains = Array.from(Object.entries(gained.data.activities))
+      .filter(([, e]) => e && e.score.gained > 0)
+      .map(([key, val]) => ({ metric: key, gained: val?.score.gained || 0 }))
+      .sort((a, b) => b.gained - a.gained);
 
-    const activityGains = gainedArray
-      .filter(([, e]) => e.score && e.score.gained > 0)
-      .map(([key, val]) => ({ metric: key, gained: val.score?.gained || 0 }))
-      .sort((a: any, b: any) => b.gained - a.gained);
-
-    const valid = [...virtualGains, ...skillGains, ...bossGains, ...activityGains];
+    const valid = [...computedGains, ...skillGains, ...bossGains, ...activityGains];
 
     if (!valid || valid.length === 0) {
       throw new Error(`${displayName} has no ${period} gains.`);
     }
 
     return valid.map(({ metric, gained }) => {
-      return `${getEmoji(metric)} ${getMetricName(metric)} - **${toKMB(gained)}**`;
+      return `${getEmoji(metric)} ${getMetricName(metric as Metric)} - **${formatNumber(
+        gained,
+        true
+      )}**`;
     });
   }
 

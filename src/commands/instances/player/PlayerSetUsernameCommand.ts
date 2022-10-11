@@ -1,11 +1,11 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { fetchPlayer } from '../../../api/modules/players';
 import config from '../../../config';
 import { updateUsername } from '../../../database/services/alias';
 import { Command } from '../../../types';
 import { encodeURL } from '../../../utils/strings';
 import CommandError from '../../CommandError';
+import womClient from '../../../api/wom-api';
 
 class PlayerSetUsernameCommand implements Command {
   global: boolean;
@@ -27,7 +27,7 @@ class PlayerSetUsernameCommand implements Command {
 
     try {
       await message.deferReply();
-      const player = await fetchPlayer(username);
+      const player = await womClient.players.getPlayerDetails({ username });
 
       await updateUsername(userId, player.displayName);
 

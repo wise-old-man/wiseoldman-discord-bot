@@ -1,13 +1,13 @@
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { fetchPlayer, fetchPlayerAchievements } from '../../../api/modules/players';
 import config from '../../../config';
 import { getUsername } from '../../../database/services/alias';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
 import { encodeURL, formatDate } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import CommandError from '../../CommandError';
+import womClient from '../../../api/wom-api';
 
 const RENDER_WIDTH = 280;
 const RENDER_HEIGHT = 165;
@@ -38,12 +38,16 @@ class PlayerAchievementsCommand implements Command, Renderable {
     }
 
     try {
-      const player = await fetchPlayer(username);
-      const achievements = await fetchPlayerAchievements(username);
+      const player = await womClient.players.getPlayerDetails({ username });
+      const data = await womClient.players.getPlayerAchievements({ username });
 
-      if (!achievements || achievements.length === 0) {
+      if (!data || data.length === 0) {
         throw new Error(`${player.displayName} has no achievements.`);
       }
+
+      const achievements = data
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+        .slice(0, 5);
 
       const { attachment, fileName } = await this.render({ player, achievements });
 
