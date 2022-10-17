@@ -3,7 +3,7 @@ import { MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
 import { BroadcastType, Event } from '../../types';
-import { getEmoji, broadcastMessage } from '../../utils';
+import { getEmoji, broadcastMessage, durationBetween } from '../../utils';
 
 interface CompetitionStartedData {
   groupId: number;
@@ -12,7 +12,8 @@ interface CompetitionStartedData {
     metric: Metric;
     type: string;
     title: string;
-    duration: string;
+    startsAt: string;
+    endsAt: string;
   };
 }
 
@@ -25,7 +26,7 @@ class CompetitionStarted implements Event {
 
   async execute(data: CompetitionStartedData): Promise<void> {
     const { groupId, competition } = data;
-    const { id, metric, duration, type, title } = competition;
+    const { id, metric, startsAt, endsAt, type, title } = competition;
 
     if (!groupId) return;
 
@@ -34,7 +35,7 @@ class CompetitionStarted implements Event {
     const fields = [
       { name: 'Metric', value: `${getEmoji(metric)} ${getMetricName(metric)}` },
       { name: 'Type', value: capitalize(type) },
-      { name: 'Ends in', value: duration }
+      { name: 'Ends in', value: durationBetween(new Date(startsAt), new Date(endsAt)) }
     ];
 
     const message = new MessageEmbed()

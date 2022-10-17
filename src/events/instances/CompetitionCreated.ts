@@ -3,7 +3,7 @@ import { capitalize } from 'lodash';
 import { getMetricName, Metric } from '@wise-old-man/utils';
 import config from '../../config';
 import { BroadcastType, Event } from '../../types';
-import { getEmoji, broadcastMessage } from '../../utils';
+import { getEmoji, broadcastMessage, durationBetween } from '../../utils';
 
 interface CompetitionCreatedData {
   groupId: number;
@@ -12,8 +12,8 @@ interface CompetitionCreatedData {
     metric: Metric;
     type: string;
     title: string;
-    duration: string;
     startsAt: string;
+    endsAt: string;
   };
 }
 
@@ -26,7 +26,7 @@ class CompetitionCreated implements Event {
 
   async execute(data: CompetitionCreatedData): Promise<void> {
     const { groupId, competition } = data;
-    const { id, metric, duration, type, title, startsAt } = competition;
+    const { id, metric, type, title, startsAt, endsAt } = competition;
 
     if (!groupId) return;
 
@@ -36,7 +36,7 @@ class CompetitionCreated implements Event {
       { name: 'Title', value: title },
       { name: 'Metric', value: `${getEmoji(metric)} ${getMetricName(metric)}` },
       { name: 'Type', value: capitalize(type) },
-      { name: 'Duration', value: duration }
+      { name: 'Duration', value: durationBetween(new Date(startsAt), new Date(endsAt)) }
     ];
 
     const message = new MessageEmbed()
