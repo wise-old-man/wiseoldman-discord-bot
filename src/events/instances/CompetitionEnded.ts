@@ -18,7 +18,6 @@ interface CompetitionEndedData {
     type: string;
     metric: string;
     title: string;
-    duration: string;
   };
   standings: CompetitionStanding[];
 }
@@ -39,6 +38,7 @@ class CompetitionEnded implements Event {
     const isTeamCompetition = competition.type === 'team';
     const url = `https://wiseoldman.net/competitions/${id}`;
 
+    const topParticipations = isTeamCompetition ? getTeamStandings(standings) : getStandings(standings);
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
       .setTitle(`${getEmoji('speaker')} ${title} has ended!`)
@@ -46,7 +46,7 @@ class CompetitionEnded implements Event {
       .addFields([
         {
           name: isTeamCompetition ? 'Top Teams' : 'Top participants',
-          value: isTeamCompetition ? getTeamStandings(standings) : getStandings(standings)
+          value: topParticipations ? topParticipations : '--'
         }
       ]);
 
