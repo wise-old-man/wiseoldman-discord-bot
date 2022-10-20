@@ -10,13 +10,16 @@ import {
   getMetricOptions,
   getHelpCategoryOptions
 } from '../utils/autocomplete';
+import { getServer } from '../database/services/server';
 
 export function onError(options: { interaction: Interaction; title: string; tip?: string }): void {
-  const response = new MessageEmbed().setColor(config.visuals.red).setDescription(options.title);
-  response.setFooter({ text: options.tip ? options.tip : '' });
+  const { interaction, title, tip } = options;
 
-  if (options.interaction && options.interaction.isCommand()) {
-    options.interaction.followUp({ embeds: [response] });
+  const response = new MessageEmbed().setColor(config.visuals.red).setDescription(title);
+  response.setFooter({ text: tip ? tip : '' });
+
+  if (interaction && interaction.isCommand()) {
+    interaction.followUp({ embeds: [response] });
   }
 }
 
@@ -63,6 +66,7 @@ export async function onInteractionReceived(interaction: Interaction): Promise<v
 
     //TODO: check for admin permissions in a better way
     if (c.requiresAdmin && !isAdmin(interaction.member as GuildMember)) {
+      await interaction.deferReply();
       return onError({
         interaction: interaction,
         title: 'That command requires Admin permissions.',
@@ -70,7 +74,26 @@ export async function onInteractionReceived(interaction: Interaction): Promise<v
       });
     }
 
-    // TODO: Show a proper error when guild isn't configured yet
+    if (c.requiresGroup) {
+      if (!interaction.inGuild()) {
+        await interaction.deferReply();
+        return onError({
+          interaction: interaction,
+          title: 'This command only works in a server.'
+        });
+      }
+
+      const server = await getServer(interaction.guildId);
+
+      if (!server?.groupId) {
+        await interaction.deferReply();
+        return onError({
+          interaction: interaction,
+          title: 'That command requires a group to be configured.',
+          tip: `Start the group setup with /config group.`
+        });
+      }
+    }
 
     try {
       interaction.channel?.sendTyping();
