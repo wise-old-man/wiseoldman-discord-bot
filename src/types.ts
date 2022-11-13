@@ -152,7 +152,7 @@ export enum Emoji {
   bounty_hunter_hunter = '<:bounty_hunter_hunter:730171196410298378>',
   bounty_hunter_rogue = '<:bounty_hunter_rogue:730171196561293392>',
   clue = '<:clue_scrolls_all:729844134004785204>',
-  soul_wars_zeal = '<:soul_wars_zeal:796447053160906772>',
+  soul_wars_zeal = '<:soul_wars_zeal:1011956473615630396>',
   guardians_of_the_rift = '<:guardians_of_the_rift:963939589070934046>',
 
   ehp = '<:ehp:766260738221670432>',
