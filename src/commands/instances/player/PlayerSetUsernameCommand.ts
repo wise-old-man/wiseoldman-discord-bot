@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import config from '../../../config';
-import { updateUsername } from '../../../database/services/alias';
+import { updateAlias } from '../../../services/prisma';
 import { Command } from '../../../types';
 import { encodeURL } from '../../../utils/strings';
 import CommandError from '../../CommandError';
@@ -29,7 +29,7 @@ class PlayerSetUsernameCommand implements Command {
       await message.deferReply();
       const player = await womClient.players.getPlayerDetails({ username });
 
-      await updateUsername(userId, player.displayName);
+      await updateAlias(userId, player.displayName);
 
       const response = new MessageEmbed()
         .setColor(config.visuals.green)

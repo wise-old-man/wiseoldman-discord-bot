@@ -2,7 +2,7 @@ import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient from '../../../api/wom-api';
 import config from '../../../config';
-import { updateGroup } from '../../../database/services/server';
+import { updateGroup } from '../../../services/prisma';
 import { Command } from '../../../types';
 import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';

@@ -2,7 +2,7 @@ import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { formatNumber, round } from '@wise-old-man/utils';
 import config from '../../../config';
-import { getUsername } from '../../../database/services/alias';
+import { getUsername } from '../../../services/prisma';
 import { Command } from '../../../types';
 import { encodeURL } from '../../../utils';
 import CommandError from '../../CommandError';

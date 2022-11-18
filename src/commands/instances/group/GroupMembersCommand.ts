@@ -6,7 +6,7 @@ import { SubCommand } from '../../../types';
 import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
-import { getServer } from '../../../database/services/server';
+import { getServer } from '../../../services/prisma';
 import womClient from '../../../api/wom-api';
 
 const RESULTS_PER_PAGE = 20;

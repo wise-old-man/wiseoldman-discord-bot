@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import config from '../../../config';
-import { getUsername } from '../../../database/services/alias';
+import { getUsername } from '../../../services/prisma';
 import { Command } from '../../../types';
 import CommandError from '../../CommandError';
 import womClient from '../../../api/wom-api';

@@ -1,17 +1,15 @@
 {
   "compilerOptions": {
-    "lib": ["es6", "es2017", "esnext"],
-    "target": "es6",
-    "module": "commonjs",
-    "strict": true,
-    "outDir": "./dist",
-    "types": ["node"],
+    "baseUrl": ".",
     "esModuleInterop": true,
-    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "lib": ["esnext"],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "skipLibCheck": true,
+    "target": "es2016",
+    "types": ["node"]
   },
-  "exclude": ["node_modules", "dist", "__tests__"],
-  "include": ["./src/**/*.ts"]
+  "exclude": ["node_modules", "dist"]
 }

@@ -1,6 +1,6 @@
 import { MessageEmbed } from 'discord.js';
 import config from '../../config';
-import { getUserId } from '../../database/services/alias';
+import { getUserId } from '../../services/prisma';
 import { Event, BroadcastType } from '../../types';
 import { encodeURL, getEmoji, broadcastMessage } from '../../utils';
 

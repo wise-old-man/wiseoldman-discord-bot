@@ -1,8 +1,7 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '../../../config';
-import { setChannelPreference } from '../../../database/services/channelPreferences';
-import { updateBotChannel } from '../../../database/services/server';
+import { updateBotChannel, updateChannelPreference } from '../../../services/prisma';
 import { SubCommand, BroadcastType } from '../../../types';
 import { getEmoji, getBroadcastName } from '../../../utils';
 import CommandError from '../../CommandError';
@@ -69,10 +68,10 @@ class ConfigChannelCommand implements SubCommand {
         description = `All group-related broadcasts will be sent to <#${announcementChannel.id}> by default.`;
       } else {
         if (status === 'disable') {
-          await setChannelPreference(guildId, channelType, null);
+          await updateChannelPreference(guildId, channelType, null);
           description = `"${broadcastName}" broadcasts have now been disabled.`;
         } else {
-          await setChannelPreference(guildId, channelType, announcementChannel.id);
+          await updateChannelPreference(guildId, channelType, announcementChannel.id);
           description = `"${broadcastName}" broadcasts will now be sent to <#${announcementChannel.id}>`;
         }
       }

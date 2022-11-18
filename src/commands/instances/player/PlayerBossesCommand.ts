@@ -13,7 +13,7 @@ import {
   round
 } from '@wise-old-man/utils';
 import config from '../../../config';
-import { getUsername } from '../../../database/services/alias';
+import { getUsername } from '../../../services/prisma';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
 import { encodeURL } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';

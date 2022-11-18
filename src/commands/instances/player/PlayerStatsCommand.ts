@@ -3,7 +3,7 @@ import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js'
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { formatNumber, isSkill, MapOf, round, Skill, SkillValue } from '@wise-old-man/utils';
 import config from '../../../config';
-import { getUsername } from '../../../database/services/alias';
+import { getUsername } from '../../../services/prisma';
 import { CanvasAttachment, Command, Renderable } from '../../../types';
 import { encodeURL, INGAME_SKILL_ORDER } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';

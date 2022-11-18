@@ -9,7 +9,7 @@ import {
   Metric
 } from '@wise-old-man/utils';
 import config from '../../../config';
-import { getUsername } from '../../../database/services/alias';
+import { getUsername } from '../../../services/prisma';
 import { Command } from '../../../types';
 import { encodeURL, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';

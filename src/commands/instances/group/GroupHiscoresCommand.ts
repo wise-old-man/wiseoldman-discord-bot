@@ -9,7 +9,7 @@ import {
 } from '@wise-old-man/utils';
 import womClient from '../../../api/wom-api';
 import config from '../../../config';
-import { getServer } from '../../../database/services/server';
+import { getServer } from '../../../services/prisma';
 import { SubCommand } from '../../../types';
 import { getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
