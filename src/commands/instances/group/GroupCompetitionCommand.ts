@@ -112,7 +112,6 @@ class GroupCompetitionCommand implements SubCommand {
       keyValue('Metric', `${getEmoji(metric)} ${MetricProps[metric].name}`),
       keyValue('Type', CompetitionTypeProps[type].name),
       keyValue('Participants', participantCount),
-      keyValue('Time left', timeLeft.join(' ')),
       keyValue(timeLeft.slice(0, 2).join(' '), timeLeft.slice(2).join(' '))
     ];
 
@@ -122,9 +121,7 @@ class GroupCompetitionCommand implements SubCommand {
 
       lines.push(keyValue('Total gained', formatNumber(totalGained, true)));
 
-      lines.push('\n');
-      lines.push(bold('Teams'));
-
+      lines.push(bold('\nTeams'));
       lines.push(
         ...teamStandings
           .sort((a, b) => b.totalGained - a.totalGained)
@@ -135,9 +132,7 @@ class GroupCompetitionCommand implements SubCommand {
 
       lines.push(keyValue('Total gained', formatNumber(totalGained, true)));
 
-      lines.push('\n');
-      lines.push(bold('Top Participants'));
-
+      lines.push(bold('\nTop Participants'));
       lines.push(
         ...participations
           .slice(0, 10)

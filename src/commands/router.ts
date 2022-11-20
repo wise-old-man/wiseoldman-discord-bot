@@ -10,7 +10,7 @@ import {
   getMetricOptions,
   getHelpCategoryOptions
 } from '../utils/autocomplete';
-import { getServer } from '../database/services/server';
+import { getServer } from '../services/prisma';
 
 export function onError(options: { interaction: Interaction; title: string; tip?: string }): void {
   const { interaction, title, tip } = options;
