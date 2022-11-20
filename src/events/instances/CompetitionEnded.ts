@@ -2,8 +2,8 @@ import { formatNumber } from '@wise-old-man/utils';
 import { MessageEmbed } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../config';
-import { BroadcastType, Event } from '../../types';
-import { getEmoji, broadcastMessage } from '../../utils';
+import { Event } from '../../types';
+import { getEmoji, broadcastMessage, BroadcastType } from '../../utils';
 
 interface CompetitionStanding {
   displayName: string;

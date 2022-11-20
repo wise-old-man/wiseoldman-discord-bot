@@ -1,8 +1,8 @@
 import { MessageEmbed } from 'discord.js';
 import config from '../../config';
 import { getUserId } from '../../services/prisma';
-import { Event, BroadcastType } from '../../types';
-import { encodeURL, getEmoji, broadcastMessage } from '../../utils';
+import { Event } from '../../types';
+import { encodeURL, getEmoji, broadcastMessage, BroadcastType } from '../../utils';
 
 interface PlayerAchievement {
   name: string;

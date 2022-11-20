@@ -1,5 +1,11 @@
 import moment from 'moment';
-import { TimeGap } from '../types';
+
+export interface TimeGap {
+  seconds: number;
+  minutes: number;
+  hours: number;
+  days: number;
+}
 
 export function formatDate(date: Date, format = 'MM-DD-YYYY HH:mm'): string {
   return moment(date).format(format);

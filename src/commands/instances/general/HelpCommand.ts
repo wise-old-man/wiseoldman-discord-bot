@@ -3,8 +3,8 @@ import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient from '../../../api/wom-api';
 import config from '../../../config';
 import { getChannelPreferences, getServer } from '../../../services/prisma';
-import { BroadcastType, Command, CustomCommand } from '../../../types';
-import { getBroadcastName, getEmoji } from '../../../utils';
+import { Command, CustomCommand } from '../../../types';
+import { BroadcastType, getBroadcastName, getEmoji } from '../../../utils';
 import CommandError from '../../CommandError';
 import { customCommands } from '../../CustomCommands';
 

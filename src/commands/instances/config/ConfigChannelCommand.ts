@@ -2,8 +2,8 @@ import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '../../../config';
 import { updateBotChannel, updateChannelPreference } from '../../../services/prisma';
-import { SubCommand, BroadcastType } from '../../../types';
-import { getEmoji, getBroadcastName } from '../../../utils';
+import { SubCommand } from '../../../types';
+import { getEmoji, getBroadcastName, BroadcastType } from '../../../utils';
 import CommandError from '../../CommandError';
 
 class ConfigChannelCommand implements SubCommand {

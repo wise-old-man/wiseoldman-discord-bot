@@ -1,7 +1,7 @@
 import { MessageEmbed } from 'discord.js';
 import config from '../../config';
-import { BroadcastType, Event } from '../../types';
-import { encodeURL, broadcastMessage } from '../../utils';
+import { Event } from '../../types';
+import { encodeURL, broadcastMessage, BroadcastType } from '../../utils';
 
 interface MemberNameChangedData {
   groupId: number;

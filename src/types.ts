@@ -29,12 +29,12 @@ export interface CustomCommand {
 
 export interface Event {
   type: string;
-  execute(data: Object): void;
+  execute(data: unknown): void;
 }
 
 export interface EventPayload {
   type: string;
-  data: Object;
+  data: unknown;
 }
 
 export interface CanvasAttachment {
@@ -44,22 +44,6 @@ export interface CanvasAttachment {
 
 export interface Renderable {
   render(props: any): Promise<CanvasAttachment>;
-}
-
-export interface TimeGap {
-  seconds: number;
-  minutes: number;
-  hours: number;
-  days: number;
-}
-
-export enum BroadcastType {
-  Default = 'DEFAULT',
-  CompetitionStatus = 'COMPETITION_STATUS',
-  MemberAchievements = 'MEMBER_ACHIEVEMENTS',
-  MemberNameChanged = 'MEMBER_NAME_CHANGED',
-  MemberHardcoreDied = 'MEMBER_HCIM_DIED',
-  MembersListChanged = 'MEMBERS_LIST_CHANGED'
 }
 
 // To find the ID of an emoji, type: \:emoji: in Discord chat

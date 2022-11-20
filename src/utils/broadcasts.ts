@@ -1,7 +1,15 @@
 import { MessageEmbed } from 'discord.js';
 import { getServers, getPreferredChannels } from '../services/prisma';
-import { BroadcastType } from '../types';
-import { propagateMessage } from '../utils';
+import { propagateMessage } from '.';
+
+export enum BroadcastType {
+  Default = 'DEFAULT',
+  CompetitionStatus = 'COMPETITION_STATUS',
+  MemberAchievements = 'MEMBER_ACHIEVEMENTS',
+  MemberNameChanged = 'MEMBER_NAME_CHANGED',
+  MemberHardcoreDied = 'MEMBER_HCIM_DIED',
+  MembersListChanged = 'MEMBERS_LIST_CHANGED'
+}
 
 async function broadcastMessage(groupId: number, type: string, message: MessageEmbed): Promise<void> {
   const servers = await getServers(groupId);
