@@ -74,26 +74,26 @@ export async function onInteractionReceived(interaction: Interaction): Promise<v
       });
     }
 
-    if (c.requiresGroup) {
-      if (!interaction.inGuild()) {
-        await interaction.deferReply();
-        return onError({
-          interaction: interaction,
-          title: 'This command only works in a server.'
-        });
-      }
+    // if (c.requiresGroup) {
+    //   if (!interaction.inGuild()) {
+    //     await interaction.deferReply();
+    //     return onError({
+    //       interaction: interaction,
+    //       title: 'This command only works in a server.'
+    //     });
+    //   }
 
-      const server = await getServer(interaction.guildId);
+    //   const server = await getServer(interaction.guildId);
 
-      if (!server?.groupId) {
-        await interaction.deferReply();
-        return onError({
-          interaction: interaction,
-          title: 'That command requires a group to be configured.',
-          tip: `Start the group setup with /config group.`
-        });
-      }
-    }
+    //   if (!server?.groupId) {
+    //     await interaction.deferReply();
+    //     return onError({
+    //       interaction: interaction,
+    //       title: 'That command requires a group to be configured.',
+    //       tip: `Start the group setup with /config group.`
+    //     });
+    //   }
+    // }
 
     try {
       interaction.channel?.sendTyping();

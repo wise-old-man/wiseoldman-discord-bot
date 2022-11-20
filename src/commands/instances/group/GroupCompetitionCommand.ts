@@ -22,7 +22,7 @@ import { bold, getLinkedGroupId, keyValue } from '../../../utils/wooow';
 
 const CONFIG: CommandConfig = {
   name: 'competition',
-  description: "View a group's ongoing/upcoming competition",
+  description: "View a group's ongoing/upcoming competition.",
   options: [
     {
       type: 'integer',
@@ -58,18 +58,18 @@ class GroupCompetitionCommand implements SubCommand {
     this.slashCommand = setupCommand(CONFIG);
   }
 
-  async execute(message: CommandInteraction) {
+  async execute(interaction: CommandInteraction) {
     try {
-      await message.deferReply();
+      await interaction.deferReply();
 
-      const groupId = await getLinkedGroupId(message.guildId);
+      const groupId = await getLinkedGroupId(interaction);
 
       // Extract the "status" param, or fallback to "ongoing"
-      const statusParam = message.options.getString('status');
+      const statusParam = interaction.options.getString('status');
       const status = isCompetitionStatus(statusParam) ? statusParam : CompetitionStatus.ONGOING;
 
       // Extract the "competition_id" param, or fallback to the default competition
-      const competitionIdParam = message.options.getInteger('competition_id');
+      const competitionIdParam = interaction.options.getInteger('competition_id');
       const competitionId = competitionIdParam || (await this.getDefaultCompetitionId(groupId, status));
 
       const competition = await womClient.competitions.getCompetitionDetails(competitionId).catch(() => {
@@ -84,9 +84,9 @@ class GroupCompetitionCommand implements SubCommand {
         .setTimestamp(this.getFooterDate(competition))
         .setFooter({ text: this.getFooterLabel(competition) });
 
-      await message.editReply({ embeds: [response] });
+      await interaction.editReply({ embeds: [response] });
     } catch (error) {
-      handleError(message, error);
+      handleError(interaction, error);
     }
   }
 
