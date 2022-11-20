@@ -27,7 +27,7 @@ class PlayerSetUsernameCommand implements Command {
 
     try {
       await message.deferReply();
-      const player = await womClient.players.getPlayerDetails({ username });
+      const player = await womClient.players.getPlayerDetails(username);
 
       await updateAlias(userId, player.displayName);
 

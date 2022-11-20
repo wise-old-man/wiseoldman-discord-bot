@@ -67,7 +67,7 @@ class PlayerBossesCommand implements Command, Renderable {
     }
 
     try {
-      const player = await womClient.players.getPlayerDetails({ username });
+      const player = await womClient.players.getPlayerDetails(username);
 
       const { attachment, fileName } = await this.render({
         bosses: player.latestSnapshot.data.bosses,

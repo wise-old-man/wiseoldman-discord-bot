@@ -33,7 +33,7 @@ class PlayerEfficiencyCommand implements Command {
     }
 
     try {
-      const player = await womClient.players.getPlayerDetails({ username });
+      const player = await womClient.players.getPlayerDetails(username);
 
       if (player.ehp === 0 && player.tt200m === 0) {
         throw new CommandError(`This player is outdated. Please try "/update ${username}" first.`);

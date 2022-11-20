@@ -38,8 +38,8 @@ class PlayerAchievementsCommand implements Command, Renderable {
     }
 
     try {
-      const player = await womClient.players.getPlayerDetails({ username });
-      const data = await womClient.players.getPlayerAchievements({ username });
+      const player = await womClient.players.getPlayerDetails(username);
+      const data = await womClient.players.getPlayerAchievements(username);
 
       if (!data || data.length === 0) {
         throw new Error(`${player.displayName} has no achievements.`);

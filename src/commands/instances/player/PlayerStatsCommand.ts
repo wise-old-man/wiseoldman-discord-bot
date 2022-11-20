@@ -60,7 +60,7 @@ class PlayerStatsCommand implements Command, Renderable {
     }
 
     try {
-      const player = await womClient.players.getPlayerDetails({ username });
+      const player = await womClient.players.getPlayerDetails(username);
       const { attachment, fileName } = await this.render({
         skills: player.latestSnapshot.data.skills,
         username: player.username,
