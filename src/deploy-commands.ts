@@ -12,20 +12,20 @@ export async function deployCommands(): Promise<void> {
   for (const command of commands) {
     const slashCommand = command.slashCommand;
 
-    if (slashCommand && !command.subcommand) {
-      if (process.env.DISCORD_DEV_LOCAL) {
-        guildCommands.push(
-          slashCommand.setDescription(`[DEV 🧑‍💻]: ${slashCommand.description}`).toJSON()
-        );
-      } else if (command.global) {
-        globalCommands.push(slashCommand.toJSON());
-      } else {
-        guildCommands.push(slashCommand.toJSON());
-      }
+    if (!slashCommand || command.subcommand) {
+      continue;
+    }
+
+    if (process.env.DISCORD_DEV_LOCAL) {
+      guildCommands.push(slashCommand.setDescription(`[DEV 🧑‍💻]: ${slashCommand.description}`).toJSON());
+    } else if (command.global) {
+      globalCommands.push(slashCommand.toJSON());
+    } else {
+      guildCommands.push(slashCommand.toJSON());
     }
   }
 
-  const restClient = new REST({ version: '9' }).setToken(config.token as string);
+  const restClient = new REST({ version: '9' }).setToken(config.token);
 
   if (guildCommands.length > 0) {
     try {

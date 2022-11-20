@@ -1,12 +1,5 @@
 import { parseMetricAbbreviation } from '@wise-old-man/utils';
-import {
-  Guild,
-  GuildChannel,
-  GuildMember,
-  MessageEmbed,
-  PermissionResolvable,
-  TextChannel
-} from 'discord.js';
+import { Guild, GuildMember, MessageEmbed, PermissionResolvable, TextChannel } from 'discord.js';
 import bot from '../bot';
 import config from '../config';
 import { Emoji } from '../types';
@@ -58,9 +51,9 @@ export function propagateMessage(message: MessageEmbed, channelIds: string[] | u
  * Finds the first text channel where the bot has
  * permissions to send messages to.
  */
-export function findOpenChannel(guild: Guild): GuildChannel | undefined {
-  const channel = guild.channels.cache.find(channel => {
-    return !!(channel.type === 'GUILD_TEXT' && guild.me?.permissions.has('SEND_MESSAGES'));
+export function findOpenChannel(guild: Guild) {
+  const channel = guild.channels.cache.find(c => {
+    return c.type === 'GUILD_TEXT' && guild.me?.permissions.has('SEND_MESSAGES');
   });
 
   return channel as TextChannel;

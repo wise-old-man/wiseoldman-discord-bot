@@ -1,7 +1,7 @@
-import { Client, Intents, MessageEmbed, TextChannel } from 'discord.js';
-import * as router from './commands/router';
+import { Client, Intents, MessageEmbed } from 'discord.js';
 import config from './config';
 import { findOpenChannel, getEmoji } from './utils';
+import * as router from './commands/router';
 
 class Bot {
   client: Client;
@@ -28,7 +28,7 @@ class Bot {
       this.client.on('interactionCreate', router.onInteractionReceived);
 
       this.client.on('guildCreate', guild => {
-        const openChannel = <TextChannel>findOpenChannel(guild);
+        const openChannel = findOpenChannel(guild);
         if (openChannel) openChannel.send({ embeds: [buildJoinMessage()] });
       });
 

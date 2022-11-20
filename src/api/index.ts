@@ -2,7 +2,7 @@ import cors from 'cors';
 import express, { Express } from 'express';
 import { onEventReceived } from '../events/router';
 
-const PORT = process.env.PORT || 7000;
+const PORT = 7000;
 
 export function init(): Express {
   const app = express();
@@ -19,7 +19,7 @@ export function init(): Express {
     const token = req.body['api_token'];
 
     if (!token || token !== process.env.DISCORD_BOT_API_TOKEN) {
-      return res.status(401).json('Wrong API Token.');
+      return res.status(401).json({ message: 'Wrong API Token.' });
     }
 
     console.log('Event received: ', req.body);
