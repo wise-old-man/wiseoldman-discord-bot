@@ -16,12 +16,10 @@ import CommandError from '../../CommandError';
 
 class GroupGainedCommand implements SubCommand {
   subcommand?: boolean | undefined;
-  requiresGroup?: boolean | undefined;
   slashCommand?: SlashCommandSubcommandBuilder;
 
   constructor() {
     this.subcommand = true;
-    this.requiresGroup = true;
 
     this.slashCommand = new SlashCommandSubcommandBuilder()
       .addStringOption(option =>

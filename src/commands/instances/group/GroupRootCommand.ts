@@ -23,12 +23,10 @@ const groupCommands: SubCommand[] = [
 
 class GroupRootCommand implements Command {
   global?: boolean | undefined;
-  requiresGroup?: boolean | undefined;
   slashCommand?: SlashCommandSubcommandsOnlyBuilder;
 
   constructor() {
     this.global = true;
-    this.requiresGroup = true;
 
     this.slashCommand = new SlashCommandBuilder()
       .setName('group')

@@ -49,12 +49,10 @@ const CONFIG: CommandConfig = {
 
 class GroupCompetitionCommand implements SubCommand {
   subcommand?: boolean;
-  requiresGroup?: boolean;
   slashCommand?: SlashCommandSubcommandBuilder;
 
   constructor() {
     this.subcommand = true;
-    this.requiresGroup = true;
     this.slashCommand = setupCommand(CONFIG);
   }
 

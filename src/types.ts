@@ -11,7 +11,6 @@ export interface Command {
     | SlashCommandSubcommandBuilder
     | SlashCommandSubcommandsOnlyBuilder;
   requiresAdmin?: boolean;
-  requiresGroup?: boolean;
   global?: boolean;
   subcommand?: boolean;
   execute(message: CommandInteraction): Promise<void>;
