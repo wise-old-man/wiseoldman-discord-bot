@@ -1,21 +1,23 @@
-import { CompetitionDetails, CompetitionListItem } from '@wise-old-man/utils';
+import { CompetitionDetails, CompetitionListItem, CompetitionStatus } from '@wise-old-man/utils';
 import { durationBetween } from '../../utils';
 import api from '../handler';
 
-export function getCompetitionStatus(competition: CompetitionDetails | CompetitionListItem): string {
+export function getCompetitionStatus(
+  competition: CompetitionDetails | CompetitionListItem
+): CompetitionStatus {
   const now = new Date();
   const endsAt = competition.endsAt;
   const startsAt = competition.startsAt;
 
   if (endsAt.getTime() < now.getTime()) {
-    return 'finished';
+    return CompetitionStatus.FINISHED;
   }
 
   if (startsAt.getTime() < now.getTime()) {
-    return 'ongoing';
+    return CompetitionStatus.ONGOING;
   }
 
-  return 'upcoming';
+  return CompetitionStatus.UPCOMING;
 }
 
 export function getCompetitionTimeLeft(competition: CompetitionDetails | CompetitionListItem): string {

@@ -5,7 +5,7 @@ import config from './config';
 
 const { guildId, clientId } = config.discord;
 
-export async function deployCommands(): Promise<void> {
+export async function deployCommands() {
   const guildCommands = [];
   const globalCommands = [];
 
