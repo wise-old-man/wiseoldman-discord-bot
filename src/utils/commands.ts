@@ -1,16 +1,20 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 
-interface IntegerOption {
-  type: 'integer';
+interface BaseOption {
+  type: 'integer' | 'string';
   name: string;
   description: string;
+  required?: boolean;
+  autocomplete?: boolean;
+}
+
+interface IntegerOption extends BaseOption {
+  type: 'integer';
   choices?: Array<{ value: number; label: string }>;
 }
 
-interface StringOption {
+interface StringOption extends BaseOption {
   type: 'string';
-  name: string;
-  description: string;
   choices?: Array<{ value: string; label: string }>;
 }
 
@@ -31,6 +35,9 @@ export function setupCommand(config: CommandConfig) {
         command.addIntegerOption(opt => {
           opt.setName(option.name).setDescription(option.description);
 
+          if (option.autocomplete) opt.setAutocomplete(true);
+          if (option.required) opt.setRequired(true);
+
           if (option.choices && option.choices.length > 0) {
             opt.addChoices(option.choices.map(c => [c.label, c.value]));
           }
@@ -40,6 +47,9 @@ export function setupCommand(config: CommandConfig) {
       } else if (option.type === 'string') {
         command.addStringOption(opt => {
           opt.setName(option.name).setDescription(option.description);
+
+          if (option.autocomplete) opt.setAutocomplete(true);
+          if (option.required) opt.setRequired(true);
 
           if (option.choices && option.choices.length > 0) {
             opt.addChoices(option.choices.map(c => [c.label, c.value]));

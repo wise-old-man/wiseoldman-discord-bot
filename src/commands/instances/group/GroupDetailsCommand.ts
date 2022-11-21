@@ -1,11 +1,17 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { CommandConfig, setupCommand } from '../../../utils/commands';
 import womClient from '../../../api/wom-api';
 import config from '../../../config';
-import { getServer } from '../../../services/prisma';
 import { SubCommand } from '../../../types';
 import { formatDate, getEmoji } from '../../../utils';
-import CommandError from '../../CommandError';
+import { CommandErrorAlt, ErrorCode, handleError } from '../../../utils/error';
+import { getLinkedGroupId } from '../../../utils/wooow';
+
+const CONFIG: CommandConfig = {
+  name: 'details',
+  description: "View the group's details."
+};
 
 class GroupDetailsCommand implements SubCommand {
   subcommand?: boolean | undefined;
@@ -13,22 +19,18 @@ class GroupDetailsCommand implements SubCommand {
 
   constructor() {
     this.subcommand = true;
-
-    this.slashCommand = new SlashCommandSubcommandBuilder()
-      .setName('details')
-      .setDescription("View the group's details.");
+    this.slashCommand = setupCommand(CONFIG);
   }
 
-  async execute(message: CommandInteraction) {
-    await message.deferReply();
-
-    const guildId = message.guild?.id;
-    const server = await getServer(guildId); // maybe cache it so we don't have to do this
-    const groupId = server?.groupId || -1;
-
+  async execute(interaction: CommandInteraction) {
     try {
-      const group = await womClient.groups.getGroupDetails(groupId);
-      const pageURL = `https://wiseoldman.net/groups/${group.id}`;
+      await interaction.deferReply();
+
+      const groupId = await getLinkedGroupId(interaction);
+
+      const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
+        throw new CommandErrorAlt(ErrorCode.GROUP_NOT_FOUND);
+      });
 
       const verification = group.verified
         ? `${getEmoji('success')} Verified`
@@ -37,7 +39,7 @@ class GroupDetailsCommand implements SubCommand {
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
         .setTitle(group.name)
-        .setURL(pageURL)
+        .setURL(`https://wiseoldman.net/groups/${group.id}`)
         .addFields([
           { name: 'Clan chat', value: group.clanChat || '---' },
           { name: 'Members', value: group.memberCount?.toString() || '0' },
@@ -45,13 +47,9 @@ class GroupDetailsCommand implements SubCommand {
           { name: '\u200B', value: verification }
         ]);
 
-      await message.editReply({ embeds: [response] });
-    } catch (e: any) {
-      if (e.response?.data?.message) {
-        throw new CommandError(e.response?.data?.message);
-      } else {
-        throw new CommandError(e.name, e.message);
-      }
+      await interaction.editReply({ embeds: [response] });
+    } catch (error) {
+      handleError(interaction, error);
     }
   }
 }

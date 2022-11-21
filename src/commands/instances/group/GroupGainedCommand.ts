@@ -1,18 +1,34 @@
 import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
-import {
-  DeltaLeaderboardEntry,
-  formatNumber,
-  getMetricName,
-  Metric,
-  parseMetricAbbreviation
-} from '@wise-old-man/utils';
+import { formatNumber, getMetricName, Metric, parseMetricAbbreviation } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { CommandConfig, setupCommand } from '../../../utils/commands';
 import womClient from '../../../api/wom-api';
 import config from '../../../config';
-import { getServer } from '../../../services/prisma';
 import { SubCommand } from '../../../types';
 import { getEmoji } from '../../../utils';
-import CommandError from '../../CommandError';
+import { bold, getLinkedGroupId } from 'src/utils/wooow';
+import { CommandErrorAlt, ErrorCode, handleError } from 'src/utils/error';
+
+const CONFIG: CommandConfig = {
+  name: 'gained',
+  description: "View the group's gains leaderboards.",
+  options: [
+    {
+      type: 'string',
+      name: 'metric',
+      description: 'The metric to show gains for',
+      required: true,
+      autocomplete: true
+    },
+    {
+      type: 'string',
+      name: 'period',
+      description: 'You can use custom periods with this format: 1y6d5h',
+      required: true,
+      autocomplete: true
+    }
+  ]
+};
 
 class GroupGainedCommand implements SubCommand {
   subcommand?: boolean | undefined;
@@ -20,59 +36,43 @@ class GroupGainedCommand implements SubCommand {
 
   constructor() {
     this.subcommand = true;
-
-    this.slashCommand = new SlashCommandSubcommandBuilder()
-      .addStringOption(option =>
-        option
-          .setName('metric')
-          .setDescription('The category to show gains for')
-          .setAutocomplete(true)
-          .setRequired(true)
-      )
-      .addStringOption(option =>
-        option
-          .setName('period')
-          .setDescription('You can use custom periods with this format: 1y6d5h')
-          .setAutocomplete(true)
-          .setRequired(true)
-      )
-      .setName('gained')
-      .setDescription("View the group's gains.");
+    this.slashCommand = setupCommand(CONFIG);
   }
 
-  async execute(message: CommandInteraction) {
-    await message.deferReply();
-
-    const guildId = message.guild?.id;
-    const server = await getServer(guildId); // maybe cache it so we don't have to do this
-    const groupId = server?.groupId || -1;
-    const metric = parseMetricAbbreviation(message.options.getString('metric', true)) || Metric.OVERALL;
-    const period = message.options.getString('period', true);
+  async execute(interaction: CommandInteraction) {
     try {
-      const group = await womClient.groups.getGroupDetails(groupId);
+      await interaction.deferReply();
+
+      const groupId = await getLinkedGroupId(interaction);
+
+      // Extract the "metric" param, or fallback to "overall"
+      const metricParam = parseMetricAbbreviation(interaction.options.getString('metric', true));  
+      const metric = metricParam || Metric.OVERALL;
+
+      // Extract the "period" param,
+      const period = interaction.options.getString('period', true);
+
+      const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
+        throw new CommandErrorAlt(ErrorCode.GROUP_NOT_FOUND);
+      });
+
       const gained = await womClient.groups.getGroupGains(groupId, { period, metric });
 
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
         .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} gains (${period})`)
-        .setDescription(this.buildList(gained))
         .setURL(`https://wiseoldman.net/groups/${groupId}/gained/`)
-        .setFooter({ text: `Tip: Try /group gained metric: zulrah period: day` });
+        .setFooter({ text: `Tip: Try /group gained metric: zulrah period: day` })
+        .setDescription(
+          gained
+            .map((g, i) => `${i + 1}. ${bold(g.player.displayName)} - ${formatNumber(g.gained, true)}`)
+            .join('\n')
+        );
 
-      await message.editReply({ embeds: [response] });
-    } catch (e: any) {
-      if (e.response?.data?.message) {
-        throw new CommandError(e.response?.data?.message);
-      } else {
-        throw new CommandError(e.name, e.message);
-      }
+      await interaction.editReply({ embeds: [response] });
+    } catch (error) {
+      handleError(interaction, error);
     }
-  }
-
-  buildList(gained: DeltaLeaderboardEntry[]) {
-    return gained
-      .map((g, i) => `${i + 1}. **${g.player.displayName}** - ${formatNumber(g.gained, true)}`)
-      .join('\n');
   }
 }
 
