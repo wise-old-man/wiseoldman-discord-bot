@@ -1,5 +1,3 @@
-import { MessageAttachment } from 'discord.js';
-
 export interface Event {
   type: string;
   execute(data: unknown): void;
@@ -8,15 +6,6 @@ export interface Event {
 export interface EventPayload {
   type: string;
   data: unknown;
-}
-
-export interface CanvasAttachment {
-  attachment: MessageAttachment;
-  fileName: string;
-}
-
-export interface Renderable {
-  render(props: any): Promise<CanvasAttachment>;
 }
 
 // To find the ID of an emoji, type: \:emoji: in Discord chat

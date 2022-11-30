@@ -1,7 +1,6 @@
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
 import config from '../../../config';
-import { CanvasAttachment } from '../../../types';
 import { encodeURL, formatDate } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import womClient from '../../../services/wiseoldman';
@@ -66,7 +65,7 @@ class PlayerAchievementsCommand extends Command {
     await interaction.editReply({ embeds: [embed], files: [attachment] });
   }
 
-  async render(player: PlayerDetails, achievements: Achievement[]): Promise<CanvasAttachment> {
+  async render(player: PlayerDetails, achievements: Achievement[]) {
     const calculatedHeight = Math.min(10 + achievements.length * 31, RENDER_HEIGHT);
 
     // Create a scaled empty canvas

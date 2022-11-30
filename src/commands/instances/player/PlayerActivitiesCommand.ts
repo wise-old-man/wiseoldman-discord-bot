@@ -2,7 +2,6 @@ import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
 import { formatNumber, isActivity, PlayerDetails } from '@wise-old-man/utils';
 import config from '../../../config';
-import { CanvasAttachment } from '../../../types';
 import { encodeURL } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import womClient from '../../../services/wiseoldman';
@@ -74,7 +73,7 @@ class PlayerActivitiesCommand extends Command {
     await interaction.editReply({ embeds: [embed], files: [attachment] });
   }
 
-  async render(playerDetails: PlayerDetails, variant: RenderVariant): Promise<CanvasAttachment> {
+  async render(playerDetails: PlayerDetails, variant: RenderVariant) {
     const username = playerDetails.username;
     const activities = playerDetails.latestSnapshot.data.activities;
 
