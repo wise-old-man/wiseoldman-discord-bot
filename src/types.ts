@@ -101,20 +101,5 @@ export enum Emoji {
   guardians_of_the_rift = '<:guardians_of_the_rift:963939589070934046>',
 
   ehp = '<:ehp:766260738221670432>',
-  ehb = '<:ehb:766260773617795103>',
-
-  success = '✅',
-  error = '❌',
-  warning = '⚠️',
-  tada = '🎉',
-  wave = '👋',
-  speaker = '📢',
-  gold_medal = '🥇',
-  silver_medal = '🥈',
-  bronze_medal = '🥉',
-  clock = '🕒',
-  crown = '👑',
-  heart = '❤️',
-  info = 'ℹ️',
-  grave = '🪦'
+  ehb = '<:ehb:766260773617795103>'
 }

@@ -3,7 +3,7 @@ import { MessageEmbed } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../config';
 import { Event } from '../../types';
-import { getEmoji, broadcastMessage, BroadcastType } from '../../utils';
+import { broadcastMessage, BroadcastType } from '../../utils';
 
 interface CompetitionStanding {
   displayName: string;
@@ -41,7 +41,7 @@ class CompetitionEnded implements Event {
     const topParticipations = isTeamCompetition ? getTeamStandings(standings) : getStandings(standings);
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji('speaker')} ${title} has ended!`)
+      .setTitle(`📢 ${title} has ended!`)
       .setURL(url)
       .addFields([
         {
@@ -88,11 +88,11 @@ function getStandings(standings: CompetitionStanding[]): string {
 function getStandingEmoji(place: number) {
   switch (place) {
     case 1:
-      return getEmoji('gold_medal');
+      return '🥇';
     case 2:
-      return getEmoji('silver_medal');
+      return '🥈';
     case 3:
-      return getEmoji('bronze_medal');
+      return '🥉';
   }
 }
 

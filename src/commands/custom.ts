@@ -1,11 +1,4 @@
-export interface CustomCommand {
-  name: string;
-  command: string;
-  message: string;
-  image?: string;
-}
-
-export const CUSTOM_COMMANDS: Array<CustomCommand> = [
+export const CUSTOM_COMMANDS = [
   {
     name: 'Runelite',
     command: 'runelite',

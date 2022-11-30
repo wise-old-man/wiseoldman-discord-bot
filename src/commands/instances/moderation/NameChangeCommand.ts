@@ -10,7 +10,7 @@ import {
 import womClient, { approveNameChange, denyNameChange } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig } from '../../utils/commands';
-import { getEmoji, hasModeratorRole } from '../../../utils/discord';
+import { hasModeratorRole } from '../../../utils/discord';
 import { CommandError, ErrorCode } from '../../../utils/error';
 
 const CONFIG: CommandConfig = {
@@ -84,14 +84,14 @@ class NameChangeCommand extends Command {
       if (buttonClicked === 'namechange_approve') {
         try {
           await approveNameChange(nameChangeId);
-          response.setFooter({ text: `Approved ${getEmoji('success')}` }).setColor(config.visuals.green);
+          response.setFooter({ text: `Approved ✅` }).setColor(config.visuals.green);
         } catch (error) {
           response.setFooter({ text: 'Failed to approve name change' }).setColor(config.visuals.red);
         }
       } else if (buttonClicked === 'namechange_deny') {
         try {
           await denyNameChange(nameChangeId);
-          response.setFooter({ text: `Denied ${getEmoji('error')}` }).setColor(config.visuals.red);
+          response.setFooter({ text: `Denied ❌` }).setColor(config.visuals.red);
         } catch (error) {
           response.setFooter({ text: 'Failed to deny name change' }).setColor(config.visuals.red);
         }
@@ -115,8 +115,8 @@ function buildReviewMessage(data: NameChangeDetails['data']): string {
 
   const lines = [];
 
-  lines.push(`New name on the hiscores? ${isNewOnHiscores ? getEmoji('success') : getEmoji('error')}`);
-  lines.push(`Has no negative gains? ${!hasNegativeGains ? getEmoji('success') : getEmoji('error')}`);
+  lines.push(`New name on the hiscores? ${isNewOnHiscores ? '✅' : '❌'}`);
+  lines.push(`Has no negative gains? ${!hasNegativeGains ? '✅' : '❌'}`);
   lines.push(`Hours difference? \`${hoursDiff}\``);
   lines.push(`EHP difference? \`${ehpDiff}\``);
   lines.push(`EHB difference? \`${ehbDiff}\``);

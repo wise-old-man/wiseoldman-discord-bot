@@ -4,7 +4,7 @@ import config from '../../../config';
 import { getChannelPreferences, getServer } from '../../../services/prisma';
 import { Command, CommandConfig } from '../../utils/commands';
 import { CUSTOM_COMMANDS } from '../../../commands/custom';
-import { BroadcastType, BroadcastName, getEmoji } from '../../../utils';
+import { BroadcastType, BroadcastName } from '../../../utils';
 import { CommandError, ErrorCode } from '../../../utils/error';
 
 const BOT_URL = 'https://bot.wiseoldman.net';
@@ -73,8 +73,8 @@ class HelpCommand extends Command {
 
     const response = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji('info')} Need help?`)
-      .setDescription(`${LINE_COMMANDS}\n\n${LINE_SUPPORT}\n\n${getEmoji('warning')}${LINE_PERMS}`)
+      .setTitle(`ℹ️ Need help?`)
+      .setDescription(`${LINE_COMMANDS}\n\n${LINE_SUPPORT}\n\n⚠️${LINE_PERMS}`)
       .addFields([
         { name: 'Tracked group', value: group ? group.name : 'none' },
         { name: 'Default Broadcast Channel', value: botChannelId ? `<#${botChannelId}>` : 'none' },

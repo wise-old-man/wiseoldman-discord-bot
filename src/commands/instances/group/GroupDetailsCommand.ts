@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '../../../config';
 import womClient from '../../../services/wiseoldman';
-import { formatDate, getEmoji } from '../../../utils';
+import { formatDate } from '../../../utils';
 import { CommandConfig, Command } from '../../utils/commands';
 import { CommandError, ErrorCode } from '../../../utils/error';
 import { getLinkedGroupId } from '../../../utils/wooow';
@@ -23,10 +23,6 @@ class GroupDetailsCommand extends Command {
       throw new CommandError(ErrorCode.GROUP_NOT_FOUND);
     });
 
-    const verification = group.verified
-      ? `${getEmoji('success')} Verified`
-      : `${getEmoji('error')} Unverified`;
-
     const response = new MessageEmbed()
       .setColor(config.visuals.blue)
       .setTitle(group.name)
@@ -35,7 +31,7 @@ class GroupDetailsCommand extends Command {
         { name: 'Clan chat', value: group.clanChat || '---' },
         { name: 'Members', value: group.memberCount?.toString() || '0' },
         { name: 'Created at', value: formatDate(group.createdAt, 'DD MMM, YYYY') },
-        { name: '\u200B', value: verification }
+        { name: '\u200B', value: group.verified ? `✅ Verified` : `❌ Unverified` }
       ]);
 
     await interaction.editReply({ embeds: [response] });

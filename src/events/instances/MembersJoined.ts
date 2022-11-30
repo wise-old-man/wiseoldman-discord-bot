@@ -1,7 +1,7 @@
 import { MessageEmbed } from 'discord.js';
 import config from '../../config';
 import { Event } from '../../types';
-import { encodeURL, getEmoji, broadcastMessage, BroadcastType } from '../../utils';
+import { encodeURL, broadcastMessage, BroadcastType } from '../../utils';
 
 interface Player {
   id: number;
@@ -34,7 +34,7 @@ class MembersJoined implements Event {
 
     if (players.length === 1) {
       const player = players[0];
-      const title = `${getEmoji('tada')} New group member: ${player.displayName}`;
+      const title = `🎉 New group member: ${player.displayName}`;
 
       return new MessageEmbed()
         .setColor(config.visuals.blue)
@@ -43,7 +43,7 @@ class MembersJoined implements Event {
     }
 
     const url = `https://wiseoldman.net/groups/${groupId}/members`;
-    const title = `${getEmoji('tada')} ${players.length} new group members!`;
+    const title = `🎉 ${players.length} new group members!`;
     const content = players.map(p => `\`${p.displayName}\``).join(', ');
 
     return new MessageEmbed()

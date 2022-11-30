@@ -41,7 +41,7 @@ class CompetitionCreated implements Event {
 
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji('tada')} New competition created!`)
+      .setTitle(`🎉 New competition created!`)
       .setURL(url)
       .addFields(fields)
       .setFooter({ text: 'Starts at' })

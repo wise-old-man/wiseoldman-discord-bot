@@ -49,7 +49,7 @@ class MemberAchievements implements Event {
 
     return new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji('tada')} ${title}`)
+      .setTitle(`🎉 ${title}`)
       .setDescription(content)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements`));
   }

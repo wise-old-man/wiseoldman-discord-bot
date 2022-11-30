@@ -2,7 +2,6 @@ import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '~/config';
 import { updateBotChannel, updateChannelPreference } from '~/services/prisma';
 import { BroadcastType, BroadcastName } from '~/utils/broadcasts';
-import { getEmoji } from '~/utils/discord';
 import { CommandError, ErrorCode } from '~/utils/error';
 import { Command, CommandConfig } from '../../utils/commands';
 
@@ -76,7 +75,7 @@ class ConfigChannelCommand extends Command {
 
     const response = new MessageEmbed()
       .setColor(config.visuals.green)
-      .setTitle(`${getEmoji('success')} Channel Preferences Updated`)
+      .setTitle(`✅ Channel Preferences Updated`)
       .setDescription(description);
 
     await interaction.editReply({ embeds: [response] });

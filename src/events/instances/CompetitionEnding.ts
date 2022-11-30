@@ -47,16 +47,15 @@ class CompetitionEnding implements Event {
     ];
 
     if (period.minutes && period.minutes < 60) {
-      const emoji = getEmoji('warning');
       fields.push({
         name: `\u200B`,
-        value: `${emoji} Don't forget to update your account's hiscores **before the time is up!**`
+        value: `⚠️ Don't forget to update your account's hiscores **before the time is up!**`
       });
     }
 
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji('clock')} ${title} is ending in ${timeLeft}`)
+      .setTitle(`🕒 ${title} is ending in ${timeLeft}`)
       .setURL(url)
       .addFields(fields);
 

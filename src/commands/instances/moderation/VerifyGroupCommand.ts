@@ -8,12 +8,11 @@ import {
 } from 'discord.js';
 import { verifyGroup } from '../../../services/wiseoldman';
 import config from '../../../config';
-import { getEmoji, hasModeratorRole } from '../../../utils';
+import { hasModeratorRole } from '../../../utils';
 import { Command, CommandConfig } from '../../utils/commands';
 import { CommandError, ErrorCode } from '../../../utils/error';
 
-const CHAT_MESSAGE = (groupName: string) =>
-  `${getEmoji('success')} \`${groupName}\` has been successfully verified!`;
+const CHAT_MESSAGE = (groupName: string) => `✅ \`${groupName}\` has been successfully verified!`;
 
 const LOG_MESSAGE = (groupId: number, groupName: string, userId: string) =>
   `${groupName} (${groupId}) - <@${userId}>`;

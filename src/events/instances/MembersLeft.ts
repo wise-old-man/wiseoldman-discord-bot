@@ -1,7 +1,7 @@
 import { MessageEmbed } from 'discord.js';
 import config from '../../config';
 import { Event } from '../../types';
-import { encodeURL, getEmoji, broadcastMessage, BroadcastType } from '../../utils';
+import { encodeURL, broadcastMessage, BroadcastType } from '../../utils';
 
 interface Player {
   id: number;
@@ -34,7 +34,7 @@ class MembersLeft implements Event {
 
     if (players.length === 1) {
       const player = players[0];
-      const title = `${getEmoji('wave')} Group member left: ${player.displayName}`;
+      const title = `👋 Group member left: ${player.displayName}`;
 
       return new MessageEmbed()
         .setColor(config.visuals.blue)
@@ -43,7 +43,7 @@ class MembersLeft implements Event {
     }
 
     const url = `https://wiseoldman.net/groups/${groupId}/members`;
-    const title = `${getEmoji('wave')} ${players.length} members have left the group`;
+    const title = `👋 ${players.length} members have left the group`;
     const content = players.map(p => `\`${p.displayName}\``).join(', ');
 
     return new MessageEmbed()

@@ -3,7 +3,7 @@ import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { updateCountry } from '../../../services/wiseoldman';
 import { Command, CommandConfig } from '../../../commands/utils/commands';
 import config from '../../../config';
-import { countryCodeEmoji, getEmoji } from '../../../utils';
+import { countryCodeEmoji } from '../../../utils';
 import { CommandError, ErrorCode } from '../../../utils/error';
 
 const CONFIG: CommandConfig = {
@@ -60,7 +60,7 @@ class PlayerSetFlagCommand extends Command {
 
     const title = hasUpdated
       ? `${countryCodeEmoji(countryCode)} Player flag updated!`
-      : `${getEmoji('error')} Failed to update flag`;
+      : `❌ Failed to update flag`;
 
     const description = hasUpdated
       ? `${interaction.user} changed \`${username}\`'s country to ${CountryProps[countryCode].name}`

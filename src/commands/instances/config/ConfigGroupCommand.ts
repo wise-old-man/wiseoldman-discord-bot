@@ -2,7 +2,6 @@ import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
 import { updateGroup } from '../../../services/prisma';
-import { getEmoji } from '../../../utils';
 import { CommandConfig, Command } from '../../utils/commands';
 import { CommandError, ErrorCode } from '../../../utils/error';
 
@@ -38,7 +37,7 @@ class ConfigGroupCommand extends Command {
 
     const response = new MessageEmbed()
       .setColor(config.visuals.green)
-      .setTitle(`${getEmoji('success')} Server group updated`)
+      .setTitle(`✅ Server group updated`)
       .setDescription(`All broadcasts and commands will be in reference to **${group.name}**`)
       .addFields({
         name: 'Page URL',

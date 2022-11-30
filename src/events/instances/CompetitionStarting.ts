@@ -48,7 +48,7 @@ class CompetitionStarting implements Event {
 
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji('clock')} ${title} is starting in ${timeLeft}`)
+      .setTitle(`🕒 ${title} is starting in ${timeLeft}`)
       .setURL(url)
       .addFields(fields);
 

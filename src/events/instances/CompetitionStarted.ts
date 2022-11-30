@@ -40,7 +40,7 @@ class CompetitionStarted implements Event {
 
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji('speaker')} ${title} has started!`)
+      .setTitle(`📢 ${title} has started!`)
       .setURL(url)
       .addFields(fields);
 

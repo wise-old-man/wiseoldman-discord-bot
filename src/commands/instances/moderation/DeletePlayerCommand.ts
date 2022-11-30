@@ -1,7 +1,7 @@
 import { CommandInteraction, GuildMember, MessageEmbed } from 'discord.js';
 import { deletePlayer } from '../../../services/wiseoldman';
 import config from '../../../config';
-import { getEmoji, hasModeratorRole } from '../../../utils';
+import { hasModeratorRole } from '../../../utils';
 import { Command, CommandConfig } from '../../utils/commands';
 
 const CONFIG: CommandConfig = {
@@ -35,7 +35,7 @@ class DeletePlayerCommand extends Command {
     // Respond on the WOM discord chat with a success status
     const response = new MessageEmbed()
       .setColor(config.visuals.green)
-      .setDescription(`${getEmoji('success')} \`${username}\` has been successfully deleted!`);
+      .setDescription(`✅ \`${username}\` has been successfully deleted!`);
 
     await interaction.editReply({ embeds: [response] });
   }

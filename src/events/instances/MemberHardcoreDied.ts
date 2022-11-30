@@ -1,7 +1,7 @@
 import { MessageEmbed } from 'discord.js';
 import config from '../../config';
 import { Event } from '../../types';
-import { encodeURL, getEmoji, broadcastMessage, BroadcastType } from '../../utils';
+import { encodeURL, broadcastMessage, BroadcastType } from '../../utils';
 
 interface MemberHardcoreDiedData {
   groupId: number;
@@ -30,7 +30,7 @@ class MemberHardcoreDied implements Event {
   buildMessage(data: MemberHardcoreDiedData): MessageEmbed {
     const { player } = data;
 
-    const title = `${getEmoji('grave')} Hardcore Ironman Member Died`;
+    const title = `🪦 Hardcore Ironman Member Died`;
     const message = `\`${player.displayName}\` has died and is now a regular Ironman.`;
 
     return new MessageEmbed()
