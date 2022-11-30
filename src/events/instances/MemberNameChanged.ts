@@ -25,7 +25,7 @@ class MemberNameChanged implements Event {
     if (!groupId) return;
 
     const message = this.buildMessage(data);
-    broadcastMessage(groupId, BroadcastType.MemberNameChanged, message);
+    broadcastMessage(groupId, BroadcastType.MEMBER_NAME_CHANGED, message);
   }
 
   buildMessage(data: MemberNameChangedData): MessageEmbed {

@@ -2,7 +2,7 @@ import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
 import { formatNumber, isSkill, PlayerDetails, round } from '@wise-old-man/utils';
 import config from '../../../config';
-import { encodeURL, INGAME_SKILL_ORDER } from '../../../utils';
+import { encodeURL } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
 import womClient from '../../../services/wiseoldman';
 import { getUsernameParam } from '../../../utils/wooow';
@@ -12,6 +12,34 @@ import { CommandError, ErrorCode } from '../../../utils/error';
 const RENDER_WIDTH = 215;
 const RENDER_HEIGHT = 260;
 const RENDER_PADDING = 15;
+
+// Used to render stats in correct order
+const INGAME_SKILL_ORDER = [
+  'attack',
+  'strength',
+  'defence',
+  'ranged',
+  'prayer',
+  'magic',
+  'runecrafting',
+  'construction',
+  'hitpoints',
+  'agility',
+  'herblore',
+  'thieving',
+  'crafting',
+  'fletching',
+  'slayer',
+  'hunter',
+  'mining',
+  'smithing',
+  'fishing',
+  'cooking',
+  'firemaking',
+  'woodcutting',
+  'farming',
+  'overall'
+];
 
 enum RenderVariant {
   LEVELS = 'levels',

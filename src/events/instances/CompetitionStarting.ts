@@ -52,7 +52,7 @@ class CompetitionStarting implements Event {
       .setURL(url)
       .addFields(fields);
 
-    broadcastMessage(groupId, BroadcastType.CompetitionStatus, message);
+    broadcastMessage(groupId, BroadcastType.COMPETITION_STATUS, message);
   }
 }
 

@@ -24,7 +24,7 @@ class MemberHardcoreDied implements Event {
     if (!groupId) return;
 
     const message = this.buildMessage(data);
-    broadcastMessage(groupId, BroadcastType.MemberHardcoreDied, message);
+    broadcastMessage(groupId, BroadcastType.MEMBER_HCIM_DIED, message);
   }
 
   buildMessage(data: MemberHardcoreDiedData): MessageEmbed {

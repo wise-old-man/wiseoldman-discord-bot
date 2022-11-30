@@ -50,7 +50,7 @@ class CompetitionEnded implements Event {
         }
       ]);
 
-    broadcastMessage(groupId, BroadcastType.CompetitionStatus, message);
+    broadcastMessage(groupId, BroadcastType.COMPETITION_STATUS, message);
   }
 }
 

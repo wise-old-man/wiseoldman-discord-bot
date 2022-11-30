@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '~/config';
 import { updateBotChannel, updateChannelPreference } from '~/services/prisma';
-import { BroadcastType, getBroadcastName } from '~/utils/broadcasts';
+import { BroadcastType, BroadcastName } from '~/utils/broadcasts';
 import { getEmoji } from '~/utils/discord';
 import { CommandError, ErrorCode } from '~/utils/error';
 import { Command, CommandConfig } from '../../utils/commands';
@@ -16,12 +16,12 @@ const CONFIG: CommandConfig = {
       name: 'broadcast_type',
       description: 'The broadcast type to configure.',
       choices: [
-        { label: 'Default', value: BroadcastType.Default },
-        { label: 'Competition status', value: BroadcastType.CompetitionStatus },
-        { label: 'Member name changed', value: BroadcastType.MemberNameChanged },
-        { label: 'Member HCIM died', value: BroadcastType.MemberHardcoreDied },
-        { label: 'Member achievements', value: BroadcastType.MemberAchievements },
-        { label: 'Members list changed', value: BroadcastType.MembersListChanged }
+        { label: 'Default', value: BroadcastName[BroadcastType.DEFAULT] },
+        { label: 'Competition status', value: BroadcastName[BroadcastType.COMPETITION_STATUS] },
+        { label: 'Member name changed', value: BroadcastName[BroadcastType.MEMBER_NAME_CHANGED] },
+        { label: 'Member HCIM died', value: BroadcastName[BroadcastType.MEMBER_HCIM_DIED] },
+        { label: 'Member achievements', value: BroadcastName[BroadcastType.MEMBER_ACHIEVEMENTS] },
+        { label: 'Members list changed', value: BroadcastName[BroadcastType.MEMBERS_LIST_CHANGED] }
       ]
     },
     {
@@ -59,11 +59,11 @@ class ConfigChannelCommand extends Command {
     const channelType = interaction.options.getString('broadcast_type', true);
     const announcementChannel = interaction.options.getChannel('broadcast_channel', true);
 
-    const broadcastName = getBroadcastName(channelType as BroadcastType);
+    const broadcastName = BroadcastName[channelType as BroadcastType];
 
     let description = '';
 
-    if (channelType === BroadcastType.Default) {
+    if (channelType === BroadcastType.DEFAULT) {
       await updateBotChannel(guildId, announcementChannel.id);
       description = `All group-related broadcasts will be sent to <#${announcementChannel.id}> by default.`;
     } else if (status === 'disable') {

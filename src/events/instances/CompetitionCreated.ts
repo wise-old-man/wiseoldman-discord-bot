@@ -47,7 +47,7 @@ class CompetitionCreated implements Event {
       .setFooter({ text: 'Starts at' })
       .setTimestamp(new Date(startsAt));
 
-    broadcastMessage(groupId, BroadcastType.CompetitionStatus, message);
+    broadcastMessage(groupId, BroadcastType.COMPETITION_STATUS, message);
   }
 }
 

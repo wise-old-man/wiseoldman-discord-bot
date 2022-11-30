@@ -34,7 +34,7 @@ class MemberAchievements implements Event {
     const discordTag = userId ? `(<@${userId}>)` : '';
 
     const message = this.buildMessage(data, discordTag);
-    broadcastMessage(groupId, BroadcastType.MemberAchievements, message);
+    broadcastMessage(groupId, BroadcastType.MEMBER_ACHIEVEMENTS, message);
   }
 
   buildMessage(data: MemberAchievementsData, discordTag: string): MessageEmbed {

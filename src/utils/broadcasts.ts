@@ -3,15 +3,24 @@ import { getServers, getPreferredChannels } from '../services/prisma';
 import { propagateMessage } from '.';
 
 export enum BroadcastType {
-  Default = 'DEFAULT',
-  CompetitionStatus = 'COMPETITION_STATUS',
-  MemberAchievements = 'MEMBER_ACHIEVEMENTS',
-  MemberNameChanged = 'MEMBER_NAME_CHANGED',
-  MemberHardcoreDied = 'MEMBER_HCIM_DIED',
-  MembersListChanged = 'MEMBERS_LIST_CHANGED'
+  DEFAULT = 'DEFAULT',
+  COMPETITION_STATUS = 'COMPETITION_STATUS',
+  MEMBER_ACHIEVEMENTS = 'MEMBER_ACHIEVEMENTS',
+  MEMBER_NAME_CHANGED = 'MEMBER_NAME_CHANGED',
+  MEMBER_HCIM_DIED = 'MEMBER_HCIM_DIED',
+  MEMBERS_LIST_CHANGED = 'MEMBERS_LIST_CHANGED'
 }
 
-async function broadcastMessage(groupId: number, type: string, message: MessageEmbed): Promise<void> {
+export const BroadcastName = {
+  [BroadcastType.DEFAULT]: 'Default',
+  [BroadcastType.COMPETITION_STATUS]: 'Competition Status',
+  [BroadcastType.MEMBER_ACHIEVEMENTS]: 'Member Achievements',
+  [BroadcastType.MEMBER_NAME_CHANGED]: 'Member Name Changed',
+  [BroadcastType.MEMBER_HCIM_DIED]: 'Member (HCIM) Died',
+  [BroadcastType.MEMBERS_LIST_CHANGED]: 'Members List Changed'
+};
+
+export async function broadcastMessage(groupId: number, type: string, message: MessageEmbed) {
   const servers = await getServers(groupId);
 
   const preferredChannels = await getPreferredChannels(
@@ -21,22 +30,3 @@ async function broadcastMessage(groupId: number, type: string, message: MessageE
 
   propagateMessage(message, preferredChannels);
 }
-
-function getBroadcastName(type: BroadcastType): string {
-  switch (type) {
-    case BroadcastType.CompetitionStatus:
-      return 'Competition Status';
-    case BroadcastType.MemberAchievements:
-      return 'Member Achievements';
-    case BroadcastType.MemberHardcoreDied:
-      return 'Member (HCIM) Died';
-    case BroadcastType.MemberNameChanged:
-      return 'Member Name Changed';
-    case BroadcastType.MembersListChanged:
-      return 'Members List Changed';
-    default:
-      return 'Default';
-  }
-}
-
-export { broadcastMessage, getBroadcastName };

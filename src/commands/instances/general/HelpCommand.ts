@@ -4,7 +4,7 @@ import config from '../../../config';
 import { getChannelPreferences, getServer } from '../../../services/prisma';
 import { Command, CommandConfig } from '../../utils/commands';
 import { CUSTOM_COMMANDS } from '../../../commands/custom';
-import { BroadcastType, getBroadcastName, getEmoji } from '../../../utils';
+import { BroadcastType, BroadcastName, getEmoji } from '../../../utils';
 import { CommandError, ErrorCode } from '../../../utils/error';
 
 const BOT_URL = 'https://bot.wiseoldman.net';
@@ -64,10 +64,12 @@ class HelpCommand extends Command {
     const group = groupId && groupId > -1 ? await womClient.groups.getGroupDetails(groupId) : null;
     const channelPreferences = await getChannelPreferences(guildId);
 
-    const channelPreferencesDetails = channelPreferences.map(pref => ({
-      name: `"${getBroadcastName(pref.type as BroadcastType)}" Broadcast Channel`,
-      value: pref.channelId ? `<#${pref.channelId}>` : '`DISABLED`'
-    }));
+    const channelPreferencesDetails = channelPreferences.map(pref => {
+      return {
+        name: `"${BroadcastName[pref.type as BroadcastType]}" Broadcast Channel`,
+        value: pref.channelId ? `<#${pref.channelId}>` : '`DISABLED`'
+      };
+    });
 
     const response = new MessageEmbed()
       .setColor(config.visuals.blue)

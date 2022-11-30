@@ -26,7 +26,7 @@ class MembersLeft implements Event {
     if (!groupId) return;
 
     const message = this.buildMessage(data);
-    broadcastMessage(groupId, BroadcastType.MembersListChanged, message);
+    broadcastMessage(groupId, BroadcastType.MEMBERS_LIST_CHANGED, message);
   }
 
   buildMessage(data: MembersLeftData) {
