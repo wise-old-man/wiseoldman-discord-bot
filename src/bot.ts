@@ -20,6 +20,8 @@ class Bot {
   }
 
   init() {
+    console.log('Starting bot...');
+
     this.client.once('ready', () => {
       // Init bot properties
       this.client.user?.setActivity('bot.wiseoldman.net');

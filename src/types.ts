@@ -1,31 +1,4 @@
-import { CommandInteraction, MessageAttachment } from 'discord.js';
-import {
-  SlashCommandBuilder,
-  SlashCommandSubcommandsOnlyBuilder,
-  SlashCommandSubcommandBuilder
-} from '@discordjs/builders';
-
-export interface Command {
-  slashCommand?:
-    | SlashCommandBuilder
-    | SlashCommandSubcommandBuilder
-    | SlashCommandSubcommandsOnlyBuilder;
-  requiresAdmin?: boolean;
-  global?: boolean;
-  subcommand?: boolean;
-  execute(message: CommandInteraction): Promise<void>;
-}
-
-export interface SubCommand extends Command {
-  slashCommand?: SlashCommandSubcommandBuilder;
-}
-
-export interface CustomCommand {
-  name: string;
-  command: string;
-  message: string;
-  image?: string;
-}
+import { MessageAttachment } from 'discord.js';
 
 export interface Event {
   type: string;

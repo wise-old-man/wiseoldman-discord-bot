@@ -1,80 +1,72 @@
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
-import { SlashCommandBuilder } from '@discordjs/builders';
 import config from '../../../config';
-import { getUsername } from '../../../services/prisma';
-import { CanvasAttachment, Command, Renderable } from '../../../types';
+import { CanvasAttachment } from '../../../types';
 import { encodeURL, formatDate } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
-import CommandError from '../../CommandError';
 import womClient from '../../../api/wom-api';
+import { getUsernameParam } from '../../../utils/wooow';
+import { Command, CommandConfig } from '../../../commands/utils/commands';
+import { CommandError, ErrorCode } from '../../../utils/error';
+import { Achievement, PlayerDetails } from '@wise-old-man/utils';
 
 const RENDER_WIDTH = 280;
 const RENDER_HEIGHT = 165;
 const RENDER_PADDING = 15;
 
-class PlayerAchievementsCommand implements Command, Renderable {
-  global: boolean;
-  slashCommand: SlashCommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'achievements',
+  description: "View a player's recent achievements.",
+  options: [
+    {
+      type: 'string',
+      name: 'username',
+      description: 'In-game username.'
+    }
+  ]
+};
 
+class PlayerAchievementsCommand extends Command {
   constructor() {
-    this.global = true;
-    this.slashCommand = new SlashCommandBuilder()
-      .addStringOption(option => option.setName('username').setDescription('In-game username'))
-      .setName('achievements')
-      .setDescription('View player recent achievements');
+    super(CONFIG);
   }
 
-  async execute(message: CommandInteraction) {
-    await message.deferReply();
-
+  async execute(interaction: CommandInteraction) {
     // Grab the username from the command's arguments or database alias
-    const username = await this.getUsername(message);
+    const username = await getUsernameParam(interaction);
 
-    if (!username) {
+    const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(
-        'This commands requires a username. Set a default by using the `setrsn` command.'
+        ErrorCode.PLAYER_NOT_FOUND,
+        "Player not found. Possibly hasn't been tracked yet on WiseOldMan.",
+        'Tip: Try tracking them first using the /update command'
       );
+    });
+
+    const achievements = await womClient.players.getPlayerAchievements(username);
+
+    if (!achievements || achievements.length === 0) {
+      throw new Error(`${player.displayName} has no achievements.`);
     }
 
-    try {
-      const player = await womClient.players.getPlayerDetails(username);
-      const data = await womClient.players.getPlayerAchievements(username);
+    const mostRecentAchievements = achievements
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, 5);
 
-      if (!data || data.length === 0) {
-        throw new Error(`${player.displayName} has no achievements.`);
-      }
+    const { attachment, fileName } = await this.render(player, mostRecentAchievements);
 
-      const achievements = data
-        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-        .slice(0, 5);
+    const embed = new MessageEmbed()
+      .setColor(config.visuals.blue)
+      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements/`))
+      .setTitle(`${player.displayName} - Recent achievements`)
+      .setImage(`attachment://${fileName}`)
+      .setFooter({ text: 'Last updated' })
+      .setTimestamp(player.updatedAt);
 
-      const { attachment, fileName } = await this.render({ player, achievements });
-
-      const embed = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements/`))
-        .setTitle(`${player.displayName} - Recent achievements`)
-        .setImage(`attachment://${fileName}`)
-        .setFooter({ text: 'Last updated' })
-        .setTimestamp(player.updatedAt);
-
-      await message.editReply({ embeds: [embed], files: [attachment] });
-    } catch (e: any) {
-      if (e.message.includes('achievements')) {
-        throw new CommandError(e.message);
-      } else {
-        const errorMessage = `**${username}** is not being tracked yet.`;
-        const errorTip = `Try /update ${username}`;
-
-        throw new CommandError(errorMessage, errorTip);
-      }
-    }
+    await interaction.editReply({ embeds: [embed], files: [attachment] });
   }
 
-  async render(props: any): Promise<CanvasAttachment> {
-    const { player, achievements } = props;
-
+  async render(player: PlayerDetails, achievements: Achievement[]): Promise<CanvasAttachment> {
     const calculatedHeight = Math.min(10 + achievements.length * 31, RENDER_HEIGHT);
 
     // Create a scaled empty canvas
@@ -113,14 +105,6 @@ class PlayerAchievementsCommand implements Command, Renderable {
     const attachment = new MessageAttachment(canvas.toBuffer(), fileName);
 
     return { attachment, fileName };
-  }
-
-  async getUsername(message: CommandInteraction): Promise<string | undefined | null> {
-    const username = message.options.getString('username', false);
-    if (username) return username;
-
-    const inferredUsername = await getUsername(message.user.id);
-    return inferredUsername;
   }
 }
 

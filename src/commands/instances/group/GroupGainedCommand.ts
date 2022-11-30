@@ -1,13 +1,19 @@
-import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
-import { formatNumber, getMetricName, Metric, parseMetricAbbreviation } from '@wise-old-man/utils';
+import {
+  formatNumber,
+  getMetricName,
+  isMetric,
+  isPeriod,
+  Metric,
+  parseMetricAbbreviation,
+  Period
+} from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { CommandConfig, setupCommand } from '../../../utils/commands';
 import womClient from '../../../api/wom-api';
 import config from '../../../config';
-import { SubCommand } from '../../../types';
 import { getEmoji } from '../../../utils';
-import { bold, getLinkedGroupId } from 'src/utils/wooow';
-import { CommandErrorAlt, ErrorCode, handleError } from 'src/utils/error';
+import { CommandConfig, Command } from '../../utils/commands';
+import { CommandError, ErrorCode } from '../../../utils/error';
+import { bold, getLinkedGroupId } from '../../../utils/wooow';
 
 const CONFIG: CommandConfig = {
   name: 'gained',
@@ -30,49 +36,38 @@ const CONFIG: CommandConfig = {
   ]
 };
 
-class GroupGainedCommand implements SubCommand {
-  subcommand?: boolean | undefined;
-  slashCommand?: SlashCommandSubcommandBuilder;
-
+class GroupGainedCommand extends Command {
   constructor() {
-    this.subcommand = true;
-    this.slashCommand = setupCommand(CONFIG);
+    super(CONFIG);
   }
 
   async execute(interaction: CommandInteraction) {
-    try {
-      await interaction.deferReply();
+    const groupId = await getLinkedGroupId(interaction);
 
-      const groupId = await getLinkedGroupId(interaction);
+    const periodParam = interaction.options.getString('period', true);
+    const metricParam = parseMetricAbbreviation(interaction.options.getString('metric', true));
 
-      // Extract the "metric" param, or fallback to "overall"
-      const metricParam = parseMetricAbbreviation(interaction.options.getString('metric', true));  
-      const metric = metricParam || Metric.OVERALL;
+    const period = isPeriod(periodParam) ? periodParam : Period.WEEK;
+    const metric = isMetric(metricParam) ? metricParam : Metric.OVERALL;
 
-      // Extract the "period" param,
-      const period = interaction.options.getString('period', true);
+    const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
+      throw new CommandError(ErrorCode.GROUP_NOT_FOUND);
+    });
 
-      const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
-        throw new CommandErrorAlt(ErrorCode.GROUP_NOT_FOUND);
-      });
+    const gained = await womClient.groups.getGroupGains(groupId, { period, metric });
 
-      const gained = await womClient.groups.getGroupGains(groupId, { period, metric });
+    const gainedList = gained
+      .map((g, i) => `${i + 1}. ${bold(g.player.displayName)} - ${formatNumber(g.gained, true)}`)
+      .join('\n');
 
-      const response = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} gains (${period})`)
-        .setURL(`https://wiseoldman.net/groups/${groupId}/gained/`)
-        .setFooter({ text: `Tip: Try /group gained metric: zulrah period: day` })
-        .setDescription(
-          gained
-            .map((g, i) => `${i + 1}. ${bold(g.player.displayName)} - ${formatNumber(g.gained, true)}`)
-            .join('\n')
-        );
+    const response = new MessageEmbed()
+      .setColor(config.visuals.blue)
+      .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} gains (${period})`)
+      .setURL(`https://wiseoldman.net/groups/${groupId}/gained/`)
+      .setFooter({ text: `Tip: Try /group gained metric: zulrah period: day` })
+      .setDescription(gainedList);
 
-      await interaction.editReply({ embeds: [response] });
-    } catch (error) {
-      handleError(interaction, error);
-    }
+    await interaction.editReply({ embeds: [response] });
   }
 }
 

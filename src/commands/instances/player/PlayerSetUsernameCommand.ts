@@ -1,54 +1,51 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { SlashCommandBuilder } from '@discordjs/builders';
 import config from '../../../config';
 import { updateAlias } from '../../../services/prisma';
-import { Command } from '../../../types';
 import { encodeURL } from '../../../utils/strings';
-import CommandError from '../../CommandError';
 import womClient from '../../../api/wom-api';
+import { Command, CommandConfig } from '../../../commands/utils/commands';
+import { CommandError, ErrorCode } from '../../../utils/error';
 
-class PlayerSetUsernameCommand implements Command {
-  global: boolean;
-  slashCommand: SlashCommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'setrsn',
+  description: 'Set your default username (alias).',
+  options: [
+    {
+      type: 'string',
+      name: 'username',
+      description: 'In-game username.',
+      required: true
+    }
+  ]
+};
 
+class PlayerSetUsernameCommand extends Command {
   constructor() {
-    this.global = true;
-    this.slashCommand = new SlashCommandBuilder()
-      .addStringOption(option =>
-        option.setName('username').setDescription('In-game username').setRequired(true)
-      )
-      .setName('setrsn')
-      .setDescription('Set player username (alias)');
+    super(CONFIG);
   }
 
-  async execute(message: CommandInteraction) {
-    const username = message.options.getString('username', true);
-    const userId = message.user.id;
+  async execute(interaction: CommandInteraction) {
+    const username = interaction.options.getString('username', true);
+    const userId = interaction.user.id;
 
-    try {
-      await message.deferReply();
-      const player = await womClient.players.getPlayerDetails(username);
+    const player = await womClient.players.getPlayerDetails(username).catch(() => {
+      throw new CommandError(
+        ErrorCode.PLAYER_NOT_FOUND,
+        "Player not found. Possibly hasn't been tracked yet on WiseOldMan.",
+        'Tip: Try tracking them first using the /update command'
+      );
+    });
 
-      await updateAlias(userId, player.displayName);
+    await updateAlias(userId, player.displayName);
 
-      const response = new MessageEmbed()
-        .setColor(config.visuals.green)
-        .setTitle('Player alias updated!')
-        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
-        .setDescription(`<@${userId}> is now associated with the username \`${player.displayName}\`.`)
-        .setFooter({ text: `They can now call any player command without including the username.` });
+    const response = new MessageEmbed()
+      .setColor(config.visuals.green)
+      .setTitle('Player alias updated!')
+      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
+      .setDescription(`<@${userId}> is now associated with the username \`${player.displayName}\`.`)
+      .setFooter({ text: `They can now call any player command without including the username.` });
 
-      await message.editReply({ embeds: [response] });
-    } catch (e: any) {
-      if (e.response?.status === 400) {
-        throw new CommandError(
-          `Failed to find player with username \`${username}\``,
-          'Maybe try to update that username with /update first?'
-        );
-      } else {
-        throw new CommandError('Failed to update player alias.');
-      }
-    }
+    await interaction.editReply({ embeds: [response] });
   }
 }
 

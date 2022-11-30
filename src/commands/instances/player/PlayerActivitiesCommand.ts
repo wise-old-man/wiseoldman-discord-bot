@@ -1,93 +1,82 @@
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { Activity, ActivityValue, formatNumber, isActivity, MapOf } from '@wise-old-man/utils';
+import { formatNumber, isActivity, PlayerDetails } from '@wise-old-man/utils';
 import config from '../../../config';
-import { getUsername } from '../../../services/prisma';
-import { CanvasAttachment, Command, Renderable } from '../../../types';
+import { CanvasAttachment } from '../../../types';
 import { encodeURL } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
-import CommandError from '../../CommandError';
 import womClient from '../../../api/wom-api';
+import { Command, CommandConfig } from '../../../commands/utils/commands';
+import { getUsernameParam } from '../../../utils/wooow';
+import { CommandError, ErrorCode } from '../../../utils/error';
 
 const RENDER_WIDTH = 357;
 const RENDER_HEIGHT = 100;
 const RENDER_PADDING = 15;
 
 enum RenderVariant {
-  Scores = 'Scores',
-  Ranks = 'Ranks'
+  SCORES = 'scores',
+  RANKS = 'ranks'
 }
 
-class PlayerActivitiesCommand implements Command, Renderable {
-  global: boolean;
-  slashCommand: SlashCommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'activities',
+  description: "View a player's activity scores.",
+  options: [
+    {
+      type: 'string',
+      name: 'variant',
+      description: 'The variant to show stats for (scores / rank).',
+      required: true,
+      choices: [
+        { label: 'Scores', value: RenderVariant.SCORES },
+        { label: 'Ranks', value: RenderVariant.RANKS }
+      ]
+    },
+    {
+      type: 'string',
+      name: 'username',
+      description: 'In-game username.'
+    }
+  ]
+};
 
+class PlayerActivitiesCommand extends Command {
   constructor() {
-    this.global = true;
-    this.slashCommand = new SlashCommandBuilder()
-      .addStringOption(option =>
-        option
-          .setName('variant')
-          .setDescription('The variant to show stats for')
-          .setRequired(true)
-          .addChoices([
-            ['Scores', RenderVariant.Scores],
-            ['Ranks', RenderVariant.Ranks]
-          ])
-      )
-      .addStringOption(option => option.setName('username').setDescription('In-game username'))
-      .setName('activities')
-      .setDescription('View player activity score');
+    super(CONFIG);
   }
 
-  async execute(message: CommandInteraction) {
-    await message.deferReply();
-
+  async execute(interaction: CommandInteraction) {
     // Grab the username from the command's arguments or database alias
-    const username = await this.getUsername(message);
+    const username = await getUsernameParam(interaction);
 
     // Get the variant from subcommand
-    const variant = message.options.getString('variant', true) as RenderVariant;
+    const variant = interaction.options.getString('variant', true) as RenderVariant;
 
-    if (!username) {
+    const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(
-        'This commands requires a username. Set a default by using the `setrsn` command.'
+        ErrorCode.PLAYER_NOT_FOUND,
+        "Player not found. Possibly hasn't been tracked yet on WiseOldMan.",
+        'Tip: Try tracking them first using the /update command'
       );
-    }
+    });
 
-    try {
-      const player = await womClient.players.getPlayerDetails(username);
+    const { attachment, fileName } = await this.render(player, variant);
 
-      const { attachment, fileName } = await this.render({
-        activities: player.latestSnapshot.data.activities,
-        username: player.username,
-        variant
-      });
+    const embed = new MessageEmbed()
+      .setColor(config.visuals.blue)
+      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/overview/activities`))
+      .setTitle(`${player.displayName} - Activity ${variant}`)
+      .setImage(`attachment://${fileName}`)
+      .setFooter({ text: 'Last updated' })
+      .setTimestamp(player.updatedAt);
 
-      const embed = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/overview/activities`))
-        .setTitle(`${player.displayName} - Activity ${variant}`)
-        .setImage(`attachment://${fileName}`)
-        .setFooter({ text: 'Last updated' })
-        .setTimestamp(player.updatedAt);
-
-      await message.editReply({ embeds: [embed], files: [attachment] });
-    } catch (e: any) {
-      const errorMessage = `**${username}** is not being tracked yet.`;
-      const errorTip = `Try /update ${username}`;
-
-      throw new CommandError(errorMessage, errorTip);
-    }
+    await interaction.editReply({ embeds: [embed], files: [attachment] });
   }
 
-  async render(props: {
-    activities: MapOf<Activity, ActivityValue>;
-    username: string;
-    variant: RenderVariant;
-  }): Promise<CanvasAttachment> {
-    const { activities, username, variant } = props;
+  async render(playerDetails: PlayerDetails, variant: RenderVariant): Promise<CanvasAttachment> {
+    const username = playerDetails.username;
+    const activities = playerDetails.latestSnapshot.data.activities;
 
     // Create a scaled empty canvas
     const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
@@ -117,7 +106,7 @@ class PlayerActivitiesCommand implements Command, Renderable {
       const activityValue = activities[activity];
       const isRanked = activityValue.score && activityValue.score > -1;
 
-      if (variant === RenderVariant.Scores) {
+      if (variant === RenderVariant.SCORES) {
         ctx.font = '11px Arial';
 
         const score = `${
@@ -132,7 +121,7 @@ class PlayerActivitiesCommand implements Command, Renderable {
         // Activity score
         ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
         ctx.fillText(score, originX + 42 - scoreWidth / 2, originY + 17);
-      } else if (variant === RenderVariant.Ranks) {
+      } else if (variant === RenderVariant.RANKS) {
         ctx.font = '10px Arial';
 
         const rank = `${isRanked ? formatNumber(activityValue.rank, true, 1) : '?'}`;
@@ -148,23 +137,6 @@ class PlayerActivitiesCommand implements Command, Renderable {
     const attachment = new MessageAttachment(canvas.toBuffer(), fileName);
 
     return { attachment, fileName };
-  }
-
-  async getUsername(message: CommandInteraction): Promise<string | undefined | null> {
-    const username = message.options.getString('username', false);
-    if (username) return username;
-
-    const inferredUsername = await getUsername(message.user.id);
-    return inferredUsername;
-  }
-
-  getRenderVariant(subCommand: string): RenderVariant {
-    switch (subCommand) {
-      case 'ranks':
-        return RenderVariant.Ranks;
-      default:
-        return RenderVariant.Scores;
-    }
   }
 }
 

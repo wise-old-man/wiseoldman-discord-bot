@@ -6,5 +6,17 @@ import { deployCommands } from './deploy-commands';
   await deployCommands();
 
   bot.init();
-  api.init();
+  const server = api.init();
+
+  process.on('SIGTERM', () => {
+    server.close();
+  });
+
+  process.on('SIGINT', () => {
+    server.close();
+  });
+
+  process.on('exit', () => {
+    server.close();
+  });
 })();

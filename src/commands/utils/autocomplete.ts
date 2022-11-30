@@ -1,5 +1,5 @@
 import { getMetricName, METRICS, PeriodProps, PERIODS, CountryProps } from '@wise-old-man/utils';
-import { customCommands } from '../commands/CustomCommands';
+import { CUSTOM_COMMANDS } from '../custom';
 
 const PERIOD_OPTIONS = PERIODS.map(p => ({ name: PeriodProps[p].name, value: p }));
 
@@ -18,10 +18,7 @@ export function getCountryOptions(currentValue: string): AutoCompleteOption[] {
   return Object.entries(CountryProps)
     .map(value => value[1])
     .filter(c => matches(currentValue, c.name, c.code))
-    .map(c => ({
-      name: c.name,
-      value: c.code
-    }));
+    .map(c => ({ name: c.name, value: c.code }));
 }
 
 export function getPeriodOptions(currentValue: string): AutoCompleteOption[] {
@@ -38,7 +35,7 @@ export function getMetricOptions(currentValue: string): AutoCompleteOption[] {
 }
 
 export function getHelpCategoryOptions(currentValue: string): AutoCompleteOption[] {
-  return customCommands
-    .filter(({ command }) => (!currentValue ? true : matches(currentValue, command)))
-    .map(c => ({ name: c.name, value: c.command }));
+  return CUSTOM_COMMANDS.filter(c => (!currentValue ? true : matches(currentValue, c.command))).map(
+    c => ({ name: c.name, value: c.command })
+  );
 }

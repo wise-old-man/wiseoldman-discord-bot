@@ -1,21 +1,25 @@
 import { CommandInteraction, GuildMember, MessageEmbed } from 'discord.js';
-import { SlashCommandBuilder } from '@discordjs/builders';
 import { deletePlayer } from '../../../api/modules/players';
 import config from '../../../config';
-import { Command } from '../../../types';
 import { getEmoji, hasModeratorRole } from '../../../utils';
-import CommandError from '../../CommandError';
+import { Command, CommandConfig } from '../../utils/commands';
 
-class DeletePlayerCommand implements Command {
-  slashCommand: SlashCommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'delete-player',
+  description: 'Delete a player from the database.',
+  options: [
+    {
+      type: 'string',
+      required: true,
+      name: 'username',
+      description: 'The username of the player to delete.'
+    }
+  ]
+};
 
+class DeletePlayerCommand extends Command {
   constructor() {
-    this.slashCommand = new SlashCommandBuilder()
-      .addStringOption(option =>
-        option.setName('username').setDescription('Username to delete').setRequired(true)
-      )
-      .setName('delete-player')
-      .setDescription('Delete a player from the database');
+    super(CONFIG);
   }
 
   async execute(message: CommandInteraction) {
@@ -26,20 +30,14 @@ class DeletePlayerCommand implements Command {
 
     const username = message.options.getString('username', true);
 
-    try {
-      await message.deferReply();
+    await deletePlayer(username);
 
-      await deletePlayer(username);
+    // Respond on the WOM discord chat with a success status
+    const response = new MessageEmbed()
+      .setColor(config.visuals.green)
+      .setDescription(`${getEmoji('success')} \`${username}\` has been successfully deleted!`);
 
-      // Respond on the WOM discord chat with a success status
-      const response = new MessageEmbed()
-        .setColor(config.visuals.green)
-        .setDescription(`${getEmoji('success')} \`${username}\` has been successfully deleted!`);
-
-      await message.editReply({ embeds: [response] });
-    } catch (error) {
-      throw new CommandError('Failed to delete player.');
-    }
+    await message.editReply({ embeds: [response] });
   }
 }
 

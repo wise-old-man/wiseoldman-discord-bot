@@ -1,3 +1,4 @@
+import { GroupListItem } from '@wise-old-man/utils';
 import {
   CommandInteraction,
   GuildChannelManager,
@@ -5,13 +6,11 @@ import {
   MessageEmbed,
   TextChannel
 } from 'discord.js';
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { GroupListItem } from '@wise-old-man/utils';
 import { verify } from '../../../api/modules/groups';
 import config from '../../../config';
-import { Command } from '../../../types';
 import { getEmoji, hasModeratorRole } from '../../../utils';
-import CommandError from '../../CommandError';
+import { Command, CommandConfig } from '../../utils/commands';
+import { CommandError, ErrorCode } from '../../../utils/error';
 
 const CHAT_MESSAGE = (groupName: string) =>
   `${getEmoji('success')} \`${groupName}\` has been successfully verified!`;
@@ -19,17 +18,28 @@ const CHAT_MESSAGE = (groupName: string) =>
 const LOG_MESSAGE = (groupId: number, groupName: string, userId: string) =>
   `${groupName} (${groupId}) - <@${userId}>`;
 
-class VerifyGroupCommand implements Command {
-  slashCommand: SlashCommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'verify-group',
+  description: 'Set a group as verified.',
+  options: [
+    {
+      type: 'integer',
+      required: true,
+      name: 'id',
+      description: 'The group ID.'
+    },
+    {
+      type: 'user',
+      required: true,
+      name: 'user',
+      description: 'Discord user tag.'
+    }
+  ]
+};
 
+class VerifyGroupCommand extends Command {
   constructor() {
-    this.slashCommand = new SlashCommandBuilder()
-      .addIntegerOption(option => option.setName('id').setDescription('Group id').setRequired(true))
-      .addUserOption(option =>
-        option.setName('user').setDescription('Discord user tag').setRequired(true)
-      )
-      .setName('verify-group')
-      .setDescription('Set a group as verified');
+    super(CONFIG);
   }
 
   async execute(message: CommandInteraction) {
@@ -38,32 +48,28 @@ class VerifyGroupCommand implements Command {
       return;
     }
 
-    await message.deferReply();
-
     const groupId = message.options.getInteger('id', true);
     const userId = message.options.getUser('user', true).id;
+
     const user = message.guild?.members.cache.find(m => m.id === userId);
 
-    if (!user) throw new CommandError('Failed to find user from tag.');
-
-    try {
-      const group = await verify(groupId);
-
-      // Respond on the WOM discord chat with a success status
-      const response = new MessageEmbed()
-        .setColor(config.visuals.green)
-        .setDescription(CHAT_MESSAGE(group.name));
-
-      await message.followUp({ embeds: [response] });
-
-      this.sendConfirmationLog(message.guild?.channels, group, userId);
-      this.addRole(user);
-    } catch (error) {
-      throw new CommandError('Failed to verify group.');
+    if (!user) {
+      throw new CommandError(ErrorCode.USER_NOT_FOUND);
     }
-  }
 
-  addRole(user: GuildMember) {
+    const group = await verify(groupId);
+
+    // Respond on the WOM discord chat with a success status
+    const response = new MessageEmbed()
+      .setColor(config.visuals.green)
+      .setDescription(CHAT_MESSAGE(group.name));
+
+    await message.followUp({ embeds: [response] });
+
+    // Send a message to the WOM leaders log channel
+    this.sendConfirmationLog(message.guild?.channels, group, userId);
+
+    // Add the "Group Leader" role to the user
     user.roles.add(config.discord.roles.groupLeader).catch(console.log);
   }
 

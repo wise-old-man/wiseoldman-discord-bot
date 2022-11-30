@@ -1,10 +1,10 @@
 import cors from 'cors';
-import express, { Express } from 'express';
+import express from 'express';
 import { onEventReceived } from '../events/router';
 
 const PORT = 7000;
 
-export function init(): Express {
+export function init() {
   const app = express();
 
   app.use(express.json());
@@ -28,7 +28,5 @@ export function init(): Express {
     return res.json('Event received.');
   });
 
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-  return app;
+  return app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
