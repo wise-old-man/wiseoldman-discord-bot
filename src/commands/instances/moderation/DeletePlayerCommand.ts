@@ -22,13 +22,13 @@ class DeletePlayerCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(message: CommandInteraction) {
-    if (!hasModeratorRole(message.member as GuildMember)) {
-      message.followUp({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
+  async execute(interaction: CommandInteraction) {
+    if (!hasModeratorRole(interaction.member as GuildMember)) {
+      interaction.followUp({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
       return;
     }
 
-    const username = message.options.getString('username', true);
+    const username = interaction.options.getString('username', true);
 
     await deletePlayer(username);
 
@@ -37,7 +37,7 @@ class DeletePlayerCommand extends Command {
       .setColor(config.visuals.green)
       .setDescription(`${getEmoji('success')} \`${username}\` has been successfully deleted!`);
 
-    await message.editReply({ embeds: [response] });
+    await interaction.editReply({ embeds: [response] });
   }
 }
 

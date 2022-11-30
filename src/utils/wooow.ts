@@ -42,11 +42,3 @@ export async function getLinkedGroupId(interaction: CommandInteraction) {
 
   return groupId;
 }
-
-export function keyValue(key: string, value: string | number) {
-  return `**${key}:** ${value}`;
-}
-
-export function bold(str: string | number) {
-  return `**${str}**`;
-}

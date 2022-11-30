@@ -35,16 +35,16 @@ class ResetGroupCodeCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(message: CommandInteraction) {
-    if (!hasModeratorRole(message.member as GuildMember)) {
-      message.followUp({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
+  async execute(interaction: CommandInteraction) {
+    if (!hasModeratorRole(interaction.member as GuildMember)) {
+      interaction.followUp({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
       return;
     }
 
-    const groupId = message.options.getInteger('id', true);
-    const userId = message.options.getUser('user', true).id;
+    const groupId = interaction.options.getInteger('id', true);
+    const userId = interaction.options.getUser('user', true).id;
 
-    const user = message.guild?.members.cache.find(m => m.id === userId);
+    const user = interaction.guild?.members.cache.find(m => m.id === userId);
 
     if (!user) {
       throw new CommandError(ErrorCode.USER_NOT_FOUND);
@@ -60,7 +60,7 @@ class ResetGroupCodeCommand extends Command {
       .setColor(config.visuals.green)
       .setDescription(CHAT_MESSAGE(userId));
 
-    await message.editReply({ embeds: [response] });
+    await interaction.editReply({ embeds: [response] });
   }
 }
 

@@ -10,7 +10,8 @@ import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
 import { getEmoji } from '../../../utils';
 import { CommandConfig, Command } from '../../utils/commands';
-import { bold, getLinkedGroupId } from '../../../utils/wooow';
+import { getLinkedGroupId } from '../../../utils/wooow';
+import { bold } from '~/utils/rendering';
 
 const CONFIG: CommandConfig = {
   name: 'hiscores',

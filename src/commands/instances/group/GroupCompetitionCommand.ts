@@ -15,7 +15,8 @@ import config from '../../../config';
 import { getEmoji } from '../../../utils';
 import { CommandConfig, Command } from '../../utils/commands';
 import { CommandError, ErrorCode } from '../../../utils/error';
-import { bold, getLinkedGroupId, keyValue } from '../../../utils/wooow';
+import { getLinkedGroupId } from '../../../utils/wooow';
+import { keyValue, bold } from '~/utils/rendering';
 
 const CONFIG: CommandConfig = {
   name: 'competition',

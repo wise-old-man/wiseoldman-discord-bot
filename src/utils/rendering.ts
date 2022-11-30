@@ -23,3 +23,11 @@ export function getScaledCanvas(width: number, height: number, factor = SCALE_FA
 
   return { canvas, ctx, width: scaledWidth, height: scaledHeight };
 }
+
+export function keyValue(key: string, value: string | number) {
+  return `**${key}:** ${value}`;
+}
+
+export function bold(str: string | number) {
+  return `**${str}**`;
+}

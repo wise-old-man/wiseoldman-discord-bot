@@ -31,8 +31,8 @@ class NameChangeCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(message: CommandInteraction) {
-    const nameChangeId = message.options.getInteger('name_change_id', true);
+  async execute(interaction: CommandInteraction) {
+    const nameChangeId = interaction.options.getInteger('name_change_id', true);
 
     const reviewData = await womClient.nameChanges.getNameChangeDetails(nameChangeId);
 
@@ -56,13 +56,13 @@ class NameChangeCommand extends Command {
       new MessageButton().setCustomId('namechange_deny').setLabel('Deny').setStyle('DANGER')
     );
 
-    await message.editReply({
+    await interaction.editReply({
       embeds: [response],
-      components: hasModeratorRole(message.member as GuildMember) ? [row] : []
+      components: hasModeratorRole(interaction.member as GuildMember) ? [row] : []
     });
 
     const filter = async (buttonInteraction: ButtonInteraction) => {
-      if (message.user.id !== buttonInteraction.user.id) {
+      if (interaction.user.id !== buttonInteraction.user.id) {
         await buttonInteraction.reply({ content: 'These buttons are not for you!', ephemeral: true });
         return false;
       }
@@ -70,8 +70,8 @@ class NameChangeCommand extends Command {
     };
 
     // Only create collector if moderator to not get the ugly (edited) tag on message
-    const collector = hasModeratorRole(message.member as GuildMember)
-      ? message.channel?.createMessageComponentCollector({
+    const collector = hasModeratorRole(interaction.member as GuildMember)
+      ? interaction.channel?.createMessageComponentCollector({
           filter,
           componentType: 'BUTTON',
           max: 1,
@@ -97,7 +97,7 @@ class NameChangeCommand extends Command {
         }
       }
 
-      await message.editReply({ embeds: [response], components: [] });
+      await interaction.editReply({ embeds: [response], components: [] });
     });
   }
 }

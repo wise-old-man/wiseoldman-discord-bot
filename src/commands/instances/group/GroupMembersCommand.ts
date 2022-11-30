@@ -4,7 +4,8 @@ import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
 import { CommandConfig, Command } from '../../utils/commands';
 import { CommandError, ErrorCode } from '../../../utils/error';
-import { bold, getLinkedGroupId } from '../../../utils/wooow';
+import { getLinkedGroupId } from '../../../utils/wooow';
+import { bold } from '~/utils/rendering';
 
 const RESULTS_PER_PAGE = 20;
 
