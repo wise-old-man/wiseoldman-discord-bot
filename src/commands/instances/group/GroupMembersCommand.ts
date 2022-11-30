@@ -1,6 +1,6 @@
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import { CommandInteraction, Constants, MessageEmbed } from 'discord.js';
-import womClient from '../../../api/wom-api';
+import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
 import { CommandConfig, Command } from '../../utils/commands';
 import { CommandError, ErrorCode } from '../../../utils/error';

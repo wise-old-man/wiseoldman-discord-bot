@@ -7,8 +7,7 @@ import {
   MessageButton,
   MessageEmbed
 } from 'discord.js';
-import { approve, deny } from '../../../api/modules/names';
-import womClient from '../../../api/wom-api';
+import womClient, { approveNameChange, denyNameChange } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig } from '../../utils/commands';
 import { getEmoji, hasModeratorRole } from '../../../utils/discord';
@@ -84,14 +83,14 @@ class NameChangeCommand extends Command {
       const buttonClicked = collection.first()?.customId;
       if (buttonClicked === 'namechange_approve') {
         try {
-          await approve(nameChangeId);
+          await approveNameChange(nameChangeId);
           response.setFooter({ text: `Approved ${getEmoji('success')}` }).setColor(config.visuals.green);
         } catch (error) {
           response.setFooter({ text: 'Failed to approve name change' }).setColor(config.visuals.red);
         }
       } else if (buttonClicked === 'namechange_deny') {
         try {
-          await deny(nameChangeId);
+          await denyNameChange(nameChangeId);
           response.setFooter({ text: `Denied ${getEmoji('error')}` }).setColor(config.visuals.red);
         } catch (error) {
           response.setFooter({ text: 'Failed to deny name change' }).setColor(config.visuals.red);

@@ -1,5 +1,5 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import womClient from '../../../api/wom-api';
+import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
 import { getChannelPreferences, getServer } from '../../../services/prisma';
 import { Command, CommandConfig } from '../../utils/commands';

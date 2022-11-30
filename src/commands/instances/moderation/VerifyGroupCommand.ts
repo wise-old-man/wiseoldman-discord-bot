@@ -6,7 +6,7 @@ import {
   MessageEmbed,
   TextChannel
 } from 'discord.js';
-import { verify } from '../../../api/modules/groups';
+import { verifyGroup } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { getEmoji, hasModeratorRole } from '../../../utils';
 import { Command, CommandConfig } from '../../utils/commands';
@@ -42,32 +42,32 @@ class VerifyGroupCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(message: CommandInteraction) {
-    if (!hasModeratorRole(message.member as GuildMember)) {
-      message.reply({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
+  async execute(interaction: CommandInteraction) {
+    if (!hasModeratorRole(interaction.member as GuildMember)) {
+      interaction.followUp({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
       return;
     }
 
-    const groupId = message.options.getInteger('id', true);
-    const userId = message.options.getUser('user', true).id;
+    const groupId = interaction.options.getInteger('id', true);
+    const userId = interaction.options.getUser('user', true).id;
 
-    const user = message.guild?.members.cache.find(m => m.id === userId);
+    const user = interaction.guild?.members.cache.find(m => m.id === userId);
 
     if (!user) {
       throw new CommandError(ErrorCode.USER_NOT_FOUND);
     }
 
-    const group = await verify(groupId);
+    const group = await verifyGroup(groupId);
 
     // Respond on the WOM discord chat with a success status
     const response = new MessageEmbed()
       .setColor(config.visuals.green)
       .setDescription(CHAT_MESSAGE(group.name));
 
-    await message.followUp({ embeds: [response] });
+    await interaction.followUp({ embeds: [response] });
 
     // Send a message to the WOM leaders log channel
-    this.sendConfirmationLog(message.guild?.channels, group, userId);
+    this.sendConfirmationLog(interaction.guild?.channels, group, userId);
 
     // Add the "Group Leader" role to the user
     user.roles.add(config.discord.roles.groupLeader).catch(console.log);

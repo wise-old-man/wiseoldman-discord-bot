@@ -2,7 +2,7 @@ import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '../../../config';
 import { updateAlias } from '../../../services/prisma';
 import { encodeURL } from '../../../utils/strings';
-import womClient from '../../../api/wom-api';
+import womClient from '../../../services/wiseoldman';
 import { Command, CommandConfig } from '../../../commands/utils/commands';
 import { CommandError, ErrorCode } from '../../../utils/error';
 

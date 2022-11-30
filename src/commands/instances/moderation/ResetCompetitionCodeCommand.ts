@@ -1,5 +1,5 @@
 import { CommandInteraction, GuildMember, MessageEmbed } from 'discord.js';
-import { resetCode } from '../../../api/modules/competitions';
+import { resetCompetitionCode } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { hasModeratorRole } from '../../../utils';
 import { Command, CommandConfig } from '../../utils/commands';
@@ -37,7 +37,7 @@ class ResetCompetitionCodeCommand extends Command {
 
   async execute(interaction: CommandInteraction) {
     if (!hasModeratorRole(interaction.member as GuildMember)) {
-      interaction.reply({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
+      interaction.followUp({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
       return;
     }
 
@@ -50,7 +50,7 @@ class ResetCompetitionCodeCommand extends Command {
       throw new CommandError(ErrorCode.USER_NOT_FOUND);
     }
 
-    const { newCode } = await resetCode(competitionId);
+    const { newCode } = await resetCompetitionCode(competitionId);
 
     // DM the user back with the new verification code
     await user.send(DM_MESSAGE(newCode));

@@ -1,5 +1,5 @@
 import { CommandInteraction, GuildMember, MessageEmbed } from 'discord.js';
-import { deletePlayer } from '../../../api/modules/players';
+import { deletePlayer } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { getEmoji, hasModeratorRole } from '../../../utils';
 import { Command, CommandConfig } from '../../utils/commands';
@@ -24,7 +24,7 @@ class DeletePlayerCommand extends Command {
 
   async execute(message: CommandInteraction) {
     if (!hasModeratorRole(message.member as GuildMember)) {
-      message.reply({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
+      message.followUp({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
       return;
     }
 

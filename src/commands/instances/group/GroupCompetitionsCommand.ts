@@ -1,7 +1,6 @@
 import { CompetitionListItem, CompetitionStatus, CompetitionTypeProps } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { getCompetitionStatus, getCompetitionTimeLeft } from '../../../api/modules/competitions';
-import womClient from '../../../api/wom-api';
+import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { getEmoji } from '../../../utils';
 import { CommandConfig, Command } from '../../utils/commands';

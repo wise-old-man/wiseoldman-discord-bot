@@ -10,7 +10,7 @@ import {
   PERIODS
 } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import womClient from '../../../api/wom-api';
+import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
 import { getEmoji } from '../../../utils';
 import { CommandConfig, Command } from '../../utils/commands';

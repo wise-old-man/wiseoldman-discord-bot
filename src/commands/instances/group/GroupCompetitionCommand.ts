@@ -10,8 +10,7 @@ import {
 } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { uniq } from 'lodash';
-import { getCompetitionStatus, getCompetitionTimeLeft } from '../../../api/modules/competitions';
-import womClient from '../../../api/wom-api';
+import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { getEmoji } from '../../../utils';
 import { CommandConfig, Command } from '../../utils/commands';

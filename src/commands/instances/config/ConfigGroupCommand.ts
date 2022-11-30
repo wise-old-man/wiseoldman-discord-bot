@@ -1,5 +1,5 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import womClient from '../../../api/wom-api';
+import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
 import { updateGroup } from '../../../services/prisma';
 import { getEmoji } from '../../../utils';

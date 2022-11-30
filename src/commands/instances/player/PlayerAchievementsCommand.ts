@@ -4,7 +4,7 @@ import config from '../../../config';
 import { CanvasAttachment } from '../../../types';
 import { encodeURL, formatDate } from '../../../utils';
 import { getScaledCanvas } from '../../../utils/rendering';
-import womClient from '../../../api/wom-api';
+import womClient from '../../../services/wiseoldman';
 import { getUsernameParam } from '../../../utils/wooow';
 import { Command, CommandConfig } from '../../../commands/utils/commands';
 import { CommandError, ErrorCode } from '../../../utils/error';

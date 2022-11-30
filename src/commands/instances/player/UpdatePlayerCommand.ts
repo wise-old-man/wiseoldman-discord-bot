@@ -1,6 +1,6 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '../../../config';
-import womClient from '../../../api/wom-api';
+import womClient from '../../../services/wiseoldman';
 import { Command, CommandConfig } from '../../../commands/utils/commands';
 import { getUsernameParam } from '../../../utils/wooow';
 import { CommandError, ErrorCode } from '../../../utils/error';

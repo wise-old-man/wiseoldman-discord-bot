@@ -1,5 +1,5 @@
 import { CommandInteraction, GuildMember, MessageEmbed } from 'discord.js';
-import { resetCode } from '../../../api/modules/groups';
+import { resetGroupCode } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { hasModeratorRole } from '../../../utils';
 import { Command, CommandConfig } from '../../utils/commands';
@@ -37,7 +37,7 @@ class ResetGroupCodeCommand extends Command {
 
   async execute(message: CommandInteraction) {
     if (!hasModeratorRole(message.member as GuildMember)) {
-      message.reply({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
+      message.followUp({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
       return;
     }
 
@@ -50,7 +50,7 @@ class ResetGroupCodeCommand extends Command {
       throw new CommandError(ErrorCode.USER_NOT_FOUND);
     }
 
-    const { newCode } = await resetCode(groupId);
+    const { newCode } = await resetGroupCode(groupId);
 
     // DM the user back with the new verification code
     await user.send(DM_MESSAGE(newCode));

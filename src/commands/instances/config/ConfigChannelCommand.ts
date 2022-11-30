@@ -1,9 +1,10 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import config from '../../../config';
-import { updateBotChannel, updateChannelPreference } from '../../../services/prisma';
-import { BroadcastType, getBroadcastName, getEmoji } from '../../../utils';
+import config from '~/config';
+import { updateBotChannel, updateChannelPreference } from '~/services/prisma';
+import { BroadcastType, getBroadcastName } from '~/utils/broadcasts';
+import { getEmoji } from '~/utils/discord';
+import { CommandError, ErrorCode } from '~/utils/error';
 import { Command, CommandConfig } from '../../utils/commands';
-import { CommandError, ErrorCode } from '../../../utils/error';
 
 const CONFIG: CommandConfig = {
   name: 'channel',

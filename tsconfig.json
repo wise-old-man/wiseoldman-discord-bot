@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "src",
+    "paths": {
+      "~/*": ["./*"]
+    },
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["esnext"],

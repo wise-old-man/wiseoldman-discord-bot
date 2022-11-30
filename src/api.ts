@@ -1,6 +1,6 @@
 import cors from 'cors';
 import express from 'express';
-import { onEventReceived } from '../events/router';
+import { onEventReceived } from './events/router';
 
 const PORT = 7000;
 
