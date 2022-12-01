@@ -2,7 +2,7 @@ import { MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
 import { getMetricName, Metric } from '@wise-old-man/utils';
 import config from '../../config';
-import { Event } from '../../types';
+import { Event } from '../../utils/events';
 import { getEmoji, broadcastMessage, durationBetween, BroadcastType } from '../../utils';
 
 interface CompetitionCreatedData {

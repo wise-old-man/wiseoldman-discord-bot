@@ -2,7 +2,7 @@ import { formatNumber } from '@wise-old-man/utils';
 import { MessageEmbed } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../config';
-import { Event } from '../../types';
+import { Event } from '../../utils/events';
 import { broadcastMessage, BroadcastType } from '../../utils';
 
 interface CompetitionStanding {

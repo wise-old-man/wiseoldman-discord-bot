@@ -1,4 +1,4 @@
-import { Event } from '../../types';
+import { Event } from '../../utils/events';
 import CompetitionCreated from './CompetitionCreated';
 import CompetitionEnded from './CompetitionEnded';
 import CompetitionEnding from './CompetitionEnding';

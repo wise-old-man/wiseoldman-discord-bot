@@ -1,6 +1,6 @@
 import { MessageEmbed } from 'discord.js';
 import config from '../../config';
-import { Event } from '../../types';
+import { Event } from '../../utils/events';
 import { encodeURL, broadcastMessage, BroadcastType } from '../../utils';
 
 interface MemberHardcoreDiedData {

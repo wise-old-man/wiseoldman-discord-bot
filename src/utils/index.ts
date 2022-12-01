@@ -6,3 +6,4 @@ export * from './broadcasts';
 export * from './error';
 export * from './commands';
 export * from './rendering';
+export * from './events';
