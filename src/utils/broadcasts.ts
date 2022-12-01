@@ -1,6 +1,6 @@
-import { MessageEmbed } from 'discord.js';
-import { getServers, getPreferredChannels } from '../services/prisma';
-import { propagateMessage } from '.';
+import { MessageEmbed, TextChannel } from 'discord.js';
+import bot from '~/bot';
+import { getServers, getPreferredChannels } from '~/services/prisma';
 
 export enum BroadcastType {
   DEFAULT = 'DEFAULT',
@@ -23,10 +23,21 @@ export const BroadcastName = {
 export async function broadcastMessage(groupId: number, type: string, message: MessageEmbed) {
   const servers = await getServers(groupId);
 
-  const preferredChannels = await getPreferredChannels(
+  const preferredChannelIds = await getPreferredChannels(
     servers.map(s => s.guildId),
     type
   );
 
-  propagateMessage(message, preferredChannels);
+  if (!preferredChannelIds) {
+    return;
+  }
+
+  preferredChannelIds.forEach(async id => {
+    const channel = await bot.client.channels.fetch(id);
+
+    if (!channel) return;
+    if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(channel)) return;
+
+    channel.send({ embeds: [message] });
+  });
 }

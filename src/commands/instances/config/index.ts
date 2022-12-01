@@ -1,7 +1,8 @@
-import { CommandConfig, AggregateCommand, Command } from '../../utils/commands';
+import { CommandConfig, AggregateCommand, Command } from '~/utils';
+import ConfigChannelCommand from './ConfigChannelCommand';
 import ConfigGroupCommand from './ConfigGroupCommand';
 
-const SUBCOMMANDS: Command[] = [ConfigGroupCommand];
+const SUBCOMMANDS: Command[] = [ConfigGroupCommand, ConfigChannelCommand];
 
 const CONFIG: CommandConfig = {
   name: 'config',

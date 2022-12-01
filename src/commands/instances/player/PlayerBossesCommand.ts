@@ -1,13 +1,17 @@
+import { formatNumber, isBoss, Metric, PlayerDetails, round } from '@wise-old-man/utils';
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
-import { formatNumber, isBoss, Metric, PlayerDetails, round } from '@wise-old-man/utils';
-import config from '../../../config';
-import { encodeURL } from '../../../utils';
-import { getScaledCanvas } from '../../../utils/rendering';
-import womClient from '../../../services/wiseoldman';
-import { Command, CommandConfig } from '../../../commands/utils/commands';
-import { getUsernameParam } from '../../../utils/wooow';
-import { CommandError, ErrorCode } from '../../../utils/error';
+import config from '~/config';
+import womClient from '~/services/wiseoldman';
+import {
+  Command,
+  CommandConfig,
+  CommandError,
+  encodeURL,
+  ErrorCode,
+  getUsernameParam,
+  getScaledCanvas
+} from '~/utils';
 
 const RENDER_WIDTH = 350;
 const RENDER_HEIGHT = 355;

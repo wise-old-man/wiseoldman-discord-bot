@@ -6,11 +6,9 @@ import {
   MessageEmbed,
   TextChannel
 } from 'discord.js';
-import { verifyGroup } from '../../../services/wiseoldman';
-import config from '../../../config';
-import { hasModeratorRole } from '../../../utils';
-import { Command, CommandConfig } from '../../utils/commands';
-import { CommandError, ErrorCode } from '../../../utils/error';
+import { verifyGroup } from '~/services/wiseoldman';
+import config from '~/config';
+import { Command, CommandConfig, CommandError, ErrorCode, hasModeratorRole } from '~/utils';
 
 const CHAT_MESSAGE = (groupName: string) => `✅ \`${groupName}\` has been successfully verified!`;
 

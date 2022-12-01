@@ -1,6 +1,5 @@
-import { Client, Intents, MessageEmbed } from 'discord.js';
+import { Client, Guild, Intents, MessageEmbed, TextChannel } from 'discord.js';
 import config from './config';
-import { findOpenChannel } from './utils';
 import * as router from './commands/router';
 
 class Bot {
@@ -59,6 +58,17 @@ function buildJoinMessage() {
         value: 'https://wiseoldman.net'
       }
     ]);
+}
+
+/**
+ * Finds the first text channel where the bot has permissions to send messages to.
+ */
+function findOpenChannel(guild: Guild) {
+  const channel = guild.channels.cache.find(c => {
+    return c.type === 'GUILD_TEXT' && guild.me?.permissions.has('SEND_MESSAGES');
+  });
+
+  return channel as TextChannel;
 }
 
 export default new Bot();

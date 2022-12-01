@@ -1,9 +1,8 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import womClient from '../../../services/wiseoldman';
-import config from '../../../config';
-import { updateGroup } from '../../../services/prisma';
-import { CommandConfig, Command } from '../../utils/commands';
-import { CommandError, ErrorCode } from '../../../utils/error';
+import config from '~/config';
+import { updateGroup } from '~/services/prisma';
+import womClient from '~/services/wiseoldman';
+import { Command, CommandConfig, CommandError, ErrorCode } from '~/utils';
 
 const CONFIG: CommandConfig = {
   name: 'group',

@@ -1,18 +1,23 @@
-import { CommandInteraction, MessageEmbed, Constants } from 'discord.js';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import {
-  GetPlayerGainsResponse,
-  PlayerDeltasMap,
-  getMetricName,
   formatNumber,
-  Metric
+  getMetricName,
+  GetPlayerGainsResponse,
+  Metric,
+  PlayerDeltasMap
 } from '@wise-old-man/utils';
-import config from '../../../config';
-import { encodeURL, getEmoji } from '../../../utils';
-import womClient from '../../../services/wiseoldman';
-import { Command, CommandConfig } from '../../../commands/utils/commands';
-import { getUsernameParam } from '../../../utils/wooow';
-import { CommandError, ErrorCode } from '../../../utils/error';
+import { CommandInteraction, Constants, MessageEmbed } from 'discord.js';
+import config from '~/config';
+import womClient from '~/services/wiseoldman';
+import {
+  encodeURL,
+  getEmoji,
+  Command,
+  CommandConfig,
+  getUsernameParam,
+  CommandError,
+  ErrorCode
+} from '~/utils';
 
 const GAINS_PER_PAGE = 10;
 

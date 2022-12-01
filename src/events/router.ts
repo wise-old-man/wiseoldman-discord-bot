@@ -1,5 +1,9 @@
-import { EventPayload } from '../types';
 import events from './instances';
+
+interface EventPayload {
+  type: string;
+  data: unknown;
+}
 
 function onEventReceived(payload: EventPayload): void {
   events.forEach(e => {

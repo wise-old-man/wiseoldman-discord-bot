@@ -10,13 +10,18 @@ import {
 } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { uniq } from 'lodash';
-import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '../../../services/wiseoldman';
-import config from '../../../config';
-import { getEmoji } from '../../../utils';
-import { CommandConfig, Command } from '../../utils/commands';
-import { CommandError, ErrorCode } from '../../../utils/error';
-import { getLinkedGroupId } from '../../../utils/wooow';
-import { keyValue, bold } from '~/utils/rendering';
+import config from '~/config';
+import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '~/services/wiseoldman';
+import {
+  bold,
+  Command,
+  CommandConfig,
+  CommandError,
+  ErrorCode,
+  getEmoji,
+  getLinkedGroupId,
+  keyValue
+} from '~/utils';
 
 const CONFIG: CommandConfig = {
   name: 'competition',

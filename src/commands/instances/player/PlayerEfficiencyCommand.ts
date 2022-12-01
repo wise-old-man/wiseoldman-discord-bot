@@ -1,11 +1,8 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { formatNumber, round } from '@wise-old-man/utils';
-import config from '../../../config';
-import { encodeURL } from '../../../utils';
-import womClient from '../../../services/wiseoldman';
-import { Command, CommandConfig } from '../../../commands/utils/commands';
-import { getUsernameParam } from '../../../utils/wooow';
-import { CommandError, ErrorCode } from '../../../utils/error';
+import config from '~/config';
+import { encodeURL, Command, CommandConfig, getUsernameParam, CommandError, ErrorCode } from '~/utils';
+import womClient from '~/services/wiseoldman';
 
 const CONFIG: CommandConfig = {
   name: 'ttm',

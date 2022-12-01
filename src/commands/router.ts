@@ -1,12 +1,12 @@
 import { Interaction } from 'discord.js';
 import {
+  getErrorResponse,
+  BaseCommand,
   getCountryOptions,
   getHelpCategoryOptions,
   getMetricOptions,
   getPeriodOptions
-} from './utils/autocomplete';
-import { BaseCommand } from './utils/commands';
-import { getErrorResponse } from '../utils/error';
+} from '~/utils';
 import ConfigRootCommand from './instances/config';
 import HelpCommand from './instances/general/HelpCommand';
 import GroupRootCommand from './instances/group';
@@ -15,15 +15,15 @@ import NameChangeCommand from './instances/moderation/NameChangeCommand';
 import ResetCompetitionCodeCommand from './instances/moderation/ResetCompetitionCodeCommand';
 import ResetGroupCodeCommand from './instances/moderation/ResetGroupCodeCommand';
 import VerifyGroupCommand from './instances/moderation/VerifyGroupCommand';
-import PlayerEfficiencyCommand from './instances/player/PlayerEfficiencyCommand';
-import PlayerSetUsernameCommand from './instances/player/PlayerSetUsernameCommand';
-import PlayerSetFlagCommand from './instances/player/PlayerSetFlagCommand';
-import UpdatePlayerCommand from './instances/player/UpdatePlayerCommand';
 import PlayerAchievementsCommand from './instances/player/PlayerAchievementsCommand';
-import PlayerGainedCommand from './instances/player/PlayerGainedCommand';
 import PlayerActivitiesCommand from './instances/player/PlayerActivitiesCommand';
 import PlayerBossesCommand from './instances/player/PlayerBossesCommand';
+import PlayerEfficiencyCommand from './instances/player/PlayerEfficiencyCommand';
+import PlayerGainedCommand from './instances/player/PlayerGainedCommand';
+import PlayerSetFlagCommand from './instances/player/PlayerSetFlagCommand';
+import PlayerSetUsernameCommand from './instances/player/PlayerSetUsernameCommand';
 import PlayerStatsCommand from './instances/player/PlayerStatsCommand';
+import UpdatePlayerCommand from './instances/player/UpdatePlayerCommand';
 
 export const COMMANDS: BaseCommand[] = [
   HelpCommand,

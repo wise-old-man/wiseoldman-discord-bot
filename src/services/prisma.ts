@@ -75,22 +75,6 @@ async function updateGroup(guildId: string, groupId: number) {
 }
 
 /**
- * Update the command prefix for a given guild.
- */
-async function updatePrefix(guildId: string, prefix: string) {
-  const server = await getServer(guildId);
-
-  if (!server) {
-    throw new Error(`Server does not exist for guild id: ${guildId}`);
-  }
-
-  return prisma.server.update({
-    where: { guildId },
-    data: { prefix }
-  });
-}
-
-/**
  * Update the bot's default broadcast channel for a given guild.
  */
 async function updateBotChannel(guildId: string, channelId: string) {
@@ -106,16 +90,12 @@ async function updateBotChannel(guildId: string, channelId: string) {
   });
 }
 
-async function getChannelPreference(guildId: string, type: string) {
-  return await prisma.channelPreference.findFirst({ where: { guildId, type } });
-}
-
 async function getChannelPreferences(guildId: string) {
-  return await prisma.channelPreference.findMany({ where: { guildId } });
+  return prisma.channelPreference.findMany({ where: { guildId } });
 }
 
 async function updateChannelPreference(guildId: string, type: string, channelId: string | null) {
-  return await prisma.channelPreference.upsert({
+  return prisma.channelPreference.upsert({
     where: { guildId_type: { guildId, type } },
     create: { guildId, type, channelId },
     update: { channelId }
@@ -142,9 +122,7 @@ export {
   getServer,
   getServers,
   updateGroup,
-  updatePrefix,
   updateBotChannel,
-  getChannelPreference,
   getChannelPreferences,
   updateChannelPreference,
   getPreferredChannels

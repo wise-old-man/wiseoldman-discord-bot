@@ -2,17 +2,10 @@ import Canvas from 'canvas';
 
 const SCALE_FACTOR = 2;
 
-export interface ScaledCanvas {
-  canvas: Canvas.Canvas;
-  ctx: Canvas.CanvasRenderingContext2D;
-  width: number;
-  height: number;
-}
-
 /**
  * Creates a scaled canvas configuration.
  */
-export function getScaledCanvas(width: number, height: number, factor = SCALE_FACTOR): ScaledCanvas {
+export function getScaledCanvas(width: number, height: number, factor = SCALE_FACTOR) {
   const scaledWidth = width * factor;
   const scaledHeight = height * factor;
 

@@ -1,21 +1,14 @@
 import moment from 'moment';
 
-export interface TimeGap {
-  seconds: number;
-  minutes: number;
-  hours: number;
-  days: number;
-}
-
-export function formatDate(date: Date, format = 'MM-DD-YYYY HH:mm'): string {
+export function formatDate(date: Date, format = 'MM-DD-YYYY HH:mm') {
   return moment(date).format(format);
 }
 
-export function durationSince(date: Date, maxDepth = 10, shortNames = false): string {
+export function durationSince(date: Date, maxDepth = 10, shortNames = false) {
   return durationBetween(date, new Date(), maxDepth, shortNames);
 }
 
-export function durationBetween(start: Date, end: Date, maxDepth = 10, shortNames = false): string {
+export function durationBetween(start: Date, end: Date, maxDepth = 10, shortNames = false) {
   if (!start || !end) {
     return '0 seconds';
   }
@@ -48,7 +41,7 @@ export function durationBetween(start: Date, end: Date, maxDepth = 10, shortName
   return periods.join(', ');
 }
 
-export function durationOf(millisDiff: number): TimeGap {
+export function durationOf(millisDiff: number) {
   if (millisDiff <= 0) {
     return { days: 0, hours: 0, minutes: 0, seconds: 0 };
   }

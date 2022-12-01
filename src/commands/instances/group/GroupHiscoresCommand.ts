@@ -6,12 +6,9 @@ import {
   parseMetricAbbreviation
 } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import womClient from '../../../services/wiseoldman';
-import config from '../../../config';
-import { getEmoji } from '../../../utils';
-import { CommandConfig, Command } from '../../utils/commands';
-import { getLinkedGroupId } from '../../../utils/wooow';
-import { bold } from '~/utils/rendering';
+import womClient from '~/services/wiseoldman';
+import config from '~/config';
+import { bold, Command, CommandConfig, getEmoji, getLinkedGroupId } from '~/utils';
 
 const CONFIG: CommandConfig = {
   name: 'hiscores',

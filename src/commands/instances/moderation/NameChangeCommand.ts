@@ -7,11 +7,9 @@ import {
   MessageButton,
   MessageEmbed
 } from 'discord.js';
-import womClient, { approveNameChange, denyNameChange } from '../../../services/wiseoldman';
-import config from '../../../config';
-import { Command, CommandConfig } from '../../utils/commands';
-import { hasModeratorRole } from '../../../utils/discord';
-import { CommandError, ErrorCode } from '../../../utils/error';
+import womClient, { approveNameChange, denyNameChange } from '~/services/wiseoldman';
+import config from '~/config';
+import { Command, CommandConfig, CommandError, ErrorCode, hasModeratorRole } from '~/utils';
 
 const CONFIG: CommandConfig = {
   name: 'namechange',

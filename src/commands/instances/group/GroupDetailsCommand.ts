@@ -1,10 +1,7 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import config from '../../../config';
-import womClient from '../../../services/wiseoldman';
-import { formatDate } from '../../../utils';
-import { CommandConfig, Command } from '../../utils/commands';
-import { CommandError, ErrorCode } from '../../../utils/error';
-import { getLinkedGroupId } from '../../../utils/wooow';
+import config from '~/config';
+import womClient from '~/services/wiseoldman';
+import { Command, CommandConfig, CommandError, ErrorCode, formatDate, getLinkedGroupId } from '~/utils';
 
 const CONFIG: CommandConfig = {
   name: 'details',
