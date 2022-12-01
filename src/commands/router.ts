@@ -1,7 +1,8 @@
-import { Interaction } from 'discord.js';
+import { Interaction, MessageEmbed } from 'discord.js';
+import config from '~/config';
 import {
-  getErrorResponse,
   BaseCommand,
+  CommandError,
   getCountryOptions,
   getHelpCategoryOptions,
   getMetricOptions,
@@ -85,6 +86,19 @@ export async function onInteractionReceived(interaction: Interaction) {
     await targetCommand.execute(interaction);
   } catch (error) {
     console.log(error);
-    await interaction.followUp({ embeds: [getErrorResponse(error)] });
+    await interaction.followUp({ embeds: [buildErrorEmbed(error)] });
   }
+}
+
+function buildErrorEmbed(error: Error) {
+  const response = new MessageEmbed().setColor(config.visuals.red);
+
+  if (error instanceof CommandError) {
+    response.setDescription(error.message);
+    if (error.tip) response.setFooter({ text: error.tip });
+  } else {
+    response.setDescription('An unexpected error occurred.');
+  }
+
+  return response;
 }

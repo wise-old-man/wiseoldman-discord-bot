@@ -17,7 +17,6 @@ import {
   Command,
   CommandConfig,
   CommandError,
-  ErrorCode,
   getEmoji,
   getLinkedGroupId,
   keyValue
@@ -67,7 +66,7 @@ class GroupCompetitionCommand extends Command {
     const competitionId = competitionIdParam || (await getDefaultCompetitionId(groupId, status));
 
     const competition = await womClient.competitions.getCompetitionDetails(competitionId).catch(() => {
-      throw new CommandError(ErrorCode.COMPETITION_NOT_FOUND);
+      throw new CommandError("Couldn't find that competition.");
     });
 
     const response = new MessageEmbed()
@@ -159,7 +158,7 @@ async function getDefaultCompetitionId(groupId: number, status: CompetitionStatu
   const match = competitions.find(c => getCompetitionStatus(c) === status);
 
   if (!match) {
-    throw new CommandError(ErrorCode.NO_COMPETITIONS_FOUND, `Couldn't find any ${status} competitions.`);
+    throw new CommandError(`Couldn't find any ${status} competitions.`);
   }
 
   return match.id;

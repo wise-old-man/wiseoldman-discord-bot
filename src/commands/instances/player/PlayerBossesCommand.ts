@@ -8,9 +8,8 @@ import {
   CommandConfig,
   CommandError,
   encodeURL,
-  ErrorCode,
-  getUsernameParam,
-  getScaledCanvas
+  getScaledCanvas,
+  getUsernameParam
 } from '~/utils';
 
 const RENDER_WIDTH = 350;
@@ -60,7 +59,6 @@ class PlayerBossesCommand extends Command {
 
     const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(
-        ErrorCode.PLAYER_NOT_FOUND,
         "Player not found. Possibly hasn't been tracked yet on WiseOldMan.",
         'Tip: Try tracking them first using the /update command'
       );

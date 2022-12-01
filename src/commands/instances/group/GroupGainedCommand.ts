@@ -10,7 +10,7 @@ import {
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient from '~/services/wiseoldman';
 import config from '~/config';
-import { Command, CommandConfig, CommandError, ErrorCode, getEmoji, getLinkedGroupId } from '~/utils';
+import { Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '~/utils';
 import { bold } from '~/utils/rendering';
 
 const CONFIG: CommandConfig = {
@@ -49,7 +49,7 @@ class GroupGainedCommand extends Command {
     const metric = isMetric(metricParam) ? metricParam : Metric.OVERALL;
 
     const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
-      throw new CommandError(ErrorCode.GROUP_NOT_FOUND);
+      throw new CommandError("Couldn't find that group.");
     });
 
     const gained = await womClient.groups.getGroupGains(groupId, { period, metric });

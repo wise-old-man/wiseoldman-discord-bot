@@ -8,7 +8,7 @@ import {
 } from 'discord.js';
 import { verifyGroup } from '~/services/wiseoldman';
 import config from '~/config';
-import { Command, CommandConfig, CommandError, ErrorCode, hasModeratorRole } from '~/utils';
+import { Command, CommandConfig, CommandError, hasModeratorRole } from '~/utils';
 
 const CHAT_MESSAGE = (groupName: string) => `✅ \`${groupName}\` has been successfully verified!`;
 
@@ -51,7 +51,7 @@ class VerifyGroupCommand extends Command {
     const user = interaction.guild?.members.cache.find(m => m.id === userId);
 
     if (!user) {
-      throw new CommandError(ErrorCode.USER_NOT_FOUND);
+      throw new CommandError("Couldn't find that user.");
     }
 
     const group = await verifyGroup(groupId);

@@ -1,7 +1,7 @@
 import { CommandInteraction, GuildMember, MessageEmbed } from 'discord.js';
 import { resetCompetitionCode } from '~/services/wiseoldman';
 import config from '~/config';
-import { Command, CommandConfig, CommandError, ErrorCode, hasModeratorRole } from '~/utils';
+import { Command, CommandConfig, CommandError, hasModeratorRole } from '~/utils';
 
 const DM_MESSAGE = (code: string) =>
   `Hey! Here's your new verification code: \`${code}\`. \nPlease save it somewhere safe and be mindful of who you choose to share it with.`;
@@ -45,7 +45,7 @@ class ResetCompetitionCodeCommand extends Command {
     const user = interaction.guild?.members.cache.find(m => m.id === userId);
 
     if (!user) {
-      throw new CommandError(ErrorCode.USER_NOT_FOUND);
+      throw new CommandError("Couldn't find that user.");
     }
 
     const { newCode } = await resetCompetitionCode(competitionId);

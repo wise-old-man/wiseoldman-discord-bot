@@ -2,7 +2,7 @@ import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '~/config';
 import { updateGroup } from '~/services/prisma';
 import womClient from '~/services/wiseoldman';
-import { Command, CommandConfig, CommandError, ErrorCode } from '~/utils';
+import { Command, CommandConfig, CommandError } from '~/utils';
 
 const CONFIG: CommandConfig = {
   name: 'group',
@@ -25,7 +25,7 @@ class ConfigGroupCommand extends Command {
     const guildId = interaction.guild?.id || '';
 
     if (!guildId || guildId.length === 0) {
-      throw new CommandError(ErrorCode.NOT_IN_GUILD);
+      throw new CommandError('This command can only be used in a Discord server.');
     }
 
     const groupId = interaction.options.getInteger('group_id', true);

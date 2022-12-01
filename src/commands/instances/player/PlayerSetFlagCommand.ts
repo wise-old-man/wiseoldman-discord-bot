@@ -1,7 +1,7 @@
 import { CountryProps, isCountry } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { updateCountry } from '~/services/wiseoldman';
-import { Command, CommandConfig, countryCodeEmoji, CommandError, ErrorCode } from '~/utils';
+import { Command, CommandConfig, countryCodeEmoji, CommandError } from '~/utils';
 import config from '~/config';
 
 const CONFIG: CommandConfig = {
@@ -38,7 +38,6 @@ class PlayerSetFlagCommand extends Command {
       interaction.channelId !== config.discord.channels.flags
     ) {
       throw new CommandError(
-        ErrorCode.NOT_IN_FLAG_CHANNEL,
         `This command only works in the **#change-flag** channel of the official Wise Old Man discord server.\
          Join us at https://wiseoldman.net/discord`
       );
@@ -46,7 +45,6 @@ class PlayerSetFlagCommand extends Command {
 
     if (!isCountry(countryCode)) {
       throw new CommandError(
-        ErrorCode.INVALID_COUNTRY_CODE,
         `Invalid country. You must supply a valid country code, according to the ISO 3166-1 standard.\
          Please see: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2`
       );

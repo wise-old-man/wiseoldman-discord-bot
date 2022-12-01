@@ -9,7 +9,7 @@ import {
 } from 'discord.js';
 import womClient, { approveNameChange, denyNameChange } from '~/services/wiseoldman';
 import config from '~/config';
-import { Command, CommandConfig, CommandError, ErrorCode, hasModeratorRole } from '~/utils';
+import { Command, CommandConfig, CommandError, hasModeratorRole } from '~/utils';
 
 const CONFIG: CommandConfig = {
   name: 'namechange',
@@ -35,11 +35,11 @@ class NameChangeCommand extends Command {
     const reviewData = await womClient.nameChanges.getNameChangeDetails(nameChangeId);
 
     if (reviewData.nameChange.status !== NameChangeStatus.PENDING) {
-      throw new CommandError(ErrorCode.NAME_CHANGE_NOT_PENDING);
+      throw new CommandError('This name change is not pending.');
     }
 
     if (!reviewData.data) {
-      throw new CommandError(ErrorCode.NAME_CHANGE_NOT_FOUND);
+      throw new CommandError('Name change data was not found.');
     }
 
     const { nameChange, data } = reviewData;

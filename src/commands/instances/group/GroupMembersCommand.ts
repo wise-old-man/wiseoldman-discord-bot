@@ -2,7 +2,7 @@ import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import { CommandInteraction, Constants, MessageEmbed } from 'discord.js';
 import womClient from '~/services/wiseoldman';
 import config from '~/config';
-import { CommandConfig, Command, CommandError, ErrorCode, getLinkedGroupId } from '~/utils';
+import { CommandConfig, Command, getLinkedGroupId, CommandError } from '~/utils';
 import { bold } from '~/utils/rendering';
 
 const RESULTS_PER_PAGE = 20;
@@ -21,7 +21,7 @@ class GroupMembersCommand extends Command {
     const groupId = await getLinkedGroupId(interaction);
 
     const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
-      throw new CommandError(ErrorCode.GROUP_NOT_FOUND);
+      throw new CommandError("Couldn't find that group.");
     });
 
     // Restrict to 25 pages because that's the limit on a paginated message

@@ -2,7 +2,7 @@ import { CompetitionListItem, CompetitionStatus, CompetitionTypeProps } from '@w
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '~/services/wiseoldman';
 import config from '~/config';
-import { Command, CommandConfig, CommandError, ErrorCode, getEmoji, getLinkedGroupId } from '~/utils';
+import { Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '~/utils';
 
 const MAX_COMPETITIONS = 5;
 
@@ -26,15 +26,15 @@ class GroupCompetitionsCommand extends Command {
     const groupId = await getLinkedGroupId(interaction);
 
     const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
-      throw new CommandError(ErrorCode.GROUP_NOT_FOUND);
+      throw new CommandError("Couldn't find that group.");
     });
 
     const competitions = await womClient.groups.getGroupCompetitions(groupId).catch(() => {
-      throw new CommandError(ErrorCode.NO_COMPETITIONS_FOUND);
+      throw new CommandError("Couldn't find any competitions for this group.");
     });
 
     if (competitions.length === 0) {
-      throw new CommandError(ErrorCode.NO_COMPETITIONS_FOUND);
+      throw new CommandError("Couldn't find any competitions for this group.");
     }
 
     const response = new MessageEmbed()

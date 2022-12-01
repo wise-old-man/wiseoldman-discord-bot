@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '~/config';
 import { updateBotChannel, updateChannelPreference } from '~/services/prisma';
-import { BroadcastName, BroadcastType, Command, CommandConfig, CommandError, ErrorCode } from '~/utils';
+import { BroadcastName, BroadcastType, Command, CommandConfig, CommandError } from '~/utils';
 
 const CONFIG: CommandConfig = {
   name: 'channel',
@@ -49,7 +49,7 @@ class ConfigChannelCommand extends Command {
     const guildId = interaction.guild?.id || '';
 
     if (!guildId || guildId.length === 0) {
-      throw new CommandError(ErrorCode.NOT_IN_GUILD);
+      throw new CommandError('This command can only be used in a Discord server.');
     }
 
     const status = interaction.options.getString('status');

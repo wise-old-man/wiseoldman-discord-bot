@@ -3,7 +3,7 @@ import config from '~/config';
 import { CUSTOM_COMMANDS } from '~/commands/custom';
 import { getChannelPreferences, getServer } from '~/services/prisma';
 import womClient from '~/services/wiseoldman';
-import { Command, CommandConfig, BroadcastName, BroadcastType, CommandError, ErrorCode } from '~/utils';
+import { Command, CommandConfig, BroadcastName, BroadcastType, CommandError } from '~/utils';
 
 const BOT_URL = 'https://bot.wiseoldman.net';
 const MAIN_URL = 'https://wiseoldman.net/discord';
@@ -32,11 +32,11 @@ class HelpCommand extends Command {
 
   async execute(interaction: CommandInteraction) {
     if (!interaction.inGuild()) {
-      throw new CommandError(ErrorCode.NOT_IN_GUILD);
+      throw new CommandError('This command can only be used in a Discord server.');
     }
 
     if (!interaction.guildId) {
-      throw new CommandError(ErrorCode.UNDEFINED_GUILD_ID);
+      throw new CommandError("Couldn't find the origin server for this interaction.");
     }
 
     const { botChannelId, groupId, guildId } = await getServer(interaction.guildId);
@@ -47,7 +47,7 @@ class HelpCommand extends Command {
       const command = CUSTOM_COMMANDS.find(c => c.command === category);
 
       if (!command) {
-        throw new CommandError(ErrorCode.INVALID_COMMAND);
+        throw new CommandError('Invalid command.');
       }
 
       const { image, message } = command;

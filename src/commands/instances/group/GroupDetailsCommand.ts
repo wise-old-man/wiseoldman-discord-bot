@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '~/config';
 import womClient from '~/services/wiseoldman';
-import { Command, CommandConfig, CommandError, ErrorCode, formatDate, getLinkedGroupId } from '~/utils';
+import { Command, CommandConfig, CommandError, formatDate, getLinkedGroupId } from '~/utils';
 
 const CONFIG: CommandConfig = {
   name: 'details',
@@ -17,7 +17,7 @@ class GroupDetailsCommand extends Command {
     const groupId = await getLinkedGroupId(interaction);
 
     const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
-      throw new CommandError(ErrorCode.GROUP_NOT_FOUND);
+      throw new CommandError("Couldn't find that group.");
     });
 
     const response = new MessageEmbed()

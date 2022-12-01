@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '~/config';
 import womClient from '~/services/wiseoldman';
-import { Command, CommandConfig, getUsernameParam, CommandError, ErrorCode } from '~/utils';
+import { Command, CommandConfig, CommandError, getUsernameParam } from '~/utils';
 
 const CONFIG: CommandConfig = {
   name: 'update',
@@ -28,18 +28,17 @@ class UpdatePlayerCommand extends Command {
       const statusCode = e.statusCode;
 
       if (statusCode === 500) {
-        throw new CommandError(ErrorCode.HISCORES_DOWN);
+        throw new CommandError('The hiscores are currently down. Please try again later.');
       }
 
       if (statusCode === 404) {
         throw new CommandError(
-          ErrorCode.PLAYER_NOT_FOUND,
           "Player not found. Possibly hasn't been tracked yet on WiseOldMan.",
           'Tip: Try tracking them first using the /update command'
         );
       }
 
-      throw new CommandError(ErrorCode.FAILED_TO_UPDATE, e.message);
+      throw e;
     });
 
     const response = new MessageEmbed()

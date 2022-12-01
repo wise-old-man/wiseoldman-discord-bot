@@ -4,13 +4,12 @@ import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js'
 import config from '~/config';
 import womClient from '~/services/wiseoldman';
 import {
-  CommandError,
-  ErrorCode,
   Command,
   CommandConfig,
   getUsernameParam,
   getScaledCanvas,
-  encodeURL
+  encodeURL,
+  CommandError
 } from '~/utils';
 
 const RENDER_WIDTH = 215;
@@ -90,7 +89,6 @@ class PlayerStatsCommand extends Command {
 
     const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(
-        ErrorCode.PLAYER_NOT_FOUND,
         "Player not found. Possibly hasn't been tracked yet on WiseOldMan.",
         'Tip: Try tracking them first using the /update command'
       );

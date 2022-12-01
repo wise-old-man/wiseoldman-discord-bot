@@ -1,8 +1,8 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { formatNumber, round } from '@wise-old-man/utils';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '~/config';
-import { encodeURL, Command, CommandConfig, getUsernameParam, CommandError, ErrorCode } from '~/utils';
 import womClient from '~/services/wiseoldman';
+import { Command, CommandConfig, CommandError, encodeURL, getUsernameParam } from '~/utils';
 
 const CONFIG: CommandConfig = {
   name: 'ttm',
@@ -27,7 +27,6 @@ class PlayerEfficiencyCommand extends Command {
 
     const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(
-        ErrorCode.PLAYER_NOT_FOUND,
         "Player not found. Possibly hasn't been tracked yet on WiseOldMan.",
         'Tip: Try tracking them first using the /update command'
       );

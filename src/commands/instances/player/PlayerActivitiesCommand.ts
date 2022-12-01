@@ -1,17 +1,16 @@
+import { formatNumber, isActivity, PlayerDetails } from '@wise-old-man/utils';
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
-import { formatNumber, isActivity, PlayerDetails } from '@wise-old-man/utils';
 import config from '~/config';
+import womClient from '~/services/wiseoldman';
 import {
-  encodeURL,
-  getScaledCanvas,
   Command,
   CommandConfig,
-  getUsernameParam,
   CommandError,
-  ErrorCode
+  encodeURL,
+  getScaledCanvas,
+  getUsernameParam
 } from '~/utils';
-import womClient from '~/services/wiseoldman';
 
 const RENDER_WIDTH = 357;
 const RENDER_HEIGHT = 100;
@@ -58,7 +57,6 @@ class PlayerActivitiesCommand extends Command {
 
     const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(
-        ErrorCode.PLAYER_NOT_FOUND,
         "Player not found. Possibly hasn't been tracked yet on WiseOldMan.",
         'Tip: Try tracking them first using the /update command'
       );

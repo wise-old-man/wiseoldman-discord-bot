@@ -2,7 +2,7 @@ import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '~/config';
 import { updateAlias } from '~/services/prisma';
 import womClient from '~/services/wiseoldman';
-import { Command, CommandConfig, CommandError, encodeURL, ErrorCode } from '~/utils';
+import { Command, CommandConfig, CommandError, encodeURL } from '~/utils';
 
 const CONFIG: CommandConfig = {
   name: 'setrsn',
@@ -28,7 +28,6 @@ class PlayerSetUsernameCommand extends Command {
 
     const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(
-        ErrorCode.PLAYER_NOT_FOUND,
         "Player not found. Possibly hasn't been tracked yet on WiseOldMan.",
         'Tip: Try tracking them first using the /update command'
       );
