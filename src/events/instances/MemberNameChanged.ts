@@ -20,22 +20,17 @@ class MemberNameChanged implements Event {
   }
 
   async execute(data: MemberNameChangedData): Promise<void> {
-    const { groupId } = data;
+    const { groupId, player, previousName } = data;
 
     if (!groupId) return;
 
-    const message = this.buildMessage(data);
-    broadcastMessage(groupId, BroadcastType.MEMBER_NAME_CHANGED, message);
-  }
-
-  buildMessage(data: MemberNameChangedData): MessageEmbed {
-    const { player, previousName } = data;
-
-    return new MessageEmbed()
+    const message = new MessageEmbed()
       .setColor(config.visuals.blue)
       .setTitle('Member Name Changed')
       .setDescription(`\`${previousName}\` → \`${player.displayName}\``)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
+
+    broadcastMessage(groupId, BroadcastType.MEMBER_NAME_CHANGED, message);
   }
 }
 

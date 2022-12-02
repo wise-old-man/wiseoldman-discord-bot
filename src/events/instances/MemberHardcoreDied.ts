@@ -19,25 +19,17 @@ class MemberHardcoreDied implements Event {
   }
 
   async execute(data: MemberHardcoreDiedData): Promise<void> {
-    const { groupId } = data;
+    const { groupId, player } = data;
 
     if (!groupId) return;
 
-    const message = this.buildMessage(data);
-    broadcastMessage(groupId, BroadcastType.MEMBER_HCIM_DIED, message);
-  }
-
-  buildMessage(data: MemberHardcoreDiedData): MessageEmbed {
-    const { player } = data;
-
-    const title = `🪦 Hardcore Ironman Member Died`;
-    const message = `\`${player.displayName}\` has died and is now a regular Ironman.`;
-
-    return new MessageEmbed()
+    const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(title)
-      .setDescription(message)
+      .setTitle(`🪦 Hardcore Ironman Member Died`)
+      .setDescription(`\`${player.displayName}\` has died and is now a regular Ironman.`)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
+
+    broadcastMessage(groupId, BroadcastType.MEMBER_HCIM_DIED, message);
   }
 }
 

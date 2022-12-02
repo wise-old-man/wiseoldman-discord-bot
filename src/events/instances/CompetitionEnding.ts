@@ -1,4 +1,4 @@
-import { getMetricName, Metric } from '@wise-old-man/utils';
+import { CompetitionType, getMetricName, Metric } from '@wise-old-man/utils';
 import { MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
@@ -9,11 +9,11 @@ interface CompetitionEndingData {
   groupId: number;
   competition: {
     id: number;
-    metric: Metric;
-    type: string;
     title: string;
-    startsAt: string;
     endsAt: string;
+    startsAt: string;
+    metric: Metric;
+    type: CompetitionType;
   };
   period: {
     hours?: number;
@@ -38,8 +38,6 @@ class CompetitionEnding implements Event {
 
     if (!timeLeft) return;
 
-    const url = `https://wiseoldman.net/competitions/${id}`;
-
     const fields = [
       { name: 'Metric', value: `${getEmoji(metric)} ${getMetricName(metric)}` },
       { name: 'Type', value: capitalize(type) },
@@ -56,7 +54,7 @@ class CompetitionEnding implements Event {
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
       .setTitle(`🕒 ${title} is ending in ${timeLeft}`)
-      .setURL(url)
+      .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields(fields);
 
     broadcastMessage(groupId, BroadcastType.COMPETITION_STATUS, message);

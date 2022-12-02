@@ -26,32 +26,24 @@ class MemberAchievements implements Event {
   }
 
   async execute(data: MemberAchievementsData): Promise<void> {
-    const { groupId, player } = data;
+    const { groupId, player, achievements } = data;
 
     if (!groupId) return;
 
     const userId = await getUserId(player.displayName);
     const discordTag = userId ? `(<@${userId}>)` : '';
 
-    const message = this.buildMessage(data, discordTag);
-    broadcastMessage(groupId, BroadcastType.MEMBER_ACHIEVEMENTS, message);
-  }
-
-  buildMessage(data: MemberAchievementsData, discordTag: string): MessageEmbed {
-    const { player, achievements } = data;
-    const { displayName } = player;
-
-    const title = `New member ${achievements.length > 1 ? 'achievements' : 'achievement'}`;
-
-    const content = achievements
-      .map(({ metric, name }) => `${displayName} ${discordTag} - ${getEmoji(metric)} ${name}`)
-      .join('\n');
-
-    return new MessageEmbed()
+    const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`🎉 ${title}`)
-      .setDescription(content)
+      .setTitle(`🎉 New member ${achievements.length > 1 ? 'achievements' : 'achievement'}`)
+      .setDescription(
+        achievements
+          .map(({ metric, name }) => `${player.displayName} ${discordTag} - ${getEmoji(metric)} ${name}`)
+          .join('\n')
+      )
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements`));
+
+    broadcastMessage(groupId, BroadcastType.MEMBER_ACHIEVEMENTS, message);
   }
 }
 

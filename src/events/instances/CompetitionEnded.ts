@@ -1,23 +1,23 @@
-import { formatNumber } from '@wise-old-man/utils';
+import { CompetitionType, formatNumber, Metric } from '@wise-old-man/utils';
 import { MessageEmbed } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../config';
 import { Event } from '../../utils/events';
-import { broadcastMessage, BroadcastType } from '../../utils';
+import { bold, broadcastMessage, BroadcastType } from '../../utils';
 
 interface CompetitionStanding {
+  gained: number;
   displayName: string;
   teamName: string | null;
-  gained: number;
 }
 
 interface CompetitionEndedData {
   groupId: number;
   competition: {
     id: number;
-    type: string;
-    metric: string;
     title: string;
+    metric: Metric;
+    type: CompetitionType;
   };
   standings: CompetitionStanding[];
 }
@@ -35,14 +35,13 @@ class CompetitionEnded implements Event {
 
     if (!groupId) return;
 
-    const isTeamCompetition = competition.type === 'team';
-    const url = `https://wiseoldman.net/competitions/${id}`;
-
+    const isTeamCompetition = competition.type === CompetitionType.TEAM;
     const topParticipations = isTeamCompetition ? getTeamStandings(standings) : getStandings(standings);
+
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
       .setTitle(`📢 ${title} has ended!`)
-      .setURL(url)
+      .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields([
         {
           name: isTeamCompetition ? 'Top Teams' : 'Top participants',
@@ -70,7 +69,7 @@ function getTeamStandings(standings: CompetitionStanding[]): string {
     .slice(0, 3)
     .map(
       (t, i) =>
-        `${getStandingEmoji(i + 1)} ${i + 1}. ${t.name} - **${formatNumber(t.totalGained, true)}**`
+        `${getStandingEmoji(i + 1)} ${i + 1}. ${t.name} - ${bold(formatNumber(t.totalGained, true))}`
     )
     .join('\n');
 }
@@ -80,7 +79,7 @@ function getStandings(standings: CompetitionStanding[]): string {
     .slice(0, 3)
     .map(
       (s, i) =>
-        `${getStandingEmoji(i + 1)} ${i + 1}. ${s.displayName} - **${formatNumber(s.gained, true)}**`
+        `${getStandingEmoji(i + 1)} ${i + 1}. ${s.displayName} - ${bold(formatNumber(s.gained, true))}`
     )
     .join('\n');
 }

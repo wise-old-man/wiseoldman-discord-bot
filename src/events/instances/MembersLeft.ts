@@ -25,33 +25,33 @@ class MembersLeft implements Event {
 
     if (!groupId) return;
 
-    const message = this.buildMessage(data);
+    const message = buildMessage(data);
     broadcastMessage(groupId, BroadcastType.MEMBERS_LIST_CHANGED, message);
   }
+}
 
-  buildMessage(data: MembersLeftData) {
-    const { groupId, players } = data;
+function buildMessage(data: MembersLeftData) {
+  const { groupId, players } = data;
 
-    if (players.length === 1) {
-      const player = players[0];
-      const title = `👋 Group member left: ${player.displayName}`;
-
-      return new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setTitle(title)
-        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
-    }
-
-    const url = `https://wiseoldman.net/groups/${groupId}/members`;
-    const title = `👋 ${players.length} members have left the group`;
-    const content = players.map(p => `\`${p.displayName}\``).join(', ');
+  if (players.length === 1) {
+    const player = players[0];
+    const title = `👋 Group member left: ${player.displayName}`;
 
     return new MessageEmbed()
       .setColor(config.visuals.blue)
       .setTitle(title)
-      .setDescription(content)
-      .setURL(url);
+      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
   }
+
+  const url = `https://wiseoldman.net/groups/${groupId}/members`;
+  const title = `👋 ${players.length} members have left the group`;
+  const content = players.map(p => `\`${p.displayName}\``).join(', ');
+
+  return new MessageEmbed()
+    .setColor(config.visuals.blue)
+    .setTitle(title)
+    .setDescription(content)
+    .setURL(url);
 }
 
 export default new MembersLeft();
