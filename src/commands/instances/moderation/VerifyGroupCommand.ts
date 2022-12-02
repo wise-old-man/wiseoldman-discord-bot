@@ -64,20 +64,24 @@ class VerifyGroupCommand extends Command {
     await interaction.followUp({ embeds: [response] });
 
     // Send a message to the WOM leaders log channel
-    this.sendConfirmationLog(interaction.guild?.channels, group, userId);
+    sendConfirmationLog(interaction.guild?.channels, group, userId);
 
     // Add the "Group Leader" role to the user
     user.roles.add(config.discord.roles.groupLeader).catch(console.log);
   }
+}
 
-  sendConfirmationLog(channels: GuildChannelManager | undefined, group: GroupListItem, userId: string) {
-    const leadersLogChannel = channels?.cache.get(config.discord.channels.leadersLog);
+function sendConfirmationLog(
+  channels: GuildChannelManager | undefined,
+  group: GroupListItem,
+  userId: string
+) {
+  const leadersLogChannel = channels?.cache.get(config.discord.channels.leadersLog);
 
-    if (!leadersLogChannel) return;
-    if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(leadersLogChannel)) return;
+  if (!leadersLogChannel) return;
+  if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(leadersLogChannel)) return;
 
-    leadersLogChannel.send(LOG_MESSAGE(group.id, group.name, userId));
-  }
+  leadersLogChannel.send(LOG_MESSAGE(group.id, group.name, userId));
 }
 
 export default new VerifyGroupCommand();

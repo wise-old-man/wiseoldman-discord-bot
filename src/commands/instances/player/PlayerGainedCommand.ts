@@ -1,4 +1,3 @@
-import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import {
   formatNumber,
   getMetricName,
@@ -6,7 +5,8 @@ import {
   Metric,
   PlayerDeltasMap
 } from '@wise-old-man/utils';
-import { CommandInteraction, Constants, MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { createPaginatedEmbed } from '~/commands/pagination';
 import config from '~/config';
 import womClient from '~/services/wiseoldman';
 import { Command, CommandConfig, CommandError, encodeURL, getEmoji, getUsernameParam } from '~/utils';
@@ -71,43 +71,18 @@ class PlayerGainedCommand extends Command {
       return;
     }
 
-    const paginatedMessage = new PaginatedMessage({
-      pageIndexPrefix: 'Page',
-      embedFooterSeparator: '|',
-      actions: [
-        {
-          customId: 'CustomPreviousAction',
-          type: Constants.MessageComponentTypes.BUTTON,
-          style: 'PRIMARY',
-          label: '<',
-          run: ({ handler }) => {
-            if (handler.index === 0) handler.index = handler.pages.length - 1;
-            else --handler.index;
-          }
-        },
-        {
-          customId: 'CustomNextAction',
-          type: Constants.MessageComponentTypes.BUTTON,
-          style: 'PRIMARY',
-          label: '>',
-          run: ({ handler }) => {
-            if (handler.index === handler.pages.length - 1) handler.index = 0;
-            else ++handler.index;
-          }
-        }
-      ],
-      template: new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setTitle(`${player.displayName} gains (${period})`)
-        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
-        .setFooter({ text: footer })
-    });
+    const embedTemplate = new MessageEmbed()
+      .setColor(config.visuals.blue)
+      .setTitle(`${player.displayName} gains (${period})`)
+      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
+      .setFooter({ text: footer });
+
+    const paginatedMessage = createPaginatedEmbed(embedTemplate, 120_000);
 
     for (const page of pages) {
       paginatedMessage.addPageEmbed(page);
     }
 
-    paginatedMessage.idle = 120000;
     paginatedMessage.run(interaction);
   }
 }

@@ -1,9 +1,8 @@
-import { PaginatedMessage } from '@sapphire/discord.js-utilities';
-import { CommandInteraction, Constants, MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient from '~/services/wiseoldman';
 import config from '~/config';
-import { CommandConfig, Command, getLinkedGroupId, CommandError } from '~/utils';
-import { bold } from '~/utils/rendering';
+import { CommandConfig, Command, getLinkedGroupId, CommandError, bold } from '~/utils';
+import { createPaginatedEmbed } from '~/commands/pagination';
 
 const RESULTS_PER_PAGE = 20;
 
@@ -27,37 +26,13 @@ class GroupMembersCommand extends Command {
     // Restrict to 25 pages because that's the limit on a paginated message
     const pageCount = Math.min(25, Math.ceil(group.memberships.length / RESULTS_PER_PAGE));
 
-    const paginatedMessage = new PaginatedMessage({
-      pageIndexPrefix: 'Page',
-      embedFooterSeparator: '|',
-      actions: [
-        {
-          customId: 'CustomPreviousAction',
-          type: Constants.MessageComponentTypes.BUTTON,
-          style: 'PRIMARY',
-          label: '<',
-          run: ({ handler }) => {
-            if (handler.index === 0) handler.index = handler.pages.length - 1;
-            else --handler.index;
-          }
-        },
-        {
-          customId: 'CustomNextAction',
-          type: Constants.MessageComponentTypes.BUTTON,
-          style: 'PRIMARY',
-          label: '>',
-          run: ({ handler }) => {
-            if (handler.index === handler.pages.length - 1) handler.index = 0;
-            else ++handler.index;
-          }
-        }
-      ],
-      template: new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setTitle(`${group.name} members list`)
-        .setURL(`https://wiseoldman.net/groups/${groupId}/members/`)
-        .setFooter({ text: group.memberships.length > 500 ? 'Click the title to view full list' : '' })
-    });
+    const embedTemplate = new MessageEmbed()
+      .setColor(config.visuals.blue)
+      .setTitle(`${group.name} members list`)
+      .setURL(`https://wiseoldman.net/groups/${groupId}/members/`)
+      .setFooter({ text: group.memberships.length > 500 ? 'Click the title to view full list' : '' });
+
+    const paginatedMessage = createPaginatedEmbed(embedTemplate, 120_000);
 
     for (let i = 0; i < pageCount; i++) {
       const memberList = group.memberships
@@ -68,7 +43,6 @@ class GroupMembersCommand extends Command {
       paginatedMessage.addPageEmbed(new MessageEmbed().setDescription(memberList));
     }
 
-    paginatedMessage.idle = 120000;
     paginatedMessage.run(interaction);
   }
 }

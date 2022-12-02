@@ -49,14 +49,14 @@ class NameChangeCommand extends Command {
       .setTitle(`Name change review: ${nameChange.oldName} → ${nameChange.newName}`)
       .setDescription(buildReviewMessage(data));
 
-    const row = new MessageActionRow().addComponents(
+    const actions = new MessageActionRow().addComponents(
       new MessageButton().setCustomId('namechange_approve').setLabel('Approve').setStyle('SUCCESS'),
       new MessageButton().setCustomId('namechange_deny').setLabel('Deny').setStyle('DANGER')
     );
 
     await interaction.editReply({
       embeds: [response],
-      components: hasModeratorRole(interaction.member as GuildMember) ? [row] : []
+      components: hasModeratorRole(interaction.member as GuildMember) ? [actions] : []
     });
 
     const filter = async (buttonInteraction: ButtonInteraction) => {

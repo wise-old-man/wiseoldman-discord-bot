@@ -1,13 +1,12 @@
 import { Interaction, MessageEmbed } from 'discord.js';
 import config from '~/config';
+import { BaseCommand, CommandError } from '~/utils';
 import {
-  BaseCommand,
-  CommandError,
   getCountryOptions,
   getHelpCategoryOptions,
   getMetricOptions,
   getPeriodOptions
-} from '~/utils';
+} from './autocomplete';
 import ConfigRootCommand from './instances/config';
 import HelpCommand from './instances/general/HelpCommand';
 import GroupRootCommand from './instances/group';
