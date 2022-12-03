@@ -1,6 +1,6 @@
 import { MessageEmbed, TextChannel } from 'discord.js';
-import bot from '~/bot';
-import { getServers, getPreferredChannels } from '~/services/prisma';
+import bot from '../bot';
+import { getServers, getPreferredChannels } from '../services/prisma';
 
 export enum BroadcastType {
   DEFAULT = 'DEFAULT',

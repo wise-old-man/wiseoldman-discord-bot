@@ -1,8 +1,8 @@
 import { CountryProps, isCountry } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { updateCountry } from '~/services/wiseoldman';
-import { Command, CommandConfig, countryCodeEmoji, CommandError } from '~/utils';
-import config from '~/config';
+import { updateCountry } from '../../../services/wiseoldman';
+import { Command, CommandConfig, countryCodeEmoji, CommandError } from '../../../utils';
+import config from '../../../config';
 
 const CONFIG: CommandConfig = {
   name: 'setflag',

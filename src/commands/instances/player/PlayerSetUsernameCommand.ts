@@ -1,8 +1,8 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import config from '~/config';
-import { updateAlias } from '~/services/prisma';
-import womClient from '~/services/wiseoldman';
-import { Command, CommandConfig, CommandError, encodeURL } from '~/utils';
+import config from '../../../config';
+import { updateAlias } from '../../../services/prisma';
+import womClient from '../../../services/wiseoldman';
+import { Command, CommandConfig, CommandError, encodeURL } from '../../../utils';
 
 const CONFIG: CommandConfig = {
   name: 'setrsn',

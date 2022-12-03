@@ -1,8 +1,8 @@
 import { Achievement, PlayerDetails } from '@wise-old-man/utils';
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
-import config from '~/config';
-import womClient from '~/services/wiseoldman';
+import config from '../../../config';
+import womClient from '../../../services/wiseoldman';
 import {
   Command,
   CommandConfig,
@@ -11,7 +11,7 @@ import {
   formatDate,
   getScaledCanvas,
   getUsernameParam
-} from '~/utils';
+} from '../../../utils';
 
 const RENDER_WIDTH = 280;
 const RENDER_HEIGHT = 165;

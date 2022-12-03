@@ -1,8 +1,8 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import womClient from '~/services/wiseoldman';
-import config from '~/config';
-import { CommandConfig, Command, getLinkedGroupId, CommandError, bold } from '~/utils';
-import { createPaginatedEmbed } from '~/commands/pagination';
+import womClient from '../../../services/wiseoldman';
+import config from '../../../config';
+import { CommandConfig, Command, getLinkedGroupId, CommandError, bold } from '../../../utils';
+import { createPaginatedEmbed } from '../../../commands/pagination';
 
 const RESULTS_PER_PAGE = 20;
 

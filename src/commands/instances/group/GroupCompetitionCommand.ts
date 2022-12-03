@@ -10,8 +10,8 @@ import {
 } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { uniq } from 'lodash';
-import config from '~/config';
-import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '~/services/wiseoldman';
+import config from '../../../config';
+import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '../../../services/wiseoldman';
 import {
   bold,
   Command,
@@ -20,7 +20,7 @@ import {
   getEmoji,
   getLinkedGroupId,
   keyValue
-} from '~/utils';
+} from '../../../utils';
 
 const CONFIG: CommandConfig = {
   name: 'competition',

@@ -8,10 +8,10 @@ import {
   Period
 } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import womClient from '~/services/wiseoldman';
-import config from '~/config';
-import { Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '~/utils';
-import { bold } from '~/utils/rendering';
+import womClient from '../../../services/wiseoldman';
+import config from '../../../config';
+import { Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
+import { bold } from '../../../utils/rendering';
 
 const CONFIG: CommandConfig = {
   name: 'gained',

@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import config from '~/config';
-import { updateBotChannel, updateChannelPreference } from '~/services/prisma';
-import { BroadcastName, BroadcastType, Command, CommandConfig, CommandError } from '~/utils';
+import config from '../../../config';
+import { updateBotChannel, updateChannelPreference } from '../../../services/prisma';
+import { BroadcastName, BroadcastType, Command, CommandConfig, CommandError } from '../../../utils';
 
 const CONFIG: CommandConfig = {
   name: 'channel',

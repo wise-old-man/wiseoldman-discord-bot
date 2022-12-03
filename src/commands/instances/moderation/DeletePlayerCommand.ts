@@ -1,7 +1,7 @@
 import { CommandInteraction, GuildMember, MessageEmbed } from 'discord.js';
-import { deletePlayer } from '~/services/wiseoldman';
-import config from '~/config';
-import { Command, CommandConfig, hasModeratorRole } from '~/utils';
+import { deletePlayer } from '../../../services/wiseoldman';
+import config from '../../../config';
+import { Command, CommandConfig, hasModeratorRole } from '../../../utils';
 
 const CONFIG: CommandConfig = {
   name: 'delete-player',

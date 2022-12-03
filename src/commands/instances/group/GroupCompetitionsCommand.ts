@@ -1,8 +1,8 @@
 import { CompetitionListItem, CompetitionStatus, CompetitionTypeProps } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '~/services/wiseoldman';
-import config from '~/config';
-import { Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '~/utils';
+import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '../../../services/wiseoldman';
+import config from '../../../config';
+import { Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
 
 const MAX_COMPETITIONS = 5;
 

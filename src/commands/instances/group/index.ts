@@ -1,4 +1,4 @@
-import { CommandConfig, AggregateCommand, Command } from '~/utils';
+import { CommandConfig, AggregateCommand, Command } from '../../../utils';
 import GroupCompetitionCommand from './GroupCompetitionCommand';
 import GroupCompetitionsCommand from './GroupCompetitionsCommand';
 import GroupDetailsCommand from './GroupDetailsCommand';

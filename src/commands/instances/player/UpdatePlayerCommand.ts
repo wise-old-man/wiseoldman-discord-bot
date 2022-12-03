@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import config from '~/config';
-import womClient from '~/services/wiseoldman';
-import { Command, CommandConfig, CommandError, getUsernameParam } from '~/utils';
+import config from '../../../config';
+import womClient from '../../../services/wiseoldman';
+import { Command, CommandConfig, CommandError, getUsernameParam } from '../../../utils';
 
 const CONFIG: CommandConfig = {
   name: 'update',

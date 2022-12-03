@@ -4,7 +4,7 @@ import {
   SlashCommandBuilder
 } from '@discordjs/builders';
 import { CommandInteraction } from 'discord.js';
-import { getServer, getUsername } from '~/services/prisma';
+import { getServer, getUsername } from '../services/prisma';
 
 export class CommandError extends Error {
   tip?: string;

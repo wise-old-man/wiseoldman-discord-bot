@@ -1,9 +1,9 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import config from '~/config';
-import { CUSTOM_COMMANDS } from '~/commands/custom';
-import { getChannelPreferences, getServer } from '~/services/prisma';
-import womClient from '~/services/wiseoldman';
-import { Command, CommandConfig, BroadcastName, BroadcastType, CommandError } from '~/utils';
+import config from '../../../config';
+import { CUSTOM_COMMANDS } from '../../../commands/custom';
+import { getChannelPreferences, getServer } from '../../../services/prisma';
+import womClient from '../../../services/wiseoldman';
+import { Command, CommandConfig, BroadcastName, BroadcastType, CommandError } from '../../../utils';
 
 const BOT_URL = 'https://bot.wiseoldman.net';
 const MAIN_URL = 'https://wiseoldman.net/discord';

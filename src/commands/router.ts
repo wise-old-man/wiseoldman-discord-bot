@@ -1,6 +1,6 @@
 import { Interaction, MessageEmbed } from 'discord.js';
-import config from '~/config';
-import { BaseCommand, CommandError } from '~/utils';
+import config from '../config';
+import { BaseCommand, CommandError } from '../utils';
 import {
   getCountryOptions,
   getHelpCategoryOptions,

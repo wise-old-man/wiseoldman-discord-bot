@@ -6,10 +6,17 @@ import {
   PlayerDeltasMap
 } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { createPaginatedEmbed } from '~/commands/pagination';
-import config from '~/config';
-import womClient from '~/services/wiseoldman';
-import { Command, CommandConfig, CommandError, encodeURL, getEmoji, getUsernameParam } from '~/utils';
+import { createPaginatedEmbed } from '../../../commands/pagination';
+import config from '../../../config';
+import womClient from '../../../services/wiseoldman';
+import {
+  Command,
+  CommandConfig,
+  CommandError,
+  encodeURL,
+  getEmoji,
+  getUsernameParam
+} from '../../../utils';
 
 const GAINS_PER_PAGE = 10;
 

@@ -1,7 +1,7 @@
 import { CommandInteraction, GuildMember, MessageEmbed } from 'discord.js';
-import { resetGroupCode } from '~/services/wiseoldman';
-import config from '~/config';
-import { Command, CommandConfig, CommandError, hasModeratorRole } from '~/utils';
+import { resetGroupCode } from '../../../services/wiseoldman';
+import config from '../../../config';
+import { Command, CommandConfig, CommandError, hasModeratorRole } from '../../../utils';
 
 const DM_MESSAGE = (code: string) =>
   `Hey! Here's your new verification code: \`${code}\`. \nPlease save it somewhere safe and be mindful of who you choose to share it with.`;

@@ -1,4 +1,4 @@
-import { CommandConfig, AggregateCommand, Command } from '~/utils';
+import { CommandConfig, AggregateCommand, Command } from '../../../utils';
 import ConfigChannelCommand from './ConfigChannelCommand';
 import ConfigGroupCommand from './ConfigGroupCommand';
 

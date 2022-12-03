@@ -1,4 +1,4 @@
-import { Event } from '~/utils/events';
+import { Event } from '../utils/events';
 import CompetitionCreated from './instances/CompetitionCreated';
 import CompetitionEnded from './instances/CompetitionEnded';
 import CompetitionEnding from './instances/CompetitionEnding';

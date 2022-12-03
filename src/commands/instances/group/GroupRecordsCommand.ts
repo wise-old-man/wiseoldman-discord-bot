@@ -10,9 +10,9 @@ import {
   PERIODS
 } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import womClient from '~/services/wiseoldman';
-import config from '~/config';
-import { bold, Command, CommandConfig, getEmoji, getLinkedGroupId } from '~/utils';
+import womClient from '../../../services/wiseoldman';
+import config from '../../../config';
+import { bold, Command, CommandConfig, getEmoji, getLinkedGroupId } from '../../../utils';
 
 const CONFIG: CommandConfig = {
   name: 'records',
