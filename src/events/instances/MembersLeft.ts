@@ -1,4 +1,4 @@
-import { MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
 import config from '../../config';
 import { Event } from '../../utils/events';
 import { encodeURL, broadcastMessage, BroadcastType } from '../../utils';
@@ -20,13 +20,13 @@ class MembersLeft implements Event {
     this.type = 'GROUP_MEMBERS_LEFT';
   }
 
-  async execute(data: MembersLeftData): Promise<void> {
+  async execute(data: MembersLeftData, client: Client) {
     const { groupId } = data;
 
     if (!groupId) return;
 
     const message = buildMessage(data);
-    broadcastMessage(groupId, BroadcastType.MEMBERS_LIST_CHANGED, message);
+    broadcastMessage(client, groupId, BroadcastType.MEMBERS_LIST_CHANGED, message);
   }
 }
 

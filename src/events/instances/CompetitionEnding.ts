@@ -1,5 +1,5 @@
 import { CompetitionType, getMetricName, Metric } from '@wise-old-man/utils';
-import { MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
 import { Event } from '../../utils/events';
@@ -28,7 +28,7 @@ class CompetitionEnding implements Event {
     this.type = 'COMPETITION_ENDING';
   }
 
-  async execute(data: CompetitionEndingData): Promise<void> {
+  async execute(data: CompetitionEndingData, client: Client) {
     const { groupId, competition, period } = data;
     const { id, metric, type, title, startsAt, endsAt } = competition;
 
@@ -57,7 +57,7 @@ class CompetitionEnding implements Event {
       .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields(fields);
 
-    broadcastMessage(groupId, BroadcastType.COMPETITION_STATUS, message);
+    broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
   }
 }
 

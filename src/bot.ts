@@ -18,7 +18,7 @@ class Bot {
     });
   }
 
-  init() {
+  async init() {
     console.log('Starting bot...');
 
     this.client.once('ready', () => {
@@ -36,7 +36,9 @@ class Bot {
       console.log('Bot is running.');
     });
 
-    this.client.login(config.token);
+    await this.client.login(config.token);
+
+    return this.client;
   }
 }
 

@@ -1,10 +1,11 @@
 import cors from 'cors';
+import { Client } from 'discord.js';
 import express from 'express';
 import { onEventReceived } from './events/router';
 
 const PORT = 7000;
 
-export function init() {
+export function init(client: Client) {
   const app = express();
 
   app.use(express.json());
@@ -28,7 +29,7 @@ export function init() {
 
     console.log('Event received: ', req.body);
 
-    onEventReceived(req.body);
+    onEventReceived(client, req.body);
     return res.json('Event received.');
   });
 

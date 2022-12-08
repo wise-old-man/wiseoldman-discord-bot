@@ -1,5 +1,4 @@
-import { MessageEmbed, TextChannel } from 'discord.js';
-import bot from '../bot';
+import { Client, MessageEmbed, TextChannel } from 'discord.js';
 import { getServers, getPreferredChannels } from '../services/prisma';
 
 export enum BroadcastType {
@@ -20,7 +19,12 @@ export const BroadcastName = {
   [BroadcastType.MEMBERS_LIST_CHANGED]: 'Members List Changed'
 };
 
-export async function broadcastMessage(groupId: number, type: string, message: MessageEmbed) {
+export async function broadcastMessage(
+  client: Client,
+  groupId: number,
+  type: string,
+  message: MessageEmbed
+) {
   const servers = await getServers(groupId);
 
   const preferredChannelIds = await getPreferredChannels(
@@ -33,7 +37,7 @@ export async function broadcastMessage(groupId: number, type: string, message: M
   }
 
   preferredChannelIds.forEach(async id => {
-    const channel = await bot.client.channels.fetch(id);
+    const channel = await client.channels.fetch(id);
 
     if (!channel) return;
     if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(channel)) return;

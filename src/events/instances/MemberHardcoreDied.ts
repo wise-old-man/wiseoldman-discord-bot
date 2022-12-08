@@ -1,4 +1,4 @@
-import { MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
 import config from '../../config';
 import { Event } from '../../utils/events';
 import { encodeURL, broadcastMessage, BroadcastType } from '../../utils';
@@ -18,7 +18,7 @@ class MemberHardcoreDied implements Event {
     this.type = 'MEMBER_HCIM_DIED';
   }
 
-  async execute(data: MemberHardcoreDiedData): Promise<void> {
+  async execute(data: MemberHardcoreDiedData, client: Client) {
     const { groupId, player } = data;
 
     if (!groupId) return;
@@ -29,7 +29,7 @@ class MemberHardcoreDied implements Event {
       .setDescription(`\`${player.displayName}\` has died and is now a regular Ironman.`)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
 
-    broadcastMessage(groupId, BroadcastType.MEMBER_HCIM_DIED, message);
+    broadcastMessage(client, groupId, BroadcastType.MEMBER_HCIM_DIED, message);
   }
 }
 

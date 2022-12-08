@@ -1,4 +1,4 @@
-import { MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
 import config from '../../config';
 import { getUserId } from '../../services/prisma';
 import { Event } from '../../utils/events';
@@ -25,7 +25,7 @@ class MemberAchievements implements Event {
     this.type = 'MEMBER_ACHIEVEMENTS';
   }
 
-  async execute(data: MemberAchievementsData): Promise<void> {
+  async execute(data: MemberAchievementsData, client: Client) {
     const { groupId, player, achievements } = data;
 
     if (!groupId) return;
@@ -43,7 +43,7 @@ class MemberAchievements implements Event {
       )
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements`));
 
-    broadcastMessage(groupId, BroadcastType.MEMBER_ACHIEVEMENTS, message);
+    broadcastMessage(client, groupId, BroadcastType.MEMBER_ACHIEVEMENTS, message);
   }
 }
 

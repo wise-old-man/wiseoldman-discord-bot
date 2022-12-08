@@ -1,4 +1,4 @@
-import { MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
 import { CompetitionType, getMetricName, Metric } from '@wise-old-man/utils';
 import config from '../../config';
@@ -24,7 +24,7 @@ class CompetitionCreated implements Event {
     this.type = 'COMPETITION_CREATED';
   }
 
-  async execute(data: CompetitionCreatedData) {
+  async execute(data: CompetitionCreatedData, client: Client) {
     const { groupId, competition } = data;
     const { id, metric, type, title, startsAt, endsAt } = competition;
 
@@ -45,7 +45,7 @@ class CompetitionCreated implements Event {
       .setFooter({ text: 'Starts at' })
       .setTimestamp(new Date(startsAt));
 
-    broadcastMessage(groupId, BroadcastType.COMPETITION_STATUS, message);
+    broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
   }
 }
 

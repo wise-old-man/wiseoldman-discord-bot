@@ -1,3 +1,4 @@
+import { Client } from 'discord.js';
 import { Event } from '../utils/events';
 import CompetitionCreated from './instances/CompetitionCreated';
 import CompetitionEnded from './instances/CompetitionEnded';
@@ -23,10 +24,10 @@ const EVENTS: Event[] = [
   MemberAchievements
 ];
 
-function onEventReceived(payload: { type: string; data: unknown }): void {
+function onEventReceived(client: Client, payload: { type: string; data: unknown }): void {
   EVENTS.forEach(e => {
     if (payload.type === e.type) {
-      e.execute(payload.data);
+      e.execute(payload.data, client);
     }
   });
 }

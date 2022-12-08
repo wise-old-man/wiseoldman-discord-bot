@@ -5,8 +5,8 @@ import { deployCommands } from './deploy-commands';
 (async function () {
   await deployCommands();
 
-  bot.init();
-  const server = api.init();
+  const client = await bot.init();
+  const server = api.init(client);
 
   process.on('SIGTERM', () => {
     server.close();

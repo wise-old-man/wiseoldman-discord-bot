@@ -1,5 +1,5 @@
 import { CompetitionType, formatNumber, Metric } from '@wise-old-man/utils';
-import { MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../config';
 import { Event } from '../../utils/events';
@@ -29,7 +29,7 @@ class CompetitionEnded implements Event {
     this.type = 'COMPETITION_ENDED';
   }
 
-  async execute(data: CompetitionEndedData): Promise<void> {
+  async execute(data: CompetitionEndedData, client: Client) {
     const { groupId, competition, standings } = data;
     const { id, title } = competition;
 
@@ -49,7 +49,7 @@ class CompetitionEnded implements Event {
         }
       ]);
 
-    broadcastMessage(groupId, BroadcastType.COMPETITION_STATUS, message);
+    broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
   }
 }
 

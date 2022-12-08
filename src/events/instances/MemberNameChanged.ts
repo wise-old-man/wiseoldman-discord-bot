@@ -1,4 +1,4 @@
-import { MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
 import config from '../../config';
 import { Event } from '../../utils/events';
 import { encodeURL, broadcastMessage, BroadcastType } from '../../utils';
@@ -19,7 +19,7 @@ class MemberNameChanged implements Event {
     this.type = 'MEMBER_NAME_CHANGED';
   }
 
-  async execute(data: MemberNameChangedData): Promise<void> {
+  async execute(data: MemberNameChangedData, client: Client) {
     const { groupId, player, previousName } = data;
 
     if (!groupId) return;
@@ -30,7 +30,7 @@ class MemberNameChanged implements Event {
       .setDescription(`\`${previousName}\` → \`${player.displayName}\``)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
 
-    broadcastMessage(groupId, BroadcastType.MEMBER_NAME_CHANGED, message);
+    broadcastMessage(client, groupId, BroadcastType.MEMBER_NAME_CHANGED, message);
   }
 }
 

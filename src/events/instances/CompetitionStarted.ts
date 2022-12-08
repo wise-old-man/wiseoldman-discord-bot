@@ -1,5 +1,5 @@
 import { CompetitionType, getMetricName, Metric } from '@wise-old-man/utils';
-import { MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
 import { Event } from '../../utils/events';
@@ -24,7 +24,7 @@ class CompetitionStarted implements Event {
     this.type = 'COMPETITION_STARTED';
   }
 
-  async execute(data: CompetitionStartedData): Promise<void> {
+  async execute(data: CompetitionStartedData, client: Client) {
     const { groupId, competition } = data;
     const { id, metric, startsAt, endsAt, type, title } = competition;
 
@@ -42,7 +42,7 @@ class CompetitionStarted implements Event {
       .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields(fields);
 
-    broadcastMessage(groupId, BroadcastType.COMPETITION_STATUS, message);
+    broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
   }
 }
 
