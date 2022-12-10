@@ -59,22 +59,6 @@ async function getServers(groupId: number) {
 }
 
 /**
- * Update the "tracked" group for a given guild.
- */
-async function updateGroup(guildId: string, groupId: number) {
-  const server = await getServer(guildId);
-
-  if (!server) {
-    throw new Error(`Server does not exist for guild id: ${guildId}`);
-  }
-
-  return prisma.server.update({
-    where: { guildId },
-    data: { groupId }
-  });
-}
-
-/**
  * Update the bot's default broadcast channel for a given guild.
  */
 async function updateBotChannel(guildId: string, channelId: string) {
@@ -121,7 +105,6 @@ export {
   updateAlias,
   getServer,
   getServers,
-  updateGroup,
   updateBotChannel,
   getChannelPreferences,
   updateChannelPreference,

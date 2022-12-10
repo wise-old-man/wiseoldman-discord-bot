@@ -1,12 +1,12 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '../../../config';
-import { updateGroup } from '../../../services/prisma';
+import prisma from '../../../services/prisma';
 import womClient from '../../../services/wiseoldman';
 import { Command, CommandConfig, CommandError } from '../../../utils';
 
 const CONFIG: CommandConfig = {
   name: 'group',
-  description: "VConfigure the server's Wise Old Man group.",
+  description: "Configure the server's Wise Old Man group.",
   options: [
     {
       type: 'integer',
@@ -19,6 +19,7 @@ const CONFIG: CommandConfig = {
 class ConfigGroupCommand extends Command {
   constructor() {
     super(CONFIG);
+    this.requiresAdmin = true;
   }
 
   async execute(interaction: CommandInteraction) {
@@ -30,9 +31,15 @@ class ConfigGroupCommand extends Command {
 
     const groupId = interaction.options.getInteger('group_id', true);
 
-    await updateGroup(guildId, groupId);
+    const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
+      throw new CommandError("Couldn't find that group.");
+    });
 
-    const group = await womClient.groups.getGroupDetails(groupId);
+    // Update the server's group ID in the database
+    await prisma.server.update({
+      where: { guildId },
+      data: { groupId }
+    });
 
     const response = new MessageEmbed()
       .setColor(config.visuals.green)

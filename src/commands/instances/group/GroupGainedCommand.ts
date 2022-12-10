@@ -10,8 +10,7 @@ import {
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
-import { Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
-import { bold } from '../../../utils/rendering';
+import { Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId, bold } from '../../../utils';
 
 const CONFIG: CommandConfig = {
   name: 'gained',

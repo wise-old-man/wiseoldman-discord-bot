@@ -1,14 +1,16 @@
 import { Client, MessageEmbed, TextChannel } from 'discord.js';
 import { getServers, getPreferredChannels } from '../services/prisma';
 
-export enum BroadcastType {
-  DEFAULT = 'DEFAULT',
-  COMPETITION_STATUS = 'COMPETITION_STATUS',
-  MEMBER_ACHIEVEMENTS = 'MEMBER_ACHIEVEMENTS',
-  MEMBER_NAME_CHANGED = 'MEMBER_NAME_CHANGED',
-  MEMBER_HCIM_DIED = 'MEMBER_HCIM_DIED',
-  MEMBERS_LIST_CHANGED = 'MEMBERS_LIST_CHANGED'
-}
+export const BroadcastType = {
+  DEFAULT: 'DEFAULT',
+  COMPETITION_STATUS: 'COMPETITION_STATUS',
+  MEMBER_ACHIEVEMENTS: 'MEMBER_ACHIEVEMENTS',
+  MEMBER_NAME_CHANGED: 'MEMBER_NAME_CHANGED',
+  MEMBER_HCIM_DIED: 'MEMBER_HCIM_DIED',
+  MEMBERS_LIST_CHANGED: 'MEMBERS_LIST_CHANGED'
+} as const;
+
+export type BroadcastType = typeof BroadcastType[keyof typeof BroadcastType];
 
 export const BroadcastName = {
   [BroadcastType.DEFAULT]: 'Default',

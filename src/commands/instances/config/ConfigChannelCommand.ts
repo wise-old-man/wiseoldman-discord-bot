@@ -13,12 +13,10 @@ const CONFIG: CommandConfig = {
       name: 'broadcast_type',
       description: 'The broadcast type to configure.',
       choices: [
-        { label: 'Default', value: BroadcastName[BroadcastType.DEFAULT] },
-        { label: 'Competition status', value: BroadcastName[BroadcastType.COMPETITION_STATUS] },
-        { label: 'Member name changed', value: BroadcastName[BroadcastType.MEMBER_NAME_CHANGED] },
-        { label: 'Member HCIM died', value: BroadcastName[BroadcastType.MEMBER_HCIM_DIED] },
-        { label: 'Member achievements', value: BroadcastName[BroadcastType.MEMBER_ACHIEVEMENTS] },
-        { label: 'Members list changed', value: BroadcastName[BroadcastType.MEMBERS_LIST_CHANGED] }
+        ...Object.values(BroadcastType).map(type => ({
+          label: BroadcastName[type],
+          value: type
+        }))
       ]
     },
     {
@@ -43,6 +41,7 @@ const CONFIG: CommandConfig = {
 class ConfigChannelCommand extends Command {
   constructor() {
     super(CONFIG);
+    this.requiresAdmin = true;
   }
 
   async execute(interaction: CommandInteraction) {
@@ -53,22 +52,22 @@ class ConfigChannelCommand extends Command {
     }
 
     const status = interaction.options.getString('status');
-    const channelType = interaction.options.getString('broadcast_type', true);
-    const announcementChannel = interaction.options.getChannel('broadcast_channel', true);
+    const channel = interaction.options.getChannel('broadcast_channel', true);
+    const broadcastType = interaction.options.getString('broadcast_type', true);
 
-    const broadcastName = BroadcastName[channelType as BroadcastType];
+    const broadcastName = BroadcastName[broadcastType as BroadcastType];
 
     let description = '';
 
-    if (channelType === BroadcastType.DEFAULT) {
-      await updateBotChannel(guildId, announcementChannel.id);
-      description = `All group-related broadcasts will be sent to <#${announcementChannel.id}> by default.`;
+    if (broadcastType === BroadcastType.DEFAULT) {
+      await updateBotChannel(guildId, channel.id);
+      description = `All group-related broadcasts will be sent to <#${channel.id}> by default.`;
     } else if (status === 'disable') {
-      await updateChannelPreference(guildId, channelType, null);
+      await updateChannelPreference(guildId, broadcastType, null);
       description = `"${broadcastName}" broadcasts have now been disabled.`;
     } else {
-      await updateChannelPreference(guildId, channelType, announcementChannel.id);
-      description = `"${broadcastName}" broadcasts will now be sent to <#${announcementChannel.id}>`;
+      await updateChannelPreference(guildId, broadcastType, channel.id);
+      description = `"${broadcastName}" broadcasts will now be sent to <#${channel.id}>`;
     }
 
     const response = new MessageEmbed()
