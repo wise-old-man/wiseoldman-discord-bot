@@ -4,7 +4,7 @@ import config from '../../../config';
 import { Command, CommandConfig, CommandError, hasModeratorRole } from '../../../utils';
 
 const DM_MESSAGE = (code: string) =>
-  `Hey! Here's your new verification code: \`${code}\`. \nPlease save it somewhere safe and be mindful of who you choose to share it with.`;
+  `Hey! Here's your new verification code: \n\`${code}\`\n\nPlease save it somewhere safe and be mindful of who you choose to share it with.`;
 
 const CHAT_MESSAGE = (userId: string) =>
   `Verification code successfully reset. A DM has been sent to <@${userId}>.`;
@@ -16,14 +16,14 @@ const CONFIG: CommandConfig = {
     {
       type: 'integer',
       name: 'id',
-      required: true,
-      description: 'The group ID.'
+      description: 'The group ID.',
+      required: true
     },
     {
       type: 'user',
       name: 'user',
-      required: true,
-      description: 'Discord user tag.'
+      description: 'Discord user tag.',
+      required: true
     }
   ]
 };
@@ -31,6 +31,7 @@ const CONFIG: CommandConfig = {
 class ResetGroupCodeCommand extends Command {
   constructor() {
     super(CONFIG);
+    this.private = true;
   }
 
   async execute(interaction: CommandInteraction) {
@@ -48,7 +49,10 @@ class ResetGroupCodeCommand extends Command {
       throw new CommandError("Couldn't find that user.");
     }
 
-    const { newCode } = await resetGroupCode(groupId);
+    const { newCode } = await resetGroupCode(groupId).catch(e => {
+      if (e.statusCode === 404) throw new CommandError('Competition not found.');
+      throw e;
+    });
 
     // DM the user back with the new verification code
     await user.send(DM_MESSAGE(newCode));

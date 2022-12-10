@@ -17,9 +17,9 @@ const CONFIG: CommandConfig = {
   options: [
     {
       type: 'integer',
-      required: true,
       name: 'name_change_id',
-      description: 'The namechange Id.'
+      description: 'The namechange Id.',
+      required: true
     }
   ]
 };
@@ -27,12 +27,16 @@ const CONFIG: CommandConfig = {
 class NameChangeCommand extends Command {
   constructor() {
     super(CONFIG);
+    this.private = true;
   }
 
   async execute(interaction: CommandInteraction) {
     const nameChangeId = interaction.options.getInteger('name_change_id', true);
 
-    const reviewData = await womClient.nameChanges.getNameChangeDetails(nameChangeId);
+    const reviewData = await womClient.nameChanges.getNameChangeDetails(nameChangeId).catch(e => {
+      if (e.statusCode === 404) throw new CommandError('Name change ID not found.');
+      throw e;
+    });
 
     if (reviewData.nameChange.status !== NameChangeStatus.PENDING) {
       throw new CommandError('This name change is not pending.');

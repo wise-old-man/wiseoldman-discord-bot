@@ -1,7 +1,7 @@
 import { CommandInteraction, GuildMember, MessageEmbed } from 'discord.js';
 import { deletePlayer } from '../../../services/wiseoldman';
 import config from '../../../config';
-import { Command, CommandConfig, hasModeratorRole } from '../../../utils';
+import { Command, CommandConfig, CommandError, hasModeratorRole } from '../../../utils';
 
 const CONFIG: CommandConfig = {
   name: 'delete-player',
@@ -19,6 +19,7 @@ const CONFIG: CommandConfig = {
 class DeletePlayerCommand extends Command {
   constructor() {
     super(CONFIG);
+    this.private = true;
   }
 
   async execute(interaction: CommandInteraction) {
@@ -29,7 +30,10 @@ class DeletePlayerCommand extends Command {
 
     const username = interaction.options.getString('username', true);
 
-    await deletePlayer(username);
+    await deletePlayer(username).catch(e => {
+      if (e.statusCode === 404) throw new CommandError('Player not found.');
+      throw e;
+    });
 
     // Respond on the WOM discord chat with a success status
     const response = new MessageEmbed()

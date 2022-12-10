@@ -12,8 +12,7 @@ import { Command, CommandConfig, CommandError, hasModeratorRole } from '../../..
 
 const CHAT_MESSAGE = (groupName: string) => `✅ \`${groupName}\` has been successfully verified!`;
 
-const LOG_MESSAGE = (groupId: number, groupName: string, userId: string) =>
-  `${groupName} (${groupId}) - <@${userId}>`;
+const LOG_MESSAGE = (id: number, name: string, userId: string) => `${name} (${id}) - <@${userId}>`;
 
 const CONFIG: CommandConfig = {
   name: 'verify-group',
@@ -21,15 +20,15 @@ const CONFIG: CommandConfig = {
   options: [
     {
       type: 'integer',
-      required: true,
       name: 'id',
-      description: 'The group ID.'
+      description: 'The group ID.',
+      required: true
     },
     {
       type: 'user',
-      required: true,
       name: 'user',
-      description: 'Discord user tag.'
+      description: 'Discord user tag.',
+      required: true
     }
   ]
 };
@@ -37,6 +36,7 @@ const CONFIG: CommandConfig = {
 class VerifyGroupCommand extends Command {
   constructor() {
     super(CONFIG);
+    this.private = true;
   }
 
   async execute(interaction: CommandInteraction) {
@@ -54,7 +54,10 @@ class VerifyGroupCommand extends Command {
       throw new CommandError("Couldn't find that user.");
     }
 
-    const group = await verifyGroup(groupId);
+    const group = await verifyGroup(groupId).catch(e => {
+      if (e.statusCode === 404) throw new CommandError('Competition not found.');
+      throw e;
+    });
 
     // Respond on the WOM discord chat with a success status
     const response = new MessageEmbed()
