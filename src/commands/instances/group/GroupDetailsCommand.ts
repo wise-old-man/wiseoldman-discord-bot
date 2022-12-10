@@ -31,6 +31,12 @@ class GroupDetailsCommand extends Command {
         { name: '\u200B', value: group.verified ? `✅ Verified` : `❌ Unverified` }
       ]);
 
+    if (!group.verified) {
+      response.setFooter({
+        text: `Tip: If you want to verify your group check out the /help command (category: Verified).`
+      });
+    }
+
     await interaction.editReply({ embeds: [response] });
   }
 }

@@ -74,10 +74,6 @@ async function updateBotChannel(guildId: string, channelId: string) {
   });
 }
 
-async function getChannelPreferences(guildId: string) {
-  return prisma.channelPreference.findMany({ where: { guildId } });
-}
-
 async function updateChannelPreference(guildId: string, type: string, channelId: string | null) {
   return prisma.channelPreference.upsert({
     where: { guildId_type: { guildId, type } },
@@ -106,7 +102,6 @@ export {
   getServer,
   getServers,
   updateBotChannel,
-  getChannelPreferences,
   updateChannelPreference,
   getPreferredChannels
 };

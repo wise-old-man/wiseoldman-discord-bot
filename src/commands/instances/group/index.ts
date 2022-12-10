@@ -25,7 +25,6 @@ const CONFIG: CommandConfig = {
 class GroupRootCommand extends AggregateCommand {
   constructor() {
     super(CONFIG, SUBCOMMANDS);
-    this.private = false;
   }
 }
 

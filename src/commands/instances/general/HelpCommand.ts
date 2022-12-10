@@ -1,7 +1,8 @@
+import { GroupDetails } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '../../../config';
 import { CUSTOM_COMMANDS } from '../../../commands/custom';
-import { getChannelPreferences, getServer } from '../../../services/prisma';
+import prisma, { getServer } from '../../../services/prisma';
 import womClient from '../../../services/wiseoldman';
 import { Command, CommandConfig, BroadcastName, BroadcastType, CommandError } from '../../../utils';
 
@@ -59,8 +60,19 @@ class HelpCommand extends Command {
       return;
     }
 
-    const group = groupId && groupId > -1 ? await womClient.groups.getGroupDetails(groupId) : null;
-    const channelPreferences = await getChannelPreferences(guildId);
+    let group: GroupDetails = null;
+
+    if (groupId && groupId > -1) {
+      try {
+        group = await womClient.groups.getGroupDetails(groupId);
+      } catch (e) {
+        console.log("Couldn't fetch group details for group", groupId);
+      }
+    }
+
+    const channelPreferences = await prisma.channelPreference.findMany({
+      where: { guildId }
+    });
 
     const channelPreferencesDetails = channelPreferences.map(pref => {
       return {

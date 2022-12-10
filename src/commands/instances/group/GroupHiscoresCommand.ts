@@ -8,7 +8,7 @@ import {
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
-import { bold, Command, CommandConfig, getEmoji, getLinkedGroupId } from '../../../utils';
+import { bold, Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
 
 const CONFIG: CommandConfig = {
   name: 'hiscores',
@@ -35,7 +35,10 @@ class GroupHiscoresCommand extends Command {
     const metric =
       parseMetricAbbreviation(interaction.options.getString('metric', true)) || Metric.OVERALL;
 
-    const group = await womClient.groups.getGroupDetails(groupId);
+    const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
+      throw new CommandError("Couldn't find that group.");
+    });
+
     const hiscores = await womClient.groups.getGroupHiscores(groupId, metric);
 
     const hiscoresList = hiscores

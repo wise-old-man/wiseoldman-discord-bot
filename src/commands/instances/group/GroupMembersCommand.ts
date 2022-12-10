@@ -37,7 +37,7 @@ class GroupMembersCommand extends Command {
     for (let i = 0; i < pageCount; i++) {
       const memberList = group.memberships
         .slice(i * RESULTS_PER_PAGE, i * RESULTS_PER_PAGE + RESULTS_PER_PAGE)
-        .map((g, i) => `${i * RESULTS_PER_PAGE + i + 1}. ${bold(g.player.displayName)}`)
+        .map((g, idx) => `${i * RESULTS_PER_PAGE + idx + 1}. ${bold(g.player.displayName)}`)
         .join('\n');
 
       paginatedMessage.addPageEmbed(new MessageEmbed().setDescription(memberList));

@@ -12,7 +12,7 @@ import {
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
-import { bold, Command, CommandConfig, getEmoji, getLinkedGroupId } from '../../../utils';
+import { bold, Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
 
 const CONFIG: CommandConfig = {
   name: 'records',
@@ -49,7 +49,10 @@ class GroupRecordsCommand extends Command {
     const period = isPeriod(periodParam) ? periodParam : Period.WEEK;
     const metric = isMetric(metricParam) ? metricParam : Metric.OVERALL;
 
-    const group = await womClient.groups.getGroupDetails(groupId);
+    const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
+      throw new CommandError("Couldn't find that group.");
+    });
+
     const records = await womClient.groups.getGroupRecords(groupId, { period, metric });
 
     const recordsList = records
