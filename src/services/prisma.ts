@@ -27,17 +27,6 @@ async function getUserId(username: string) {
 }
 
 /**
- * Update (or create) the "alias" username for a given discord userId.
- */
-async function updateAlias(userId: string, username: string) {
-  return prisma.alias.upsert({
-    where: { userId },
-    update: { username },
-    create: { userId, username }
-  });
-}
-
-/**
  * Find the Server object corresponding to a given guildId.
  */
 
@@ -98,7 +87,6 @@ export default prisma;
 export {
   getUserId,
   getUsername,
-  updateAlias,
   getServer,
   getServers,
   updateBotChannel,

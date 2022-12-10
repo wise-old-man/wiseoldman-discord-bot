@@ -57,7 +57,7 @@ class PlayerActivitiesCommand extends Command {
 
     const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(
-        "Player not found. Possibly hasn't been tracked yet on WiseOldMan.",
+        "Player not found. Possibly hasn't been tracked yet on Wise Old Man.",
         'Tip: Try tracking them first using the /update command'
       );
     });

@@ -25,15 +25,17 @@ class UpdatePlayerCommand extends Command {
     const username = await getUsernameParam(interaction);
 
     const result = await womClient.players.updatePlayer(username).catch(e => {
-      const statusCode = e.statusCode;
-
-      if (statusCode === 500) {
+      if (e.statusCode === 500) {
         throw new CommandError('The hiscores are currently down. Please try again later.');
       }
 
-      if (statusCode === 404) {
+      if (e.statusCode === 429) {
+        throw new CommandError('This player has been updated recently. Please try again later.');
+      }
+
+      if (e.statusCode === 404) {
         throw new CommandError(
-          "Player not found. Possibly hasn't been tracked yet on WiseOldMan.",
+          "Player not found. Possibly hasn't been tracked yet on Wise Old Man.",
           'Tip: Try tracking them first using the /update command'
         );
       }

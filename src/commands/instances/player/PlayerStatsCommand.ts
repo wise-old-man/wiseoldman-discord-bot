@@ -1,4 +1,4 @@
-import { formatNumber, isSkill, PlayerDetails, round } from '@wise-old-man/utils';
+import { formatNumber, isSkill, Metric, PlayerDetails, round } from '@wise-old-man/utils';
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
 import config from '../../../config';
@@ -18,31 +18,31 @@ const RENDER_PADDING = 15;
 
 // Used to render stats in correct order
 const INGAME_SKILL_ORDER = [
-  'attack',
-  'strength',
-  'defence',
-  'ranged',
-  'prayer',
-  'magic',
-  'runecrafting',
-  'construction',
-  'hitpoints',
-  'agility',
-  'herblore',
-  'thieving',
-  'crafting',
-  'fletching',
-  'slayer',
-  'hunter',
-  'mining',
-  'smithing',
-  'fishing',
-  'cooking',
-  'firemaking',
-  'woodcutting',
-  'farming',
-  'overall'
-];
+  Metric.ATTACK,
+  Metric.STRENGTH,
+  Metric.DEFENCE,
+  Metric.RANGED,
+  Metric.PRAYER,
+  Metric.MAGIC,
+  Metric.RUNECRAFTING,
+  Metric.CONSTRUCTION,
+  Metric.HITPOINTS,
+  Metric.AGILITY,
+  Metric.HERBLORE,
+  Metric.THIEVING,
+  Metric.CRAFTING,
+  Metric.FLETCHING,
+  Metric.SLAYER,
+  Metric.HUNTER,
+  Metric.MINING,
+  Metric.SMITHING,
+  Metric.FISHING,
+  Metric.COOKING,
+  Metric.FIREMAKING,
+  Metric.WOODCUTTING,
+  Metric.FARMING,
+  Metric.OVERALL
+] as string[];
 
 enum RenderVariant {
   LEVELS = 'levels',
@@ -89,7 +89,7 @@ class PlayerStatsCommand extends Command {
 
     const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(
-        "Player not found. Possibly hasn't been tracked yet on WiseOldMan.",
+        "Player not found. Possibly hasn't been tracked yet on Wise Old Man.",
         'Tip: Try tracking them first using the /update command'
       );
     });

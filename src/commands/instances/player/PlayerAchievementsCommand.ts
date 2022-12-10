@@ -40,7 +40,7 @@ class PlayerAchievementsCommand extends Command {
 
     const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(
-        "Player not found. Possibly hasn't been tracked yet on WiseOldMan.",
+        "Player not found. Possibly hasn't been tracked yet on Wise Old Man.",
         'Tip: Try tracking them first using the /update command'
       );
     });
@@ -48,7 +48,7 @@ class PlayerAchievementsCommand extends Command {
     const achievements = await womClient.players.getPlayerAchievements(username);
 
     if (!achievements || achievements.length === 0) {
-      throw new Error(`${player.displayName} has no achievements.`);
+      throw new CommandError(`${player.displayName} has no achievements.`);
     }
 
     const mostRecentAchievements = achievements

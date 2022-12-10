@@ -1,6 +1,6 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '../../../config';
-import { updateAlias } from '../../../services/prisma';
+import prisma from '../../../services/prisma';
 import womClient from '../../../services/wiseoldman';
 import { Command, CommandConfig, CommandError, encodeURL } from '../../../utils';
 
@@ -28,12 +28,17 @@ class PlayerSetUsernameCommand extends Command {
 
     const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(
-        "Player not found. Possibly hasn't been tracked yet on WiseOldMan.",
+        "Player not found. Possibly hasn't been tracked yet on Wise Old Man.",
         'Tip: Try tracking them first using the /update command'
       );
     });
 
-    await updateAlias(userId, player.displayName);
+    // Update the database
+    await prisma.alias.upsert({
+      where: { userId },
+      update: { username },
+      create: { userId, username }
+    });
 
     const response = new MessageEmbed()
       .setColor(config.visuals.green)

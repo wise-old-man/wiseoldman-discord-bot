@@ -3,6 +3,7 @@ import {
   getMetricName,
   GetPlayerGainsResponse,
   Metric,
+  PeriodProps,
   PlayerDeltasMap
 } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
@@ -53,7 +54,7 @@ class PlayerGainedCommand extends Command {
 
     const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(
-        "Player not found. Possibly hasn't been tracked yet on WiseOldMan.",
+        "Player not found. Possibly hasn't been tracked yet on Wise Old Man.",
         'Tip: Try tracking them first using the /update command'
       );
     });
@@ -61,7 +62,7 @@ class PlayerGainedCommand extends Command {
     const playerGains = await womClient.players.getPlayerGains(username, { period });
 
     if (!playerGains || !playerGains.startsAt || !playerGains.endsAt) {
-      throw new Error(`${player.displayName} has no ${period} gains.`);
+      throw new CommandError(`${player.displayName} has no "${PeriodProps[period].name}" gains.`);
     }
 
     const pages = buildPages(player.displayName, period, playerGains);
@@ -103,7 +104,7 @@ function buildPages(
   const pageCount = Math.ceil(gainsList.length / GAINS_PER_PAGE);
 
   if (pageCount === 0) {
-    throw new Error(`${displayName} has no ${period} gains.`);
+    throw new CommandError(`${displayName} has no "${PeriodProps[period].name}" gains.`);
   }
 
   const pages = [];
@@ -148,7 +149,7 @@ function buildGainsList(
   const valid = [...computedGains, ...skillGains, ...bossGains, ...activityGains];
 
   if (!valid || valid.length === 0) {
-    throw new Error(`${displayName} has no ${period} gains.`);
+    throw new CommandError(`${displayName} has no "${PeriodProps[period].name}" gains.`);
   }
 
   return valid.map(({ metric, gained }) => {

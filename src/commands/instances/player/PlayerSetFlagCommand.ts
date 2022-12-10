@@ -27,6 +27,7 @@ const CONFIG: CommandConfig = {
 class PlayerSetFlagCommand extends Command {
   constructor() {
     super(CONFIG);
+    this.private = true;
   }
 
   async execute(interaction: CommandInteraction) {
@@ -45,7 +46,7 @@ class PlayerSetFlagCommand extends Command {
 
     if (!isCountry(countryCode)) {
       throw new CommandError(
-        `Invalid country. You must supply a valid country code, according to the ISO 3166-1 standard.\
+        `Invalid country. You must supply a valid country name or code, according to the ISO 3166-1 standard.\
          Please see: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2`
       );
     }
