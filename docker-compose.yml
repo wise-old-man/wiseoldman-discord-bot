@@ -25,7 +25,10 @@ services:
     networks:
       - pgadminnet
   bot:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base # more efficient during local development
     expose:
       - '7000'
     ports:
