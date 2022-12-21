@@ -24,7 +24,9 @@ services:
       driver: none
   bot:
     container_name: bot
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     expose:
       - '${BOT_PORT}'
     ports:
@@ -32,8 +34,8 @@ services:
     depends_on:
       - db
     volumes:
-      - .:/wise-old-man/discord-bot
+      - ./:/wise-old-man/discord-bot
       - /wise-old-man/discord-bot/node_modules
-    command: ['./wait-for-it.sh', '-t', '30', '${DB_HOST}:${POSTGRES_PORT}', '--', 'npm', 'run', 'watch']
+    command: './wait-for-it.sh -t 30 ${DB_HOST}:${POSTGRES_PORT} -- npm run watch'
 volumes:
   pgdata:

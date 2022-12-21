@@ -9,10 +9,10 @@
     "node": ">=16.9"
   },
   "scripts": {
-    "build": "cross-env rm -rf ./dist/ && tsc",
+    "build": "rimraf ./dist && tsc",
     "lint": "eslint . --ext .ts",
     "dev": "docker-compose up --build",
-    "watch": "cross-env NODE_ENV=development prisma migrate dev && ts-node-dev --poll --exit-child --respawn --transpile-only --ignore-watch node_modules src/index.ts"
+    "watch": "prisma migrate dev && ts-node-dev --poll --exit-child --respawn --transpile-only --ignore-watch node_modules src/index.ts"
   },
   "keywords": [
     "discord",
@@ -35,6 +35,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.7.1",
     "prisma": "^4.6.1",
+    "rimraf": "^3.0.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^4.5.5"
   },
@@ -46,7 +47,6 @@
     "@wise-old-man/utils": "^2.0.10",
     "canvas": "^2.6.1",
     "cors": "^2.8.5",
-    "cross-env": "^7.0.2",
     "discord-api-types": "^0.27.2",
     "discord.js": "^13.6.0",
     "dotenv": "^8.2.0",
