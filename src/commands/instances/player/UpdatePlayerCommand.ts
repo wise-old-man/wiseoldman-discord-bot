@@ -31,7 +31,7 @@ class UpdatePlayerCommand implements Command {
     }
 
     try {
-      const result = await womClient.players.updatePlayer({ username });
+      const result = await womClient.players.updatePlayer(username);
 
       const response = new MessageEmbed()
         .setColor(config.visuals.green)

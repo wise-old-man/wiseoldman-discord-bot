@@ -57,7 +57,7 @@ class PlayerActivitiesCommand implements Command, Renderable {
     }
 
     try {
-      const player = await womClient.players.getPlayerDetails({ username });
+      const player = await womClient.players.getPlayerDetails(username);
 
       const { attachment, fileName } = await this.render({
         activities: player.latestSnapshot.data.activities,
