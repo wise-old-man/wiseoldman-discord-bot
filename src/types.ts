@@ -125,6 +125,7 @@ export enum Emoji {
   nightmare = '<:nightmare:729840084844675103>',
   phosanis_nightmare = '<:phosanis_nightmare:859756301651148850>',
   obor = '<:obor:729840084907589674>',
+  phantom_muspah = '<:phantom_muspah:1062744540307529738>',
   sarachnis = '<:sarachnis:729840085377220628>',
   scorpia = '<:scorpia:729840084962115666>',
   skotizo = '<:skotizo:729840085398454273>',

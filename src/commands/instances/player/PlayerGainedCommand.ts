@@ -54,8 +54,8 @@ class PlayerGainedCommand implements Command {
     }
 
     try {
-      const player = await womClient.players.getPlayerDetails({ username });
-      const playerGains = await womClient.players.getPlayerGains({ username }, { period });
+      const player = await womClient.players.getPlayerDetails(username);
+      const playerGains = await womClient.players.getPlayerGains(username, { period });
 
       if (!playerGains || !playerGains.startsAt || !playerGains.endsAt) {
         throw new Error(`${player.displayName} has no ${period} gains.`);
