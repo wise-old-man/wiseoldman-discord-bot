@@ -64,6 +64,7 @@ const MetricEmoji = {
   [Metric.NIGHTMARE]: '<:nightmare:729840084844675103>',
   [Metric.PHOSANIS_NIGHTMARE]: '<:phosanis_nightmare:859756301651148850>',
   [Metric.OBOR]: '<:obor:729840084907589674>',
+  [Metric.PHANTOM_MUSPAH]: '<:phantom_muspah:1062744540307529738>',
   [Metric.SARACHNIS]: '<:sarachnis:729840085377220628>',
   [Metric.SCORPIA]: '<:scorpia:729840084962115666>',
   [Metric.SKOTIZO]: '<:skotizo:729840085398454273>',
