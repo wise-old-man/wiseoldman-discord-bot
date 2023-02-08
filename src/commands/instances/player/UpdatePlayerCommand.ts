@@ -35,7 +35,7 @@ class UpdatePlayerCommand extends Command {
 
       if (e.statusCode === 404) {
         throw new CommandError(
-          "Player not found. Possibly hasn't been tracked yet on Wise Old Man.",
+          `Player "${username}" not found. Possibly hasn't been tracked yet on Wise Old Man.`,
           'Tip: Try tracking them first using the /update command'
         );
       }
