@@ -1,4 +1,4 @@
-FROM node:16.14.0
+FROM node:16.14.0 as base
 
 WORKDIR /wise-old-man/discord-bot
 
@@ -12,5 +12,12 @@ COPY . .
 COPY wait-for-it.sh .
 
 RUN npm run build
+
+# production image
+FROM base as production
+# Creates a non-root user with an explicit UID and adds permission to access the /wise-old-man/discord-bot folder
+RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /wise-old-man/discord-bot
+USER appuser
+
 
 CMD ["npm", "start"]

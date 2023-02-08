@@ -28,7 +28,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: base # more efficient during local development
+      target: production
     expose:
       - '7000'
     ports:
