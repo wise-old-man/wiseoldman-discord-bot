@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node';
 import { Interaction, MessageEmbed } from 'discord.js';
 import config from '../config';
 import { BaseCommand, CommandError } from '../utils';
@@ -85,6 +86,7 @@ export async function onInteractionReceived(interaction: Interaction) {
     await targetCommand.execute(interaction);
   } catch (error) {
     console.log(error);
+    Sentry.captureException(error);
     await interaction.followUp({ embeds: [buildErrorEmbed(error)] });
   }
 }

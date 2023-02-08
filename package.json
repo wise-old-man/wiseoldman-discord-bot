@@ -52,6 +52,8 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "lodash": "^4.17.19",
-    "moment": "^2.26.0"
+    "moment": "^2.26.0",
+    "@sentry/node": "^7.28.0",
+    "@sentry/tracing": "^7.28.0"
   }
 }

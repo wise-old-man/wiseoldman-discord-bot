@@ -1,6 +1,13 @@
+import * as Sentry from '@sentry/node';
+import '@sentry/tracing';
 import * as api from './api';
 import bot from './bot';
 import { deployCommands } from './deploy-commands';
+
+Sentry.init({
+  dsn: process.env.DISCORD_BOT_SENTRY_DSN,
+  tracesSampleRate: 0.01
+});
 
 (async function () {
   await deployCommands();
