@@ -11,11 +11,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.ORG_DOCKER_USERNAME }} -p ${{ secrets.ORG_DOCKER_PASSWORD }}
+
       - name: Build & Push the Docker image
         run: |
-          docker build . --file Dockerfile --tag wiseoldman/discord-bot:latest
+          docker build . --file Dockerfile.prod --tag wiseoldman/discord-bot:latest
           docker push wiseoldman/discord-bot:latest
   deploy:
     runs-on: ubuntu-latest
@@ -30,5 +32,6 @@ jobs:
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
             cd wise-old-man
+            docker image rm wiseoldman/discord-bot
             docker-compose pull bot
             docker-compose up -d --no-deps --build bot
