@@ -1,6 +1,7 @@
 import cors from 'cors';
 import { Client } from 'discord.js';
 import express from 'express';
+import env from './env';
 import { onEventReceived } from './events/router';
 
 const PORT = 7000;
@@ -23,7 +24,7 @@ export function init(client: Client) {
   app.post('/event', (req, res) => {
     const token = req.body['api_token'];
 
-    if (!token || token !== process.env.DISCORD_BOT_API_TOKEN) {
+    if (!token || token !== env.DISCORD_BOT_API_TOKEN) {
       return res.status(401).json({ message: 'Wrong API Token.' });
     }
 

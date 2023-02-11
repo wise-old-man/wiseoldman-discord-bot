@@ -7,6 +7,7 @@ import {
   NameChange,
   Player
 } from '@wise-old-man/utils';
+import env from '../env';
 import { durationBetween } from '../utils/dates';
 
 import config from '../config';
@@ -56,7 +57,7 @@ export function getCompetitionTimeLeft(competition: CompetitionDetails | Competi
  */
 export async function resetCompetitionCode(competitionId: number): Promise<{ newCode: string }> {
   return womClient.competitions.putRequest(`/competitions/${competitionId}/reset-code`, {
-    adminPassword: process.env.ADMIN_PASSWORD
+    adminPassword: env.ADMIN_PASSWORD
   });
 }
 
@@ -65,7 +66,7 @@ export async function resetCompetitionCode(competitionId: number): Promise<{ new
  */
 export async function resetGroupCode(groupId: number): Promise<{ newCode: string }> {
   return womClient.groups.putRequest(`/groups/${groupId}/reset-code`, {
-    adminPassword: process.env.ADMIN_PASSWORD
+    adminPassword: env.ADMIN_PASSWORD
   });
 }
 
@@ -74,19 +75,19 @@ export async function resetGroupCode(groupId: number): Promise<{ newCode: string
  */
 export async function verifyGroup(groupId: number): Promise<GroupListItem> {
   return womClient.groups.putRequest(`/groups/${groupId}/verify`, {
-    adminPassword: process.env.ADMIN_PASSWORD
+    adminPassword: env.ADMIN_PASSWORD
   });
 }
 
 export async function approveNameChange(id: number): Promise<NameChange> {
   return womClient.nameChanges.postRequest(`/names/${id}/approve`, {
-    adminPassword: process.env.ADMIN_PASSWORD
+    adminPassword: env.ADMIN_PASSWORD
   });
 }
 
 export async function denyNameChange(id: number): Promise<NameChange> {
   return womClient.nameChanges.postRequest(`/names/${id}/deny`, {
-    adminPassword: process.env.ADMIN_PASSWORD
+    adminPassword: env.ADMIN_PASSWORD
   });
 }
 
@@ -95,7 +96,7 @@ export async function denyNameChange(id: number): Promise<NameChange> {
  */
 export async function deletePlayer(username: string): Promise<{ message: string }> {
   return womClient.players.deleteRequest(`/players/${username}`, {
-    adminPassword: process.env.ADMIN_PASSWORD
+    adminPassword: env.ADMIN_PASSWORD
   });
 }
 
@@ -105,7 +106,7 @@ export async function deletePlayer(username: string): Promise<{ message: string 
 export async function updateCountry(username: string, country: string): Promise<Player> {
   return womClient.players.putRequest(`/players/${username}/country`, {
     country,
-    adminPassword: process.env.ADMIN_PASSWORD
+    adminPassword: env.ADMIN_PASSWORD
   });
 }
 

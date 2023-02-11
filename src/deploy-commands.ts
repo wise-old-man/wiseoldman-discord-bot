@@ -1,5 +1,6 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
+import env from './env';
 import { COMMANDS } from './commands/router';
 import config from './config';
 
@@ -16,7 +17,7 @@ export async function deployCommands() {
       continue;
     }
 
-    if (process.env.DISCORD_DEV_LOCAL) {
+    if (env.DISCORD_DEV_LOCAL) {
       guildCommands.push(slashCommand.setDescription(`[DEV 🧑‍💻]: ${slashCommand.description}`).toJSON());
     } else if (command.private) {
       guildCommands.push(slashCommand.toJSON());
