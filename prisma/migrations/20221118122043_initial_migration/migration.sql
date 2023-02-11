@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "aliases" (
+CREATE TABLE IF NOT EXISTS "aliases" (
     "userId" VARCHAR(256) NOT NULL,
     "username" VARCHAR(12) NOT NULL,
     "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -9,7 +9,7 @@ CREATE TABLE "aliases" (
 );
 
 -- CreateTable
-CREATE TABLE "channelPreferences" (
+CREATE TABLE IF NOT EXISTS "channelPreferences" (
     "guildId" VARCHAR(256) NOT NULL,
     "type" VARCHAR(64) NOT NULL,
     "channelId" VARCHAR(256),
@@ -20,7 +20,7 @@ CREATE TABLE "channelPreferences" (
 );
 
 -- CreateTable
-CREATE TABLE "servers" (
+CREATE TABLE IF NOT EXISTS "servers" (
     "guildId" VARCHAR(256) NOT NULL,
     "groupId" INTEGER,
     "botChannelId" VARCHAR(256),
