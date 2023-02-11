@@ -2,5 +2,5 @@ import { Client } from 'discord.js';
 
 export interface Event {
   type: string;
-  execute(data: unknown, client: Client): void;
+  execute(data: unknown, client: Client): Promise<void>;
 }

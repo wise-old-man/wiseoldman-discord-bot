@@ -19,7 +19,7 @@ class MonitoringService {
     this.eventHistogram = new prometheus.Histogram({
       name: 'event_duration_seconds',
       help: 'Duration of event execution in microseconds',
-      labelNames: ['event', 'status', 'guild'],
+      labelNames: ['event', 'status'],
       buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10, 30]
     });
 
@@ -43,6 +43,16 @@ class MonitoringService {
     return {
       endTracking: (command: string, status: number, guild: string) => {
         endTimerFn({ command, status, guild });
+      }
+    };
+  }
+
+  trackEvent() {
+    const endTimerFn = this.eventHistogram.startTimer();
+
+    return {
+      endTracking: (event: string, status: number) => {
+        endTimerFn({ event, status });
       }
     };
   }

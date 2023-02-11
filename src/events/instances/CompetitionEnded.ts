@@ -1,4 +1,4 @@
-import { CompetitionType, formatNumber, Metric } from '@wise-old-man/utils';
+import { Competition, CompetitionType, formatNumber } from '@wise-old-man/utils';
 import { Client, MessageEmbed } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../config';
@@ -13,12 +13,7 @@ interface CompetitionStanding {
 
 interface CompetitionEndedData {
   groupId: number;
-  competition: {
-    id: number;
-    title: string;
-    metric: Metric;
-    type: CompetitionType;
-  };
+  competition: Competition;
   standings: CompetitionStanding[];
 }
 
@@ -49,7 +44,7 @@ class CompetitionEnded implements Event {
         }
       ]);
 
-    broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
+    await broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
   }
 }
 

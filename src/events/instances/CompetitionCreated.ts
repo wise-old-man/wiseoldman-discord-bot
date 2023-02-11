@@ -1,20 +1,13 @@
 import { Client, MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
-import { CompetitionType, getMetricName, Metric } from '@wise-old-man/utils';
+import { Competition, getMetricName } from '@wise-old-man/utils';
 import config from '../../config';
 import { Event } from '../../utils/events';
 import { getEmoji, broadcastMessage, durationBetween, BroadcastType } from '../../utils';
 
 interface CompetitionCreatedData {
   groupId: number;
-  competition: {
-    id: number;
-    title: string;
-    metric: Metric;
-    type: CompetitionType;
-    startsAt: string;
-    endsAt: string;
-  };
+  competition: Competition;
 }
 
 class CompetitionCreated implements Event {
@@ -45,7 +38,7 @@ class CompetitionCreated implements Event {
       .setFooter({ text: 'Starts at' })
       .setTimestamp(new Date(startsAt));
 
-    broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
+    await broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
   }
 }
 

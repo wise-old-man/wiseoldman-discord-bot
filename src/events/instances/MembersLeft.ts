@@ -1,12 +1,8 @@
 import { Client, MessageEmbed } from 'discord.js';
+import { Player } from '@wise-old-man/utils';
 import config from '../../config';
 import { Event } from '../../utils/events';
 import { encodeURL, broadcastMessage, BroadcastType } from '../../utils';
-
-interface Player {
-  id: number;
-  displayName: string;
-}
 
 interface MembersLeftData {
   groupId: number;
@@ -26,7 +22,7 @@ class MembersLeft implements Event {
     if (!groupId) return;
 
     const message = buildMessage(data);
-    broadcastMessage(client, groupId, BroadcastType.MEMBERS_LIST_CHANGED, message);
+    await broadcastMessage(client, groupId, BroadcastType.MEMBERS_LIST_CHANGED, message);
   }
 }
 

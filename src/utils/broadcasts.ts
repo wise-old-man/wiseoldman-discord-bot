@@ -50,6 +50,6 @@ export async function broadcastMessage(
     if (!channel) return;
     if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(channel)) return;
 
-    channel.send({ embeds: [message] });
+    await channel.send({ embeds: [message] });
   });
 }
