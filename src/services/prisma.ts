@@ -72,14 +72,12 @@ async function updateChannelPreference(guildId: string, type: string, channelId:
 }
 
 async function getPreferredChannels(guildIds: string[], type: string) {
-  return (
-    await prisma.channelPreference.findMany({
-      where: { guildId: { in: guildIds }, type },
-      select: { channelId: true }
-    })
-  )
-    .map(pref => pref.channelId)
-    .filter(c => !!c) as string[];
+  const preferences = await prisma.channelPreference.findMany({
+    where: { guildId: { in: guildIds }, type },
+    select: { guildId: true, channelId: true }
+  });
+
+  return Object.fromEntries(preferences.map(p => [p.guildId, p.channelId]));
 }
 
 export default prisma;
