@@ -1,4 +1,4 @@
-import { CompetitionType, getMetricName, Metric } from '@wise-old-man/utils';
+import { Competition, getMetricName } from '@wise-old-man/utils';
 import { Client, MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
@@ -7,14 +7,7 @@ import { getEmoji, broadcastMessage, durationBetween, BroadcastType } from '../.
 
 interface CompetitionEndingData {
   groupId: number;
-  competition: {
-    id: number;
-    title: string;
-    endsAt: string;
-    startsAt: string;
-    metric: Metric;
-    type: CompetitionType;
-  };
+  competition: Competition;
   period: {
     hours?: number;
     minutes?: number;
@@ -57,7 +50,7 @@ class CompetitionEnding implements Event {
       .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields(fields);
 
-    broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
+    await broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
   }
 }
 

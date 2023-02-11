@@ -1,7 +1,9 @@
 import cors from 'cors';
 import { Client } from 'discord.js';
 import express from 'express';
+import env from './env';
 import { onEventReceived } from './events/router';
+import monitoring from './utils/monitoring';
 
 const PORT = 7000;
 
@@ -23,14 +25,22 @@ export function init(client: Client) {
   app.post('/event', (req, res) => {
     const token = req.body['api_token'];
 
-    if (!token || token !== process.env.DISCORD_BOT_API_TOKEN) {
+    if (!token || token !== env.DISCORD_BOT_API_TOKEN) {
       return res.status(401).json({ message: 'Wrong API Token.' });
     }
 
+    onEventReceived(client, req.body);
+
+    // delete this key so it doesn't get logged
+    delete req.body.api_token;
     console.log('Event received: ', req.body);
 
-    onEventReceived(client, req.body);
     return res.json('Event received.');
+  });
+
+  app.get('/monitoring', async (req, res) => {
+    const metrics = await monitoring.getMetrics();
+    res.json(metrics);
   });
 
   return app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -1,20 +1,13 @@
-import { CompetitionType, getMetricName, Metric } from '@wise-old-man/utils';
+import { Competition, getMetricName } from '@wise-old-man/utils';
 import { Client, MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
 import { Event } from '../../utils/events';
-import { getEmoji, broadcastMessage, durationBetween, BroadcastType } from '../../utils';
+import { broadcastMessage, BroadcastType, durationBetween, getEmoji } from '../../utils';
 
 interface CompetitionStartingData {
   groupId: number;
-  competition: {
-    id: number;
-    title: string;
-    metric: Metric;
-    type: CompetitionType;
-    startsAt: string;
-    endsAt: string;
-  };
+  competition: Competition;
   period: {
     hours?: number;
     minutes?: number;
@@ -50,7 +43,7 @@ class CompetitionStarting implements Event {
       .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields(fields);
 
-    broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
+    await broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
   }
 }
 

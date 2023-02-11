@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/node';
 import { Interaction, MessageEmbed } from 'discord.js';
 import config from '../config';
+import monitoring from '../utils/monitoring';
 import { BaseCommand, CommandError } from '../utils';
 import {
   getCountryOptions,
@@ -71,23 +72,27 @@ export async function onInteractionReceived(interaction: Interaction) {
     return;
   }
 
+  const commandMonitor = monitoring.trackCommand();
+
   try {
     const { commandName } = interaction;
     const targetCommand = COMMANDS.find(cmd => cmd.slashCommand.name === commandName);
 
     if (!targetCommand) {
-      console.log('Error: Command not implemented', commandName);
-      return;
+      throw new Error(`Error: Command not implemented: ${commandName}`);
     }
 
     await interaction.channel?.sendTyping();
     await interaction.deferReply();
 
     await targetCommand.execute(interaction);
+
+    commandMonitor.endTracking(interaction.commandName, 1, interaction.guildId);
   } catch (error) {
     console.log(error);
     Sentry.captureException(error);
     await interaction.followUp({ embeds: [buildErrorEmbed(error)] });
+    commandMonitor.endTracking(interaction.commandName, 0, interaction.guildId);
   }
 }
 

@@ -7,7 +7,7 @@ ENV NODE_ENV=development
 RUN apt-get update && apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 
 # Copy package.json and install dependencies
-COPY package*.json .
+COPY package*.json ./
 RUN npm i
 
 # Copy the rest of the files into the container

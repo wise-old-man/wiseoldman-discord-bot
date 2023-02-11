@@ -1,21 +1,14 @@
 import { Client, MessageEmbed } from 'discord.js';
+import { Achievement, Player } from '@wise-old-man/utils';
 import config from '../../config';
 import { getUserId } from '../../services/prisma';
 import { Event } from '../../utils/events';
 import { encodeURL, getEmoji, broadcastMessage, BroadcastType } from '../../utils';
 
-interface PlayerAchievement {
-  name: string;
-  metric: string;
-}
-
 interface MemberAchievementsData {
   groupId: number;
-  player: {
-    id: number;
-    displayName: string;
-  };
-  achievements: PlayerAchievement[];
+  player: Player;
+  achievements: Achievement[];
 }
 
 class MemberAchievements implements Event {
@@ -43,7 +36,7 @@ class MemberAchievements implements Event {
       )
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements`));
 
-    broadcastMessage(client, groupId, BroadcastType.MEMBER_ACHIEVEMENTS, message);
+    await broadcastMessage(client, groupId, BroadcastType.MEMBER_ACHIEVEMENTS, message);
   }
 }
 

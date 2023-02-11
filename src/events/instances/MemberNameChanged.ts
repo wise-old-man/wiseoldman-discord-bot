@@ -1,14 +1,12 @@
 import { Client, MessageEmbed } from 'discord.js';
+import { Player } from '@wise-old-man/utils';
 import config from '../../config';
 import { Event } from '../../utils/events';
 import { encodeURL, broadcastMessage, BroadcastType } from '../../utils';
 
 interface MemberNameChangedData {
   groupId: number;
-  player: {
-    id: number;
-    displayName: string;
-  };
+  player: Player;
   previousName: string;
 }
 
@@ -30,7 +28,7 @@ class MemberNameChanged implements Event {
       .setDescription(`\`${previousName}\` → \`${player.displayName}\``)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
 
-    broadcastMessage(client, groupId, BroadcastType.MEMBER_NAME_CHANGED, message);
+    await broadcastMessage(client, groupId, BroadcastType.MEMBER_NAME_CHANGED, message);
   }
 }
 

@@ -1,5 +1,6 @@
 import { Client } from 'discord.js';
 import { Event } from '../utils/events';
+import monitoring from '../utils/monitoring';
 import CompetitionCreated from './instances/CompetitionCreated';
 import CompetitionEnded from './instances/CompetitionEnded';
 import CompetitionEnding from './instances/CompetitionEnding';
@@ -25,9 +26,17 @@ const EVENTS: Event[] = [
 ];
 
 function onEventReceived(client: Client, payload: { type: string; data: unknown }): void {
-  EVENTS.forEach(e => {
-    if (payload.type === e.type) {
-      e.execute(payload.data, client);
+  EVENTS.forEach(event => {
+    if (payload.type === event.type) {
+      const eventMonitor = monitoring.trackEvent();
+
+      event
+        .execute(payload.data, client)
+        .then(() => eventMonitor.endTracking(event.type, 1))
+        .catch(error => {
+          console.log(error);
+          eventMonitor.endTracking(event.type, 0);
+        });
     }
   });
 }

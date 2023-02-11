@@ -1,14 +1,12 @@
 import { Client, MessageEmbed } from 'discord.js';
+import { Player } from '@wise-old-man/utils';
 import config from '../../config';
 import { Event } from '../../utils/events';
 import { encodeURL, broadcastMessage, BroadcastType } from '../../utils';
 
 interface MemberHardcoreDiedData {
   groupId: number;
-  player: {
-    id: number;
-    displayName: string;
-  };
+  player: Player;
 }
 
 class MemberHardcoreDied implements Event {
@@ -29,7 +27,7 @@ class MemberHardcoreDied implements Event {
       .setDescription(`\`${player.displayName}\` has died and is now a regular Ironman.`)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
 
-    broadcastMessage(client, groupId, BroadcastType.MEMBER_HCIM_DIED, message);
+    await broadcastMessage(client, groupId, BroadcastType.MEMBER_HCIM_DIED, message);
   }
 }
 
