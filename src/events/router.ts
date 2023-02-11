@@ -26,13 +26,17 @@ const EVENTS: Event[] = [
 ];
 
 function onEventReceived(client: Client, payload: { type: string; data: unknown }): void {
-  EVENTS.forEach(e => {
-    if (payload.type === e.type) {
+  EVENTS.forEach(event => {
+    if (payload.type === event.type) {
       const eventMonitor = monitoring.trackEvent();
 
-      e.execute(payload.data, client)
-        .then(() => eventMonitor.endTracking(e.type, 1))
-        .catch(() => eventMonitor.endTracking(e.type, 0));
+      event
+        .execute(payload.data, client)
+        .then(() => eventMonitor.endTracking(event.type, 1))
+        .catch(error => {
+          console.log(error);
+          eventMonitor.endTracking(event.type, 0);
+        });
     }
   });
 }

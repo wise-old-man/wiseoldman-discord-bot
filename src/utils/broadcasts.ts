@@ -34,22 +34,37 @@ export async function broadcastMessage(
     type
   );
 
-  servers.forEach(async server => {
-    // This broadcast type has been disabled for this server
-    if (preferredChannelsMap[server.guildId] === null) {
-      return;
-    }
+  const results = await Promise.allSettled(
+    servers.map(async server => {
+      // This broadcast type has been disabled for this server
+      if (preferredChannelsMap[server.guildId] === null) {
+        return;
+      }
 
-    // If the server has configured a prefered channel for this broadcast type, use that.
-    // otherwise, use the default bot channel (if it exists)
-    const targetChannelId = preferredChannelsMap[server.guildId] || server.botChannelId;
-    if (!targetChannelId) return;
+      // If the server has configured a prefered channel for this broadcast type, use that.
+      // otherwise, use the default bot channel (if it exists)
+      const targetChannelId = preferredChannelsMap[server.guildId] || server.botChannelId;
+      if (!targetChannelId) return;
 
-    const channel = await client.channels.fetch(targetChannelId);
+      const channel = await client.channels.fetch(targetChannelId);
 
-    if (!channel) return;
-    if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(channel)) return;
+      if (!channel) return;
+      if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(channel)) return;
 
-    await channel.send({ embeds: [message] });
-  });
+      try {
+        await channel.send({ embeds: [message] });
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    })
+  );
+
+  const failedPropagations = results.filter(r => r.status === 'rejected');
+
+  if (failedPropagations.length > 0) {
+    throw new Error(
+      `Failed to fully propagate broadcast message. (${failedPropagations.length}/${servers.length})`
+    );
+  }
 }

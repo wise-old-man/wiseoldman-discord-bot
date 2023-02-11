@@ -22,7 +22,6 @@ class CompetitionStarting implements Event {
   }
 
   async execute(data: CompetitionStartingData, client: Client) {
-    console.time('A');
     const { groupId, competition, period } = data;
     const { id, metric, startsAt, endsAt, type, title } = competition;
 
@@ -45,7 +44,6 @@ class CompetitionStarting implements Event {
       .addFields(fields);
 
     await broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
-    console.timeEnd('A');
   }
 }
 
