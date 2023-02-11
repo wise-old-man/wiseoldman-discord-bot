@@ -58,7 +58,7 @@ class MonitoringService {
   }
 
   getMetrics() {
-    return this.registry.getMetricsAsJSON();
+    return this.registry.metrics();
   }
 }
 
