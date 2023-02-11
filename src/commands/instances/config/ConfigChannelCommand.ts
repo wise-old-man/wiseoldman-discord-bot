@@ -1,91 +1,81 @@
-import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '../../../config';
-import { setChannelPreference } from '../../../database/services/channelPreferences';
-import { updateBotChannel } from '../../../database/services/server';
-import { SubCommand, BroadcastType } from '../../../types';
-import { getEmoji, getBroadcastName } from '../../../utils';
-import CommandError from '../../CommandError';
+import { updateBotChannel, updateChannelPreference } from '../../../services/prisma';
+import { BroadcastName, BroadcastType, Command, CommandConfig, CommandError } from '../../../utils';
 
-class ConfigChannelCommand implements SubCommand {
-  subcommand?: boolean;
-  requiresAdmin: boolean;
-  slashCommand?: SlashCommandSubcommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'channel',
+  description: "Configure the bot's broadcast channels.",
+  options: [
+    {
+      type: 'string',
+      required: true,
+      name: 'broadcast_type',
+      description: 'The broadcast type to configure.',
+      choices: [
+        ...Object.values(BroadcastType).map(type => ({
+          label: BroadcastName[type],
+          value: type
+        }))
+      ]
+    },
+    {
+      type: 'channel',
+      required: true,
+      name: 'broadcast_channel',
+      description: 'The channel to which announcements are sent.',
+      channelType: 0 //  Only add text channels
+    },
+    {
+      type: 'string',
+      name: 'status',
+      description: `Enable or disable announcements of a certain type. Default channel cannot be disabled.`,
+      choices: [
+        { label: 'Enable', value: 'enable' },
+        { label: 'Disable', value: 'disable' }
+      ]
+    }
+  ]
+};
 
+class ConfigChannelCommand extends Command {
   constructor() {
-    this.subcommand = true;
+    super(CONFIG);
     this.requiresAdmin = true;
-
-    this.slashCommand = new SlashCommandSubcommandBuilder()
-      .addStringOption(option =>
-        option
-          .setName('broadcast_type')
-          .setDescription('The broadcast type to configure')
-          .setChoices([
-            ['Default', BroadcastType.Default],
-            ['Competition status', BroadcastType.CompetitionStatus],
-            ['Member name changed', BroadcastType.MemberNameChanged],
-            ['Member HCIM died', BroadcastType.MemberHardcoreDied],
-            ['Member achievements', BroadcastType.MemberAchievements],
-            ['Members list changed', BroadcastType.MembersListChanged]
-          ])
-          .setRequired(true)
-      )
-      .addChannelOption(option =>
-        option
-          .setName('broadcast_channel')
-          .setDescription('The channel where announcements are sent')
-          .addChannelType(0) // Only add text channels
-          .setRequired(true)
-      )
-      .addStringOption(option =>
-        option
-          .setName('status')
-          .setDescription(
-            'Enable or disable announcements of a certain type. Default channel cannot be disabled.'
-          )
-          .setChoices([
-            ['Enable', 'enable'],
-            ['Disable', 'disable']
-          ])
-      )
-      .setName('channel')
-      .setDescription('Configure various broadcast channels');
   }
 
-  async execute(message: CommandInteraction) {
-    const guildId = message.guildId || '';
-    const channelType = message.options.getString('broadcast_type', true);
-    const announcementChannel = message.options.getChannel('broadcast_channel', true);
-    const status = message.options.getString('status');
-    const broadcastName = getBroadcastName(channelType as BroadcastType);
+  async execute(interaction: CommandInteraction) {
+    const guildId = interaction.guild?.id || '';
 
-    try {
-      await message.deferReply();
-
-      let description = '';
-      if (channelType === BroadcastType.Default) {
-        await updateBotChannel(guildId, announcementChannel.id);
-        description = `All group-related broadcasts will be sent to <#${announcementChannel.id}> by default.`;
-      } else {
-        if (status === 'disable') {
-          await setChannelPreference(guildId, channelType, null);
-          description = `"${broadcastName}" broadcasts have now been disabled.`;
-        } else {
-          await setChannelPreference(guildId, channelType, announcementChannel.id);
-          description = `"${broadcastName}" broadcasts will now be sent to <#${announcementChannel.id}>`;
-        }
-      }
-
-      const response = new MessageEmbed()
-        .setColor(config.visuals.green)
-        .setTitle(`${getEmoji('success')} Channel Preferences Updated`)
-        .setDescription(description);
-
-      await message.editReply({ embeds: [response] });
-    } catch (error: any) {
-      throw new CommandError('Failed to update channel preferences.');
+    if (!guildId || guildId.length === 0) {
+      throw new CommandError('This command can only be used in a Discord server.');
     }
+
+    const status = interaction.options.getString('status');
+    const channel = interaction.options.getChannel('broadcast_channel', true);
+    const broadcastType = interaction.options.getString('broadcast_type', true);
+
+    const broadcastName = BroadcastName[broadcastType as BroadcastType];
+
+    let description = '';
+
+    if (broadcastType === BroadcastType.DEFAULT) {
+      await updateBotChannel(guildId, channel.id);
+      description = `All group-related broadcasts will be sent to <#${channel.id}> by default.`;
+    } else if (status === 'disable') {
+      await updateChannelPreference(guildId, broadcastType, null);
+      description = `"${broadcastName}" broadcasts have now been disabled.`;
+    } else {
+      await updateChannelPreference(guildId, broadcastType, channel.id);
+      description = `"${broadcastName}" broadcasts will now be sent to <#${channel.id}>`;
+    }
+
+    const response = new MessageEmbed()
+      .setColor(config.visuals.green)
+      .setTitle(`✅ Channel Preferences Updated`)
+      .setDescription(description);
+
+    await interaction.editReply({ embeds: [response] });
   }
 }
 

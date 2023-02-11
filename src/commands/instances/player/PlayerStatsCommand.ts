@@ -1,95 +1,115 @@
+import { formatNumber, isSkill, Metric, PlayerDetails, round } from '@wise-old-man/utils';
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { formatNumber, isSkill, MapOf, round, Skill, SkillValue } from '@wise-old-man/utils';
 import config from '../../../config';
-import { getUsername } from '../../../database/services/alias';
-import { CanvasAttachment, Command, Renderable } from '../../../types';
-import { encodeURL, INGAME_SKILL_ORDER } from '../../../utils';
-import { getScaledCanvas } from '../../../utils/rendering';
-import CommandError from '../../CommandError';
-import womClient from '../../../api/wom-api';
+import womClient from '../../../services/wiseoldman';
+import {
+  Command,
+  CommandConfig,
+  getUsernameParam,
+  getScaledCanvas,
+  encodeURL,
+  CommandError
+} from '../../../utils';
 
 const RENDER_WIDTH = 215;
 const RENDER_HEIGHT = 260;
 const RENDER_PADDING = 15;
 
+// Used to render stats in correct order
+const INGAME_SKILL_ORDER = [
+  Metric.ATTACK,
+  Metric.STRENGTH,
+  Metric.DEFENCE,
+  Metric.RANGED,
+  Metric.PRAYER,
+  Metric.MAGIC,
+  Metric.RUNECRAFTING,
+  Metric.CONSTRUCTION,
+  Metric.HITPOINTS,
+  Metric.AGILITY,
+  Metric.HERBLORE,
+  Metric.THIEVING,
+  Metric.CRAFTING,
+  Metric.FLETCHING,
+  Metric.SLAYER,
+  Metric.HUNTER,
+  Metric.MINING,
+  Metric.SMITHING,
+  Metric.FISHING,
+  Metric.COOKING,
+  Metric.FIREMAKING,
+  Metric.WOODCUTTING,
+  Metric.FARMING,
+  Metric.OVERALL
+] as string[];
+
 enum RenderVariant {
-  Levels = 'Levels',
-  Ranks = 'Ranks',
-  Experience = 'Experience',
-  EHP = 'EHP'
+  LEVELS = 'levels',
+  RANKS = 'ranks',
+  EXPERIENCE = 'experience',
+  EHP = 'ehp'
 }
 
-class PlayerStatsCommand implements Command, Renderable {
-  global: boolean;
-  slashCommand: SlashCommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'stats',
+  description: "View a player's skilling stats.",
+  options: [
+    {
+      type: 'string',
+      name: 'variant',
+      description: 'The variant to show stats for (levels / exp / rank / ehp).',
+      required: true,
+      choices: [
+        { label: 'Levels', value: RenderVariant.LEVELS },
+        { label: 'Ranks', value: RenderVariant.RANKS },
+        { label: 'Experience', value: RenderVariant.EXPERIENCE },
+        { label: 'Efficient Hours Played', value: RenderVariant.EHP }
+      ]
+    },
+    {
+      type: 'string',
+      name: 'username',
+      description: 'In-game username.'
+    }
+  ]
+};
 
+class PlayerStatsCommand extends Command {
   constructor() {
-    this.global = true;
-    this.slashCommand = new SlashCommandBuilder()
-      .addStringOption(option =>
-        option
-          .setName('variant')
-          .setDescription('The variant to show stats for')
-          .setRequired(true)
-          .addChoices([
-            ['Levels', RenderVariant.Levels],
-            ['Ranks', RenderVariant.Ranks],
-            ['Experience', RenderVariant.Experience],
-            ['Efficient Hours Played', RenderVariant.EHP]
-          ])
-      )
-      .addStringOption(option => option.setName('username').setDescription('In-game username'))
-      .setName('stats')
-      .setDescription('View player stats');
+    super(CONFIG);
   }
 
-  async execute(message: CommandInteraction) {
-    await message.deferReply();
-
+  async execute(interaction: CommandInteraction) {
     // Grab the username from the command's arguments or database alias
-    const username = await this.getUsername(message);
+    const username = await getUsernameParam(interaction);
 
-    const variant = message.options.getString('variant') as RenderVariant;
+    // Get the variant from subcommand
+    const variant = interaction.options.getString('variant', true) as RenderVariant;
 
-    if (!username) {
+    const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(
-        'This commands requires a username. Set a default by using the `setrsn` command.'
+        `Player "${username}" not found. Possibly hasn't been tracked yet on Wise Old Man.`,
+        'Tip: Try tracking them first using the /update command'
       );
-    }
+    });
 
-    try {
-      const player = await womClient.players.getPlayerDetails(username);
-      const { attachment, fileName } = await this.render({
-        skills: player.latestSnapshot.data.skills,
-        username: player.username,
-        variant
-      });
+    const { attachment, fileName } = await this.render(player, variant);
 
-      const embed = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
-        .setTitle(`${player.displayName} (Combat ${player.combatLevel}) - ${variant}`)
-        .setImage(`attachment://${fileName}`)
-        .setFooter({ text: 'Last updated' })
-        .setTimestamp(player.updatedAt);
+    const embed = new MessageEmbed()
+      .setColor(config.visuals.blue)
+      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
+      .setTitle(`${player.displayName} (Combat ${player.combatLevel}) - ${variant}`)
+      .setImage(`attachment://${fileName}`)
+      .setFooter({ text: 'Last updated' })
+      .setTimestamp(player.updatedAt);
 
-      await message.editReply({ embeds: [embed], files: [attachment] });
-    } catch (e: any) {
-      const errorMessage = `**${username}** is not being tracked yet.`;
-      const errorTip = `Try /update ${username}`;
-
-      throw new CommandError(errorMessage, errorTip);
-    }
+    await interaction.editReply({ embeds: [embed], files: [attachment] });
   }
 
-  async render(props: {
-    skills: MapOf<Skill, SkillValue>;
-    username: string;
-    variant: RenderVariant;
-  }): Promise<CanvasAttachment> {
-    const { skills, username, variant } = props;
+  async render(playerDetails: PlayerDetails, variant: RenderVariant) {
+    const username = playerDetails.username;
+    const skills = playerDetails.latestSnapshot.data.skills;
 
     // Create a scaled empty canvas
     const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
@@ -121,7 +141,7 @@ class PlayerStatsCommand implements Command, Renderable {
 
       ctx.fillStyle = '#ffffff';
 
-      if (variant === RenderVariant.Levels) {
+      if (variant === RenderVariant.LEVELS) {
         ctx.font = '11px sans-serif';
 
         const level = `${skills[skill].level || 1}`;
@@ -129,7 +149,7 @@ class PlayerStatsCommand implements Command, Renderable {
 
         // Skill level
         ctx.fillText(level, originX + 42 - lvlWidth / 2, originY + 17);
-      } else if (variant === RenderVariant.Experience) {
+      } else if (variant === RenderVariant.EXPERIENCE) {
         const fontSize = skill === 'overall' ? 9 : 10;
         ctx.font = `${fontSize}px sans-serif`;
 
@@ -138,7 +158,7 @@ class PlayerStatsCommand implements Command, Renderable {
 
         // Skill Experience
         ctx.fillText(exp, originX + 44 - expWidth / 2, originY + 17);
-      } else if (variant === RenderVariant.Ranks) {
+      } else if (variant === RenderVariant.RANKS) {
         ctx.font = '10px sans-serif';
 
         const rank = `${formatNumber(skills[skill].rank, true, 1) || 0}`;
@@ -161,27 +181,6 @@ class PlayerStatsCommand implements Command, Renderable {
     const attachment = new MessageAttachment(canvas.toBuffer(), fileName);
 
     return { attachment, fileName };
-  }
-
-  async getUsername(message: CommandInteraction): Promise<string | undefined | null> {
-    const username = message.options.getString('username', false);
-    if (username) return username;
-
-    const inferredUsername = await getUsername(message.user.id);
-    return inferredUsername;
-  }
-
-  getRenderVariant(subCommand: string): RenderVariant {
-    switch (subCommand) {
-      case 'exp':
-        return RenderVariant.Experience;
-      case 'ranks':
-        return RenderVariant.Ranks;
-      case 'ehp':
-        return RenderVariant.EHP;
-      default:
-        return RenderVariant.Levels;
-    }
   }
 }
 

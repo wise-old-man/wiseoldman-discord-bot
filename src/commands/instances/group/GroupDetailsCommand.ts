@@ -1,60 +1,43 @@
-import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import womClient from '../../../api/wom-api';
 import config from '../../../config';
-import { getServer } from '../../../database/services/server';
-import { SubCommand } from '../../../types';
-import { formatDate, getEmoji } from '../../../utils';
-import CommandError from '../../CommandError';
+import womClient from '../../../services/wiseoldman';
+import { Command, CommandConfig, CommandError, formatDate, getLinkedGroupId } from '../../../utils';
 
-class GroupDetailsCommand implements SubCommand {
-  subcommand?: boolean | undefined;
-  requiresGroup?: boolean | undefined;
-  slashCommand?: SlashCommandSubcommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'details',
+  description: "View the group's details."
+};
 
+class GroupDetailsCommand extends Command {
   constructor() {
-    this.subcommand = true;
-    this.requiresGroup = true;
-
-    this.slashCommand = new SlashCommandSubcommandBuilder()
-      .setName('details')
-      .setDescription("View the group's details.");
+    super(CONFIG);
   }
 
-  async execute(message: CommandInteraction) {
-    await message.deferReply();
+  async execute(interaction: CommandInteraction): Promise<void> {
+    const groupId = await getLinkedGroupId(interaction);
 
-    const guildId = message.guild?.id;
-    const server = await getServer(guildId); // maybe cache it so we don't have to do this
-    const groupId = server?.groupId || -1;
+    const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
+      throw new CommandError("Couldn't find that group.");
+    });
 
-    try {
-      const group = await womClient.groups.getGroupDetails(groupId);
-      const pageURL = `https://wiseoldman.net/groups/${group.id}`;
+    const response = new MessageEmbed()
+      .setColor(config.visuals.blue)
+      .setTitle(group.name)
+      .setURL(`https://wiseoldman.net/groups/${group.id}`)
+      .addFields([
+        { name: 'Clan chat', value: group.clanChat || '---' },
+        { name: 'Members', value: group.memberCount?.toString() || '0' },
+        { name: 'Created at', value: formatDate(group.createdAt, 'DD MMM, YYYY') },
+        { name: '\u200B', value: group.verified ? `✅ Verified` : `❌ Unverified` }
+      ]);
 
-      const verification = group.verified
-        ? `${getEmoji('success')} Verified`
-        : `${getEmoji('error')} Unverified`;
-
-      const response = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setTitle(group.name)
-        .setURL(pageURL)
-        .addFields([
-          { name: 'Clan chat', value: group.clanChat || '---' },
-          { name: 'Members', value: group.memberCount?.toString() || '0' },
-          { name: 'Created at', value: formatDate(group.createdAt, 'DD MMM, YYYY') },
-          { name: '\u200B', value: verification }
-        ]);
-
-      await message.editReply({ embeds: [response] });
-    } catch (e: any) {
-      if (e.response?.data?.message) {
-        throw new CommandError(e.response?.data?.message);
-      } else {
-        throw new CommandError(e.name, e.message);
-      }
+    if (!group.verified) {
+      response.setFooter({
+        text: `Tip: If you want to verify your group check out the /help command (category: Verified).`
+      });
     }
+
+    await interaction.editReply({ embeds: [response] });
   }
 }
 

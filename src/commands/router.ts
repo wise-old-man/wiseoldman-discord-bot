@@ -1,44 +1,56 @@
-import { Interaction, MessageEmbed, GuildMember, CommandInteraction } from 'discord.js';
+import * as Sentry from '@sentry/node';
+import { Interaction, MessageEmbed } from 'discord.js';
 import config from '../config';
-import { isAdmin } from '../utils';
-import CommandError from './CommandError';
-import commands from './instances';
-import { SubCommand } from '../types';
+import { BaseCommand, CommandError } from '../utils';
 import {
   getCountryOptions,
-  getPeriodOptions,
+  getHelpCategoryOptions,
   getMetricOptions,
-  getHelpCategoryOptions
-} from '../utils/autocomplete';
-import { getServer } from '../database/services/server';
+  getPeriodOptions
+} from './autocomplete';
+import ConfigRootCommand from './instances/config';
+import HelpCommand from './instances/general/HelpCommand';
+import GroupRootCommand from './instances/group';
+import DeletePlayerCommand from './instances/moderation/DeletePlayerCommand';
+import NameChangeCommand from './instances/moderation/NameChangeCommand';
+import ResetCompetitionCodeCommand from './instances/moderation/ResetCompetitionCodeCommand';
+import ResetGroupCodeCommand from './instances/moderation/ResetGroupCodeCommand';
+import VerifyGroupCommand from './instances/moderation/VerifyGroupCommand';
+import PlayerAchievementsCommand from './instances/player/PlayerAchievementsCommand';
+import PlayerActivitiesCommand from './instances/player/PlayerActivitiesCommand';
+import PlayerBossesCommand from './instances/player/PlayerBossesCommand';
+import PlayerEfficiencyCommand from './instances/player/PlayerEfficiencyCommand';
+import PlayerGainedCommand from './instances/player/PlayerGainedCommand';
+import PlayerSetFlagCommand from './instances/player/PlayerSetFlagCommand';
+import PlayerSetUsernameCommand from './instances/player/PlayerSetUsernameCommand';
+import PlayerStatsCommand from './instances/player/PlayerStatsCommand';
+import UpdatePlayerCommand from './instances/player/UpdatePlayerCommand';
 
-export function onError(options: { interaction: Interaction; title: string; tip?: string }): void {
-  const { interaction, title, tip } = options;
+export const COMMANDS: BaseCommand[] = [
+  HelpCommand,
+  // Player Commands
+  PlayerStatsCommand,
+  UpdatePlayerCommand,
+  PlayerGainedCommand,
+  PlayerBossesCommand,
+  PlayerSetFlagCommand,
+  PlayerActivitiesCommand,
+  PlayerEfficiencyCommand,
+  PlayerSetUsernameCommand,
+  PlayerAchievementsCommand,
+  // Group Commands
+  GroupRootCommand,
+  // Config Commands
+  ConfigRootCommand,
+  // Moderation Commands
+  NameChangeCommand,
+  VerifyGroupCommand,
+  DeletePlayerCommand,
+  ResetGroupCodeCommand,
+  ResetCompetitionCodeCommand
+];
 
-  const response = new MessageEmbed().setColor(config.visuals.red).setDescription(title);
-  response.setFooter({ text: tip ? tip : '' });
-
-  if (interaction && interaction.isCommand()) {
-    interaction.followUp({ embeds: [response] });
-  }
-}
-
-export async function executeSubCommand(
-  message: CommandInteraction,
-  subcommand: string,
-  candidates: SubCommand[]
-): Promise<void> {
-  try {
-    await candidates.find(c => c.slashCommand?.name === subcommand)?.execute(message);
-  } catch (e) {
-    if (e instanceof CommandError) {
-      return onError({ interaction: message, title: e.message, tip: e.tip });
-    }
-  }
-}
-
-// Slash commands
-export async function onInteractionReceived(interaction: Interaction): Promise<void> {
+export async function onInteractionReceived(interaction: Interaction) {
   if (interaction.isAutocomplete()) {
     const focused = interaction.options.getFocused(true);
     const currentValue = focused.value?.toString();
@@ -59,51 +71,35 @@ export async function onInteractionReceived(interaction: Interaction): Promise<v
     return;
   }
 
-  const { commandName } = interaction;
+  try {
+    const { commandName } = interaction;
+    const targetCommand = COMMANDS.find(cmd => cmd.slashCommand.name === commandName);
 
-  commands.forEach(async c => {
-    if (c.slashCommand?.name !== commandName) return;
-
-    //TODO: check for admin permissions in a better way
-    if (c.requiresAdmin && !isAdmin(interaction.member as GuildMember)) {
-      await interaction.deferReply();
-      return onError({
-        interaction: interaction,
-        title: 'That command requires Admin permissions.',
-        tip: 'Contact your server administrator for help.'
-      });
+    if (!targetCommand) {
+      console.log('Error: Command not implemented', commandName);
+      return;
     }
 
-    if (c.requiresGroup) {
-      if (!interaction.inGuild()) {
-        await interaction.deferReply();
-        return onError({
-          interaction: interaction,
-          title: 'This command only works in a server.'
-        });
-      }
+    await interaction.channel?.sendTyping();
+    await interaction.deferReply();
 
-      const server = await getServer(interaction.guildId);
+    await targetCommand.execute(interaction);
+  } catch (error) {
+    console.log(error);
+    Sentry.captureException(error);
+    await interaction.followUp({ embeds: [buildErrorEmbed(error)] });
+  }
+}
 
-      if (!server?.groupId) {
-        await interaction.deferReply();
-        return onError({
-          interaction: interaction,
-          title: 'That command requires a group to be configured.',
-          tip: `Start the group setup with /config group.`
-        });
-      }
-    }
+function buildErrorEmbed(error: Error) {
+  const response = new MessageEmbed().setColor(config.visuals.red);
 
-    try {
-      interaction.channel?.sendTyping();
+  if (error instanceof CommandError) {
+    response.setDescription(error.message);
+    if (error.tip) response.setFooter({ text: error.tip });
+  } else {
+    response.setDescription('An unexpected error occurred.');
+  }
 
-      await c.execute(interaction);
-    } catch (e) {
-      // If a command error was thrown during execution, handle the response here.
-      if (e instanceof CommandError) {
-        return onError({ interaction: interaction, title: e.message, tip: e.tip });
-      }
-    }
-  });
+  return response;
 }

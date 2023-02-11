@@ -1,7 +1,7 @@
-import { MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
 import config from '../../config';
-import { BroadcastType, Event } from '../../types';
-import { encodeURL, getEmoji, broadcastMessage } from '../../utils';
+import { Event } from '../../utils/events';
+import { encodeURL, broadcastMessage, BroadcastType } from '../../utils';
 
 interface MemberHardcoreDiedData {
   groupId: number;
@@ -18,26 +18,18 @@ class MemberHardcoreDied implements Event {
     this.type = 'MEMBER_HCIM_DIED';
   }
 
-  async execute(data: MemberHardcoreDiedData): Promise<void> {
-    const { groupId } = data;
+  async execute(data: MemberHardcoreDiedData, client: Client) {
+    const { groupId, player } = data;
 
     if (!groupId) return;
 
-    const message = this.buildMessage(data);
-    broadcastMessage(groupId, BroadcastType.MemberHardcoreDied, message);
-  }
-
-  buildMessage(data: MemberHardcoreDiedData): MessageEmbed {
-    const { player } = data;
-
-    const title = `${getEmoji('grave')} Hardcore Ironman Member Died`;
-    const message = `\`${player.displayName}\` has died and is now a regular Ironman.`;
-
-    return new MessageEmbed()
+    const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(title)
-      .setDescription(message)
+      .setTitle(`🪦 Hardcore Ironman Member Died`)
+      .setDescription(`\`${player.displayName}\` has died and is now a regular Ironman.`)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
+
+    broadcastMessage(client, groupId, BroadcastType.MEMBER_HCIM_DIED, message);
   }
 }
 

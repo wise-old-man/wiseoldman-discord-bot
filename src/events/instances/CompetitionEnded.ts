@@ -1,23 +1,23 @@
-import { formatNumber } from '@wise-old-man/utils';
-import { MessageEmbed } from 'discord.js';
+import { CompetitionType, formatNumber, Metric } from '@wise-old-man/utils';
+import { Client, MessageEmbed } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../config';
-import { BroadcastType, Event } from '../../types';
-import { getEmoji, broadcastMessage } from '../../utils';
+import { Event } from '../../utils/events';
+import { bold, broadcastMessage, BroadcastType } from '../../utils';
 
 interface CompetitionStanding {
+  gained: number;
   displayName: string;
   teamName: string | null;
-  gained: number;
 }
 
 interface CompetitionEndedData {
   groupId: number;
   competition: {
     id: number;
-    type: string;
-    metric: string;
     title: string;
+    metric: Metric;
+    type: CompetitionType;
   };
   standings: CompetitionStanding[];
 }
@@ -29,20 +29,19 @@ class CompetitionEnded implements Event {
     this.type = 'COMPETITION_ENDED';
   }
 
-  async execute(data: CompetitionEndedData): Promise<void> {
+  async execute(data: CompetitionEndedData, client: Client) {
     const { groupId, competition, standings } = data;
     const { id, title } = competition;
 
     if (!groupId) return;
 
-    const isTeamCompetition = competition.type === 'team';
-    const url = `https://wiseoldman.net/competitions/${id}`;
-
+    const isTeamCompetition = competition.type === CompetitionType.TEAM;
     const topParticipations = isTeamCompetition ? getTeamStandings(standings) : getStandings(standings);
+
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji('speaker')} ${title} has ended!`)
-      .setURL(url)
+      .setTitle(`📢 ${title} has ended!`)
+      .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields([
         {
           name: isTeamCompetition ? 'Top Teams' : 'Top participants',
@@ -50,7 +49,7 @@ class CompetitionEnded implements Event {
         }
       ]);
 
-    broadcastMessage(groupId, BroadcastType.CompetitionStatus, message);
+    broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
   }
 }
 
@@ -70,7 +69,7 @@ function getTeamStandings(standings: CompetitionStanding[]): string {
     .slice(0, 3)
     .map(
       (t, i) =>
-        `${getStandingEmoji(i + 1)} ${i + 1}. ${t.name} - **${formatNumber(t.totalGained, true)}**`
+        `${getStandingEmoji(i + 1)} ${i + 1}. ${t.name} - ${bold(formatNumber(t.totalGained, true))}`
     )
     .join('\n');
 }
@@ -80,7 +79,7 @@ function getStandings(standings: CompetitionStanding[]): string {
     .slice(0, 3)
     .map(
       (s, i) =>
-        `${getStandingEmoji(i + 1)} ${i + 1}. ${s.displayName} - **${formatNumber(s.gained, true)}**`
+        `${getStandingEmoji(i + 1)} ${i + 1}. ${s.displayName} - ${bold(formatNumber(s.gained, true))}`
     )
     .join('\n');
 }
@@ -88,11 +87,11 @@ function getStandings(standings: CompetitionStanding[]): string {
 function getStandingEmoji(place: number) {
   switch (place) {
     case 1:
-      return getEmoji('gold_medal');
+      return '🥇';
     case 2:
-      return getEmoji('silver_medal');
+      return '🥈';
     case 3:
-      return getEmoji('bronze_medal');
+      return '🥉';
   }
 }
 

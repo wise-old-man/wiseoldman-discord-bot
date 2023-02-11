@@ -1,85 +1,75 @@
+import { CompetitionListItem, CompetitionStatus, CompetitionTypeProps } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
-import { capitalize } from 'lodash';
-import { CompetitionListItem } from '@wise-old-man/utils';
-import { getCompetitionStatus, getCompetitionTimeLeft } from '../../../api/modules/competitions';
+import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '../../../services/wiseoldman';
 import config from '../../../config';
-import { SubCommand } from '../../../types';
-import { getEmoji } from '../../../utils';
-import CommandError from '../../CommandError';
-import { getServer } from '../../../database/services/server';
-import womClient from '../../../api/wom-api';
+import { Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
 
 const MAX_COMPETITIONS = 5;
 
-const STATUS_ORDER = ['ongoing', 'upcoming', 'finished'];
+const STATUS_PRIORITY_ORDER = [
+  CompetitionStatus.ONGOING,
+  CompetitionStatus.UPCOMING,
+  CompetitionStatus.FINISHED
+];
 
-class GroupCompetitionsCommand implements SubCommand {
-  subcommand?: boolean | undefined;
-  requiresGroup?: boolean | undefined;
-  slashCommand?: SlashCommandSubcommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'competitions',
+  description: "View a group's most recent competitions."
+};
 
+class GroupCompetitionsCommand extends Command {
   constructor() {
-    this.subcommand = true;
-    this.requiresGroup = true;
-
-    this.slashCommand = new SlashCommandSubcommandBuilder()
-      .setName('competitions')
-      .setDescription("View the group's competitions.");
+    super(CONFIG);
   }
 
-  async execute(message: CommandInteraction) {
-    await message.deferReply();
-    const guildId = message.guild?.id;
-    const server = await getServer(guildId); // maybe cache it so we don't have to do this
-    const groupId = server?.groupId || -1;
+  async execute(interaction: CommandInteraction) {
+    const groupId = await getLinkedGroupId(interaction);
 
-    try {
-      const group = await womClient.groups.getGroupDetails(groupId);
-      const competitions = await womClient.groups.getGroupCompetitions(groupId);
+    const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
+      throw new CommandError("Couldn't find that group.");
+    });
 
-      const fields = this.buildCompetitionsList(competitions);
-      const pageURL = `https://wiseoldman.net/groups/${groupId}/competitions`;
+    const competitions = await womClient.groups.getGroupCompetitions(groupId).catch(() => {
+      throw new CommandError("Couldn't find any competitions for this group.");
+    });
 
-      const response = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setTitle(`${group.name} competitions`)
-        .setURL(pageURL)
-        .addFields(fields);
-
-      await message.editReply({ embeds: [response] });
-    } catch (e: any) {
-      if (e.response?.data?.message) {
-        throw new CommandError(e.response?.data?.message);
-      } else {
-        throw new CommandError(e.name, e.message);
-      }
+    if (competitions.length === 0) {
+      throw new CommandError("Couldn't find any competitions for this group.");
     }
-  }
 
-  buildCompetitionsList(competitions: CompetitionListItem[]) {
-    return competitions
-      .map(c => ({ ...c, status: getCompetitionStatus(c) }))
-      .sort(
-        (a, b) =>
-          STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status) ||
-          a.startsAt.getTime() - b.startsAt.getTime() ||
-          a.endsAt.getTime() - b.endsAt.getTime()
-      )
-      .slice(0, MAX_COMPETITIONS)
-      .map(c => {
-        const icon = getEmoji(c.metric);
-        const type = capitalize(c.type);
-        const timeLeft = getCompetitionTimeLeft(c);
-        const participants = `${c.participantCount} participants`;
-        const id = c.id;
+    const response = new MessageEmbed()
+      .setColor(config.visuals.blue)
+      .setTitle(`${group.name} - Most Recent Competitions`)
+      .setURL(`https://wiseoldman.net/groups/${groupId}/competitions`)
+      .addFields(buildCompetitionsList(competitions));
 
-        return {
-          name: `${c.title}`,
-          value: `${icon} • ${type} • ${participants} • ${timeLeft} - ID: ${id}`
-        };
-      });
+    await interaction.editReply({ embeds: [response] });
   }
+}
+
+function buildCompetitionsList(competitions: CompetitionListItem[]) {
+  return competitions
+    .map(c => ({ ...c, status: getCompetitionStatus(c) }))
+    .sort(
+      (a, b) =>
+        STATUS_PRIORITY_ORDER.indexOf(a.status) - STATUS_PRIORITY_ORDER.indexOf(b.status) ||
+        a.startsAt.getTime() - b.startsAt.getTime() ||
+        a.endsAt.getTime() - b.endsAt.getTime()
+    )
+    .slice(0, MAX_COMPETITIONS)
+    .map(c => {
+      const { id, metric, type, participantCount } = c;
+
+      const icon = getEmoji(metric);
+      const typeName = CompetitionTypeProps[type].name;
+      const timeLeft = getCompetitionTimeLeft(c);
+      const participants = `${participantCount} participants`;
+
+      return {
+        name: `${c.title}`,
+        value: `${icon} • ${typeName} • ${participants} • ${timeLeft} - ID: ${id}`
+      };
+    });
 }
 
 export default new GroupCompetitionsCommand();
