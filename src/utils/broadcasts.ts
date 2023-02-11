@@ -29,17 +29,23 @@ export async function broadcastMessage(
 ) {
   const servers = await getServers(groupId);
 
-  const preferredChannelIds = await getPreferredChannels(
+  const preferredChannelsMap = await getPreferredChannels(
     servers.map(s => s.guildId),
     type
   );
 
-  if (!preferredChannelIds) {
-    return;
-  }
+  servers.forEach(async server => {
+    // This broadcast type has been disabled for this server
+    if (preferredChannelsMap[server.guildId] === null) {
+      return;
+    }
 
-  preferredChannelIds.forEach(async id => {
-    const channel = await client.channels.fetch(id);
+    // If the server has configured a prefered channel for this broadcast type, use that.
+    // otherwise, use the default bot channel (if it exists)
+    const targetChannelId = preferredChannelsMap[server.guildId] || server.botChannelId;
+    if (!targetChannelId) return;
+
+    const channel = await client.channels.fetch(targetChannelId);
 
     if (!channel) return;
     if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(channel)) return;
