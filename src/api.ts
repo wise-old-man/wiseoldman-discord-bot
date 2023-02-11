@@ -40,7 +40,7 @@ export function init(client: Client) {
 
   app.get('/monitoring', async (req, res) => {
     const metrics = await monitoring.getMetrics();
-    res.json(metrics);
+    res.end(metrics);
   });
 
   return app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
