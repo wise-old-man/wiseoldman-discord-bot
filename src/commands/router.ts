@@ -82,7 +82,7 @@ export async function onInteractionReceived(interaction: Interaction) {
       throw new Error(`Error: Command not implemented: ${commandName}`);
     }
 
-    await interaction.channel?.sendTyping();
+    // await interaction.channel?.sendTyping();
     await interaction.deferReply();
 
     await targetCommand.execute(interaction);
