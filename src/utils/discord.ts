@@ -1,5 +1,5 @@
 import { Metric, parseMetricAbbreviation } from '@wise-old-man/utils';
-import { GuildMember, PermissionResolvable } from 'discord.js';
+import { Channel, DMChannel, GuildMember, PermissionResolvable, TextChannel } from 'discord.js';
 import config from '../config';
 
 export const MAX_FIELD_SIZE = 25;
@@ -109,12 +109,24 @@ export function hasModeratorRole(member: GuildMember | null): boolean {
   return member.roles.cache.some(r => r.id === config.discord.roles.moderator);
 }
 
-export function getMissingPermissions(member: GuildMember | null | undefined): string[] | null {
-  if (!member) return null;
+export function getMissingPermissions(channel: TextChannel) {
+  return [...config.requiredPermissions, 'SEND_MESSAGES'].filter(permission => {
+    return !channel.permissionsFor(channel.client.user).has(permission as PermissionResolvable);
+  });
+}
 
-  return config.requiredPermissions.filter(
-    permission => !member?.permissions.has(permission as PermissionResolvable)
-  );
+export function isChannelSendable(channel: Channel | undefined | null): channel is TextChannel {
+  if (!channel) return false;
+  if (!channel.isText()) return false;
+  if (!('guild' in channel)) return true;
+
+  const canView = channel.permissionsFor(channel.client.user).has('VIEW_CHANNEL');
+
+  if (!(channel instanceof DMChannel) && !(channel instanceof TextChannel) && canView) {
+    return false;
+  }
+
+  return true;
 }
 
 export function getEmoji(metric: string): string {

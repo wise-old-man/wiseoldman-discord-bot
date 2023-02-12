@@ -1,7 +1,15 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { Channel, CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '../../../config';
 import { updateBotChannel, updateChannelPreference } from '../../../services/prisma';
-import { BroadcastName, BroadcastType, Command, CommandConfig, CommandError } from '../../../utils';
+import {
+  BroadcastName,
+  BroadcastType,
+  Command,
+  CommandConfig,
+  CommandError,
+  getMissingPermissions,
+  isChannelSendable
+} from '../../../utils';
 
 const CONFIG: CommandConfig = {
   name: 'channel',
@@ -52,10 +60,42 @@ class ConfigChannelCommand extends Command {
     }
 
     const status = interaction.options.getString('status');
-    const channel = interaction.options.getChannel('broadcast_channel', true);
+    const channel = interaction.options.getChannel('broadcast_channel', true) as Channel;
     const broadcastType = interaction.options.getString('broadcast_type', true);
 
     const broadcastName = BroadcastName[broadcastType as BroadcastType];
+
+    if (status !== 'disable') {
+      if (!isChannelSendable(channel)) {
+        throw new CommandError(`Error: <#${channel.id}> is not a valid text channel.`);
+      }
+
+      if (!channel.permissionsFor(channel.client.user).has('VIEW_CHANNEL')) {
+        throw new CommandError(`Error: The bot does not have access to <#${channel.id}>.`);
+      }
+
+      const missingPermissions = getMissingPermissions(channel);
+
+      if (missingPermissions.length > 0) {
+        const missingPermissionsList = missingPermissions.map(p => `\`${p}\``).join(', ');
+
+        throw new CommandError(
+          `Error: The bot is missing the following permissions on <#${channel.id}>: \n\n${missingPermissionsList}`
+        );
+      }
+
+      // As a last test, send an empty message to the channel to test permissions and delete it immediately afterwards
+      await channel
+        .send('​') // whitespace character
+        .then(message => {
+          return message.delete();
+        })
+        .catch(() => {
+          throw new CommandError(
+            `Error: <#${channel.id}> can't be selected. Please try another channel.`
+          );
+        });
+    }
 
     let description = '';
 
