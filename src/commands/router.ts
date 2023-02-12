@@ -74,25 +74,27 @@ export async function onInteractionReceived(interaction: Interaction) {
 
   const commandMonitor = monitoring.trackCommand();
 
+  const commandName = interaction.commandName;
+  const subCommandName = interaction.options.getSubcommand(false);
+
+  const fullCommandName = subCommandName ? `${commandName}:${subCommandName}` : commandName;
+
   try {
-    const { commandName } = interaction;
     const targetCommand = COMMANDS.find(cmd => cmd.slashCommand.name === commandName);
 
     if (!targetCommand) {
       throw new Error(`Error: Command not implemented: ${commandName}`);
     }
 
-    // await interaction.channel?.sendTyping();
     await interaction.deferReply();
-
     await targetCommand.execute(interaction);
 
-    commandMonitor.endTracking(interaction.commandName, 1, interaction.guildId);
+    commandMonitor.endTracking(fullCommandName, 1, interaction.guildId);
   } catch (error) {
     console.log(error);
     Sentry.captureException(error);
     await interaction.followUp({ embeds: [buildErrorEmbed(error)] });
-    commandMonitor.endTracking(interaction.commandName, 0, interaction.guildId);
+    commandMonitor.endTracking(fullCommandName, 0, interaction.guildId);
   }
 }
 
