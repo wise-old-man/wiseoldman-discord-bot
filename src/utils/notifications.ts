@@ -1,7 +1,7 @@
 import { Client, MessageEmbed, TextChannel } from 'discord.js';
 import { getServers, getPreferredChannels } from '../services/prisma';
 
-export const BroadcastType = {
+export const NotificationType = {
   DEFAULT: 'DEFAULT',
   COMPETITION_STATUS: 'COMPETITION_STATUS',
   MEMBER_ACHIEVEMENTS: 'MEMBER_ACHIEVEMENTS',
@@ -10,18 +10,18 @@ export const BroadcastType = {
   MEMBERS_LIST_CHANGED: 'MEMBERS_LIST_CHANGED'
 } as const;
 
-export type BroadcastType = typeof BroadcastType[keyof typeof BroadcastType];
+export type NotificationType = typeof NotificationType[keyof typeof NotificationType];
 
-export const BroadcastName = {
-  [BroadcastType.DEFAULT]: 'Default',
-  [BroadcastType.COMPETITION_STATUS]: 'Competition Status',
-  [BroadcastType.MEMBER_ACHIEVEMENTS]: 'Member Achievements',
-  [BroadcastType.MEMBER_NAME_CHANGED]: 'Member Name Changed',
-  [BroadcastType.MEMBER_HCIM_DIED]: 'Member (HCIM) Died',
-  [BroadcastType.MEMBERS_LIST_CHANGED]: 'Members List Changed'
+export const NotificationName = {
+  [NotificationType.DEFAULT]: 'Default',
+  [NotificationType.COMPETITION_STATUS]: 'Competition Status',
+  [NotificationType.MEMBER_ACHIEVEMENTS]: 'Member Achievements',
+  [NotificationType.MEMBER_NAME_CHANGED]: 'Member Name Changed',
+  [NotificationType.MEMBER_HCIM_DIED]: 'Member (HCIM) Died',
+  [NotificationType.MEMBERS_LIST_CHANGED]: 'Members List Changed'
 };
 
-export async function broadcastMessage(
+export async function propagateMessage(
   client: Client,
   groupId: number,
   type: string,
@@ -36,12 +36,12 @@ export async function broadcastMessage(
 
   const results = await Promise.allSettled(
     servers.map(async server => {
-      // This broadcast type has been disabled for this server
+      // This notification type has been disabled for this server
       if (preferredChannelsMap[server.guildId] === null) {
         return;
       }
 
-      // If the server has configured a prefered channel for this broadcast type, use that.
+      // If the server has configured a prefered channel for this notification type, use that.
       // otherwise, use the default bot channel (if it exists)
       const targetChannelId = preferredChannelsMap[server.guildId] || server.botChannelId;
       if (!targetChannelId) return;
@@ -64,7 +64,7 @@ export async function broadcastMessage(
 
   if (failedPropagations.length > 0) {
     throw new Error(
-      `Failed to fully propagate broadcast message. (${failedPropagations.length}/${servers.length})`
+      `Failed to fully propagate notification message. (${failedPropagations.length}/${servers.length})`
     );
   }
 }

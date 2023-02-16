@@ -2,8 +2,8 @@ import { Channel, CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '../../../config';
 import { updateBotChannel, updateChannelPreference } from '../../../services/prisma';
 import {
-  BroadcastName,
-  BroadcastType,
+  NotificationName,
+  NotificationType,
   Command,
   CommandConfig,
   CommandError,
@@ -13,16 +13,16 @@ import {
 
 const CONFIG: CommandConfig = {
   name: 'channel',
-  description: "Configure the bot's broadcast channels.",
+  description: "Configure the bot's notification channels.",
   options: [
     {
       type: 'string',
       required: true,
-      name: 'broadcast_type',
-      description: 'The broadcast type to configure.',
+      name: 'notification_type',
+      description: 'The notification type to configure.',
       choices: [
-        ...Object.values(BroadcastType).map(type => ({
-          label: BroadcastName[type],
+        ...Object.values(NotificationType).map(type => ({
+          label: NotificationName[type],
           value: type
         }))
       ]
@@ -30,7 +30,7 @@ const CONFIG: CommandConfig = {
     {
       type: 'channel',
       required: true,
-      name: 'broadcast_channel',
+      name: 'notification_channel',
       description: 'The channel to which announcements are sent.',
       channelType: 0 //  Only add text channels
     },
@@ -60,10 +60,10 @@ class ConfigChannelCommand extends Command {
     }
 
     const status = interaction.options.getString('status');
-    const channel = interaction.options.getChannel('broadcast_channel', true) as Channel;
-    const broadcastType = interaction.options.getString('broadcast_type', true);
+    const channel = interaction.options.getChannel('notification_channel', true) as Channel;
+    const notificationType = interaction.options.getString('notification_type', true);
 
-    const broadcastName = BroadcastName[broadcastType as BroadcastType];
+    const notificationName = NotificationName[notificationType as NotificationType];
 
     if (status !== 'disable') {
       if (!isChannelSendable(channel)) {
@@ -99,15 +99,15 @@ class ConfigChannelCommand extends Command {
 
     let description = '';
 
-    if (broadcastType === BroadcastType.DEFAULT) {
+    if (notificationType === NotificationType.DEFAULT) {
       await updateBotChannel(guildId, channel.id);
-      description = `All group-related broadcasts will be sent to <#${channel.id}> by default.`;
+      description = `All group-related notifications will be sent to <#${channel.id}> by default.`;
     } else if (status === 'disable') {
-      await updateChannelPreference(guildId, broadcastType, null);
-      description = `"${broadcastName}" broadcasts have now been disabled.`;
+      await updateChannelPreference(guildId, notificationType, null);
+      description = `"${notificationName}" notifications have now been disabled.`;
     } else {
-      await updateChannelPreference(guildId, broadcastType, channel.id);
-      description = `"${broadcastName}" broadcasts will now be sent to <#${channel.id}>`;
+      await updateChannelPreference(guildId, notificationType, channel.id);
+      description = `"${notificationName}" notifications will now be sent to <#${channel.id}>`;
     }
 
     const response = new MessageEmbed()

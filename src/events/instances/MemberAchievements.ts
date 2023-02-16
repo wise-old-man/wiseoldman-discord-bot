@@ -3,7 +3,7 @@ import { Achievement, Player } from '@wise-old-man/utils';
 import config from '../../config';
 import { getUserId } from '../../services/prisma';
 import { Event } from '../../utils/events';
-import { encodeURL, getEmoji, broadcastMessage, BroadcastType } from '../../utils';
+import { encodeURL, getEmoji, propagateMessage, NotificationType } from '../../utils';
 
 interface MemberAchievementsData {
   groupId: number;
@@ -36,7 +36,7 @@ class MemberAchievements implements Event {
       )
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements`));
 
-    await broadcastMessage(client, groupId, BroadcastType.MEMBER_ACHIEVEMENTS, message);
+    await propagateMessage(client, groupId, NotificationType.MEMBER_ACHIEVEMENTS, message);
   }
 }
 

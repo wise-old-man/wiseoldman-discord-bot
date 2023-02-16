@@ -3,7 +3,7 @@ import { Client, MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
 import { Event } from '../../utils/events';
-import { getEmoji, broadcastMessage, durationBetween, BroadcastType } from '../../utils';
+import { getEmoji, propagateMessage, durationBetween, NotificationType } from '../../utils';
 
 interface CompetitionEndingData {
   groupId: number;
@@ -50,7 +50,7 @@ class CompetitionEnding implements Event {
       .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields(fields);
 
-    await broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
+    await propagateMessage(client, groupId, NotificationType.COMPETITION_STATUS, message);
   }
 }
 
