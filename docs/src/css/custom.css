@@ -54,3 +54,11 @@ table {
 .token.constant {
   color: inherit !important;
 }
+
+hr {
+  background: var(--ifm-toc-border-color);
+}
+
+h2 {
+  font-family: monospace;
+}

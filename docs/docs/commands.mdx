@@ -1,0 +1,394 @@
+---
+sidebar_position: 3
+---
+
+import CommandCall from '@site/src/components/CommandCall/CommandCall';
+
+# Commands
+
+You can call our bot's commands by typing `/` on Discord's chat box and browse our available commands. These are what Discord calls Application Commands (or Slash Commands) and they should not require the bot to be in the channel you're currently on.
+
+<br />
+
+---
+
+## /help
+
+By default (without specifying any categories), this command will provide you with a few useful links, and a detailed list of your configurations, including your currently tracked group and your notification channel configurations.
+
+<details>
+  <summary>Example (default)</summary>
+
+<CommandCall commandRoot="/help" />
+
+<br />
+
+![Help Command (default)](./assets/help.png)
+
+</details>
+
+Alternatively, you can choose to select a category to get specific info on that topic. The current categories are:
+
+- RuneLite
+- Plugin
+- Sync
+- Verified
+- Permissions
+- FAQ
+- Flag
+
+<details>
+  <summary>Example (flag category):</summary>
+
+<CommandCall commandRoot="/help" options={[{ key: 'category', value: 'Flag' }]} />
+
+<br />
+
+![Help Command (flag)](./assets/help:flag.png)
+
+</details>
+
+<br />
+
+---
+
+## /config group
+
+To use any group-specific commands, or receive group-related [notifications](/notifications), the bot needs to know what group your server is interested in.
+
+This command allows you to specify a group ID, and the bot will use that ID for any future group-related commands or notifications.
+
+:::info
+If you don't know your group's ID, it should be the number in your group's wiseoldman.net page URL.
+
+![Group ID URL](./assets/group_id.png)
+:::
+
+<br />
+
+<details>
+  <summary>Example</summary>
+
+<CommandCall commandRoot="/config group" options={[{ key: 'group_id', value: '139' }]} />
+
+<br />
+
+![Config Group Command](./assets/config:group.png)
+
+</details>
+
+<br />
+
+---
+
+## /config channel
+
+Besides commands, this bot also can send [notifications](/notifications) to your Discord when something happens to one of your members (new achievements, HCIM death, etc), or to your competitions (started, ended, starting soon, etc).
+
+For this, the bot needs to know where to send those notifications, and since there are many types of notifications, you need to either specify where to receive each type, disable a type, or just **assign a default notifications channel**.
+
+The current notification types are:
+
+- Default
+- Competition Status
+- Member Achievements
+- Member Name Changed
+- Member (HCIM) Died
+- Members List Changed
+
+:::info
+The bot will check for permissions (by sending a message and immediately deleting it) in the selected channel before accepting this configuration, if you choose to remove permissions after configuration, it will simply stop working.
+:::
+
+<br />
+
+<details>
+  <summary>Example (default channel)</summary>
+
+<CommandCall
+  commandRoot="/config channel"
+  options={[
+    { key: 'notification_type', value: 'Default' },
+    { key: 'notification_channel', value: '#general' }
+  ]}
+/>
+
+<br />
+
+![Config Channel Command (default)](./assets/config:channel:default.png)
+
+</details>
+
+<details>
+  <summary>Example (specific notification type)</summary>
+
+<CommandCall
+  commandRoot="/config channel"
+  options={[
+    { key: 'notification_type', value: 'Members List Changed' },
+    { key: 'notification_channel', value: '#member-updates' }
+  ]}
+/>
+
+<br />
+
+![Config Channel Command (default)](./assets/config:channel:members.png)
+
+</details>
+
+<details>
+  <summary>Example (disabling a notification type)</summary>
+
+<CommandCall
+  commandRoot="/config channel"
+  options={[
+    { key: 'notification_type', value: 'Competition Status' },
+    { key: 'notification_channel', value: '#general' },
+    { key: 'status', value: 'Disable' }
+  ]}
+/>
+
+<br />
+
+![Config Channel Command (default)](./assets/config:channel:disable.png)
+
+</details>
+
+<br />
+
+---
+
+## /group details
+
+<br />
+
+:::caution
+Requires group ID configuration. [Learn how to set this up](#config-group).
+:::
+
+<br />
+
+This command will provide you with your group's details, such as name, clan chat, members count, etc.
+
+<br />
+
+<details>
+  <summary>Example</summary>
+
+<CommandCall commandRoot="/group details" />
+
+<br />
+
+![Group Details Command](./assets/group:details.png)
+
+</details>
+
+<br />
+
+---
+
+## /group members
+
+<br />
+
+:::caution
+Requires group ID configuration. [Learn how to set this up](#config-group).
+:::
+
+<br />
+
+This command will provide you with a list of your group's members. You can use the `<` and `>` buttons to navigate through the list.
+
+<br />
+
+<details>
+  <summary>Example</summary>
+
+<CommandCall commandRoot="/group members" />
+
+<br />
+
+![Group Members Command](./assets/group:members.png)
+
+</details>
+
+<br />
+
+---
+
+## /group competitions
+
+<br />
+
+:::caution
+Requires group ID configuration. [Learn how to set this up](#config-group).
+:::
+
+<br />
+
+This command will show you a list of your group's upcoming (or recent) competitions.
+
+<br />
+
+<details>
+  <summary>Example</summary>
+
+<CommandCall commandRoot="/group competitions" />
+
+<br />
+
+![Group Competitions Command](./assets/group:competitions.png)
+
+</details>
+
+<br />
+
+---
+
+## /group competition
+
+<br />
+
+:::caution
+Requires group ID configuration. [Learn how to set this up](#config-group).
+:::
+
+<br />
+
+This command will show you the details of one of your group's competitions.
+If no "ID" parameter is provided, it will try to show the current ongoing competition, or an upcoming one if there are no ongoing competitions.
+
+You can choose to give it an ID parameter, to see a specific competition. You can find the ID of a competition in the URL of its https://wiseoldman.net page, or by using the `/group competitions` command.
+
+<br />
+
+<details>
+  <summary>Example (default)</summary>
+
+<CommandCall commandRoot="/group competition" />
+
+<br />
+
+![Group Competition (default) Command](./assets/group:competition.png)
+
+</details>
+
+<details>
+  <summary>Example (specific ID)</summary>
+
+<CommandCall
+  commandRoot="/group competition"
+  options={[
+    {
+      key: 'group_id',
+      value: '15832'
+    }
+  ]}
+/>
+
+<br />
+
+![Group Competition (specific ID) Command](./assets/group:competition:id.png)
+
+</details>
+
+<br />
+
+---
+
+## /group gained
+
+<br />
+
+:::caution
+Requires group ID configuration. [Learn how to set this up](#config-group).
+:::
+
+<br />
+
+This command shows you a leaderboard of your group's members, sorted by their gained exp/kc/score (in a specific skill/boss/activity) within a given time period.
+
+<br />
+
+<details>
+  <summary>Example</summary>
+
+<CommandCall
+  commandRoot="/group gained"
+  options={[
+    { key: 'metric', value: 'Strength' },
+    { key: 'period', value: 'Month' }
+  ]}
+/>
+
+<br />
+
+![Group Gained Command](./assets/group:gained.png)
+
+</details>
+
+<br />
+
+---
+
+## /group hiscores
+
+<br />
+
+:::caution
+Requires group ID configuration. [Learn how to set this up](#config-group).
+:::
+
+<br />
+
+This command shows you a leaderboard of your group's members, sorted by current exp/kc/score in a specific skill/boss/activity.
+
+<br />
+
+<details>
+  <summary>Example</summary>
+
+<CommandCall commandRoot="/group hiscores" options={[{ key: 'metric', value: 'Zulrah' }]} />
+
+<br />
+
+![Group Hiscores Command](./assets/group:hiscores.png)
+
+</details>
+
+<br />
+
+---
+
+## /group records
+
+<br />
+
+:::caution
+Requires group ID configuration. [Learn how to set this up](#config-group).
+:::
+
+<br />
+
+This command shows you a leaderboard of your group's members records, sorted by their gained exp/kc/score (in a specific skill/boss/activity) within a given time period.
+
+<br />
+
+<details>
+  <summary>Example</summary>
+
+<CommandCall
+  commandRoot="/group records"
+  options={[
+    { key: 'metric', value: 'Farming' },
+    { key: 'period', value: 'Week' }
+  ]}
+/>
+
+<br />
+
+![Group Records Command](./assets/group:records.png)
+
+</details>
+
+<br />
