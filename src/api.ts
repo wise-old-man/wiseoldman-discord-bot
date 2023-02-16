@@ -20,7 +20,7 @@ export function init(client: Client) {
 
   /**
    * The bot opens up port 7000 to receive http requests from the WOM API.
-   * These requests contain events that the bot should attempt to propagate (brodcast) to relevant discord servers.
+   * These requests contain events that the bot should attempt to propagate to relevant discord servers.
    */
   app.post('/event', (req, res) => {
     const token = req.body['api_token'];

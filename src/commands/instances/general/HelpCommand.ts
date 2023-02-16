@@ -4,7 +4,13 @@ import config from '../../../config';
 import { CUSTOM_COMMANDS } from '../../../commands/custom';
 import prisma, { getServer } from '../../../services/prisma';
 import womClient from '../../../services/wiseoldman';
-import { Command, CommandConfig, BroadcastName, BroadcastType, CommandError } from '../../../utils';
+import {
+  Command,
+  CommandConfig,
+  NotificationName,
+  NotificationType,
+  CommandError
+} from '../../../utils';
 
 const BOT_URL = 'https://bot.wiseoldman.net';
 const MAIN_URL = 'https://wiseoldman.net/discord';
@@ -76,7 +82,7 @@ class HelpCommand extends Command {
 
     const channelPreferencesDetails = channelPreferences.map(pref => {
       return {
-        name: `"${BroadcastName[pref.type as BroadcastType]}" Broadcast Channel`,
+        name: `"${NotificationName[pref.type as NotificationType]}" Notification Channel`,
         value: pref.channelId ? `<#${pref.channelId}>` : '`DISABLED`'
       };
     });
@@ -87,7 +93,7 @@ class HelpCommand extends Command {
       .setDescription(`${LINE_COMMANDS}\n\n${LINE_SUPPORT}\n\n⚠️${LINE_PERMS}`)
       .addFields([
         { name: 'Tracked group', value: group ? group.name : 'none' },
-        { name: 'Default Broadcast Channel', value: botChannelId ? `<#${botChannelId}>` : 'none' },
+        { name: 'Default Notification Channel', value: botChannelId ? `<#${botChannelId}>` : 'none' },
         ...channelPreferencesDetails
       ]);
 

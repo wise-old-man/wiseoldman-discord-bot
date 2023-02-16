@@ -44,7 +44,7 @@ class ConfigGroupCommand extends Command {
     const response = new MessageEmbed()
       .setColor(config.visuals.green)
       .setTitle(`✅ Server group updated`)
-      .setDescription(`All broadcasts and commands will be in reference to **${group.name}**`)
+      .setDescription(`All notifications and commands will be in reference to **${group.name}**`)
       .addFields({
         name: 'Page URL',
         value: `https://wiseoldman.net/groups/${groupId}`

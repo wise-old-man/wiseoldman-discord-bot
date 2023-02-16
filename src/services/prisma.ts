@@ -48,7 +48,7 @@ async function getServers(groupId: number) {
 }
 
 /**
- * Update the bot's default broadcast channel for a given guild.
+ * Update the bot's default notification channel for a given guild.
  */
 async function updateBotChannel(guildId: string, channelId: string) {
   const server = await getServer(guildId);

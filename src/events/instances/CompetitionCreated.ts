@@ -3,7 +3,7 @@ import { capitalize } from 'lodash';
 import { Competition, getMetricName } from '@wise-old-man/utils';
 import config from '../../config';
 import { Event } from '../../utils/events';
-import { getEmoji, broadcastMessage, durationBetween, BroadcastType } from '../../utils';
+import { getEmoji, propagateMessage, durationBetween, NotificationType } from '../../utils';
 
 interface CompetitionCreatedData {
   groupId: number;
@@ -38,7 +38,7 @@ class CompetitionCreated implements Event {
       .setFooter({ text: 'Starts at' })
       .setTimestamp(new Date(startsAt));
 
-    await broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
+    await propagateMessage(client, groupId, NotificationType.COMPETITION_STATUS, message);
   }
 }
 

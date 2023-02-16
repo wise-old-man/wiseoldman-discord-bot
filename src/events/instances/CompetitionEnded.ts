@@ -3,7 +3,7 @@ import { Client, MessageEmbed } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../config';
 import { Event } from '../../utils/events';
-import { bold, broadcastMessage, BroadcastType } from '../../utils';
+import { bold, propagateMessage, NotificationType } from '../../utils';
 
 interface CompetitionStanding {
   gained: number;
@@ -44,7 +44,7 @@ class CompetitionEnded implements Event {
         }
       ]);
 
-    await broadcastMessage(client, groupId, BroadcastType.COMPETITION_STATUS, message);
+    await propagateMessage(client, groupId, NotificationType.COMPETITION_STATUS, message);
   }
 }
 
