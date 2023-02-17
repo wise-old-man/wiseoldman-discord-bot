@@ -54,8 +54,14 @@ class NameChangeCommand extends Command {
       .setDescription(buildReviewMessage(data));
 
     const actions = new MessageActionRow().addComponents(
-      new MessageButton().setCustomId('namechange_approve').setLabel('Approve').setStyle('SUCCESS'),
-      new MessageButton().setCustomId('namechange_deny').setLabel('Deny').setStyle('DANGER')
+      new MessageButton()
+        .setCustomId(`namechange_approve/${nameChangeId}`)
+        .setLabel('Approve')
+        .setStyle('SUCCESS'),
+      new MessageButton()
+        .setCustomId(`namechange_deny/${nameChangeId}`)
+        .setLabel('Deny')
+        .setStyle('DANGER')
     );
 
     await interaction.editReply({
@@ -83,14 +89,14 @@ class NameChangeCommand extends Command {
 
     collector?.on('end', async collection => {
       const buttonClicked = collection.first()?.customId;
-      if (buttonClicked === 'namechange_approve') {
+      if (buttonClicked === `namechange_approve/${nameChangeId}`) {
         try {
           await approveNameChange(nameChangeId);
           response.setFooter({ text: `Approved ✅` }).setColor(config.visuals.green);
         } catch (error) {
           response.setFooter({ text: 'Failed to approve name change' }).setColor(config.visuals.red);
         }
-      } else if (buttonClicked === 'namechange_deny') {
+      } else if (buttonClicked === `namechange_deny/${nameChangeId}`) {
         try {
           await denyNameChange(nameChangeId);
           response.setFooter({ text: `Denied ❌` }).setColor(config.visuals.red);
