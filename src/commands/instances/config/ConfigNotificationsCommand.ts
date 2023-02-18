@@ -13,7 +13,7 @@ import {
 
 const CONFIG: CommandConfig = {
   name: 'notifications',
-  description: "Configure the bot's notifications.",
+  description: "Configure the bot's notification preferences.",
   options: [
     {
       type: 'string',
