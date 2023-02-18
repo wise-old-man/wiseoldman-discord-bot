@@ -12,7 +12,7 @@
     "build": "rimraf ./dist && tsc",
     "lint": "eslint . --ext .ts",
     "dev": "docker-compose up --build",
-    "prod": "prisma migrate deploy && pm2-runtime dist/index.js",
+    "prod": "pm2-runtime dist/index.js",
     "watch": "prisma migrate dev && ts-node-dev --poll --exit-child --respawn --transpile-only --ignore-watch node_modules src/index.ts"
   },
   "keywords": [
