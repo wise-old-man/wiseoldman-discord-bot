@@ -1,5 +1,5 @@
 import { Client, MessageEmbed, TextChannel } from 'discord.js';
-import { getServers, getPreferredChannels } from '../services/prisma';
+import { getServers, getNotificationPreferences } from '../services/prisma';
 
 export const NotificationType = {
   DEFAULT: 'DEFAULT',
@@ -29,7 +29,7 @@ export async function propagateMessage(
 ) {
   const servers = await getServers(groupId);
 
-  const preferredChannelsMap = await getPreferredChannels(
+  const preferredChannelsMap = await getNotificationPreferences(
     servers.map(s => s.guildId),
     type
   );

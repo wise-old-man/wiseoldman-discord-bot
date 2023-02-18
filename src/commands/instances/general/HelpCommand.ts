@@ -76,11 +76,11 @@ class HelpCommand extends Command {
       }
     }
 
-    const channelPreferences = await prisma.channelPreference.findMany({
+    const notificationPreferences = await prisma.notificationPreference.findMany({
       where: { guildId }
     });
 
-    const channelPreferencesDetails = channelPreferences.map(pref => {
+    const notificationPreferencesDetails = notificationPreferences.map(pref => {
       return {
         name: `"${NotificationName[pref.type as NotificationType]}" Notification Channel`,
         value: pref.channelId ? `<#${pref.channelId}>` : '`DISABLED`'
@@ -94,7 +94,7 @@ class HelpCommand extends Command {
       .addFields([
         { name: 'Tracked group', value: group ? group.name : 'none' },
         { name: 'Default Notification Channel', value: botChannelId ? `<#${botChannelId}>` : 'none' },
-        ...channelPreferencesDetails
+        ...notificationPreferencesDetails
       ]);
 
     await interaction.editReply({ embeds: [response] });

@@ -1,6 +1,6 @@
 import { Channel, CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '../../../config';
-import { updateBotDefaultChannel, updateChannelPreference } from '../../../services/prisma';
+import { updateBotDefaultChannel, updateNotificationPreferences } from '../../../services/prisma';
 import {
   NotificationName,
   NotificationType,
@@ -103,10 +103,10 @@ class ConfigNotificationsCommand extends Command {
       await updateBotDefaultChannel(guildId, channel.id);
       description = `All group-related notifications will be sent to <#${channel.id}> by default.`;
     } else if (status === 'disable') {
-      await updateChannelPreference(guildId, notificationType, null);
+      await updateNotificationPreferences(guildId, notificationType, null);
       description = `"${notificationName}" notifications have now been disabled.`;
     } else {
-      await updateChannelPreference(guildId, notificationType, channel.id);
+      await updateNotificationPreferences(guildId, notificationType, channel.id);
       description = `"${notificationName}" notifications will now be sent to <#${channel.id}>`;
     }
 
