@@ -15,4 +15,4 @@ RUN npx prisma generate
 # Transpile the TypeScript code into JavaScript
 RUN npm run build
 
-CMD ["pm2-runtime", "dist/index.js"]
+CMD ["npm", "run", "prod"]
