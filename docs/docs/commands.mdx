@@ -14,7 +14,7 @@ You can call our bot's commands by typing `/` on Discord's chat box and browse o
 
 ## /help
 
-By default (without specifying any categories), this command will provide you with a few useful links, and a detailed list of your configurations, including your currently tracked group and your notification channel configurations.
+By default (without specifying any categories), this command will provide you with a few useful links, and a detailed list of your configurations, including your currently tracked group and your notification configurations.
 
 <details>
   <summary>Example (default)</summary>
@@ -81,9 +81,9 @@ If you don't know your group's ID, it should be the number in your group's wiseo
 
 ---
 
-## /config channel
+## /config notifications
 
-Besides commands, this bot also can send [notifications](/notifications) to your Discord when something happens to one of your members (new achievements, HCIM death, etc), or to your competitions (started, ended, starting soon, etc).
+Besides commands, this bot also can send [notifications](/notifications) to your Discord when something happens to one of your group members (new achievements, HCIM death, etc), or to your competitions (started, ended, starting soon, etc).
 
 For this, the bot needs to know where to send those notifications, and since there are many types of notifications, you need to either specify where to receive each type, disable a type, or just **assign a default notifications channel**.
 
@@ -106,7 +106,7 @@ The bot will check for permissions (by sending a message and immediately deletin
   <summary>Example (default channel)</summary>
 
 <CommandCall
-  commandRoot="/config channel"
+  commandRoot="/config notifications"
   options={[
     { key: 'notification_type', value: 'Default' },
     { key: 'notification_channel', value: '#general' }
@@ -115,7 +115,7 @@ The bot will check for permissions (by sending a message and immediately deletin
 
 <br />
 
-![Config Channel Command (default)](./assets/config:channel:default.png)
+![Config Notifications Command (default)](./assets/config:notifications:default.png)
 
 </details>
 
@@ -123,16 +123,16 @@ The bot will check for permissions (by sending a message and immediately deletin
   <summary>Example (specific notification type)</summary>
 
 <CommandCall
-  commandRoot="/config channel"
+  commandRoot="/config notifications"
   options={[
     { key: 'notification_type', value: 'Members List Changed' },
-    { key: 'notification_channel', value: '#member-updates' }
+    { key: 'notification_channel', value: '#bot-channel' }
   ]}
 />
 
 <br />
 
-![Config Channel Command (default)](./assets/config:channel:members.png)
+![Config Notifications Command (default)](./assets/config:notifications:members.png)
 
 </details>
 
@@ -140,7 +140,7 @@ The bot will check for permissions (by sending a message and immediately deletin
   <summary>Example (disabling a notification type)</summary>
 
 <CommandCall
-  commandRoot="/config channel"
+  commandRoot="/config notifications"
   options={[
     { key: 'notification_type', value: 'Competition Status' },
     { key: 'notification_channel', value: '#general' },
@@ -150,7 +150,7 @@ The bot will check for permissions (by sending a message and immediately deletin
 
 <br />
 
-![Config Channel Command (default)](./assets/config:channel:disable.png)
+![Config Notifications Command (default)](./assets/config:notifications:disable.png)
 
 </details>
 
