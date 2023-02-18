@@ -17,7 +17,7 @@ model Alias {
   @@map("aliases")
 }
 
-model ChannelPreference {
+model NotificationPreference {
   guildId   String   @db.VarChar(256)
   type      String   @db.VarChar(64)
   channelId String?  @db.VarChar(256)
@@ -27,7 +27,7 @@ model ChannelPreference {
   // Constraints
   @@id([guildId, type])
   // Map
-  @@map("channelPreferences")
+  @@map("notificationPreferences")
 }
 
 model Server {

@@ -50,7 +50,7 @@ async function getServers(groupId: number) {
 /**
  * Update the bot's default notification channel for a given guild.
  */
-async function updateBotChannel(guildId: string, channelId: string) {
+async function updateBotDefaultChannel(guildId: string, channelId: string) {
   const server = await getServer(guildId);
 
   if (!server) {
@@ -63,16 +63,16 @@ async function updateBotChannel(guildId: string, channelId: string) {
   });
 }
 
-async function updateChannelPreference(guildId: string, type: string, channelId: string | null) {
-  return prisma.channelPreference.upsert({
+async function updateNotificationPreferences(guildId: string, type: string, channelId: string | null) {
+  return prisma.notificationPreference.upsert({
     where: { guildId_type: { guildId, type } },
     create: { guildId, type, channelId },
     update: { channelId }
   });
 }
 
-async function getPreferredChannels(guildIds: string[], type: string) {
-  const preferences = await prisma.channelPreference.findMany({
+async function getNotificationPreferences(guildIds: string[], type: string) {
+  const preferences = await prisma.notificationPreference.findMany({
     where: { guildId: { in: guildIds }, type },
     select: { guildId: true, channelId: true }
   });
@@ -87,7 +87,7 @@ export {
   getUsername,
   getServer,
   getServers,
-  updateBotChannel,
-  updateChannelPreference,
-  getPreferredChannels
+  updateBotDefaultChannel,
+  updateNotificationPreferences,
+  getNotificationPreferences
 };
