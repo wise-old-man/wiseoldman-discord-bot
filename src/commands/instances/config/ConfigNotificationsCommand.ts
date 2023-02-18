@@ -1,6 +1,6 @@
 import { Channel, CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '../../../config';
-import { updateBotChannel, updateChannelPreference } from '../../../services/prisma';
+import { updateBotDefaultChannel, updateChannelPreference } from '../../../services/prisma';
 import {
   NotificationName,
   NotificationType,
@@ -12,8 +12,8 @@ import {
 } from '../../../utils';
 
 const CONFIG: CommandConfig = {
-  name: 'channel',
-  description: "Configure the bot's notification channels.",
+  name: 'notifications',
+  description: "Configure the bot's notifications.",
   options: [
     {
       type: 'string',
@@ -31,13 +31,13 @@ const CONFIG: CommandConfig = {
       type: 'channel',
       required: true,
       name: 'notification_channel',
-      description: 'The channel to which announcements are sent.',
+      description: 'The channel to which notifications are sent.',
       channelType: 0 //  Only add text channels
     },
     {
       type: 'string',
       name: 'status',
-      description: `Enable or disable announcements of a certain type. Default channel cannot be disabled.`,
+      description: `Enable or disable notifications of a certain type. Default channel cannot be disabled.`,
       choices: [
         { label: 'Enable', value: 'enable' },
         { label: 'Disable', value: 'disable' }
@@ -46,7 +46,7 @@ const CONFIG: CommandConfig = {
   ]
 };
 
-class ConfigChannelCommand extends Command {
+class ConfigNotificationsCommand extends Command {
   constructor() {
     super(CONFIG);
     this.requiresAdmin = true;
@@ -100,7 +100,7 @@ class ConfigChannelCommand extends Command {
     let description = '';
 
     if (notificationType === NotificationType.DEFAULT) {
-      await updateBotChannel(guildId, channel.id);
+      await updateBotDefaultChannel(guildId, channel.id);
       description = `All group-related notifications will be sent to <#${channel.id}> by default.`;
     } else if (status === 'disable') {
       await updateChannelPreference(guildId, notificationType, null);
@@ -112,11 +112,11 @@ class ConfigChannelCommand extends Command {
 
     const response = new MessageEmbed()
       .setColor(config.visuals.green)
-      .setTitle(`✅ Channel Preferences Updated`)
+      .setTitle(`✅ Notification Preferences Updated`)
       .setDescription(description);
 
     await interaction.editReply({ embeds: [response] });
   }
 }
 
-export default new ConfigChannelCommand();
+export default new ConfigNotificationsCommand();

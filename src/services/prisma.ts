@@ -50,7 +50,7 @@ async function getServers(groupId: number) {
 /**
  * Update the bot's default notification channel for a given guild.
  */
-async function updateBotChannel(guildId: string, channelId: string) {
+async function updateBotDefaultChannel(guildId: string, channelId: string) {
   const server = await getServer(guildId);
 
   if (!server) {
@@ -87,7 +87,7 @@ export {
   getUsername,
   getServer,
   getServers,
-  updateBotChannel,
+  updateBotDefaultChannel,
   updateChannelPreference,
   getPreferredChannels
 };
