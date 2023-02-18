@@ -127,6 +127,8 @@ class PlayerStatsCommand extends Command {
       .entries()) {
       if (!isSkill(skill)) continue;
 
+      const isRanked = skills[skill].experience > -1;
+
       const x = Math.floor(index / 8);
       const y = index % 8;
 
@@ -139,12 +141,12 @@ class PlayerStatsCommand extends Command {
       ctx.drawImage(badge, originX, originY, 64, 26);
       ctx.drawImage(icon, originX + 1, originY, icon.width / 2, icon.height / 2);
 
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
 
       if (variant === RenderVariant.LEVELS) {
         ctx.font = '11px sans-serif';
 
-        const level = `${skills[skill].level || 1}`;
+        const level = isRanked ? `${skills[skill].level}` : '?';
         const lvlWidth = ctx.measureText(level).width;
 
         // Skill level
@@ -153,7 +155,7 @@ class PlayerStatsCommand extends Command {
         const fontSize = skill === 'overall' ? 9 : 10;
         ctx.font = `${fontSize}px sans-serif`;
 
-        const exp = `${formatNumber(skills[skill].experience, true, 1) || 0}`;
+        const exp = isRanked ? `${formatNumber(skills[skill].experience, true, 1)}` : '?';
         const expWidth = ctx.measureText(exp).width;
 
         // Skill Experience
@@ -161,7 +163,7 @@ class PlayerStatsCommand extends Command {
       } else if (variant === RenderVariant.RANKS) {
         ctx.font = '10px sans-serif';
 
-        const rank = `${formatNumber(skills[skill].rank, true, 1) || 0}`;
+        const rank = isRanked ? `${formatNumber(skills[skill].rank, true, 1)}` : '?';
         const rankWidth = ctx.measureText(rank).width;
 
         // Skill Rank
@@ -169,7 +171,7 @@ class PlayerStatsCommand extends Command {
       } else if (variant === RenderVariant.EHP) {
         ctx.font = '9px sans-serif';
 
-        const ehp = `${round(skills[skill].ehp || 0, 1)}`;
+        const ehp = isRanked ? `${round(skills[skill].ehp, 1)}` : '?';
         const ehpWidth = ctx.measureText(ehp).width;
 
         // Skill EHP
