@@ -59,6 +59,7 @@ hr {
   background: var(--ifm-toc-border-color);
 }
 
-h2 {
+h3 {
   font-family: monospace;
+  font-size: 2rem;
 }

@@ -2,6 +2,7 @@
 sidebar_position: 3
 ---
 
+import Badge from '@site/src/components/Badge/Badge';
 import CommandCall from '@site/src/components/CommandCall/CommandCall';
 
 # Commands
@@ -12,20 +13,21 @@ You can call our bot's commands by typing `/` on Discord's chat box and browse o
 
 ---
 
-## /help
+## General commands
+
+<br />
+
+### /help
 
 By default (without specifying any categories), this command will provide you with a few useful links, and a detailed list of your configurations, including your currently tracked group and your notification configurations.
 
-<details>
-  <summary>Example (default)</summary>
+#### Example (default)
 
 <CommandCall commandRoot="/help" />
 
 <br />
 
 ![Help Command (default)](./assets/help.png)
-
-</details>
 
 Alternatively, you can choose to select a category to get specific info on that topic. The current categories are:
 
@@ -37,8 +39,7 @@ Alternatively, you can choose to select a category to get specific info on that 
 - FAQ
 - Flag
 
-<details>
-  <summary>Example (flag category):</summary>
+#### Example (flag category):
 
 <CommandCall commandRoot="/help" options={[{ key: 'category', value: 'Flag' }]} />
 
@@ -46,13 +47,19 @@ Alternatively, you can choose to select a category to get specific info on that 
 
 ![Help Command (flag)](./assets/help:flag.png)
 
-</details>
-
 <br />
 
 ---
 
-## /config group
+## Config commands
+
+<br />
+
+### /config group
+
+<Badge>Requires Admin Permissions</Badge>
+<br />
+<br />
 
 To use any group-specific commands, or receive group-related [notifications](/notifications), the bot needs to know what group your server is interested in.
 
@@ -66,8 +73,7 @@ If you don't know your group's ID, it should be the number in your group's wiseo
 
 <br />
 
-<details>
-  <summary>Example</summary>
+#### Example
 
 <CommandCall commandRoot="/config group" options={[{ key: 'group_id', value: '139' }]} />
 
@@ -75,13 +81,15 @@ If you don't know your group's ID, it should be the number in your group's wiseo
 
 ![Config Group Command](./assets/config:group.png)
 
-</details>
-
 <br />
 
 ---
 
-## /config notifications
+### /config notifications
+
+<Badge>Requires Admin Permissions</Badge>
+<br />
+<br />
 
 Besides commands, this bot also can send [notifications](/notifications) to your Discord when something happens to one of your group members (new achievements, HCIM death, etc), or to your competitions (started, ended, starting soon, etc).
 
@@ -102,8 +110,7 @@ The bot will check for permissions (by sending a message and immediately deletin
 
 <br />
 
-<details>
-  <summary>Example (default channel)</summary>
+#### Example (default channel)
 
 <CommandCall
   commandRoot="/config notifications"
@@ -117,10 +124,9 @@ The bot will check for permissions (by sending a message and immediately deletin
 
 ![Config Notifications Command (default)](./assets/config:notifications:default.png)
 
-</details>
+<br />
 
-<details>
-  <summary>Example (specific notification type)</summary>
+#### Example (specific notification type)
 
 <CommandCall
   commandRoot="/config notifications"
@@ -134,10 +140,9 @@ The bot will check for permissions (by sending a message and immediately deletin
 
 ![Config Notifications Command (default)](./assets/config:notifications:members.png)
 
-</details>
+<br />
 
-<details>
-  <summary>Example (disabling a notification type)</summary>
+#### Example (disabling a notification type)
 
 <CommandCall
   commandRoot="/config notifications"
@@ -152,13 +157,13 @@ The bot will check for permissions (by sending a message and immediately deletin
 
 ![Config Notifications Command (default)](./assets/config:notifications:disable.png)
 
-</details>
-
 <br />
 
 ---
 
-## /group details
+## Group commands
+
+### /group details
 
 <br />
 
@@ -172,8 +177,7 @@ This command will provide you with your group's details, such as name, clan chat
 
 <br />
 
-<details>
-  <summary>Example</summary>
+#### Example
 
 <CommandCall commandRoot="/group details" />
 
@@ -181,13 +185,11 @@ This command will provide you with your group's details, such as name, clan chat
 
 ![Group Details Command](./assets/group:details.png)
 
-</details>
-
 <br />
 
 ---
 
-## /group members
+### /group members
 
 <br />
 
@@ -201,8 +203,7 @@ This command will provide you with a list of your group's members. You can use t
 
 <br />
 
-<details>
-  <summary>Example</summary>
+#### Example
 
 <CommandCall commandRoot="/group members" />
 
@@ -210,13 +211,11 @@ This command will provide you with a list of your group's members. You can use t
 
 ![Group Members Command](./assets/group:members.png)
 
-</details>
-
 <br />
 
 ---
 
-## /group competitions
+### /group competitions
 
 <br />
 
@@ -230,8 +229,7 @@ This command will show you a list of your group's upcoming (or recent) competiti
 
 <br />
 
-<details>
-  <summary>Example</summary>
+#### Example
 
 <CommandCall commandRoot="/group competitions" />
 
@@ -239,13 +237,11 @@ This command will show you a list of your group's upcoming (or recent) competiti
 
 ![Group Competitions Command](./assets/group:competitions.png)
 
-</details>
-
 <br />
 
 ---
 
-## /group competition
+### /group competition
 
 <br />
 
@@ -262,8 +258,7 @@ You can choose to give it an ID parameter, to see a specific competition. You ca
 
 <br />
 
-<details>
-  <summary>Example (default)</summary>
+#### Example (default)
 
 <CommandCall commandRoot="/group competition" />
 
@@ -271,10 +266,9 @@ You can choose to give it an ID parameter, to see a specific competition. You ca
 
 ![Group Competition (default) Command](./assets/group:competition.png)
 
-</details>
+<br />
 
-<details>
-  <summary>Example (specific ID)</summary>
+#### Example (specific ID)
 
 <CommandCall
   commandRoot="/group competition"
@@ -290,13 +284,11 @@ You can choose to give it an ID parameter, to see a specific competition. You ca
 
 ![Group Competition (specific ID) Command](./assets/group:competition:id.png)
 
-</details>
-
 <br />
 
 ---
 
-## /group gained
+### /group gained
 
 <br />
 
@@ -310,8 +302,7 @@ This command shows you a leaderboard of your group's members, sorted by their ga
 
 <br />
 
-<details>
-  <summary>Example</summary>
+#### Example
 
 <CommandCall
   commandRoot="/group gained"
@@ -325,13 +316,11 @@ This command shows you a leaderboard of your group's members, sorted by their ga
 
 ![Group Gained Command](./assets/group:gained.png)
 
-</details>
-
 <br />
 
 ---
 
-## /group hiscores
+### /group hiscores
 
 <br />
 
@@ -345,8 +334,7 @@ This command shows you a leaderboard of your group's members, sorted by current 
 
 <br />
 
-<details>
-  <summary>Example</summary>
+#### Example
 
 <CommandCall commandRoot="/group hiscores" options={[{ key: 'metric', value: 'Zulrah' }]} />
 
@@ -354,13 +342,11 @@ This command shows you a leaderboard of your group's members, sorted by current 
 
 ![Group Hiscores Command](./assets/group:hiscores.png)
 
-</details>
-
 <br />
 
 ---
 
-## /group records
+### /group records
 
 <br />
 
@@ -374,8 +360,7 @@ This command shows you a leaderboard of your group's members records, sorted by 
 
 <br />
 
-<details>
-  <summary>Example</summary>
+#### Example
 
 <CommandCall
   commandRoot="/group records"
@@ -389,6 +374,304 @@ This command shows you a leaderboard of your group's members records, sorted by 
 
 ![Group Records Command](./assets/group:records.png)
 
-</details>
+<br />
+
+---
+
+## Player commands
 
 <br />
+
+### /update
+
+<br />
+
+:::info
+This command (along with most other player commands) accepts an optional "username" parameter to specify the player you're refering to.
+
+If no username is provided, it will default to the username linked to the Discord user who sent the command.
+
+You can link your Discord user to a username using the [`/setrsn`](/commands#setrsn) command.
+:::
+
+<br />
+
+This command will send an update request to the Wise Old Man servers, which will then update your stats, records, achievements, etc.
+
+<br />
+
+#### Example
+
+<CommandCall commandRoot="/update" />
+
+<br />
+
+![Update Command](./assets/update.png)
+
+<br />
+
+---
+
+### /stats
+
+<br />
+
+:::info
+This command (along with most other player commands) accepts an optional "username" parameter to specify the player you're refering to.
+
+If no username is provided, it will default to the username linked to the Discord user who sent the command.
+
+You can link your Discord user to a username using the [`/setrsn`](/commands#setrsn) command.
+:::
+
+<br />
+
+This command will provide you with a player's skilling stats. It supports 4 different variants: **levels**, **experience**, **ranks** or **EHP**.
+
+<br />
+
+#### Example (levels, specific username)
+
+<CommandCall
+  commandRoot="/stats"
+  options={[
+    { key: 'variant', value: 'Levels' },
+    { key: 'username', value: 'Zezima' }
+  ]}
+/>
+
+<br />
+
+![Player Stats Command](./assets/stats:levels:zezima.png)
+
+<br />
+
+#### Example (experience, no username)
+
+<CommandCall commandRoot="/stats" options={[{ key: 'variant', value: 'Experience' }]} />
+
+<br />
+
+![Player Stats Command](./assets/stats:experience.png)
+
+<br />
+
+---
+
+### /bosses
+
+<br />
+
+:::info
+This command (along with most other player commands) accepts an optional "username" parameter to specify the player you're refering to.
+
+If no username is provided, it will default to the username linked to the Discord user who sent the command.
+
+You can link your Discord user to a username using the [`/setrsn`](/commands#setrsn) command.
+:::
+
+<br />
+
+This command will provide you with a player's bossing stats. It supports 3 different variants: **killcounts**, **ranks** or **EHB**.
+
+<br />
+
+#### Example (killcounts, specific username)
+
+<CommandCall
+  commandRoot="/bosses"
+  options={[
+    { key: 'variant', value: 'Kill Counts' },
+    { key: 'username', value: 'Zezima' }
+  ]}
+/>
+
+<br />
+
+![Player Bosses Command](./assets/bosses:killcounts:zezima.png)
+
+<br />
+
+#### Example (EHB, no username)
+
+<CommandCall commandRoot="/stats" options={[{ key: 'variant', value: 'Efficient Hours Bosses' }]} />
+
+<br />
+
+![Player Bosses Command](./assets/bosses:ehb.png)
+
+<br />
+
+---
+
+### /activities
+
+<br />
+
+:::info
+This command (along with most other player commands) accepts an optional "username" parameter to specify the player you're refering to.
+
+If no username is provided, it will default to the username linked to the Discord user who sent the command.
+
+You can link your Discord user to a username using the [`/setrsn`](/commands#setrsn) command.
+:::
+
+<br />
+
+This command will provide you with a player's activity (minigames, etc) stats. It supports 2 different variants: **scores** and **ranks**.
+
+<br />
+
+#### Example (scores, specific username)
+
+<CommandCall
+  commandRoot="/activities"
+  options={[
+    { key: 'variant', value: 'Scores' },
+    { key: 'username', value: 'Zezima' }
+  ]}
+/>
+
+<br />
+
+![Player Activities Command](./assets/activities:scores:zezima.png)
+
+<br />
+
+#### Example (ranks, no username)
+
+<CommandCall commandRoot="/activities" options={[{ key: 'variant', value: 'Ranks' }]} />
+
+<br />
+
+![Player Activities Command](./assets/activities:ranks.png)
+
+<br />
+
+---
+
+### /ttm
+
+<br />
+
+:::info
+This command (along with most other player commands) accepts an optional "username" parameter to specify the player you're refering to.
+
+If no username is provided, it will default to the username linked to the Discord user who sent the command.
+
+You can link your Discord user to a username using the [`/setrsn`](/commands#setrsn) command.
+:::
+
+<br />
+
+This command will provide you with a player's Efficiency stats, such as Time to Max, Time to 200m All, EHP, EHB, etc.
+
+<br />
+
+#### Example
+
+<CommandCall commandRoot="/ttm" options={[{ key: 'username', value: 'Psikoi' }]} />
+
+<br />
+
+![Player Efficiency Command](./assets/ttm.png)
+
+<br />
+
+---
+
+### /achievements
+
+<br />
+
+:::info
+This command (along with most other player commands) accepts an optional "username" parameter to specify the player you're refering to.
+
+If no username is provided, it will default to the username linked to the Discord user who sent the command.
+
+You can link your Discord user to a username using the [`/setrsn`](/commands#setrsn) command.
+:::
+
+<br />
+
+This command will provide you with a player's most recent achievements.
+
+<br />
+
+#### Example
+
+<CommandCall commandRoot="/achievements" options={[{ key: 'username', value: 'Psikoi' }]} />
+
+<br />
+
+![Player Achievements Command](./assets/achievements.png)
+
+<br />
+
+---
+
+### /gained
+
+<br />
+
+:::info
+This command (along with most other player commands) accepts an optional "username" parameter to specify the player you're refering to.
+
+If no username is provided, it will default to the username linked to the Discord user who sent the command.
+
+You can link your Discord user to a username using the [`/setrsn`](/commands#setrsn) command.
+:::
+
+<br />
+
+This command will provide you with a player's gains within the past specified period. This command is also paginated, you can use the `>` and `<` buttons to navigate between pages.
+
+<br />
+
+#### Example (no username, year period)
+
+<CommandCall commandRoot="/gained" options={[{ key: 'period', value: 'year' }]} />
+
+<br />
+
+![Player Gained Command](./assets/gained:year.png)
+
+<br />
+
+#### Example (specific username, month period)
+
+<CommandCall
+  commandRoot="/gained"
+  options={[
+    { key: 'period', value: 'month' },
+    { key: 'username', value: 'rro' }
+  ]}
+/>
+
+<br />
+
+![Player Gained Command](./assets/gained:month:rro.png)
+
+<br />
+
+---
+
+### /setrsn
+
+<br />
+
+This command will link your Discord user to a RuneScape username. This will allow you to use commands that require a username without having to specify your in-game username every time.
+
+<br />
+
+#### Example
+
+<CommandCall commandRoot="/setrsn" options={[{ key: 'username', value: 'Psikoi' }]} />
+
+<br />
+
+![Player Set Username Command](./assets/setrsn.png)
+
+<br />
+
+---
