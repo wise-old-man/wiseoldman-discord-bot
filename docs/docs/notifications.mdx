@@ -1,0 +1,125 @@
+---
+sidebar_position: 4
+---
+
+# Notifications
+
+Besides commands, this bot can also send notifications to your Discord server when something happens to one of your group members (new achievements, HCIM death, etc), or to your competitions (started, ended, starting soon, etc).
+
+For this, the bot needs to know what your group is and where to send those notifications, and since there are many types of notifications, you need to either specify where to receive each type, disable a type, or just **assign a default notifications channel**.
+
+<br />
+
+:::caution
+Notifications are only sent if configured properly beforehand. Learn more about these configurations here:
+
+- [Configuring Group ID](/commands#config-group)
+- [Configuring Notifications](/commands#config-notifications)
+
+The bot also needs certain permissions to be able to speak in the channel you want to receive notifications in without being mentioned. Here are the current required permissions:
+
+- Send messages
+- Manage messages
+- Embed links
+- Attach files
+- Use application commands
+
+:::
+
+<br />
+
+---
+
+## Competition Created
+
+This notification is sent when a group competition is created.
+
+:::info
+To configure this notification, you can use the "Competition Status" notification type in the `/config notifications` command.
+:::
+
+<br />
+
+![Competition Created Notification](./assets/comp:created.png)
+
+<br />
+
+---
+
+## Competition Starting
+
+This notification is sent when a group competition is starting soon. The time periods aren't configurable at the moment, this notification is sent multiple times before the competition starts.
+
+- 6 Hours
+- 5 Minutes
+
+:::info
+To configure this notification, you can use the "Competition Status" notification type in the `/config notifications` command.
+:::
+
+<br />
+
+![Competition Starting Notification](./assets/comp:starting.png)
+
+<br />
+
+---
+
+## Competition Started
+
+This notification is sent when a group competition has started.
+
+:::info
+To configure this notification, you can use the "Competition Status" notification type in the `/config notifications` command.
+:::
+
+<br />
+
+![Competition Started Notification](./assets/comp:started.png)
+
+<br />
+
+---
+
+## Competition Ending
+
+This notification is sent when a group competition is ending soon. The time periods aren't configurable at the moment, this notification is sent multiple times before the competition ends.
+
+- 12 hours
+- 30 Minutes
+
+:::info
+To configure this notification, you can use the "Competition Status" notification type in the `/config notifications` command.
+:::
+
+<br />
+
+![Competition Ending Notification](./assets/comp:ending.png)
+
+<br />
+
+---
+
+## Competition Ended
+
+This notification is sent when a group competition has ended. It also includes the top participants or teams.
+
+:::info
+To configure this notification, you can use the "Competition Status" notification type in the `/config notifications` command.
+:::
+
+<br />
+
+#### Example (Classic competition, showing top participants):
+
+![Competition Ended (Classic) Notification](./assets/comp:ended:participants.png)
+
+<br />
+
+#### Example (Team competition, showing top teans):
+
+![Competition Ended (Teams) Notification](./assets/comp:ended:teams.png)
+
+<br />
+
+---
