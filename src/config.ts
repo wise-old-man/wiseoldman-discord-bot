@@ -2,7 +2,7 @@ import env from './env';
 
 export default {
   token: env.DISCORD_TOKEN,
-  apiKey: env.WOM_BOT_API_KEY,
+  apiKey: env.DISCORD_BOT_API_KEY,
   baseAPIUrl: env.BASE_API_URL || 'https://api.wiseoldman.net/v2',
   requiredPermissions: ['MANAGE_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES', 'USE_APPLICATION_COMMANDS'],
   visuals: {
