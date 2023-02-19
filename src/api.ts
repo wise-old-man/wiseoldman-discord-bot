@@ -1,7 +1,6 @@
 import cors from 'cors';
 import { Client } from 'discord.js';
 import express from 'express';
-import env from './env';
 import { onEventReceived } from './events/router';
 import monitoring from './utils/monitoring';
 
@@ -23,18 +22,9 @@ export function init(client: Client) {
    * These requests contain events that the bot should attempt to propagate to relevant discord servers.
    */
   app.post('/event', (req, res) => {
-    const token = req.body['api_token'];
-
-    if (!token || token !== env.DISCORD_BOT_API_TOKEN) {
-      return res.status(401).json({ message: 'Wrong API Token.' });
-    }
-
     onEventReceived(client, req.body);
 
-    // delete this key so it doesn't get logged
-    delete req.body.api_token;
     console.log('Event received: ', req.body);
-
     return res.json('Event received.');
   });
 
