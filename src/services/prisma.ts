@@ -63,6 +63,22 @@ async function updateBotDefaultChannel(guildId: string, channelId: string) {
   });
 }
 
+/**
+ * Update the server's tracked group.
+ */
+async function updateServerGroup(guildId: string, groupId: number) {
+  const server = await getServer(guildId);
+
+  if (!server) {
+    throw new Error(`Server does not exist for guild id: ${guildId}`);
+  }
+
+  return prisma.server.update({
+    where: { guildId },
+    data: { groupId }
+  });
+}
+
 async function updateNotificationPreferences(guildId: string, type: string, channelId: string | null) {
   return prisma.notificationPreference.upsert({
     where: { guildId_type: { guildId, type } },
@@ -87,6 +103,7 @@ export {
   getUsername,
   getServer,
   getServers,
+  updateServerGroup,
   updateBotDefaultChannel,
   updateNotificationPreferences,
   getNotificationPreferences
