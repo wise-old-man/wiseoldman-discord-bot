@@ -1,6 +1,6 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import config from '../../../config';
-import prisma from '../../../services/prisma';
+import { updateServerGroup } from '../../../services/prisma';
 import womClient from '../../../services/wiseoldman';
 import { Command, CommandConfig, CommandError } from '../../../utils';
 
@@ -36,10 +36,7 @@ class ConfigGroupCommand extends Command {
     });
 
     // Update the server's group ID in the database
-    await prisma.server.update({
-      where: { guildId },
-      data: { groupId }
-    });
+    await updateServerGroup(guildId, groupId);
 
     const response = new MessageEmbed()
       .setColor(config.visuals.green)
