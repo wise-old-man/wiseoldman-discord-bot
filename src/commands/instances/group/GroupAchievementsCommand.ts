@@ -36,7 +36,6 @@ class GroupAchievements extends Command {
         .setTitle('Recent Group Achievements')
         .setDescription(achievementList)
         .setURL(`https://wiseoldman.net/groups/${groupId}/achievements/`)
-        .setFooter({ text: `Tip: Try /group records metric: zulrah period: day` });
 
       await interaction.editReply({ embeds: [response] });
     } catch (e) {
