@@ -1,4 +1,12 @@
-import { bold, Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
+import {
+  bold,
+  Command,
+  CommandConfig,
+  CommandError,
+  formatDate,
+  getEmoji,
+  getLinkedGroupId
+} from '../../../utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
@@ -17,25 +25,25 @@ class GroupAchievements extends Command {
     const groupId = await getLinkedGroupId(interaction);
 
     try {
-      const groupAchievements = await womClient.groups.getGroupAchievements(groupId);
+      const groupAchievements = await womClient.groups.getGroupAchievements(groupId, { limit: 10 });
+      // TODO this is on the ExtendedAchievement type, use player on that model after this repo is updated
       const players = await Promise.all(
         groupAchievements.map(x => womClient.players.getPlayerDetailsById(x.playerId))
       );
 
       const achievementList = groupAchievements
         .map(
-          (ach, idx) =>
-            `${idx + 1}. ${bold(players.find(x => x.id === ach.playerId).displayName)} - ${getEmoji(
-              ach.metric
-            )} ${ach.name}`
+          ach =>
+            `${formatDate(ach.createdAt, 'DD MMM')} | ${bold(
+              players.find(x => x.id === ach.playerId).displayName
+            )} ${getEmoji(ach.metric)} ${ach.name}`
         )
         .join('\n');
-
       const response = new MessageEmbed()
         .setColor(config.visuals.blue)
         .setTitle('Recent Group Achievements')
         .setDescription(achievementList)
-        .setURL(`https://wiseoldman.net/groups/${groupId}/achievements/`)
+        .setURL(`https://wiseoldman.net/groups/${groupId}/achievements/`);
 
       await interaction.editReply({ embeds: [response] });
     } catch (e) {
