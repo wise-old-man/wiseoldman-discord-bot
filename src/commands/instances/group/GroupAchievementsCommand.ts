@@ -1,13 +1,4 @@
 import { bold, Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
-import {
-  formatNumber,
-  getMetricName,
-  isMetric,
-  isPeriod,
-  Metric,
-  parseMetricAbbreviation,
-  Period
-} from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
