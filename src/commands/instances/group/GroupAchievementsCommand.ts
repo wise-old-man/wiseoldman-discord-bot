@@ -43,7 +43,7 @@ class GroupAchievements extends Command {
 
       await interaction.editReply({ embeds: [response] });
     } catch (e) {
-      throw new CommandError("Couldn't find that group or player.");
+      throw new CommandError("Couldn't find that group.");
     }
   }
 }
