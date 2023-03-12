@@ -26,17 +26,13 @@ class GroupAchievements extends Command {
 
     try {
       const groupAchievements = await womClient.groups.getGroupAchievements(groupId, { limit: 10 });
-      // TODO this is on the ExtendedAchievement type, use player on that model after this repo is updated
-      const players = await Promise.all(
-        groupAchievements.map(x => womClient.players.getPlayerDetailsById(x.playerId))
-      );
 
       const achievementList = groupAchievements
         .map(
           ach =>
-            `${formatDate(ach.createdAt, 'DD MMM')} | ${bold(
-              players.find(x => x.id === ach.playerId).displayName
-            )} ${getEmoji(ach.metric)} ${ach.name}`
+            `${formatDate(ach.createdAt, 'DD MMM')} | ${bold(ach.player.displayName)} ${getEmoji(
+              ach.metric
+            )} ${ach.name}`
         )
         .join('\n');
       const response = new MessageEmbed()
