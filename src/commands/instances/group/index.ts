@@ -6,6 +6,7 @@ import GroupMembersCommand from './GroupMembersCommand';
 import GroupHiscoresCommand from './GroupHiscoresCommand';
 import GroupRecordsCommand from './GroupRecordsCommand';
 import GroupGainedCommand from './GroupGainedCommand';
+import GroupAchievementsCommand from './GroupAchievementsCommand';
 
 const SUBCOMMANDS: Command[] = [
   GroupGainedCommand,
@@ -14,7 +15,8 @@ const SUBCOMMANDS: Command[] = [
   GroupRecordsCommand,
   GroupHiscoresCommand,
   GroupCompetitionCommand,
-  GroupCompetitionsCommand
+  GroupCompetitionsCommand,
+  GroupAchievementsCommand
 ];
 
 const CONFIG: CommandConfig = {
