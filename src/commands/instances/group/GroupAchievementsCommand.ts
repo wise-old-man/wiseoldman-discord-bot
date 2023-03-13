@@ -24,27 +24,28 @@ class GroupAchievements extends Command {
   async execute(interaction: CommandInteraction) {
     const groupId = await getLinkedGroupId(interaction);
 
-    try {
-      const groupAchievements = await womClient.groups.getGroupAchievements(groupId, { limit: 10 });
+    const groupAchievements = await womClient.groups
+      .getGroupAchievements(groupId, { limit: 10 })
+      .catch(() => {
+        throw new CommandError("Couldn't find that group.");
+      });
 
-      const achievementList = groupAchievements
-        .map(
-          ach =>
-            `${formatDate(ach.createdAt, 'DD MMM')} | ${bold(ach.player.displayName)} ${getEmoji(
-              ach.metric
-            )} ${ach.name}`
-        )
-        .join('\n');
-      const response = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setTitle('Recent Group Achievements')
-        .setDescription(achievementList)
-        .setURL(`https://wiseoldman.net/groups/${groupId}/achievements/`);
+    const achievementList = groupAchievements
+      .map(
+        ach =>
+          `${formatDate(ach.createdAt, 'DD MMM')} | ${bold(ach.player.displayName)} ${getEmoji(
+            ach.metric
+          )} ${ach.name}`
+      )
+      .join('\n');
 
-      await interaction.editReply({ embeds: [response] });
-    } catch (e) {
-      throw new CommandError("Couldn't find that group.");
-    }
+    const response = new MessageEmbed()
+      .setColor(config.visuals.blue)
+      .setTitle('Recent Group Achievements')
+      .setDescription(achievementList)
+      .setURL(`https://wiseoldman.net/groups/${groupId}/achievements/`);
+
+    await interaction.editReply({ embeds: [response] });
   }
 }
 
