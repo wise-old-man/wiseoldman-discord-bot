@@ -170,11 +170,11 @@ export async function getUsernameParam(interaction: CommandInteraction) {
   const username = interaction.options.getString('username', false);
   const isDiscordId = username?.match(DISCORD_TAG_REGEX);
 
-  if (username && !isDiscordId) return username;
+  if (username !== null && !isDiscordId) return username;
 
   // if it's a discord id, replace the <@> and pass as the alias id
   const inferredUsername = await getUsername(
-    isDiscordId && username?.length ? username.replace(/[^0-9]/g, '') : interaction.user.id
+    isDiscordId && username !== null ? username.replace(/[^0-9]/g, '') : interaction.user.id
   );
 
   if (!inferredUsername) {
