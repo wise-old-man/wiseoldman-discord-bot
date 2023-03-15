@@ -167,13 +167,13 @@ function attachOptions(
 export async function getUsernameParam(interaction: CommandInteraction) {
   const discordTagRegex = /<@!?(\d+)>/;
   const username = interaction.options.getString('username', false);
-  const isDiscordId = username.match(discordTagRegex);
+  const isDiscordId = username?.match(discordTagRegex);
 
   if (username && !isDiscordId) return username;
 
   // if it's a discord id, replace the <@> and pass as the alias id
   const inferredUsername = await getUsername(
-    isDiscordId && username.length ? username.replace(/[^0-9]/g, '') : interaction.user.id
+    isDiscordId && username?.length ? username.replace(/[^0-9]/g, '') : interaction.user.id
   );
 
   if (!inferredUsername) {
