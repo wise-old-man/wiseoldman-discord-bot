@@ -59,7 +59,8 @@ class GroupCompetitionCommand extends Command {
 
     // Extract the "status" param, or fallback to "ongoing"
     const statusParam = interaction.options.getString('status');
-    const status = isCompetitionStatus(statusParam) ? statusParam : CompetitionStatus.ONGOING;
+    const status =
+      statusParam !== null && isCompetitionStatus(statusParam) ? statusParam : CompetitionStatus.ONGOING;
 
     // Extract the "competition_id" param, or fallback to the default competition
     const competitionIdParam = interaction.options.getInteger('competition_id');

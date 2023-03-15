@@ -47,7 +47,7 @@ class GroupRecordsCommand extends Command {
     const metricParam = parseMetricAbbreviation(interaction.options.getString('metric', true));
 
     const period = isPeriod(periodParam) ? periodParam : Period.WEEK;
-    const metric = isMetric(metricParam) ? metricParam : Metric.OVERALL;
+    const metric = metricParam !== null && isMetric(metricParam) ? metricParam : Metric.OVERALL;
 
     const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
       throw new CommandError("Couldn't find that group.");

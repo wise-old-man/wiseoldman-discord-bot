@@ -89,12 +89,16 @@ export async function onInteractionReceived(interaction: Interaction) {
     await interaction.deferReply();
     await targetCommand.execute(interaction);
 
+    if (interaction.guildId === null) {
+      throw new Error('Error fetching guildId');
+    }
+
     commandMonitor.endTracking(fullCommandName, 1, interaction.guildId);
   } catch (error) {
     console.log(error);
     Sentry.captureException(error);
     await interaction.followUp({ embeds: [buildErrorEmbed(error)] });
-    commandMonitor.endTracking(fullCommandName, 0, interaction.guildId);
+    commandMonitor.endTracking(fullCommandName, 0, interaction.guildId ?? 'unknown guild id');
   }
 }
 

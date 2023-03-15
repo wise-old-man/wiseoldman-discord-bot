@@ -120,23 +120,21 @@ class NameChangeCommand extends Command {
 }
 
 function buildReviewMessage(data: NameChangeDetails['data']): string {
-  const { isNewOnHiscores, hasNegativeGains, hoursDiff, ehpDiff, ehbDiff, oldStats, newStats } = data;
-
   const expDiff =
-    newStats.data.skills.overall && oldStats.data.skills.overall
-      ? newStats.data.skills.overall.experience - oldStats.data.skills.overall.experience
+    data?.newStats.data.skills.overall && data?.oldStats.data.skills.overall
+      ? data.newStats.data.skills.overall.experience - data.oldStats.data.skills.overall.experience
       : 0;
 
-  const oldTotalLevel = oldStats.data.skills.overall?.level;
-  const newTotalLevel = newStats.data.skills.overall?.level;
+  const oldTotalLevel = data?.oldStats.data.skills.overall?.level;
+  const newTotalLevel = data?.newStats.data.skills.overall?.level;
 
-  const lines = [];
+  const lines: Array<string> = [];
 
-  lines.push(`New name on the hiscores? ${isNewOnHiscores ? '✅' : '❌'}`);
-  lines.push(`Has no negative gains? ${!hasNegativeGains ? '✅' : '❌'}`);
-  lines.push(`Hours difference? \`${hoursDiff}\``);
-  lines.push(`EHP difference? \`${ehpDiff}\``);
-  lines.push(`EHB difference? \`${ehbDiff}\``);
+  lines.push(`New name on the hiscores? ${data?.isNewOnHiscores ? '✅' : '❌'}`);
+  lines.push(`Has no negative gains? ${!data?.hasNegativeGains ? '✅' : '❌'}`);
+  lines.push(`Hours difference? \`${data?.hoursDiff ? data.hoursDiff : 0}\``);
+  lines.push(`EHP difference? \`${data?.ehpDiff ? data.ehpDiff : 0}\``);
+  lines.push(`EHB difference? \`${data?.ehbDiff ? data.ehbDiff : 0}\``);
   lines.push(`Exp difference? \`${expDiff}\``);
   lines.push(`Old total level? \`${oldTotalLevel}\``);
   lines.push(`New total level? \`${newTotalLevel}\``);

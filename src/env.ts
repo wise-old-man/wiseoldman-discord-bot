@@ -6,9 +6,9 @@ import 'dotenv/config';
 
 function parseTemplate(originTemplate: string) {
   if (!originTemplate) return originTemplate;
-  return originTemplate.replace(/{([^{}]+)}/g, (_, key) => process.env[key]).replace(/\$/g, '');
+  return originTemplate.replace(/{([^{}]+)}/g, (_, key) => process.env[key] ?? '').replace(/\$/g, '');
 }
 
-process.env.BOT_DATABASE_URL = parseTemplate(process.env.BOT_DATABASE_URL);
+process.env.BOT_DATABASE_URL = parseTemplate(process.env.BOT_DATABASE_URL ?? '');
 
 export default process.env;

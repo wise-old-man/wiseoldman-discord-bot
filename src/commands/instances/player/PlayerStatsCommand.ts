@@ -171,7 +171,7 @@ class PlayerStatsCommand extends Command {
       } else if (variant === RenderVariant.EHP) {
         ctx.font = '9px sans-serif';
 
-        const ehp = isRanked ? `${round(skills[skill].ehp, 1)}` : '?';
+        const ehp = isRanked ? `${round(skills[skill]?.ehp ?? 0, 1)}` : '?';
         const ehpWidth = ctx.measureText(ehp).width;
 
         // Skill EHP

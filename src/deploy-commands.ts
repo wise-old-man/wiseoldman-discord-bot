@@ -7,8 +7,8 @@ import config from './config';
 const { guildId, clientId } = config.discord;
 
 export async function deployCommands() {
-  const guildCommands = [];
-  const globalCommands = [];
+  const guildCommands: Array<unknown> = [];
+  const globalCommands: Array<unknown> = [];
 
   for (const command of COMMANDS) {
     const slashCommand = command.slashCommand;
@@ -26,7 +26,7 @@ export async function deployCommands() {
     }
   }
 
-  const restClient = new REST({ version: '9' }).setToken(config.token);
+  const restClient = new REST({ version: '9' }).setToken(config?.token ?? '');
 
   if (guildCommands.length > 0) {
     try {

@@ -111,7 +111,7 @@ export function hasModeratorRole(member: GuildMember | null): boolean {
 
 export function getMissingPermissions(channel: TextChannel) {
   return [...config.requiredPermissions, 'SEND_MESSAGES'].filter(permission => {
-    return !channel.permissionsFor(channel.client.user).has(permission as PermissionResolvable);
+    return !clientUserPermissions(channel)?.has(permission as PermissionResolvable);
   });
 }
 
@@ -120,7 +120,7 @@ export function isChannelSendable(channel: Channel | undefined | null): channel 
   if (!channel.isText()) return false;
   if (!('guild' in channel)) return true;
 
-  const canView = channel.permissionsFor(channel.client.user).has('VIEW_CHANNEL');
+  const canView = clientUserPermissions(channel as TextChannel)?.has('VIEW_CHANNEL');
 
   if (!(channel instanceof DMChannel) && !(channel instanceof TextChannel) && canView) {
     return false;
@@ -136,3 +136,6 @@ export function getEmoji(metric: string): string {
 
   return MetricEmoji[emojiKey];
 }
+
+const clientUserPermissions = (channel: TextChannel) =>
+  channel.client.user ? channel.permissionsFor(channel.client.user) : null;

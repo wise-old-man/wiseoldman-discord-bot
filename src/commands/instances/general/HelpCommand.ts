@@ -66,7 +66,7 @@ class HelpCommand extends Command {
       return;
     }
 
-    let group: GroupDetails = null;
+    let group: GroupDetails | null = null;
 
     if (groupId && groupId > -1) {
       try {

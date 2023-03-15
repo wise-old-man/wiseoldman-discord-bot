@@ -16,7 +16,7 @@ export function durationBetween(start: Date, end: Date, maxDepth = 10, shortName
   const diff = end.getTime() - start.getTime();
   const { days, hours, minutes, seconds } = durationOf(diff);
 
-  const periods = [];
+  const periods: string[] = [];
 
   if (days > 0 && periods.length < maxDepth) {
     periods.push(`${days} days`);
