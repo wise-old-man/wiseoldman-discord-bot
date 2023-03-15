@@ -6,6 +6,8 @@ import {
 import { CommandInteraction } from 'discord.js';
 import { getServer, getUsername } from '../services/prisma';
 
+const DISCORD_TAG_REGEX = /<@!?(\d+)>/;
+
 export class CommandError extends Error {
   tip?: string;
 
@@ -165,9 +167,8 @@ function attachOptions(
 }
 
 export async function getUsernameParam(interaction: CommandInteraction) {
-  const discordTagRegex = /<@!?(\d+)>/;
   const username = interaction.options.getString('username', false);
-  const isDiscordId = username?.match(discordTagRegex);
+  const isDiscordId = username?.match(DISCORD_TAG_REGEX);
 
   if (username && !isDiscordId) return username;
 
