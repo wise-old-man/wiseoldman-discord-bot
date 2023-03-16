@@ -35,7 +35,7 @@ const CONFIG: CommandConfig = {
     {
       type: 'string',
       name: 'username',
-      description: 'In-game username.'
+      description: 'In-game username or discord tag.'
     }
   ]
 };
