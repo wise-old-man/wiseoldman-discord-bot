@@ -89,7 +89,7 @@ export async function onInteractionReceived(interaction: Interaction) {
     await interaction.deferReply();
     await targetCommand.execute(interaction);
 
-    commandMonitor.endTracking(fullCommandName, 1, interaction.guildId ?? '');
+    commandMonitor.endTracking(fullCommandName, 1, interaction.guildId ?? undefined);
   } catch (error) {
     console.log(error);
     Sentry.captureException(error);
