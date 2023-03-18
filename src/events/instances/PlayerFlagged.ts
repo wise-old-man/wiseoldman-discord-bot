@@ -43,14 +43,17 @@ class PlayerFlagged implements Event {
 
     const timeDiff = new Date(rejected.createdAt).getTime() - new Date(previous.createdAt).getTime();
 
+    const previousEHP = previous.data.skills.overall.ehp;
+    const rejectedEHP = rejected.data.skills.overall.ehp;
+
     const previousEHB = BOSSES.map(b => previous.data.bosses[b].ehb).reduce((a, b) => a + b, 0);
     const rejectedEHB = BOSSES.map(b => rejected.data.bosses[b].ehb).reduce((a, b) => a + b, 0);
 
-    const ehpDiff = rejected.data.skills.overall.ehp - previous.data.skills.overall.ehp;
+    const ehpDiff = rejectedEHP - previousEHP;
     const ehbDiff = rejectedEHB - previousEHB;
 
-    const ehpChange = Math.round((ehpDiff / rejected.data.skills.overall.ehp) * 100);
-    const ehbChange = Math.round((ehbDiff / rejectedEHB) * 100);
+    const ehpChange = Math.round(getPercentageIncrease(previousEHP, rejectedEHP) * 100);
+    const ehbChange = Math.round(getPercentageIncrease(previousEHB, rejectedEHB) * 100);
 
     const lines = [];
 
@@ -58,16 +61,31 @@ class PlayerFlagged implements Event {
       lines.push(`**Main cause**: Negative gains`);
       lines.push(`**Time diff**: ${Math.floor(timeDiff / 1000 / 60 / 60)} hours`);
 
-      // if lost too much exp, it's most likely not a rollback
-      if (data.excessiveGainsReversed) {
+      // if lost or gained too much exp, it's most likely not a rollback
+      if (data.excessiveGainsReversed || data.excessiveGains) {
         lines.push(`\n**🤔 Prediction 🤔**\n Name transfer`);
       } else {
-        lines.push(`\n**🤔 Prediction 🤔**\n Hiscores rollback (rare) or Name transfer (common)`);
+        lines.push(`\n**🤔 Prediction 🤔**\n Name transfer (common) or Hiscores rollback (rare)`);
       }
 
       lines.push('\n');
-      lines.push(`**EHP diff**: ${Math.round(ehpDiff)} (${ehpChange}%)`);
-      lines.push(`**EHB diff**: ${Math.round(ehbDiff)} (${ehbChange}%)`);
+      lines.push('**EHP**');
+
+      lines.push(
+        [
+          `\`${formatNumber(previousEHP, false, 3)}\` -> \`${formatNumber(rejectedEHP, false, 3)}\``,
+          `\`${formatNumber(ehpDiff, false, 3)}\` (\`${ehpChange}%\`)`
+        ].join(' · ')
+      );
+
+      lines.push('**EHB**');
+
+      lines.push(
+        [
+          `\`${formatNumber(previousEHB, false, 3)}\` -> \`${formatNumber(rejectedEHB, false, 3)}\``,
+          `\`${formatNumber(ehbDiff, false, 3)}\` (\`${ehbChange}%\`)`
+        ].join(' · ')
+      );
     } else if (data.excessiveGains) {
       // Sum the gained EHP from all stackable skills
       const gainedEHPFromStackableSkills = STACKABLE_EXP_SKILLS.map(
@@ -82,8 +100,8 @@ class PlayerFlagged implements Event {
       const previousExp = previous.data.skills.overall.experience;
       const rejectedExp = rejected.data.skills.overall.experience;
 
-      const rankChange = 1 - previousRank / rejectedRank;
-      const expChange = 1 - previousExp / rejectedExp;
+      const rankChange = getPercentageIncrease(previousRank, rejectedRank);
+      const expChange = getPercentageIncrease(previousExp, rejectedExp);
 
       lines.push(`**Main cause**: Excessive gains`);
       lines.push(`**Time diff**: ${Math.floor(timeDiff / 1000 / 60 / 60)} hours`);
@@ -99,29 +117,44 @@ class PlayerFlagged implements Event {
       }
 
       lines.push('\n');
-      lines.push(`**EHP diff**: ${Math.round(ehpDiff)} (\`${Math.max(0, ehpChange)}%\`)`);
-      lines.push(`**EHB diff**: ${Math.round(ehbDiff)} (\`${Math.max(0, ehbChange)}%\`)`);
+      lines.push('**EHP**');
+
+      lines.push(
+        [
+          `\`${formatNumber(previousEHP, false, 3)}\` -> \`${formatNumber(rejectedEHP, false, 3)}\``,
+          `\`${formatNumber(ehpDiff, false, 3)}\` (\`${ehpChange}%\`)`
+        ].join(' · ')
+      );
+
+      lines.push('**EHB**');
+
+      lines.push(
+        [
+          `\`${formatNumber(previousEHB, false, 3)}\` -> \`${formatNumber(rejectedEHB, false, 3)}\``,
+          `\`${formatNumber(ehbDiff, false, 3)}\` (\`${ehbChange}%\`)`
+        ].join(' · ')
+      );
 
       lines.push('\n');
 
       lines.push(
         [
           `Stackable skill gains: \`${Math.round(stackableGainedRatio * 100)}%\``,
-          stackableGainedRatio > 0.7 ? '(`> 70%`)' : ''
+          stackableGainedRatio > 0.7 ? '(`> 70%` ⚠️)' : ''
         ].join(' ')
       );
 
       lines.push(
         [
           `Exp change: \`${formatNumber(previousExp, true)}\` -> \`${formatNumber(rejectedExp, true)}\``,
-          `(\`${Math.round(expChange * 100)}%\`)`
+          `(\`${Math.round(getPercentageIncrease(previousExp, rejectedExp) * 100)}%\`)`
         ].join(' ')
       );
 
       lines.push(
         [
           `Rank change: \`${formatNumber(previousRank)}\` -> \`${formatNumber(rejectedRank)}\``,
-          `(\`${Math.round(rankChange * 100)}%\`)`
+          `(\`${Math.round(getPercentageIncrease(previousRank, rejectedRank) * 100)}%\`)`
         ].join(' ')
       );
     }
@@ -171,13 +204,13 @@ function getLargestSkillChanges(previous: FormattedSnapshot, rejected: Formatted
 
   if (biggestGains.length > 0) {
     lines.push('\n');
-    lines.push(`**Skill gains:**`);
+    lines.push(`**Top Skill gains:**`);
     lines.push(...biggestGains.map(g => `${MetricProps[g[0]].name}: \`+${formatNumber(g[1], true)}\``));
   }
 
   if (biggestLosses.length > 0) {
     lines.push('\n');
-    lines.push(`**Skill losses:**`);
+    lines.push(`**Top Skill losses:**`);
     lines.push(...biggestLosses.map(l => `${MetricProps[l[0]].name}: \`${formatNumber(l[1], true)}\``));
   }
 
@@ -204,17 +237,23 @@ function getLargestBossChanges(previous: FormattedSnapshot, rejected: FormattedS
 
   if (biggestGains.length > 0) {
     lines.push('\n');
-    lines.push(`**Boss gains:**`);
+    lines.push(`**Top Boss gains:**`);
     lines.push(...biggestGains.map(g => `${MetricProps[g[0]].name}: \`+${formatNumber(g[1], true)}\``));
   }
 
   if (biggestLosses.length > 0) {
     lines.push('\n');
-    lines.push(`**Boss losses:**`);
+    lines.push(`**Top Boss losses:**`);
     lines.push(...biggestLosses.map(l => `${MetricProps[l[0]].name}: \`${formatNumber(l[1], true)}\``));
   }
 
   return lines;
+}
+
+function getPercentageIncrease(previous: number, current: number) {
+  if (previous === 0) return 0;
+
+  return (current - previous) / previous;
 }
 
 export default new PlayerFlagged();
