@@ -20,7 +20,8 @@ export default {
     },
     channels: {
       flags: '802680940835897384',
-      leadersLog: '830199626630955039'
+      leadersLog: '830199626630955039',
+      flaggedPlayerReviews: '1086637095415722169'
     }
   }
 };
