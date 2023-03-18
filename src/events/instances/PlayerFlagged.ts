@@ -10,6 +10,7 @@ import {
   REAL_SKILLS,
   Skill
 } from '@wise-old-man/utils';
+import { encodeURL } from '../../utils';
 import { Event } from '../../utils/events';
 import config from '../../config';
 
@@ -130,6 +131,7 @@ class PlayerFlagged implements Event {
 
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
+      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
       .setTitle(`"${player.displayName}" flagged for review`)
       .setDescription(lines.join('\n'));
 
