@@ -1,4 +1,4 @@
-import { Client, MessageEmbed, TextChannel } from 'discord.js';
+import { Client, MessageActionRow, MessageButton, MessageEmbed, TextChannel } from 'discord.js';
 import {
   Boss,
   BOSSES,
@@ -13,6 +13,7 @@ import {
 import { encodeURL } from '../../utils';
 import { Event } from '../../utils/events';
 import config from '../../config';
+import { forceUpdate, rollback } from '../../services/wiseoldman';
 
 const STACKABLE_EXP_SKILLS = [
   Metric.COOKING,
@@ -41,6 +42,9 @@ class PlayerFlagged implements Event {
   async execute(data: PlayerFlaggedData, client: Client) {
     const { player, previousSnapshot: previous, rejectedSnapshot: rejected } = data;
 
+    const uniqueId = `${player.id}_${rejected.createdAt}`;
+    const actions = new MessageActionRow();
+
     const timeDiff = new Date(rejected.createdAt).getTime() - new Date(previous.createdAt).getTime();
 
     const previousEHP = previous.data.skills.overall.ehp;
@@ -67,6 +71,17 @@ class PlayerFlagged implements Event {
       } else {
         lines.push(`\n**🤔 Prediction 🤔**\n Name transfer (common) or Hiscores rollback (rare)`);
       }
+
+      actions.addComponents(
+        new MessageButton()
+          .setCustomId(`name_transfer/${uniqueId}`)
+          .setLabel('Name Transfer')
+          .setStyle('PRIMARY'),
+        new MessageButton()
+          .setCustomId(`rollback/${uniqueId}`)
+          .setLabel('Hiscores Rollback')
+          .setStyle('SECONDARY')
+      );
 
       lines.push('\n');
       lines.push('**EHP**');
@@ -116,6 +131,21 @@ class PlayerFlagged implements Event {
         lines.push(`\n**🤔 Prediction 🤔**\n Name transfer`);
       }
 
+      actions.addComponents(
+        new MessageButton()
+          .setCustomId(`name_transfer/${uniqueId}`)
+          .setLabel('Name Transfer')
+          .setStyle('PRIMARY'),
+        new MessageButton()
+          .setCustomId(`deironed/${uniqueId}`)
+          .setLabel('De-ironed')
+          .setStyle('SECONDARY'),
+        new MessageButton()
+          .setCustomId(`exp_dump/${uniqueId}`)
+          .setLabel('Stackable Exp Dump')
+          .setStyle('SECONDARY')
+      );
+
       lines.push('\n');
       lines.push('**EHP**');
 
@@ -162,23 +192,84 @@ class PlayerFlagged implements Event {
     lines.push(...getLargestSkillChanges(previous, rejected));
     lines.push(...getLargestBossChanges(previous, rejected));
 
+    actions.addComponents(
+      new MessageButton()
+        .setCustomId(`idk/${uniqueId}`)
+        .setLabel("I'm not sure  🤷‍♂️")
+        .setStyle('SECONDARY')
+    );
+
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
       .setTitle(`"${player.displayName}" flagged for review`)
       .setDescription(lines.join('\n'));
 
-    await sendReviewMessage(message, client);
+    const reviewChannel = client.channels?.cache.get(config.discord.channels.flaggedPlayerReviews);
+
+    if (!reviewChannel) return;
+    if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(reviewChannel)) return;
+
+    const reportMessage = await reviewChannel.send({
+      embeds: [message],
+      components: [actions]
+    });
+
+    reviewChannel
+      .createMessageComponentCollector({ componentType: 'BUTTON', max: 1, time: 3600 * 1000 })
+      .on('end', async collection => {
+        if (!collection.first()) return;
+
+        const username = collection.first().member.user.username;
+        const clickedId = collection.first().customId;
+
+        if (clickedId === `idk/${uniqueId}`) {
+          message.setColor(config.visuals.orange).setFooter({ text: `Marked as "🤷‍♂️" by ${username}` });
+          await reportMessage.edit({ embeds: [message], components: [] });
+          await reportMessage.reply(`Paging <@329256344798494773>`);
+          return;
+        }
+
+        if (clickedId === `rollback/${uniqueId}`) {
+          try {
+            await rollback(player.username, false);
+            message.setColor(config.visuals.green).setFooter({ text: `Rolled back by ${username}` });
+          } catch (error) {
+            message.setColor(config.visuals.red).setFooter({ text: `Rollback failed` });
+          }
+
+          await reportMessage.edit({ embeds: [message], components: [] });
+          return;
+        }
+
+        if (clickedId === `deironed/${uniqueId}`) {
+          try {
+            await rollback(player.username, true);
+            message.setColor(config.visuals.green).setFooter({ text: `De-iron fix by ${username}` });
+          } catch (error) {
+            message.setColor(config.visuals.red).setFooter({ text: `De-iron fix failed` });
+          }
+          await reportMessage.edit({ embeds: [message], components: [] });
+          return;
+        }
+
+        if (clickedId === `exp_dump/${uniqueId}`) {
+          try {
+            await forceUpdate(player.username);
+            message.setColor(config.visuals.green).setFooter({ text: `Force updated by ${username}` });
+          } catch (error) {
+            message.setColor(config.visuals.red).setFooter({ text: `Force update failed` });
+          }
+          await reportMessage.edit({ embeds: [message], components: [] });
+          return;
+        }
+
+        if (clickedId === `name_transfer/${uniqueId}`) {
+          await reportMessage.reply(`Player archiving is available yet.`);
+          return;
+        }
+      });
   }
-}
-
-function sendReviewMessage(message: MessageEmbed, client: Client) {
-  const reviewChannel = client.channels?.cache.get(config.discord.channels.flaggedPlayerReviews);
-
-  if (!reviewChannel) return;
-  if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(reviewChannel)) return;
-
-  return reviewChannel.send({ embeds: [message] });
 }
 
 function getLargestSkillChanges(previous: FormattedSnapshot, rejected: FormattedSnapshot) {
