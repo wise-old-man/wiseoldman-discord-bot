@@ -41,7 +41,7 @@ class MonitoringService {
     const endTimerFn = this.commandHistogram.startTimer();
 
     return {
-      endTracking: (command: string, status: number, guild: string) => {
+      endTracking: (command: string, status: number, guild?: string) => {
         endTimerFn({ command, status, guild });
       }
     };

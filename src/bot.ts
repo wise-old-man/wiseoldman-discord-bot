@@ -67,7 +67,7 @@ function buildJoinMessage() {
  */
 function findOpenChannel(guild: Guild) {
   const channel = guild.channels.cache.find(c => {
-    return c.type === 'GUILD_TEXT' && guild.me?.permissions.has('SEND_MESSAGES');
+    return c.type === 'GUILD_TEXT' && Boolean(guild.me?.permissions.has('SEND_MESSAGES'));
   });
 
   return channel as TextChannel;

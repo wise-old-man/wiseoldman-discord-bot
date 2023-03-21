@@ -46,7 +46,13 @@ class HelpCommand extends Command {
       throw new CommandError("Couldn't find the origin server for this interaction.");
     }
 
-    const { botChannelId, groupId, guildId } = await getServer(interaction.guildId);
+    const server = await getServer(interaction.guildId);
+
+    if (!server) {
+      throw new CommandError("Couldn't find the origin server for this interaction.");
+    }
+
+    const { botChannelId, groupId, guildId } = server;
 
     const category = interaction.options.getString('category');
 
@@ -66,7 +72,7 @@ class HelpCommand extends Command {
       return;
     }
 
-    let group: GroupDetails = null;
+    let group: GroupDetails | null = null;
 
     if (groupId && groupId > -1) {
       try {

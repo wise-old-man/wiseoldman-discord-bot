@@ -70,7 +70,10 @@ class ConfigNotificationsCommand extends Command {
         throw new CommandError(`Error: <#${channel.id}> is not a valid text channel.`);
       }
 
-      if (!channel.permissionsFor(channel.client.user).has('VIEW_CHANNEL')) {
+      const channelPermissions =
+        channel.client.user !== null ? channel.permissionsFor(channel.client.user) : null;
+
+      if (channelPermissions !== null && !channelPermissions.has('VIEW_CHANNEL')) {
         throw new CommandError(`Error: The bot does not have access to <#${channel.id}>.`);
       }
 

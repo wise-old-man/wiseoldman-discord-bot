@@ -119,7 +119,7 @@ class NameChangeCommand extends Command {
   }
 }
 
-function buildReviewMessage(data: NameChangeDetails['data']): string {
+function buildReviewMessage(data: NonNullable<NameChangeDetails['data']>): string {
   const { isNewOnHiscores, hasNegativeGains, hoursDiff, ehpDiff, ehbDiff, oldStats, newStats } = data;
 
   const expDiff =
@@ -130,7 +130,7 @@ function buildReviewMessage(data: NameChangeDetails['data']): string {
   const oldTotalLevel = oldStats.data.skills.overall?.level;
   const newTotalLevel = newStats.data.skills.overall?.level;
 
-  const lines = [];
+  const lines: Array<string> = [];
 
   lines.push(`New name on the hiscores? ${isNewOnHiscores ? '✅' : '❌'}`);
   lines.push(`Has no negative gains? ${!hasNegativeGains ? '✅' : '❌'}`);

@@ -107,7 +107,7 @@ function buildPages(
     throw new CommandError(`${displayName} has no "${PeriodProps[period].name}" gains.`);
   }
 
-  const pages = [];
+  const pages: Array<MessageEmbed> = [];
 
   for (let i = 0; i < pageCount; i++) {
     const pageGains = gainsList.slice(i * GAINS_PER_PAGE, i * GAINS_PER_PAGE + GAINS_PER_PAGE);

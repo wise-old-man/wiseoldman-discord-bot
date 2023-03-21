@@ -119,7 +119,7 @@ function attachOptions(
   command: SlashCommandBuilder | SlashCommandSubcommandBuilder,
   config: CommandConfig
 ) {
-  config.options.forEach(option => {
+  config.options?.forEach(option => {
     if (option.type === 'integer') {
       command.addIntegerOption(opt => {
         opt.setName(option.name).setDescription(option.description);
