@@ -47,17 +47,16 @@ const config = {
         respectPrefersColorScheme: false
       },
       navbar: {
-        title: 'Wise Old Man',
+        title: 'Wise Old Man - Discord Bot',
         logo: {
           alt: 'Wise Old Man Logo',
           src: 'img/logo.png'
         },
         items: [
           {
-            type: 'doc',
-            docId: 'intro',
-            position: 'left',
-            label: 'Discord Bot'
+            href: 'https://wiseoldman.net',
+            label: 'Wise Old Man',
+            position: 'right'
           },
           {
             href: 'https://github.com/wise-old-man/discord-bot',
