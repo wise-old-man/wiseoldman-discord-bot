@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 import React from 'react';
-import { Fade } from 'react-slideshow-image';
-import 'react-slideshow-image/dist/styles.css';
+import BrowserOnly from '@docusaurus/BrowserOnly';
 
 const PREVIEW_IMAGE_PATHS = [
   '/img/discord_preview_1.png',
@@ -11,6 +10,11 @@ const PREVIEW_IMAGE_PATHS = [
 
 const INVITE_URL =
   'https://discord.com/api/oauth2/authorize?client_id=719720369241718837&permissions=2147543040&scope=applications.commands%20bot';
+
+const BASE_PATH =
+  process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://bot.wiseoldman.net';
+
+const DOCS_URL = `${BASE_PATH}/how-to-setup`;
 
 // Could I make this dynamic? yes sure, but who cares,
 // I'll just manually updated it every few months
@@ -50,16 +54,10 @@ function Homepage() {
               competitions, etc.
             </p>
             <div className="flex md:flex-row flex-col gap-y-5 gap-x-10 mt-7">
-              <a
-                href={`${window.location.origin}/configuration`}
-                className="text-[#60A5FA] font-semibold text-sm"
-              >
+              <a href={DOCS_URL} className="text-[#60A5FA] font-semibold text-sm">
                 Learn how to setup
               </a>
-              <a
-                href={`${window.location.origin}/commands`}
-                className="text-[#60A5FA] font-semibold text-sm"
-              >
+              <a href={`${BASE_PATH}/commands`} className="text-[#60A5FA] font-semibold text-sm">
                 Browse the features
               </a>
               <a href="https://wiseoldman.net/discord" className="text-[#60A5FA] font-semibold text-sm">
@@ -135,7 +133,7 @@ function CallToActionBar() {
           </span>
         </Button>
       </a>
-      <a href={`${window.location.origin}/configuration`} className="!decoration-transparent">
+      <a href={DOCS_URL} className="!decoration-transparent">
         <Button color="gray">Read documentation</Button>
       </a>
     </div>
@@ -166,14 +164,26 @@ function PreviewSlideShow() {
   return (
     <div className="text-center relative">
       <div className="hidden md:block">
-        <div className="absolute inset-0">
-          <img src={'/img/discord_preview_empty.png'} width={838} height={634} />
-        </div>
-        <Fade arrows={false} transitionDuration={500} duration={2000}>
-          {PREVIEW_IMAGE_PATHS.map(image => (
-            <img key={image} src={image} width={838} height={634} />
-          ))}
-        </Fade>
+        <BrowserOnly fallback={<div>Loading...</div>}>
+          {() => {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const Fade = require('react-slideshow-image').Fade;
+            require('react-slideshow-image/dist/styles.css');
+
+            return (
+              <>
+                <div className="absolute inset-0">
+                  <img src={'/img/discord_preview_empty.png'} width={838} height={634} />
+                </div>
+                <Fade arrows={false} transitionDuration={500} duration={2000}>
+                  {PREVIEW_IMAGE_PATHS.map(image => (
+                    <img key={image} src={image} width={838} height={634} />
+                  ))}
+                </Fade>
+              </>
+            );
+          }}
+        </BrowserOnly>
       </div>
 
       <img className="md:hidden block w-full px-5" src={PREVIEW_IMAGE_PATHS[0]} />

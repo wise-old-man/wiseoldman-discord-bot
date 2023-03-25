@@ -2,17 +2,21 @@
 sidebar_position: 1
 ---
 
-# Configuration
+# How to setup
 
 :::caution
 Are you having issues with the bot? is it not responding or not sending notifications? Check out the [Troubleshooting](/troubleshooting) page.
 :::
 
+## Installing the bot
+
+First, you need to invite the bot to your server, you can find the invite button [here](https://bot.wiseoldman.net).
+
 ## As a server admin
 
 **Configuring the group**
 
-You can and should configure the selected `group` for the Discord server. This is the group that will be used for all commands and notifications.
+You can (and should) configure the selected `group` for the Discord server. This is the group that will be used for all commands and notifications.
 
 You can do this with the [`/config group` command](/commands#config-group).
 
