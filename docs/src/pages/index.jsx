@@ -25,7 +25,7 @@ function Homepage() {
     <div className="bg-[#171717] relative">
       <div className="absolute homepage-glow h-full inset-0 min-h-screen" />
       <div className="relative flex flex-col items-center mb-40">
-        <h1 className="mt-20 mb-2 md:mb-4 uppercase text-4xl md:text-[52px] text-transparent bg-clip-text font-bold bg-gradient-to-t to-[#3B82F6] from-[#2563EB]">
+        <h1 className="pt-20 mb-0 pb-2 md:pb-4 uppercase text-4xl md:text-[52px] text-transparent bg-clip-text font-bold bg-gradient-to-t to-[#3B82F6] from-[#2563EB]">
           Wise Old Man
         </h1>
         <h2 className="uppercase bg-white text-[#1F3A75] text-sm md:text-xl px-1 md:px-2 font-mono rounded leading-2 pt-[1px]">
@@ -35,7 +35,7 @@ function Homepage() {
           Track your Old School Runescape clan&apos;s progress from your own Discord server.
         </p>
         <div className="relative w-full flex justify-center">
-          <img src="/img/wom_character.png" className="max-w-xs md:max-w-sm w-full" />
+          <img src="/img/wom_character.png" className="w-[297px] h-[390px]" />
           <div className="absolute bottom-16 right-0 left-0 flex flex-col items-center space-y-4">
             <CallToActionBar />
             <LinksBar />
@@ -162,7 +162,9 @@ function PreviewSlideShow() {
   return (
     <div className="text-center relative">
       <div className="hidden md:block">
-        <BrowserOnly fallback={<div>Loading...</div>}>
+        <BrowserOnly
+          fallback={<img className="px-5" src={PREVIEW_IMAGE_PATHS[0]} width={838} height={634} />}
+        >
           {() => {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             const Fade = require('react-slideshow-image').Fade;
