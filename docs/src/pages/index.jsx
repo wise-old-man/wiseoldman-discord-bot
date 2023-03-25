@@ -36,7 +36,7 @@ function Homepage() {
         </p>
         <div className="relative w-full flex justify-center">
           <img src="/img/wom_character.png" className="max-w-xs md:max-w-sm w-full" />
-          <div className="absolute bottom-16 right-0 left-0 flex flex-col items-center gap-y-4">
+          <div className="absolute bottom-16 right-0 left-0 flex flex-col items-center space-y-4">
             <CallToActionBar />
             <LinksBar />
           </div>
@@ -53,7 +53,7 @@ function Homepage() {
               helps you keep track of your clan&apos;s gains, latest achievements and upcoming/ongoing
               competitions, etc.
             </p>
-            <div className="flex md:flex-row flex-col gap-y-5 gap-x-10 mt-7">
+            <div className="flex md:flex-row flex-col space-y-5 md:space-y-0 md:space-x-10 mt-7">
               <a href={DOCS_URL} className="text-[#60A5FA] font-semibold text-sm">
                 Learn how to setup
               </a>
@@ -72,11 +72,9 @@ function Homepage() {
               the official OSRS hiscores, it helps you keep track of your gains, earn your ranks on the
               global leaderboards, participate in group competitions, collect achievements and much more.
             </p>
-            <div className="flex gap-x-10 mt-7">
-              <a href="https://wiseoldman.net" className="text-[#60A5FA] font-semibold text-sm">
-                Check out the app
-              </a>
-            </div>
+            <a href="https://wiseoldman.net" className="mt-7 text-[#60A5FA] font-semibold text-sm">
+              Check out the app
+            </a>
           </div>
         </div>
       </div>
@@ -86,12 +84,12 @@ function Homepage() {
 
 function LinksBar() {
   return (
-    <div className="flex gap-x-3">
+    <div className="flex space-x-3">
       <a
         href="https://github.com/wise-old-man/discord-bot"
         target="_blank"
         rel="noopener noreferrer"
-        className="hover:bg-black/50 bg-black/70 md:text-sm font-semibold text-white !decoration-transparent hover:text-white py-2 px-4 rounded flex gap-x-2 items-center pl-3"
+        className="hover:bg-black/50 bg-black/70 md:text-sm font-semibold text-white !decoration-transparent hover:text-white py-2 px-4 rounded flex space-x-2 items-center pl-3"
       >
         <img src="/img/github.svg" className="w-5 h-5" />
         <span className="hidden md:block">Contribute on Github</span>
@@ -101,7 +99,7 @@ function LinksBar() {
         href="https://wiseoldman.net/discord"
         target="_blank"
         rel="noopener noreferrer"
-        className="hover:bg-black/50 bg-black/70 md:text-sm font-semibold text-white !decoration-transparent hover:text-white py-2 px-4 rounded flex gap-x-2 items-center pl-3"
+        className="hover:bg-black/50 bg-black/70 md:text-sm font-semibold text-white !decoration-transparent hover:text-white py-2 px-4 rounded flex space-x-2 items-center pl-3"
       >
         <img src="/img/discord.svg" className="w-5 h-5" />
         <span className="hidden md:block">Join our Discord</span>
@@ -111,7 +109,7 @@ function LinksBar() {
         href="https://wiseoldman.net"
         target="_blank"
         rel="noopener noreferrer"
-        className="hover:bg-black/50 bg-black/70 md:text-sm font-semibold text-white !decoration-transparent hover:text-white py-2 px-4 rounded flex gap-x-2 items-center pl-3"
+        className="hover:bg-black/50 bg-black/70 md:text-sm font-semibold text-white !decoration-transparent hover:text-white py-2 px-4 rounded flex space-x-2 items-center pl-3"
       >
         <img src="/img/web.svg" className="w-5 h-5" />
         <span className="hidden md:block">Visit wiseoldman.net</span>
@@ -123,7 +121,7 @@ function LinksBar() {
 
 function CallToActionBar() {
   return (
-    <div className="rounded-lg bg-black/40 flex gap-3 p-3 md:gap-5 md:p-5">
+    <div className="rounded-lg bg-black/40 flex space-x-3 p-3 md:space-x-5 md:p-5">
       <a href={INVITE_URL} target="_blank" rel="noopener noreferrer" className="!decoration-transparent">
         <Button color="blue">
           Invite to Discord
@@ -153,7 +151,7 @@ function Button(props) {
         '--background-color': backgroundColor,
         '--hover-background-color': hoverBackgroundColor
       }}
-      className="w-full justify-center flex items-center bg-[var(--background-color)] hover:bg-[var(--hover-background-color)] md:text-[16px] text-[14px] hover:cursor-pointer font-sans py-2 px-3 md:py-3 md:px-5 rounded font-semibold border-0 border-t border-white/10 shadow-md"
+      className="text-white w-full justify-center flex items-center bg-[var(--background-color)] hover:bg-[var(--hover-background-color)] md:text-[16px] text-[14px] hover:cursor-pointer font-sans py-2 px-3 md:py-3 md:px-5 rounded font-semibold border-0 border-t border-white/10 shadow-md"
     >
       {children}
     </button>
