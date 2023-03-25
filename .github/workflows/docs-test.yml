@@ -1,0 +1,29 @@
+name: (Docs) Test Build Bot Documentation
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'docs/**'
+      - '.github/workflows/docs-test.yml'
+
+jobs:
+  test-build:
+    name: Test Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./docs
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build website
+        run: npm run build
