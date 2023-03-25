@@ -105,5 +105,8 @@ dist
 
 dist/**/*
 
+.DS_Store
+
+
 # jetbrains files
 .idea
