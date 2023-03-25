@@ -110,4 +110,18 @@ export async function updateCountry(username: string, country: string): Promise<
   });
 }
 
+export async function rollback(username: string, untilLastChange: boolean) {
+  return womClient.players.postRequest(`/players/${username}/rollback`, {
+    adminPassword: env.ADMIN_PASSWORD,
+    untilLastChange
+  });
+}
+
+export async function forceUpdate(username: string) {
+  return womClient.players.postRequest(`/players/${username}`, {
+    adminPassword: env.ADMIN_PASSWORD,
+    force: true
+  });
+}
+
 export default womClient;

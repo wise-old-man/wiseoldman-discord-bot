@@ -35,6 +35,8 @@ class NameChangeCommand extends Command {
 
     const reviewData = await womClient.nameChanges.getNameChangeDetails(nameChangeId).catch(e => {
       if (e.statusCode === 404) throw new CommandError('Name change ID not found.');
+      if (e.statusCode === 500) throw new CommandError('Failed to load hiscores. Please try again.');
+
       throw e;
     });
 
@@ -89,12 +91,19 @@ class NameChangeCommand extends Command {
 
     collector?.on('end', async collection => {
       const buttonClicked = collection.first()?.customId;
+
       if (buttonClicked === `namechange_approve/${nameChangeId}`) {
         try {
           await approveNameChange(nameChangeId);
           response.setFooter({ text: `Approved ✅` }).setColor(config.visuals.green);
         } catch (error) {
-          response.setFooter({ text: 'Failed to approve name change' }).setColor(config.visuals.red);
+          if ('statusCode' in error && error.statusCode === 504) {
+            response
+              .setFooter({ text: 'Approval timed out. Check the status again in a few minutes.' })
+              .setColor(config.visuals.orange);
+          } else {
+            response.setFooter({ text: 'Failed to approve name change' }).setColor(config.visuals.red);
+          }
         }
       } else if (buttonClicked === `namechange_deny/${nameChangeId}`) {
         try {
@@ -110,7 +119,7 @@ class NameChangeCommand extends Command {
   }
 }
 
-function buildReviewMessage(data: NameChangeDetails['data']): string {
+function buildReviewMessage(data: NonNullable<NameChangeDetails['data']>): string {
   const { isNewOnHiscores, hasNegativeGains, hoursDiff, ehpDiff, ehbDiff, oldStats, newStats } = data;
 
   const expDiff =
@@ -121,7 +130,7 @@ function buildReviewMessage(data: NameChangeDetails['data']): string {
   const oldTotalLevel = oldStats.data.skills.overall?.level;
   const newTotalLevel = newStats.data.skills.overall?.level;
 
-  const lines = [];
+  const lines: Array<string> = [];
 
   lines.push(`New name on the hiscores? ${isNewOnHiscores ? '✅' : '❌'}`);
   lines.push(`Has no negative gains? ${!hasNegativeGains ? '✅' : '❌'}`);

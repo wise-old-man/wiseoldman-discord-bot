@@ -2,8 +2,8 @@ import env from './env';
 
 export default {
   token: env.DISCORD_TOKEN,
-  apiKey: env.WOM_BOT_API_KEY,
-  baseAPIUrl: env.DISCORD_DEV_API_URL || 'https://api.wiseoldman.net/v2',
+  apiKey: env.DISCORD_BOT_API_KEY,
+  baseAPIUrl: env.BASE_API_URL || 'https://api.wiseoldman.net/v2',
   requiredPermissions: ['MANAGE_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES', 'USE_APPLICATION_COMMANDS'],
   visuals: {
     blue: 0x2980b9,
@@ -20,7 +20,8 @@ export default {
     },
     channels: {
       flags: '802680940835897384',
-      leadersLog: '830199626630955039'
+      leadersLog: '830199626630955039',
+      flaggedPlayerReviews: '1086637095415722169'
     }
   }
 };

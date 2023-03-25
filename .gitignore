@@ -104,4 +104,9 @@ dist
 .tern-port
 
 dist/**/*
+
 .DS_Store
+
+
+# jetbrains files
+.idea
