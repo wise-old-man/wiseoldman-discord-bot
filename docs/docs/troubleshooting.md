@@ -44,4 +44,4 @@ A good way to check if the bot has viewing and speaking permissions on that chan
 
 ![Missing Emojis example](./assets/missing_emojis.png)
 
-This a known bug with Discord, and the to fix it, make sure that `@everyone` role has the `Use external emoji` permission enabled.
+This a known bug with Discord, and to fix it, make sure that `@everyone` role has the `Use external emoji` permission enabled.
