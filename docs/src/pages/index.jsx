@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 import React from 'react';
+import Head from '@docusaurus/Head';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 
 const PREVIEW_IMAGE_PATHS = [
@@ -16,69 +17,82 @@ const BASE_PATH =
 
 const DOCS_URL = `${BASE_PATH}/how-to-setup`;
 
+const DESCRIPTION = `Track your Old School Runescape clan's progress from your own Discord server.`;
+
 // Could I make this dynamic? yes sure, but who cares,
 // I'll just manually updated it every few months
 const STATIC_SERVER_COUNT = '3.6k';
 
 function Homepage() {
   return (
-    <div className="bg-[#171717] relative">
-      <div className="absolute homepage-glow h-full inset-0 min-h-screen" />
-      <div className="relative flex flex-col items-center mb-40">
-        <h1 className="pt-20 mb-0 pb-2 md:pb-4 uppercase text-4xl md:text-[52px] text-transparent bg-clip-text font-bold bg-gradient-to-t to-[#3B82F6] from-[#2563EB]">
-          Wise Old Man
-        </h1>
-        <h2 className="uppercase bg-white text-[#1F3A75] text-sm md:text-xl px-1 md:px-2 font-mono rounded leading-2 pt-[1px]">
-          Discord Bot
-        </h2>
-        <p className="text-lg md:text-xl w-full mb-2 max-w-sm sm:max-w-md md:max-w-lg text-center leading-9 font-light mt-5">
-          Track your Old School Runescape clan&apos;s progress from your own Discord server.
-        </p>
-        <div className="relative w-full flex justify-center">
-          <img src="/img/wom_character.png" className="w-[297px] h-[390px]" />
-          <div className="absolute bottom-16 right-0 left-0 flex flex-col items-center space-y-4">
-            <CallToActionBar />
-            <LinksBar />
+    <>
+      <Head>
+        <meta property="og:image" content="/img/og.png" />
+        <meta name="description" content={DESCRIPTION} />
+        <meta property="og:description" content={DESCRIPTION} />
+      </Head>
+      <div className="bg-[#171717] relative">
+        <div className="absolute homepage-glow h-full inset-0 min-h-screen" />
+        <div className="relative flex flex-col items-center mb-40">
+          <h1 className="pt-20 mb-0 pb-2 md:pb-4 uppercase text-4xl md:text-[52px] text-transparent bg-clip-text font-bold bg-gradient-to-t to-[#3B82F6] from-[#2563EB]">
+            Wise Old Man
+          </h1>
+          <h2 className="uppercase bg-white text-[#1F3A75] text-sm md:text-xl px-1 md:px-2 font-mono rounded leading-2 pt-[1px]">
+            Discord Bot
+          </h2>
+          <p className="text-lg md:text-xl w-full mb-2 max-w-sm sm:max-w-md md:max-w-lg text-center leading-9 font-light mt-5">
+            Track your Old School Runescape clan&apos;s progress from your own Discord server.
+          </p>
+          <div className="relative w-full flex justify-center">
+            <img src="/img/wom_character.png" className="w-[297px] h-[390px]" />
+            <div className="absolute bottom-16 right-0 left-0 flex flex-col items-center space-y-4">
+              <CallToActionBar />
+              <LinksBar />
+            </div>
           </div>
-        </div>
-        <div className="-mt-12 z-10 w-full overflow-hidden">
-          <PreviewSlideShow />
-        </div>
-        <div className="mx-5">
-          <div className="border border-white/10 w-full lg:w-[838px] rounded-lg mt-10 p-6 md:p-12 border-solid bg-black/20 shadow-lg">
-            <h2 className="text-2xl md:text-3xl">What is this bot?</h2>
-            <p className="text-white/70 md:leading-7 leading-6 text-sm md:text-[14px]">
-              The Wise Old Man Discord bot is one of the elements in the Wise Old Man project. It allows
-              you to interface with the core Wise Old Man application through your Discord server and
-              helps you keep track of your clan&apos;s gains, latest achievements and upcoming/ongoing
-              competitions, etc.
-            </p>
-            <div className="flex md:flex-row flex-col space-y-5 md:space-y-0 md:space-x-10 mt-7">
-              <a href={DOCS_URL} className="text-[#60A5FA] font-semibold text-sm">
-                Learn how to setup
-              </a>
-              <a href={`${BASE_PATH}/commands`} className="text-[#60A5FA] font-semibold text-sm">
-                Browse the features
-              </a>
-              <a href="https://wiseoldman.net/discord" className="text-[#60A5FA] font-semibold text-sm">
-                Join our Discord for help
+          <div className="-mt-12 z-10 w-full overflow-hidden">
+            <PreviewSlideShow />
+          </div>
+          <div className="mx-5">
+            <div className="border border-white/10 w-full lg:w-[838px] rounded-lg mt-10 p-6 md:p-12 border-solid bg-black/20 shadow-lg">
+              <h2 className="text-2xl md:text-3xl">What is this bot?</h2>
+              <p className="text-white/70 md:leading-7 leading-6 text-sm md:text-[14px]">
+                The Wise Old Man Discord bot is one of the elements in the Wise Old Man project. It
+                allows you to interface with the core Wise Old Man application through your Discord
+                server and helps you keep track of your clan&apos;s gains, latest achievements and
+                upcoming/ongoing competitions, etc.
+              </p>
+              <div className="flex md:flex-row flex-col space-y-5 md:space-y-0 md:space-x-10 mt-7">
+                <a href={DOCS_URL} className="text-[#60A5FA] font-semibold text-sm">
+                  Learn how to setup
+                </a>
+                <a href={`${BASE_PATH}/commands`} className="text-[#60A5FA] font-semibold text-sm">
+                  Browse the features
+                </a>
+                <a
+                  href="https://wiseoldman.net/discord"
+                  className="text-[#60A5FA] font-semibold text-sm"
+                >
+                  Join our Discord for help
+                </a>
+              </div>
+            </div>
+            <div className="border border-white/10 w-full lg:w-[838px] rounded-lg mt-10 p-6 md:p-12 border-solid bg-black/20 shadow-lg">
+              <h2 className="text-2xl md:text-3xl">What is the Wise Old Man?</h2>
+              <p className="text-white/70 md:leading-7 leading-6 text-sm md:text-[14px]">
+                WOM is a web application that tracks your progress in Old School Runescape. Built on top
+                of the official OSRS hiscores, it helps you keep track of your gains, earn your ranks on
+                the global leaderboards, participate in group competitions, collect achievements and much
+                more.
+              </p>
+              <a href="https://wiseoldman.net" className="mt-7 text-[#60A5FA] font-semibold text-sm">
+                Check out the app
               </a>
             </div>
           </div>
-          <div className="border border-white/10 w-full lg:w-[838px] rounded-lg mt-10 p-6 md:p-12 border-solid bg-black/20 shadow-lg">
-            <h2 className="text-2xl md:text-3xl">What is the Wise Old Man?</h2>
-            <p className="text-white/70 md:leading-7 leading-6 text-sm md:text-[14px]">
-              WOM is a web application that tracks your progress in Old School Runescape. Built on top of
-              the official OSRS hiscores, it helps you keep track of your gains, earn your ranks on the
-              global leaderboards, participate in group competitions, collect achievements and much more.
-            </p>
-            <a href="https://wiseoldman.net" className="mt-7 text-[#60A5FA] font-semibold text-sm">
-              Check out the app
-            </a>
-          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
