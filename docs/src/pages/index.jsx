@@ -44,7 +44,7 @@ function Homepage() {
         <div className="-mt-12 z-10 w-full overflow-hidden">
           <PreviewSlideShow />
         </div>
-        <div className="mx-10">
+        <div className="mx-5">
           <div className="border border-white/10 w-full lg:w-[838px] rounded-lg mt-10 p-6 md:p-12 border-solid bg-black/20 shadow-lg">
             <h2 className="text-2xl md:text-3xl">What is this bot?</h2>
             <p className="text-white/70 md:leading-7 leading-6 text-sm md:text-[14px]">
@@ -89,7 +89,7 @@ function LinksBar() {
         href="https://github.com/wise-old-man/discord-bot"
         target="_blank"
         rel="noopener noreferrer"
-        className="hover:bg-black/50 bg-black/70 md:text-sm font-semibold text-white !decoration-transparent hover:text-white py-2 px-4 rounded flex space-x-2 items-center pl-3"
+        className="hover:bg-black/50 bg-black/70 text-sm md:text-sm font-semibold text-white !decoration-transparent hover:text-white py-2 px-4 rounded flex space-x-2 items-center pl-3"
       >
         <img src="/img/github.svg" className="w-5 h-5" />
         <span className="hidden md:block">Contribute on Github</span>
@@ -99,7 +99,7 @@ function LinksBar() {
         href="https://wiseoldman.net/discord"
         target="_blank"
         rel="noopener noreferrer"
-        className="hover:bg-black/50 bg-black/70 md:text-sm font-semibold text-white !decoration-transparent hover:text-white py-2 px-4 rounded flex space-x-2 items-center pl-3"
+        className="hover:bg-black/50 bg-black/70 text-sm md:text-sm font-semibold text-white !decoration-transparent hover:text-white py-2 px-4 rounded flex space-x-2 items-center pl-3"
       >
         <img src="/img/discord.svg" className="w-5 h-5" />
         <span className="hidden md:block">Join our Discord</span>
@@ -109,7 +109,7 @@ function LinksBar() {
         href="https://wiseoldman.net"
         target="_blank"
         rel="noopener noreferrer"
-        className="hover:bg-black/50 bg-black/70 md:text-sm font-semibold text-white !decoration-transparent hover:text-white py-2 px-4 rounded flex space-x-2 items-center pl-3"
+        className="hover:bg-black/50 bg-black/70 text-sm md:text-sm font-semibold text-white !decoration-transparent hover:text-white py-2 px-4 rounded flex space-x-2 items-center pl-3"
       >
         <img src="/img/web.svg" className="w-5 h-5" />
         <span className="hidden md:block">Visit wiseoldman.net</span>
