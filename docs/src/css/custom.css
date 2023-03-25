@@ -1,3 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/static/fonts/Inter-VariableFont_slnt,wght.ttf') format('tff');
+}
+
 :root {
   font-size: 0.9rem;
 
@@ -9,6 +18,7 @@
   --ifm-color-primary-lighter: hsl(202, 82%, 67%);
   --ifm-color-primary-lightest: hsl(202, 82%, 74%);
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-font-family-base: 'Inter';
 }
 
 html {
@@ -62,4 +72,11 @@ hr {
 h3 {
   font-family: monospace;
   font-size: 2rem;
+}
+
+.homepage-glow {
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0) 100%),
+    radial-gradient(40.09% 30.09% at 50% 39.36%, rgba(37, 99, 235, 0.25) 0%, rgba(0, 0, 0, 0) 100%),
+    radial-gradient(46.09% 46.09% at 50% 36.36%, rgba(37, 99, 235, 0.1) 0%, rgba(0, 0, 0, 0) 100%),
+    #171717;
 }
