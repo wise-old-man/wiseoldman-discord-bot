@@ -8,7 +8,7 @@
 }
 
 :root {
-  font-size: 0.9rem;
+  font-size: 1rem;
 
   --ifm-color-primary: hsl(202, 82%, 60%);
   --ifm-color-primary-dark: hsl(202, 82%, 56%);
