@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import React from 'react';
+import React, { useEffect } from 'react';
 import Head from '@docusaurus/Head';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 
@@ -24,6 +24,30 @@ const DESCRIPTION = `Track your Old School Runescape clan's progress from your o
 const STATIC_SERVER_COUNT = '3.6k';
 
 function Homepage() {
+  // This is a scroll effect for the bg glow and WOM character
+  useEffect(() => {
+    const listener = window.addEventListener('scroll', e => {
+      const scrollPercent = window.scrollY / 500;
+
+      const glowElement = document.getElementById('glow');
+      const womElement = document.getElementById('wom');
+
+      if (glowElement) {
+        glowElement.style.opacity = 1 - scrollPercent;
+      }
+
+      if (womElement) {
+        womElement.style.opacity = 1 - scrollPercent;
+        womElement.style.filter = `blur(${10 * scrollPercent}px)`;
+        womElement.style.transform = `translateY(${scrollPercent * 100}px)`;
+      }
+    });
+
+    return () => {
+      window.removeEventListener('scroll', listener);
+    };
+  }, []);
+
   return (
     <>
       <Head>
@@ -32,9 +56,9 @@ function Homepage() {
         <meta property="og:description" content={DESCRIPTION} />
       </Head>
       <div className="bg-[#171717] relative">
-        <div className="absolute homepage-glow h-full inset-0 min-h-screen" />
+        <div id="glow" className="absolute homepage-glow h-full inset-0 min-h-screen" />
         <div className="relative flex flex-col items-center mb-40">
-          <h1 className="pt-20 mb-0 pb-2 md:pb-4 uppercase text-4xl md:text-[52px] text-transparent bg-clip-text font-bold bg-gradient-to-t to-[#3B82F6] from-[#2563EB]">
+          <h1 className="pt-20 mb-0 pb-2 md:pb-4 uppercase text-4xl md:text-[3.25rem] text-transparent bg-clip-text font-bold bg-gradient-to-t to-[#3B82F6] from-[#2563EB]">
             Wise Old Man
           </h1>
           <h2 className="uppercase bg-white text-[#1F3A75] text-sm md:text-xl px-1 md:px-2 font-mono rounded leading-2 pt-[1px]">
@@ -44,7 +68,7 @@ function Homepage() {
             Track your Old School Runescape clan&apos;s progress from your own Discord server.
           </p>
           <div className="relative w-full flex justify-center">
-            <img src="/img/wom_character.png" className="w-[297px] h-[390px]" />
+            <img id="wom" src="/img/wom_character.png" className="w-[297px] h-[390px]" />
             <div className="absolute bottom-16 right-0 left-0 flex flex-col items-center space-y-4">
               <CallToActionBar />
               <LinksBar />
@@ -56,7 +80,7 @@ function Homepage() {
           <div className="mx-5">
             <div className="border border-white/10 w-full lg:w-[838px] rounded-lg mt-10 p-6 md:p-12 border-solid bg-black/20 shadow-lg">
               <h2 className="text-2xl md:text-3xl">What is this bot?</h2>
-              <p className="text-white/70 md:leading-7 leading-6 text-sm md:text-[14px]">
+              <p className="text-white/70 md:leading-7 leading-6 text-sm md:text-[0.875rem]">
                 The Wise Old Man Discord bot is one of the elements in the Wise Old Man project. It
                 allows you to interface with the core Wise Old Man application through your Discord
                 server and helps you keep track of your clan&apos;s gains, latest achievements and
@@ -79,7 +103,7 @@ function Homepage() {
             </div>
             <div className="border border-white/10 w-full lg:w-[838px] rounded-lg mt-10 p-6 md:p-12 border-solid bg-black/20 shadow-lg">
               <h2 className="text-2xl md:text-3xl">What is the Wise Old Man?</h2>
-              <p className="text-white/70 md:leading-7 leading-6 text-sm md:text-[14px]">
+              <p className="text-white/70 md:leading-7 leading-6 text-sm md:text-[0.875rem]">
                 WOM is a web application that tracks your progress in Old School Runescape. Built on top
                 of the official OSRS hiscores, it helps you keep track of your gains, earn your ranks on
                 the global leaderboards, participate in group competitions, collect achievements and much
@@ -165,7 +189,7 @@ function Button(props) {
         '--background-color': backgroundColor,
         '--hover-background-color': hoverBackgroundColor
       }}
-      className="text-white w-full justify-center flex items-center bg-[var(--background-color)] hover:bg-[var(--hover-background-color)] md:text-[16px] text-[14px] hover:cursor-pointer font-sans py-2 px-3 md:py-3 md:px-5 rounded font-semibold border-0 border-t border-white/10 shadow-md"
+      className="text-white w-full justify-center flex items-center bg-[var(--background-color)] hover:bg-[var(--hover-background-color)] md:text-[1rem] text-[0.875rem] hover:cursor-pointer font-sans py-2 px-3 md:py-3 md:px-5 rounded font-semibold border-0 border-t border-white/10 shadow-md"
     >
       {children}
     </button>
