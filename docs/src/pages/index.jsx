@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import React from 'react';
+import React, { useEffect } from 'react';
 import Head from '@docusaurus/Head';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 
@@ -24,6 +24,30 @@ const DESCRIPTION = `Track your Old School Runescape clan's progress from your o
 const STATIC_SERVER_COUNT = '3.6k';
 
 function Homepage() {
+  // This is a scroll effect for the bg glow and WOM character
+  useEffect(() => {
+    const listener = window.addEventListener('scroll', e => {
+      const scrollPercent = window.scrollY / 500;
+
+      const glowElement = document.getElementById('glow');
+      const womElement = document.getElementById('wom');
+
+      if (glowElement) {
+        glowElement.style.opacity = 1 - scrollPercent;
+      }
+
+      if (womElement) {
+        womElement.style.opacity = 1 - scrollPercent;
+        womElement.style.filter = `blur(${10 * scrollPercent}px)`;
+        womElement.style.transform = `translateY(${scrollPercent * 100}px)`;
+      }
+    });
+
+    return () => {
+      window.removeEventListener('scroll', listener);
+    };
+  }, []);
+
   return (
     <>
       <Head>
@@ -32,7 +56,7 @@ function Homepage() {
         <meta property="og:description" content={DESCRIPTION} />
       </Head>
       <div className="bg-[#171717] relative">
-        <div className="absolute homepage-glow h-full inset-0 min-h-screen" />
+        <div id="glow" className="absolute homepage-glow h-full inset-0 min-h-screen" />
         <div className="relative flex flex-col items-center mb-40">
           <h1 className="pt-20 mb-0 pb-2 md:pb-4 uppercase text-4xl md:text-[3.25rem] text-transparent bg-clip-text font-bold bg-gradient-to-t to-[#3B82F6] from-[#2563EB]">
             Wise Old Man
@@ -44,7 +68,7 @@ function Homepage() {
             Track your Old School Runescape clan&apos;s progress from your own Discord server.
           </p>
           <div className="relative w-full flex justify-center">
-            <img src="/img/wom_character.png" className="w-[297px] h-[390px]" />
+            <img id="wom" src="/img/wom_character.png" className="w-[297px] h-[390px]" />
             <div className="absolute bottom-16 right-0 left-0 flex flex-col items-center space-y-4">
               <CallToActionBar />
               <LinksBar />
