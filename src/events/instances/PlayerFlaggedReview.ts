@@ -12,7 +12,7 @@ import {
 import { encodeURL } from '../../utils';
 import { Event } from '../../utils/events';
 import config from '../../config';
-import { forceUpdate, rollback } from '../../services/wiseoldman';
+import { archive, forceUpdate, rollback } from '../../services/wiseoldman';
 
 interface PlayerFlaggedData {
   player: Player;
@@ -267,7 +267,15 @@ class PlayerFlaggedReview implements Event {
         }
 
         if (clickedId === `name_transfer/${uniqueId}`) {
-          await reportMessage.reply(`Player archiving is available yet.`);
+          try {
+            const archivedPlayer = await archive(player.username);
+            message.setColor(config.visuals.green).setFooter({
+              text: `Archived by ${username} (archived username: ${archivedPlayer.username})`
+            });
+          } catch (error) {
+            message.setColor(config.visuals.red).setFooter({ text: `Archive failed` });
+          }
+          await reportMessage.edit({ embeds: [message], components: [] });
           return;
         }
       });
