@@ -4,7 +4,6 @@ import {
   BOSSES,
   formatNumber,
   FormattedSnapshot,
-  Metric,
   MetricProps,
   Player,
   REAL_SKILLS,
@@ -15,43 +14,47 @@ import { Event } from '../../utils/events';
 import config from '../../config';
 import { forceUpdate, rollback } from '../../services/wiseoldman';
 
-const STACKABLE_EXP_SKILLS = [
-  Metric.COOKING,
-  Metric.CRAFTING,
-  Metric.SMITHING,
-  Metric.AGILITY,
-  Metric.THIEVING
-];
-
 interface PlayerFlaggedData {
   player: Player;
-  previousSnapshot: FormattedSnapshot;
-  rejectedSnapshot: FormattedSnapshot;
-  negativeGains: boolean;
-  excessiveGains: boolean;
-  excessiveGainsReversed: boolean;
+  flagContext: {
+    previous: FormattedSnapshot;
+    rejected: FormattedSnapshot;
+    negativeGains: boolean;
+    excessiveGains: boolean;
+    possibleRollback: boolean;
+    excessiveGainsReversed: boolean;
+    data: {
+      stackableGainedRatio: number;
+      previousEHP: number;
+      previousEHB: number;
+      previousRank: number;
+      rejectedEHP: number;
+      rejectedEHB: number;
+      rejectedRank: number;
+    };
+  };
 }
 
-class PlayerFlagged implements Event {
+class PlayerFlaggedReview implements Event {
   type: string;
 
   constructor() {
-    this.type = 'PLAYER_FLAGGED';
+    this.type = 'PLAYER_FLAGGED_REVIEW';
   }
 
   async execute(data: PlayerFlaggedData, client: Client) {
-    const { player, previousSnapshot: previous, rejectedSnapshot: rejected } = data;
+    const { player, flagContext } = data;
+    const { previous, rejected, possibleRollback, negativeGains, excessiveGains } = flagContext;
 
-    const uniqueId = `${player.id}_${rejected.createdAt}`;
-    const actions = new MessageActionRow();
-
-    const timeDiff = new Date(rejected.createdAt).getTime() - new Date(previous.createdAt).getTime();
-
-    const previousEHP = previous.data.skills.overall.ehp;
-    const rejectedEHP = rejected.data.skills.overall.ehp;
-
-    const previousEHB = BOSSES.map(b => previous.data.bosses[b].ehb).reduce((a, b) => a + b, 0);
-    const rejectedEHB = BOSSES.map(b => rejected.data.bosses[b].ehb).reduce((a, b) => a + b, 0);
+    const {
+      previousEHP,
+      previousEHB,
+      previousRank,
+      rejectedEHP,
+      rejectedEHB,
+      rejectedRank,
+      stackableGainedRatio
+    } = flagContext.data;
 
     const ehpDiff = rejectedEHP - previousEHP;
     const ehbDiff = rejectedEHB - previousEHB;
@@ -59,17 +62,21 @@ class PlayerFlagged implements Event {
     const ehpChange = Math.round(getPercentageIncrease(previousEHP, rejectedEHP) * 100);
     const ehbChange = Math.round(getPercentageIncrease(previousEHB, rejectedEHB) * 100);
 
-    const lines = [];
+    const uniqueId = `${player.id}_${rejected.createdAt}`;
+    const actions = new MessageActionRow();
 
-    if (data.negativeGains) {
+    const timeDiff = new Date(rejected.createdAt).getTime() - new Date(previous.createdAt).getTime();
+
+    const lines: string[] = [];
+
+    if (negativeGains) {
       lines.push(`**Main cause**: Negative gains`);
       lines.push(`**Time diff**: ${Math.floor(timeDiff / 1000 / 60 / 60)} hours`);
 
-      // if lost or gained too much exp, it's most likely not a rollback
-      if (data.excessiveGainsReversed || data.excessiveGains) {
-        lines.push(`\n**🤔 Prediction 🤔**\n Name transfer`);
-      } else {
+      if (possibleRollback) {
         lines.push(`\n**🤔 Prediction 🤔**\n Name transfer (common) or Hiscores rollback (rare)`);
+      } else {
+        lines.push(`\n**🤔 Prediction 🤔**\n Name transfer`);
       }
 
       actions.addComponents(
@@ -101,17 +108,7 @@ class PlayerFlagged implements Event {
           `\`${formatNumber(ehbDiff, false, 3)}\` (\`${ehbChange}%\`)`
         ].join(' · ')
       );
-    } else if (data.excessiveGains) {
-      // Sum the gained EHP from all stackable skills
-      const gainedEHPFromStackableSkills = STACKABLE_EXP_SKILLS.map(
-        s => rejected.data.skills[s].ehp - previous.data.skills[s].ehp
-      ).reduce((a, b) => a + b, 0);
-
-      const stackableGainedRatio = gainedEHPFromStackableSkills / (ehpDiff + ehbDiff);
-
-      const previousRank = previous.data.skills.overall.rank;
-      const rejectedRank = rejected.data.skills.overall.rank;
-
+    } else if (excessiveGains) {
       const previousExp = previous.data.skills.overall.experience;
       const rejectedExp = rejected.data.skills.overall.experience;
 
@@ -218,10 +215,15 @@ class PlayerFlagged implements Event {
     reviewChannel
       .createMessageComponentCollector({ componentType: 'BUTTON', max: 1, time: 3600 * 1000 })
       .on('end', async collection => {
-        if (!collection.first()) return;
+        if (!collection) return;
 
-        const username = collection.first().member.user.username;
-        const clickedId = collection.first().customId;
+        const first = collection.first();
+        if (!first) return;
+
+        const username = first.member?.user.username;
+        if (!username) return;
+
+        const clickedId = first.customId;
 
         if (clickedId === `idk/${uniqueId}`) {
           message.setColor(config.visuals.orange).setFooter({ text: `Marked as "🤷‍♂️" by ${username}` });
@@ -273,7 +275,7 @@ class PlayerFlagged implements Event {
 }
 
 function getLargestSkillChanges(previous: FormattedSnapshot, rejected: FormattedSnapshot) {
-  const lines = [];
+  const lines: string[] = [];
 
   const map = new Map<Skill, number>();
 
@@ -295,13 +297,13 @@ function getLargestSkillChanges(previous: FormattedSnapshot, rejected: Formatted
 
   if (biggestGains.length > 0) {
     lines.push('\n');
-    lines.push(`**Top Skill gains:**`);
+    lines.push(`**Top Skill gains**`);
     lines.push(...biggestGains.map(g => `${MetricProps[g[0]].name}: \`+${formatNumber(g[1], true)}\``));
   }
 
   if (biggestLosses.length > 0) {
     lines.push('\n');
-    lines.push(`**Top Skill losses:**`);
+    lines.push(`**🔻 Top Skill losses🔻**`);
     lines.push(...biggestLosses.map(l => `${MetricProps[l[0]].name}: \`${formatNumber(l[1], true)}\``));
   }
 
@@ -309,7 +311,7 @@ function getLargestSkillChanges(previous: FormattedSnapshot, rejected: Formatted
 }
 
 function getLargestBossChanges(previous: FormattedSnapshot, rejected: FormattedSnapshot) {
-  const lines = [];
+  const lines: string[] = [];
 
   const map = new Map<Boss, number>();
 
@@ -328,13 +330,13 @@ function getLargestBossChanges(previous: FormattedSnapshot, rejected: FormattedS
 
   if (biggestGains.length > 0) {
     lines.push('\n');
-    lines.push(`**Top Boss gains:**`);
+    lines.push(`**Top Boss gains**`);
     lines.push(...biggestGains.map(g => `${MetricProps[g[0]].name}: \`+${formatNumber(g[1], true)}\``));
   }
 
   if (biggestLosses.length > 0) {
     lines.push('\n');
-    lines.push(`**Top Boss losses:**`);
+    lines.push(`**🔻 Top Boss losses 🔻**`);
     lines.push(...biggestLosses.map(l => `${MetricProps[l[0]].name}: \`${formatNumber(l[1], true)}\``));
   }
 
@@ -347,4 +349,4 @@ function getPercentageIncrease(previous: number, current: number) {
   return (current - previous) / previous;
 }
 
-export default new PlayerFlagged();
+export default new PlayerFlaggedReview();
