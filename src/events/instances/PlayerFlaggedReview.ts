@@ -246,7 +246,7 @@ class PlayerFlaggedReview implements Event {
 
         if (clickedId === `deironed/${uniqueId}`) {
           try {
-            await rollback(player.username, true);
+            await handleRollback(player.username);
             message.setColor(config.visuals.green).setFooter({ text: `De-iron fix by ${username}` });
           } catch (error) {
             message.setColor(config.visuals.red).setFooter({ text: `De-iron fix failed` });
@@ -280,6 +280,21 @@ class PlayerFlaggedReview implements Event {
         }
       });
   }
+}
+
+async function handleRollback(username: string) {
+  // First, try to delete only the snapshots AFTER lastChangedAt, if that fails
+  // try to delete the last snapshot (regardless of lastChangedAt date),
+  // if both of those fail, then there's something wrong, just let it throw
+  try {
+    await rollback(username, true);
+  } catch (error) {
+    if (error.message !== "Failed to delete a player's last snapshots.") {
+      throw error;
+    }
+  }
+
+  await rollback(username, false);
 }
 
 function getLargestSkillChanges(previous: FormattedSnapshot, rejected: FormattedSnapshot) {
