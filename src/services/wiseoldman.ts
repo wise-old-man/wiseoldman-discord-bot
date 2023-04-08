@@ -117,6 +117,12 @@ export async function rollback(username: string, untilLastChange: boolean) {
   });
 }
 
+export async function archive(username: string) {
+  return womClient.players.postRequest<Player>(`/players/${username}/archive`, {
+    adminPassword: env.ADMIN_PASSWORD
+  });
+}
+
 export async function forceUpdate(username: string) {
   return womClient.players.postRequest(`/players/${username}`, {
     adminPassword: env.ADMIN_PASSWORD,
