@@ -237,6 +237,7 @@ class PlayerFlaggedReview implements Event {
             await rollback(player.username, false);
             message.setColor(config.visuals.green).setFooter({ text: `Rolled back by ${username}` });
           } catch (error) {
+            console.log(error);
             message.setColor(config.visuals.red).setFooter({ text: `Rollback failed` });
           }
 
@@ -249,6 +250,7 @@ class PlayerFlaggedReview implements Event {
             await handleRollback(player.username);
             message.setColor(config.visuals.green).setFooter({ text: `De-iron fix by ${username}` });
           } catch (error) {
+            console.log(error);
             message.setColor(config.visuals.red).setFooter({ text: `De-iron fix failed` });
           }
           await reportMessage.edit({ embeds: [message], components: [] });
@@ -260,6 +262,7 @@ class PlayerFlaggedReview implements Event {
             await forceUpdate(player.username);
             message.setColor(config.visuals.green).setFooter({ text: `Force updated by ${username}` });
           } catch (error) {
+            console.log(error);
             message.setColor(config.visuals.red).setFooter({ text: `Force update failed` });
           }
           await reportMessage.edit({ embeds: [message], components: [] });
@@ -273,6 +276,7 @@ class PlayerFlaggedReview implements Event {
               text: `Archived by ${username} (archived username: ${archivedPlayer.username})`
             });
           } catch (error) {
+            console.log(error);
             message.setColor(config.visuals.red).setFooter({ text: `Archive failed` });
           }
           await reportMessage.edit({ embeds: [message], components: [] });
