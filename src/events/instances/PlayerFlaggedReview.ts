@@ -216,7 +216,7 @@ class PlayerFlaggedReview implements Event {
     });
 
     reviewChannel
-      .createMessageComponentCollector({ componentType: 'BUTTON', max: 1, time: 3600 * 1000 })
+      .createMessageComponentCollector({ componentType: 'BUTTON', max: 1, time: 900 * 1000 })
       .on('end', async collection => {
         console.log('Button clicked.');
         if (!collection) return;
