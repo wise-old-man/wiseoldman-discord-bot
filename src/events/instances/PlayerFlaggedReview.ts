@@ -218,13 +218,18 @@ class PlayerFlaggedReview implements Event {
     reviewChannel
       .createMessageComponentCollector({ componentType: 'BUTTON', max: 1, time: 3600 * 1000 })
       .on('end', async collection => {
+        console.log('Button clicked.');
         if (!collection) return;
 
         const first = collection.first();
         if (!first) return;
 
+        console.log('Interaction found', first.customId);
+
         const username = first.member?.user.username;
         if (!username) return;
+
+        console.log('User found', username);
 
         const clickedId = first.customId;
 
