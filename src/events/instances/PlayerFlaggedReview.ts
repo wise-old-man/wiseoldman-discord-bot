@@ -1,5 +1,7 @@
 import { Client, MessageActionRow, MessageButton, MessageEmbed, TextChannel } from 'discord.js';
 import {
+  ACTIVITIES,
+  Activity,
   Boss,
   BOSSES,
   formatNumber,
@@ -188,6 +190,7 @@ class PlayerFlaggedReview implements Event {
 
     lines.push(...getLargestSkillChanges(previous, rejected));
     lines.push(...getLargestBossChanges(previous, rejected));
+    lines.push(...getLargestActivityChanges(previous, rejected));
 
     actions.addComponents(
       new MessageButton()
@@ -364,6 +367,42 @@ function getLargestBossChanges(previous: FormattedSnapshot, rejected: FormattedS
   if (biggestLosses.length > 0) {
     lines.push('\n');
     lines.push(`**🔻 Top Boss losses 🔻**`);
+    lines.push(...biggestLosses.map(l => `${MetricProps[l[0]].name}: \`${formatNumber(l[1], true)}\``));
+  }
+
+  return lines;
+}
+
+function getLargestActivityChanges(previous: FormattedSnapshot, rejected: FormattedSnapshot) {
+  const lines: string[] = [];
+
+  const map = new Map<Activity, number>();
+
+  ACTIVITIES.map(a => {
+    map.set(
+      a,
+      Math.max(0, rejected.data.activities[a].score) - Math.max(0, previous.data.activities[a].score)
+    );
+  });
+
+  const entries = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
+
+  const biggestGains = entries.slice(0, 3).filter(v => v[1] > 0);
+
+  const biggestLosses = entries
+    .slice(entries.length - 3, entries.length)
+    .reverse()
+    .filter(v => v[1] < 0);
+
+  if (biggestGains.length > 0) {
+    lines.push('\n');
+    lines.push(`**Top Activity gains**`);
+    lines.push(...biggestGains.map(g => `${MetricProps[g[0]].name}: \`+${formatNumber(g[1], true)}\``));
+  }
+
+  if (biggestLosses.length > 0) {
+    lines.push('\n');
+    lines.push(`**🔻 Top Activity losses 🔻**`);
     lines.push(...biggestLosses.map(l => `${MetricProps[l[0]].name}: \`${formatNumber(l[1], true)}\``));
   }
 
