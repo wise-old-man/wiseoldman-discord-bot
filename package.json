@@ -1,6 +1,6 @@
 {
   "name": "wise-old-man-bot",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "description": "A Discord bot for the Wise Old Man projects (https://github.com/wise-old-man/wise-old-man/)",
   "author": "Psikoi",
   "license": "ISC",
@@ -47,7 +47,7 @@
     "@sapphire/discord.js-utilities": "^4.8.0",
     "@sentry/node": "^7.28.0",
     "@sentry/tracing": "^7.28.0",
-    "@wise-old-man/utils": "^2.1.2",
+    "@wise-old-man/utils": "^2.1.8",
     "canvas": "^2.6.1",
     "cors": "^2.8.5",
     "discord-api-types": "^0.27.2",
