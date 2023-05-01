@@ -209,3 +209,14 @@ export async function getLinkedGroupId(interaction: CommandInteraction) {
 
   return groupId;
 }
+
+export function requiresAdminPermissions(command: BaseCommand, subCommandName: string | null): boolean {
+  if (!(command instanceof AggregateCommand)) {
+    return !!command.requiresAdmin;
+  }
+
+  return (
+    !!subCommandName &&
+    !!command.subCommands.find(s => s.slashCommand.name === subCommandName)?.requiresAdmin
+  );
+}
