@@ -18,8 +18,7 @@ const CONFIG: CommandConfig = {
       type: 'string',
       name: 'metric',
       description: 'The metric to show hiscores for.',
-      autocomplete: true,
-      required: true
+      autocomplete: true
     }
   ]
 };
@@ -33,7 +32,7 @@ class GroupHiscoresCommand extends Command {
     const groupId = await getLinkedGroupId(interaction);
 
     const metric =
-      parseMetricAbbreviation(interaction.options.getString('metric', true)) || Metric.OVERALL;
+      parseMetricAbbreviation(interaction.options.getString('metric') || 'overall') || Metric.OVERALL;
 
     const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
       throw new CommandError("Couldn't find that group.");

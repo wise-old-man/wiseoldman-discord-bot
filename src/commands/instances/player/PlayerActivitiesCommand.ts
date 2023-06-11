@@ -29,7 +29,6 @@ const CONFIG: CommandConfig = {
       type: 'string',
       name: 'variant',
       description: 'The variant to show stats for (scores / rank).',
-      required: true,
       choices: [
         { label: 'Scores', value: RenderVariant.SCORES },
         { label: 'Ranks', value: RenderVariant.RANKS }
@@ -53,7 +52,7 @@ class PlayerActivitiesCommand extends Command {
     const username = await getUsernameParam(interaction);
 
     // Get the variant from subcommand
-    const variant = interaction.options.getString('variant', true) as RenderVariant;
+    const variant = (interaction.options.getString('variant') as RenderVariant) || RenderVariant.SCORES;
 
     const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(

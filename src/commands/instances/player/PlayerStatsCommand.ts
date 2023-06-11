@@ -59,7 +59,6 @@ const CONFIG: CommandConfig = {
       type: 'string',
       name: 'variant',
       description: 'The variant to show stats for (levels / exp / rank / ehp).',
-      required: true,
       choices: [
         { label: 'Levels', value: RenderVariant.LEVELS },
         { label: 'Ranks', value: RenderVariant.RANKS },
@@ -84,9 +83,8 @@ class PlayerStatsCommand extends Command {
     // Grab the username from the command's arguments or database alias
     const username = await getUsernameParam(interaction);
 
-
     // Get the variant from subcommand
-    const variant = interaction.options.getString('variant', true) as RenderVariant;
+    const variant = (interaction.options.getString('variant') as RenderVariant) || RenderVariant.LEVELS;
 
     const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(

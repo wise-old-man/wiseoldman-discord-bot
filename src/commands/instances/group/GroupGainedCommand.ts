@@ -1,7 +1,6 @@
 import {
   formatNumber,
   getMetricName,
-  isMetric,
   isPeriod,
   Metric,
   parseMetricAbbreviation,
@@ -20,14 +19,12 @@ const CONFIG: CommandConfig = {
       type: 'string',
       name: 'metric',
       description: 'The metric to show gains for',
-      required: true,
       autocomplete: true
     },
     {
       type: 'string',
       name: 'period',
       description: 'You can use custom periods with this format: 1y6d5h',
-      required: true,
       autocomplete: true
     }
   ]
@@ -41,11 +38,11 @@ class GroupGainedCommand extends Command {
   async execute(interaction: CommandInteraction) {
     const groupId = await getLinkedGroupId(interaction);
 
-    const periodParam = interaction.options.getString('period', true);
-    const metricParam = parseMetricAbbreviation(interaction.options.getString('metric', true));
+    const periodParam = interaction.options.getString('period') || Period.WEEK;
 
     const period = isPeriod(periodParam) ? periodParam : Period.WEEK;
-    const metric = metricParam !== null && isMetric(metricParam) ? metricParam : Metric.OVERALL;
+    const metric =
+      parseMetricAbbreviation(interaction.options.getString('metric') || 'overall') || Metric.OVERALL;
 
     const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
       throw new CommandError("Couldn't find that group.");

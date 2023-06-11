@@ -2,7 +2,9 @@ import {
   formatNumber,
   getMetricName,
   GetPlayerGainsResponse,
+  isPeriod,
   Metric,
+  Period,
   PeriodProps,
   PlayerDeltasMap
 } from '@wise-old-man/utils';
@@ -29,7 +31,6 @@ const CONFIG: CommandConfig = {
       type: 'string',
       name: 'period',
       description: 'Tip: You can use custom periods using the following format: 1y6d5h',
-      required: true,
       autocomplete: true
     },
     {
@@ -50,7 +51,8 @@ class PlayerGainedCommand extends Command {
     const username = await getUsernameParam(interaction);
 
     // Grab the period from the command's arguments
-    const period = interaction.options.getString('period', true);
+    const periodParam = interaction.options.getString('period') || Period.WEEK;
+    const period = isPeriod(periodParam) ? periodParam : Period.WEEK;
 
     const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(
