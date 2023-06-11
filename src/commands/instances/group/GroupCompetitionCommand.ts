@@ -1,197 +1,168 @@
-import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import {
   CompetitionDetails,
-  CompetitionListItem,
+  CompetitionStatus,
+  CompetitionStatusProps,
+  CompetitionType,
+  CompetitionTypeProps,
   formatNumber,
-  getMetricName
+  isCompetitionStatus,
+  MetricProps
 } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { capitalize, uniq } from 'lodash';
-import { getCompetitionStatus, getCompetitionTimeLeft } from '../../../api/modules/competitions';
-import womClient from '../../../api/wom-api';
+import { uniq } from 'lodash';
 import config from '../../../config';
-import { getServer } from '../../../database/services/server';
-import { SubCommand } from '../../../types';
-import { getEmoji } from '../../../utils';
-import CommandError from '../../CommandError';
+import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '../../../services/wiseoldman';
+import {
+  bold,
+  Command,
+  CommandConfig,
+  CommandError,
+  getEmoji,
+  getLinkedGroupId,
+  keyValue
+} from '../../../utils';
 
-class GroupCompetitionCommand implements SubCommand {
-  subcommand?: boolean | undefined;
-  requiresGroup?: boolean | undefined;
-  slashCommand?: SlashCommandSubcommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'competition',
+  description: "View a group's ongoing/upcoming competition.",
+  options: [
+    {
+      type: 'integer',
+      name: 'competition_id',
+      description: 'Competition ID'
+    },
+    {
+      type: 'string',
+      name: 'status',
+      description: 'View an ongoing or upcoming group competition.',
+      choices: [
+        {
+          value: CompetitionStatus.ONGOING,
+          label: CompetitionStatusProps[CompetitionStatus.ONGOING].name
+        },
+        {
+          value: CompetitionStatus.UPCOMING,
+          label: CompetitionStatusProps[CompetitionStatus.UPCOMING].name
+        }
+      ]
+    }
+  ]
+};
 
+class GroupCompetitionCommand extends Command {
   constructor() {
-    this.subcommand = true;
-    this.requiresGroup = true;
-
-    this.slashCommand = new SlashCommandSubcommandBuilder()
-      .addStringOption(option =>
-        option
-          .setName('status')
-          .setDescription('View an ongoing or upcoming group competition.')
-          .addChoices([
-            ['Ongoing', 'ongoing'],
-            ['Upcoming', 'upcoming']
-          ])
-      )
-      .addIntegerOption(option => option.setName('competition_id').setDescription('Competition id'))
-      .setName('competition')
-      .setDescription("View a group's ongoing/upcoming competition");
+    super(CONFIG);
   }
 
-  async execute(message: CommandInteraction) {
-    await message.deferReply();
+  async execute(interaction: CommandInteraction) {
+    const groupId = await getLinkedGroupId(interaction);
 
-    const guildId = message.guild?.id;
-    const server = await getServer(guildId); // maybe cache it so we don't have to do this
-    const groupId = server?.groupId || -1;
+    // Extract the "status" param, or fallback to "ongoing"
+    const statusParam = interaction.options.getString('status');
+    const status =
+      statusParam !== null && isCompetitionStatus(statusParam) ? statusParam : CompetitionStatus.ONGOING;
 
-    const status = message.options.getString('status') || 'ongoing';
+    // Extract the "competition_id" param, or fallback to the default competition
+    const competitionIdParam = interaction.options.getInteger('competition_id');
+    const competitionId = competitionIdParam || (await getDefaultCompetitionId(groupId, status));
 
-    try {
-      const competitions = await womClient.groups.getGroupCompetitions(groupId);
-
-      const competition = await womClient.competitions.getCompetitionDetails(
-        message.options.getInteger('competition_id') ||
-          this.getSelectedCompetitionId(competitions, status)
-      );
-
-      const pageURL = `https://wiseoldman.net/competitions/${competition.id}/`;
-
-      const response = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setTitle(competition.title)
-        .setURL(pageURL)
-        .setDescription(this.buildContent(competition))
-        .setTimestamp(this.getFooterDate(competition))
-        .setFooter({ text: this.getFooterLabel(competition) });
-
-      await message.editReply({ embeds: [response] });
-    } catch (e: any) {
-      if (e.response?.data?.message) {
-        throw new CommandError(e.response?.data?.message);
-      } else {
-        throw new CommandError(e.name, e.message);
-      }
-    }
-  }
-
-  getFooterDate(competition: CompetitionDetails) {
-    const status = getCompetitionStatus(competition);
-
-    if (status === 'upcoming') {
-      return new Date(competition.startsAt);
-    } else {
-      return new Date(competition.endsAt);
-    }
-  }
-
-  getFooterLabel(competition: CompetitionDetails) {
-    const status = getCompetitionStatus(competition);
-
-    if (status === 'upcoming') {
-      return 'Starts at';
-    } else if (status === 'ongoing') {
-      return 'Ends at';
-    } else {
-      return 'Ended at';
-    }
-  }
-
-  buildContent(competition: CompetitionDetails) {
-    const isTeamCompetition = competition.type === 'team';
-    const timeLeft = getCompetitionTimeLeft(competition).split(' ');
-
-    const lines = [
-      `**Metric:** ${getEmoji(competition.metric)} ${getMetricName(competition.metric)}`,
-      `**Type:** ${capitalize(competition.type)}`,
-      `**Participants:** ${competition.participantCount}`,
-      `**${timeLeft.slice(0, 2).join(' ')}:** ${timeLeft.slice(2).join(' ')}`
-    ];
-
-    if (isTeamCompetition) {
-      const teamStandings = this.getTeamData(competition);
-
-      lines.push(
-        `**Total gained:** ${formatNumber(
-          teamStandings.reduce((a, b) => a + b.totalGained, 0) || 0,
-          true
-        )}\n`
-      );
-      lines.push('**Teams:**');
-
-      lines.push(
-        ...teamStandings
-          .sort((a, b) => b.totalGained - a.totalGained)
-          .map(t => `${t.name} - **${formatNumber(t.totalGained, true)}**`)
-      );
-    } else {
-      lines.push(
-        `**Total gained:** ${formatNumber(
-          competition.participations.reduce((a, b) => a + b.progress.gained, 0) || 0,
-          true
-        )}\n`
-      );
-
-      lines.push('**Top Participants:**');
-      lines.push(...this.getParticipantData(competition));
-    }
-
-    return lines.join('\n');
-  }
-
-  getTeamData(competition: CompetitionDetails) {
-    const participants = competition.participations;
-
-    if (!participants || participants.length === 0) return [];
-
-    const teamNames = uniq(participants.map(p => p.teamName));
-    const teamTally: { [name: string]: number } = Object.fromEntries(teamNames.map(t => [t, 0]));
-
-    participants.forEach(p => {
-      if (!p.teamName) return;
-      teamTally[p.teamName] = teamTally[p.teamName] + p.progress.gained;
+    const competition = await womClient.competitions.getCompetitionDetails(competitionId).catch(() => {
+      throw new CommandError("Couldn't find that competition.");
     });
 
-    const teamStandings = Object.entries(teamTally).map(t => ({ name: t[0], totalGained: t[1] }));
+    const response = new MessageEmbed()
+      .setColor(config.visuals.blue)
+      .setTitle(competition.title)
+      .setURL(`https://wiseoldman.net/competitions/${competition.id}/`)
+      .setDescription(buildContent(competition))
+      .setTimestamp(getFooterDate(competition))
+      .setFooter({ text: getFooterLabel(competition) });
 
-    // Sort teams by most total gained
-    return teamStandings;
+    await interaction.editReply({ embeds: [response] });
+  }
+}
+
+function getFooterDate(competition: CompetitionDetails) {
+  return getCompetitionStatus(competition) === CompetitionStatus.UPCOMING
+    ? new Date(competition.startsAt)
+    : new Date(competition.endsAt);
+}
+
+function getFooterLabel(competition: CompetitionDetails) {
+  const status = getCompetitionStatus(competition);
+
+  if (status === CompetitionStatus.UPCOMING) return 'Starts at';
+  if (status === CompetitionStatus.ONGOING) return 'Ends at';
+  return 'Ended at';
+}
+
+function buildContent(competition: CompetitionDetails) {
+  const { metric, type, participations, participantCount } = competition;
+  const timeLeft = getCompetitionTimeLeft(competition).split(' ');
+
+  const lines = [
+    keyValue('Metric', `${getEmoji(metric)} ${MetricProps[metric].name}`),
+    keyValue('Type', CompetitionTypeProps[type].name),
+    keyValue('Participants', participantCount),
+    keyValue(timeLeft.slice(0, 2).join(' '), timeLeft.slice(2).join(' '))
+  ];
+
+  if (type === CompetitionType.TEAM) {
+    const teamStandings = aggregateTeamData(competition);
+    const totalGained = teamStandings.reduce((a, b) => a + b.totalGained, 0) || 0;
+
+    lines.push(keyValue('Total gained', formatNumber(totalGained, true)));
+
+    lines.push(bold('\nTeams'));
+    lines.push(
+      ...teamStandings
+        .sort((a, b) => b.totalGained - a.totalGained)
+        .map(t => `${t.name} - ${bold(formatNumber(t.totalGained, true))}`)
+    );
+  } else {
+    const totalGained = participations.reduce((a, b) => a + b.progress.gained, 0) || 0;
+
+    lines.push(keyValue('Total gained', formatNumber(totalGained, true)));
+
+    lines.push(bold('\nTop Participants'));
+    lines.push(
+      ...participations
+        .slice(0, 10)
+        .map(p => `${p.player.displayName} - ${bold(formatNumber(p.progress.gained, true))}`)
+    );
   }
 
-  getParticipantData(competition: CompetitionDetails) {
-    return competition.participations
-      .slice(0, 10)
-      .map(p => `${p.player.displayName} - **${formatNumber(p.progress.gained, true)}**`);
+  return lines.join('\n');
+}
+
+function aggregateTeamData(competition: CompetitionDetails) {
+  const participants = competition.participations;
+
+  if (!participants || participants.length === 0) return [];
+
+  const teamNames = uniq(participants.map(p => p.teamName));
+  const teamTally: { [name: string]: number } = Object.fromEntries(teamNames.map(t => [t, 0]));
+
+  participants.forEach(p => {
+    if (!p.teamName) return;
+    teamTally[p.teamName] = teamTally[p.teamName] + p.progress.gained;
+  });
+
+  const teamStandings = Object.entries(teamTally).map(t => ({ name: t[0], totalGained: t[1] }));
+
+  return teamStandings;
+}
+
+async function getDefaultCompetitionId(groupId: number, status: CompetitionStatus) {
+  const competitions = await womClient.groups.getGroupCompetitions(groupId);
+
+  const match = competitions.find(c => getCompetitionStatus(c) === status);
+
+  if (!match) {
+    throw new CommandError(`Couldn't find any ${status} competitions.`);
   }
 
-  getSelectedCompetitionId(competitions: CompetitionListItem[], status: string) {
-    if (status === 'ongoing') {
-      const ongoing = competitions.find(c => getCompetitionStatus(c) === 'ongoing');
-
-      if (!ongoing) {
-        throw new CommandError(
-          'There are no ongoing competitions for this group.',
-          `Try /group competition status: upcoming`
-        );
-      }
-
-      return ongoing.id;
-    } else if (status === 'upcoming') {
-      const upcoming = competitions.find(c => getCompetitionStatus(c) === 'upcoming');
-
-      if (!upcoming) {
-        throw new CommandError(
-          'There are no upcoming competitions for this group.',
-          `Try /group competition status: ongoing`
-        );
-      }
-
-      return upcoming.id;
-    } else {
-      throw new CommandError(`${status} is not a valid status.`, 'Try --ongoing or --upcoming');
-    }
-  }
+  return match.id;
 }
 
 export default new GroupCompetitionCommand();

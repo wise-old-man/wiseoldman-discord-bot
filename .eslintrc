@@ -9,7 +9,7 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
-    "@typescript-eslint/ban-types": "off",
-    "@typescript-eslint/no-explicit-any": "off"
+    "prettier/prettier": 2,
+    "@typescript-eslint/explicit-module-boundary-types": "off"
   }
 }

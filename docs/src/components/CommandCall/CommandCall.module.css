@@ -1,0 +1,48 @@
+.container {
+  border: 1px solid var(--ifm-toc-border-color);
+  background: var(--ifm-color-emphasis-200);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 600;
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  align-items: center;
+}
+
+.commandRoot {
+  display: inline-block;
+  color: white;
+  white-space: nowrap;
+  margin-right: 8px;
+}
+
+.option {
+  display: inline-block;
+  white-space: nowrap;
+  margin-right: 16px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+  border: 1px solid hsl(225, 8%, 12%);
+}
+
+.optionKey {
+  display: inline-block;
+  background: hsl(225, 8%, 12%);
+  padding: 0 6px;
+  padding-right: 8px;
+}
+
+.optionValue {
+  display: inline-block;
+  background: hsl(225, 8%, 24%);
+  padding: 0 6px;
+  padding-left: 8px;
+}
+
+.channel {
+  background: hsl(202, 60%, 17%);
+  color: hsl(202, 82%, 65%);
+}

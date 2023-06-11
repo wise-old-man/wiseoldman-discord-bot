@@ -1,80 +1,82 @@
+import { CountryProps, isCountry } from '@wise-old-man/utils';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { Country, CountryProps } from '@wise-old-man/utils';
-import { updateCountry } from '../../../api/modules/players';
+import { updateCountry } from '../../../services/wiseoldman';
+import { Command, CommandConfig, countryCodeEmoji, CommandError } from '../../../utils';
 import config from '../../../config';
-import { Command } from '../../../types';
-import { countryCodeEmoji, getEmoji } from '../../../utils';
-import CommandError from '../../CommandError';
 
-class PlayerSetFlagCommand implements Command {
-  slashCommand: SlashCommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'setflag',
+  description: 'Set your country/flag',
+  options: [
+    {
+      type: 'string',
+      name: 'username',
+      description: 'In-game username',
+      required: true
+    },
+    {
+      type: 'string',
+      name: 'country',
+      description: 'Country name.',
+      required: true,
+      autocomplete: true
+    }
+  ]
+};
 
+class PlayerSetFlagCommand extends Command {
   constructor() {
-    this.slashCommand = new SlashCommandBuilder()
-      .addStringOption(option =>
-        option.setName('username').setDescription('In-game username').setRequired(true)
-      )
-      .addStringOption(option =>
-        option
-          .setName('country')
-          .setDescription('Start typing your country name')
-          .setRequired(true)
-          .setAutocomplete(true)
-      )
-      .setName('setflag')
-      .setDescription('Set player username (alias)');
+    super(CONFIG);
+    this.private = true;
   }
 
-  async execute(message: CommandInteraction) {
-    await message.deferReply();
-    const username = message.options.getString('username', true);
-    const countryCode = message.options.getString('country', true);
-
-    const response = { message: '', isError: false };
+  async execute(interaction: CommandInteraction) {
+    const username = interaction.options.getString('username', true);
+    const countryCode = interaction.options.getString('country', true);
 
     if (
-      message.guild?.id !== config.discord.guildId ||
-      message.channel?.id !== config.discord.channels.flags
+      interaction.guildId !== config.discord.guildId ||
+      interaction.channelId !== config.discord.channels.flags
     ) {
       throw new CommandError(
-        'This command only works in the **#change-flag** channel of the official Wise Old Man discord server.\
-          You can join at https://wiseoldman.net/discord'
+        `This command only works in the **#change-flag** channel of the official Wise Old Man discord server.\
+         Join us at https://wiseoldman.net/discord`
       );
     }
 
-    try {
-      await updateCountry(username, countryCode);
-
-      response.message = `${message.user} changed \`${username}\`'s country to ${
-        CountryProps[countryCode as Country].name
-      }`;
-      response.isError = false;
-    } catch (e: any) {
-      // The API's error message references country name, and this command
-      // is restricted to country codes (for now), so let's hide that part of the message
-      response.message = e.response?.data?.message?.replace(' or name', '') || 'Failed to update flag.';
-      response.isError = true;
+    if (!isCountry(countryCode)) {
+      throw new CommandError(
+        `Invalid country. You must supply a valid country name or code, according to the ISO 3166-1 standard.\
+         Please see: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2`
+      );
     }
 
+    const hasUpdated = await updateCountry(username, countryCode)
+      .then(() => true)
+      .catch(() => false);
+
+    const title = hasUpdated
+      ? `${countryCodeEmoji(countryCode)} Player flag updated!`
+      : `❌ Failed to update flag`;
+
+    const description = hasUpdated
+      ? `${interaction.user} changed \`${username}\`'s country to ${CountryProps[countryCode].name}`
+      : `Failed to update flag.`;
+
     const embed = new MessageEmbed()
-      .setColor(response.isError ? config.visuals.red : config.visuals.green)
-      .setTitle(
-        response.isError
-          ? `${getEmoji('error')} Failed to update flag`
-          : `${countryCodeEmoji(countryCode)} Player flag updated!`
-      )
-      .setDescription(response.message)
+      .setColor(hasUpdated ? config.visuals.green : config.visuals.red)
+      .setTitle(title)
+      .setDescription(description)
       .addFields([
         { name: 'Username', value: username },
         { name: 'Country Code:', value: countryCode }
       ]);
 
-    if (response.isError) {
+    if (!hasUpdated) {
       embed.setFooter({ text: 'The correct command format is: /setflag {username} {country_code}' });
     }
 
-    await message.editReply({ embeds: [embed] });
+    await interaction.editReply({ embeds: [embed] });
   }
 }
 

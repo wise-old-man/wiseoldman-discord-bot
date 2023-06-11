@@ -1,31 +1,32 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
-import commands from './commands/instances';
+import env from './env';
+import { COMMANDS } from './commands/router';
 import config from './config';
 
 const { guildId, clientId } = config.discord;
 
-export async function deployCommands(): Promise<void> {
-  const guildCommands = [];
-  const globalCommands = [];
+export async function deployCommands() {
+  const guildCommands: Array<unknown> = [];
+  const globalCommands: Array<unknown> = [];
 
-  for (const command of commands) {
+  for (const command of COMMANDS) {
     const slashCommand = command.slashCommand;
 
-    if (slashCommand && !command.subcommand) {
-      if (process.env.DISCORD_DEV_LOCAL) {
-        guildCommands.push(
-          slashCommand.setDescription(`[DEV 🧑‍💻]: ${slashCommand.description}`).toJSON()
-        );
-      } else if (command.global) {
-        globalCommands.push(slashCommand.toJSON());
-      } else {
-        guildCommands.push(slashCommand.toJSON());
-      }
+    if (!slashCommand) {
+      continue;
+    }
+
+    if (env.DISCORD_DEV_LOCAL) {
+      guildCommands.push(slashCommand.setDescription(`[DEV 🧑‍💻]: ${slashCommand.description}`).toJSON());
+    } else if (command.private) {
+      guildCommands.push(slashCommand.toJSON());
+    } else {
+      globalCommands.push(slashCommand.toJSON());
     }
   }
 
-  const restClient = new REST({ version: '9' }).setToken(config.token as string);
+  const restClient = new REST({ version: '9' }).setToken(config?.token ?? '');
 
   if (guildCommands.length > 0) {
     try {

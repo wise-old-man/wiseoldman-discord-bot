@@ -1,20 +1,13 @@
-import { MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
-import { getMetricName, Metric } from '@wise-old-man/utils';
+import { Competition, getMetricName } from '@wise-old-man/utils';
 import config from '../../config';
-import { BroadcastType, Event } from '../../types';
-import { getEmoji, broadcastMessage, durationBetween } from '../../utils';
+import { Event } from '../../utils/events';
+import { getEmoji, propagateMessage, durationBetween, NotificationType } from '../../utils';
 
 interface CompetitionCreatedData {
   groupId: number;
-  competition: {
-    id: number;
-    metric: Metric;
-    type: string;
-    title: string;
-    startsAt: string;
-    endsAt: string;
-  };
+  competition: Competition;
 }
 
 class CompetitionCreated implements Event {
@@ -24,13 +17,11 @@ class CompetitionCreated implements Event {
     this.type = 'COMPETITION_CREATED';
   }
 
-  async execute(data: CompetitionCreatedData): Promise<void> {
+  async execute(data: CompetitionCreatedData, client: Client) {
     const { groupId, competition } = data;
     const { id, metric, type, title, startsAt, endsAt } = competition;
 
     if (!groupId) return;
-
-    const url = `https://wiseoldman.net/competitions/${id}`;
 
     const fields = [
       { name: 'Title', value: title },
@@ -41,13 +32,13 @@ class CompetitionCreated implements Event {
 
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji('tada')} New competition created!`)
-      .setURL(url)
+      .setTitle(`🎉 New competition created!`)
+      .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields(fields)
       .setFooter({ text: 'Starts at' })
       .setTimestamp(new Date(startsAt));
 
-    broadcastMessage(groupId, BroadcastType.CompetitionStatus, message);
+    await propagateMessage(client, groupId, NotificationType.COMPETITION_STATUS, message);
   }
 }
 

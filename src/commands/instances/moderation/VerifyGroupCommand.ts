@@ -1,3 +1,4 @@
+import { GroupListItem } from '@wise-old-man/utils';
 import {
   CommandInteraction,
   GuildChannelManager,
@@ -5,76 +6,85 @@ import {
   MessageEmbed,
   TextChannel
 } from 'discord.js';
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { GroupListItem } from '@wise-old-man/utils';
-import { verify } from '../../../api/modules/groups';
+import { verifyGroup } from '../../../services/wiseoldman';
 import config from '../../../config';
-import { Command } from '../../../types';
-import { getEmoji, hasModeratorRole } from '../../../utils';
-import CommandError from '../../CommandError';
+import { Command, CommandConfig, CommandError, hasModeratorRole } from '../../../utils';
 
-const CHAT_MESSAGE = (groupName: string) =>
-  `${getEmoji('success')} \`${groupName}\` has been successfully verified!`;
+const CHAT_MESSAGE = (groupName: string) => `✅ \`${groupName}\` has been successfully verified!`;
 
-const LOG_MESSAGE = (groupId: number, groupName: string, userId: string) =>
-  `${groupName} (${groupId}) - <@${userId}>`;
+const LOG_MESSAGE = (id: number, name: string, userId: string) => `${name} (${id}) - <@${userId}>`;
 
-class VerifyGroupCommand implements Command {
-  slashCommand: SlashCommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'verify-group',
+  description: 'Set a group as verified.',
+  options: [
+    {
+      type: 'integer',
+      name: 'id',
+      description: 'The group ID.',
+      required: true
+    },
+    {
+      type: 'user',
+      name: 'user',
+      description: 'Discord user tag.',
+      required: true
+    }
+  ]
+};
 
+class VerifyGroupCommand extends Command {
   constructor() {
-    this.slashCommand = new SlashCommandBuilder()
-      .addIntegerOption(option => option.setName('id').setDescription('Group id').setRequired(true))
-      .addUserOption(option =>
-        option.setName('user').setDescription('Discord user tag').setRequired(true)
-      )
-      .setName('verify-group')
-      .setDescription('Set a group as verified');
+    super(CONFIG);
+    this.private = true;
   }
 
-  async execute(message: CommandInteraction) {
-    if (!hasModeratorRole(message.member as GuildMember)) {
-      message.reply({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
+  async execute(interaction: CommandInteraction) {
+    if (!hasModeratorRole(interaction.member as GuildMember)) {
+      interaction.followUp({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
       return;
     }
 
-    await message.deferReply();
+    const groupId = interaction.options.getInteger('id', true);
+    const userId = interaction.options.getUser('user', true).id;
 
-    const groupId = message.options.getInteger('id', true);
-    const userId = message.options.getUser('user', true).id;
-    const user = message.guild?.members.cache.find(m => m.id === userId);
+    const user = interaction.guild?.members.cache.find(m => m.id === userId);
 
-    if (!user) throw new CommandError('Failed to find user from tag.');
-
-    try {
-      const group = await verify(groupId);
-
-      // Respond on the WOM discord chat with a success status
-      const response = new MessageEmbed()
-        .setColor(config.visuals.green)
-        .setDescription(CHAT_MESSAGE(group.name));
-
-      await message.followUp({ embeds: [response] });
-
-      this.sendConfirmationLog(message.guild?.channels, group, userId);
-      this.addRole(user);
-    } catch (error) {
-      throw new CommandError('Failed to verify group.');
+    if (!user) {
+      throw new CommandError("Couldn't find that user.");
     }
-  }
 
-  addRole(user: GuildMember) {
+    const group = await verifyGroup(groupId).catch(e => {
+      if (e.statusCode === 404) throw new CommandError('Competition not found.');
+      throw e;
+    });
+
+    // Respond on the WOM discord chat with a success status
+    const response = new MessageEmbed()
+      .setColor(config.visuals.green)
+      .setDescription(CHAT_MESSAGE(group.name));
+
+    await interaction.followUp({ embeds: [response] });
+
+    // Send a message to the WOM leaders log channel
+    sendConfirmationLog(interaction.guild?.channels, group, userId);
+
+    // Add the "Group Leader" role to the user
     user.roles.add(config.discord.roles.groupLeader).catch(console.log);
   }
+}
 
-  sendConfirmationLog(channels: GuildChannelManager | undefined, group: GroupListItem, userId: string) {
-    const leadersLogChannel = channels?.cache.get(config.discord.channels.leadersLog);
+function sendConfirmationLog(
+  channels: GuildChannelManager | undefined,
+  group: GroupListItem,
+  userId: string
+) {
+  const leadersLogChannel = channels?.cache.get(config.discord.channels.leadersLog);
 
-    if (!leadersLogChannel) return;
-    if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(leadersLogChannel)) return;
+  if (!leadersLogChannel) return;
+  if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(leadersLogChannel)) return;
 
-    leadersLogChannel.send(LOG_MESSAGE(group.id, group.name, userId));
-  }
+  leadersLogChannel.send(LOG_MESSAGE(group.id, group.name, userId));
 }
 
 export default new VerifyGroupCommand();

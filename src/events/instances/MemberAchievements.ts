@@ -1,21 +1,14 @@
-import { MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
+import { Achievement, Player } from '@wise-old-man/utils';
 import config from '../../config';
-import { getUserId } from '../../database/services/alias';
-import { Event, BroadcastType } from '../../types';
-import { encodeURL, getEmoji, broadcastMessage } from '../../utils';
-
-interface PlayerAchievement {
-  name: string;
-  metric: string;
-}
+import { getUserId } from '../../services/prisma';
+import { Event } from '../../utils/events';
+import { encodeURL, getEmoji, propagateMessage, NotificationType } from '../../utils';
 
 interface MemberAchievementsData {
   groupId: number;
-  player: {
-    id: number;
-    displayName: string;
-  };
-  achievements: PlayerAchievement[];
+  player: Player;
+  achievements: Achievement[];
 }
 
 class MemberAchievements implements Event {
@@ -25,33 +18,25 @@ class MemberAchievements implements Event {
     this.type = 'MEMBER_ACHIEVEMENTS';
   }
 
-  async execute(data: MemberAchievementsData): Promise<void> {
-    const { groupId, player } = data;
+  async execute(data: MemberAchievementsData, client: Client) {
+    const { groupId, player, achievements } = data;
 
     if (!groupId) return;
 
     const userId = await getUserId(player.displayName);
     const discordTag = userId ? `(<@${userId}>)` : '';
 
-    const message = this.buildMessage(data, discordTag);
-    broadcastMessage(groupId, BroadcastType.MemberAchievements, message);
-  }
-
-  buildMessage(data: MemberAchievementsData, discordTag: string): MessageEmbed {
-    const { player, achievements } = data;
-    const { displayName } = player;
-
-    const title = `New member ${achievements.length > 1 ? 'achievements' : 'achievement'}`;
-
-    const content = achievements
-      .map(({ metric, name }) => `${displayName} ${discordTag} - ${getEmoji(metric)} ${name}`)
-      .join('\n');
-
-    return new MessageEmbed()
+    const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji('tada')} ${title}`)
-      .setDescription(content)
+      .setTitle(`🎉 New member ${achievements.length > 1 ? 'achievements' : 'achievement'}`)
+      .setDescription(
+        achievements
+          .map(({ metric, name }) => `${player.displayName} ${discordTag} - ${getEmoji(metric)} ${name}`)
+          .join('\n')
+      )
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements`));
+
+    await propagateMessage(client, groupId, NotificationType.MEMBER_ACHIEVEMENTS, message);
   }
 }
 

@@ -1,104 +1,85 @@
+import { formatNumber, isBoss, Metric, PlayerDetails, round } from '@wise-old-man/utils';
 import Canvas from 'canvas';
 import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
-import { SlashCommandBuilder } from '@discordjs/builders';
-import {
-  Boss,
-  BossValue,
-  ComputedMetric,
-  ComputedMetricValue,
-  formatNumber,
-  isBoss,
-  MapOf,
-  Metric,
-  round
-} from '@wise-old-man/utils';
 import config from '../../../config';
-import { getUsername } from '../../../database/services/alias';
-import { CanvasAttachment, Command, Renderable } from '../../../types';
-import { encodeURL } from '../../../utils';
-import { getScaledCanvas } from '../../../utils/rendering';
-import CommandError from '../../CommandError';
-import womClient from '../../../api/wom-api';
+import womClient from '../../../services/wiseoldman';
+import {
+  Command,
+  CommandConfig,
+  CommandError,
+  encodeURL,
+  getScaledCanvas,
+  getUsernameParam
+} from '../../../utils';
 
 const RENDER_WIDTH = 350;
 const RENDER_HEIGHT = 355;
 const RENDER_PADDING = 15;
 
 enum RenderVariant {
-  Kills = 'Kills',
-  Ranks = 'Ranks',
-  EHB = 'EHB'
+  KILLS = 'kills',
+  RANKS = 'ranks',
+  EHB = 'ehb'
 }
 
-class PlayerBossesCommand implements Command, Renderable {
-  global: boolean;
-  slashCommand: SlashCommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'bosses',
+  description: "View a player's bossing stats.",
+  options: [
+    {
+      type: 'string',
+      name: 'variant',
+      description: 'The variant to show stats for (kills / rank / ehb).',
+      required: true,
+      choices: [
+        { label: 'Kill Counts', value: RenderVariant.KILLS },
+        { label: 'Ranks', value: RenderVariant.RANKS },
+        { label: 'Efficient Hours Bossed', value: RenderVariant.EHB }
+      ]
+    },
+    {
+      type: 'string',
+      name: 'username',
+      description: 'In-game username or discord tag.'
+    }
+  ]
+};
 
+class PlayerBossesCommand extends Command {
   constructor() {
-    this.global = true;
-    this.slashCommand = new SlashCommandBuilder()
-      .addStringOption(option =>
-        option
-          .setName('variant')
-          .setDescription('The variant to show stats for')
-          .addChoices([
-            ['Kill Counts', RenderVariant.Kills],
-            ['Ranks', RenderVariant.Ranks],
-            ['Efficient Hours Bossed', RenderVariant.EHB]
-          ])
-      )
-      .addStringOption(option => option.setName('username').setDescription('In-game username'))
-      .setName('bosses')
-      .setDescription('View player bosses');
+    super(CONFIG);
   }
 
-  async execute(message: CommandInteraction) {
-    await message.deferReply();
-
+  async execute(interaction: CommandInteraction) {
     // Grab the username from the command's arguments or database alias
-    const username = await this.getUsername(message);
-    const variant = (message.options.getString('variant') as RenderVariant) || RenderVariant.Kills;
+    const username = await getUsernameParam(interaction);
 
-    if (!username) {
+    // Get the variant from subcommand
+    const variant = interaction.options.getString('variant', true) as RenderVariant;
+
+    const player = await womClient.players.getPlayerDetails(username).catch(() => {
       throw new CommandError(
-        'This commands requires a username. Set a default by using the `setrsn` command.'
+        `Player "${username}" not found. Possibly hasn't been tracked yet on Wise Old Man.`,
+        'Tip: Try tracking them first using the /update command'
       );
-    }
+    });
 
-    try {
-      const player = await womClient.players.getPlayerDetails({ username });
+    const { attachment, fileName } = await this.render(player, variant);
 
-      const { attachment, fileName } = await this.render({
-        bosses: player.latestSnapshot.data.bosses,
-        computed: player.latestSnapshot.data.computed,
-        username: player.username,
-        variant
-      });
+    const embed = new MessageEmbed()
+      .setColor(config.visuals.blue)
+      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/overview/bossing`))
+      .setTitle(`${player.displayName} - Boss ${variant}`)
+      .setImage(`attachment://${fileName}`)
+      .setFooter({ text: 'Last updated' })
+      .setTimestamp(player.updatedAt);
 
-      const embed = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/overview/bossing`))
-        .setTitle(`${player.displayName} - Boss ${variant}`)
-        .setImage(`attachment://${fileName}`)
-        .setFooter({ text: 'Last updated' })
-        .setTimestamp(player.updatedAt);
-
-      await message.editReply({ embeds: [embed], files: [attachment] });
-    } catch (e: any) {
-      const errorMessage = `**${username}** is not being tracked yet.`;
-      const errorTip = `Try /update ${username}`;
-
-      throw new CommandError(errorMessage, errorTip);
-    }
+    await interaction.editReply({ embeds: [embed], files: [attachment] });
   }
 
-  async render(props: {
-    bosses: MapOf<Boss, BossValue>;
-    computed: MapOf<ComputedMetric, ComputedMetricValue>;
-    username: string;
-    variant: RenderVariant;
-  }): Promise<CanvasAttachment> {
-    const { bosses, computed, username, variant } = props;
+  async render(playerDetails: PlayerDetails, variant: RenderVariant) {
+    const username = playerDetails.username;
+    const { bosses, computed } = playerDetails.latestSnapshot.data;
 
     // Create a scaled empty canvas
     const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
@@ -131,7 +112,7 @@ class PlayerBossesCommand implements Command, Renderable {
 
       const isRanked = value > -1;
 
-      if (variant === RenderVariant.Kills) {
+      if (variant === RenderVariant.KILLS) {
         ctx.font = '11px Arial';
 
         const killsLabel = `${isRanked ? formatNumber(value, true, 1) : '?'}`;
@@ -140,7 +121,7 @@ class PlayerBossesCommand implements Command, Renderable {
         // Boss kills
         ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
         ctx.fillText(killsLabel, originX + 42 - killsWidth / 2, originY + 17);
-      } else if (variant === RenderVariant.Ranks) {
+      } else if (variant === RenderVariant.RANKS) {
         ctx.font = '10px Arial';
 
         const rankLabel = `${isRanked ? formatNumber(rank, true, 1) : '?'}`;
@@ -180,25 +161,6 @@ class PlayerBossesCommand implements Command, Renderable {
     const attachment = new MessageAttachment(canvas.toBuffer(), fileName);
 
     return { attachment, fileName };
-  }
-
-  async getUsername(message: CommandInteraction): Promise<string | undefined | null> {
-    const username = message.options.getString('username', false);
-    if (username) return username;
-
-    const inferredUsername = await getUsername(message.user.id);
-    return inferredUsername;
-  }
-
-  getRenderVariant(subCommand: string): RenderVariant {
-    switch (subCommand) {
-      case 'ranks':
-        return RenderVariant.Ranks;
-      case 'ehb':
-        return RenderVariant.EHB;
-      default:
-        return RenderVariant.Kills;
-    }
   }
 }
 

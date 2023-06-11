@@ -1,41 +1,57 @@
-import { Interaction, MessageEmbed, GuildMember, CommandInteraction } from 'discord.js';
+import * as Sentry from '@sentry/node';
+import { GuildMember, Interaction, MessageEmbed } from 'discord.js';
 import config from '../config';
-import { isAdmin } from '../utils';
-import CommandError from './CommandError';
-import commands from './instances';
-import { SubCommand } from '../types';
+import monitoring from '../utils/monitoring';
+import { BaseCommand, CommandError, isAdmin, requiresAdminPermissions } from '../utils';
 import {
   getCountryOptions,
-  getPeriodOptions,
+  getHelpCategoryOptions,
   getMetricOptions,
-  getHelpCategoryOptions
-} from '../utils/autocomplete';
+  getPeriodOptions
+} from './autocomplete';
+import ConfigRootCommand from './instances/config';
+import HelpCommand from './instances/general/HelpCommand';
+import GroupRootCommand from './instances/group';
+import DeletePlayerCommand from './instances/moderation/DeletePlayerCommand';
+import NameChangeCommand from './instances/moderation/NameChangeCommand';
+import ResetCompetitionCodeCommand from './instances/moderation/ResetCompetitionCodeCommand';
+import ResetGroupCodeCommand from './instances/moderation/ResetGroupCodeCommand';
+import VerifyGroupCommand from './instances/moderation/VerifyGroupCommand';
+import PlayerAchievementsCommand from './instances/player/PlayerAchievementsCommand';
+import PlayerActivitiesCommand from './instances/player/PlayerActivitiesCommand';
+import PlayerBossesCommand from './instances/player/PlayerBossesCommand';
+import PlayerEfficiencyCommand from './instances/player/PlayerEfficiencyCommand';
+import PlayerGainedCommand from './instances/player/PlayerGainedCommand';
+import PlayerSetFlagCommand from './instances/player/PlayerSetFlagCommand';
+import PlayerSetUsernameCommand from './instances/player/PlayerSetUsernameCommand';
+import PlayerStatsCommand from './instances/player/PlayerStatsCommand';
+import UpdatePlayerCommand from './instances/player/UpdatePlayerCommand';
 
-export function onError(options: { interaction: Interaction; title: string; tip?: string }): void {
-  const response = new MessageEmbed().setColor(config.visuals.red).setDescription(options.title);
-  response.setFooter({ text: options.tip ? options.tip : '' });
+export const COMMANDS: BaseCommand[] = [
+  HelpCommand,
+  // Player Commands
+  PlayerStatsCommand,
+  UpdatePlayerCommand,
+  PlayerGainedCommand,
+  PlayerBossesCommand,
+  PlayerSetFlagCommand,
+  PlayerActivitiesCommand,
+  PlayerEfficiencyCommand,
+  PlayerSetUsernameCommand,
+  PlayerAchievementsCommand,
+  // Group Commands
+  GroupRootCommand,
+  // Config Commands
+  ConfigRootCommand,
+  // Moderation Commands
+  NameChangeCommand,
+  VerifyGroupCommand,
+  DeletePlayerCommand,
+  ResetGroupCodeCommand,
+  ResetCompetitionCodeCommand
+];
 
-  if (options.interaction && options.interaction.isCommand()) {
-    options.interaction.followUp({ embeds: [response] });
-  }
-}
-
-export async function executeSubCommand(
-  message: CommandInteraction,
-  subcommand: string,
-  candidates: SubCommand[]
-): Promise<void> {
-  try {
-    await candidates.find(c => c.slashCommand?.name === subcommand)?.execute(message);
-  } catch (e) {
-    if (e instanceof CommandError) {
-      return onError({ interaction: message, title: e.message, tip: e.tip });
-    }
-  }
-}
-
-// Slash commands
-export async function onInteractionReceived(interaction: Interaction): Promise<void> {
+export async function onInteractionReceived(interaction: Interaction) {
   if (interaction.isAutocomplete()) {
     const focused = interaction.options.getFocused(true);
     const currentValue = focused.value?.toString();
@@ -56,31 +72,49 @@ export async function onInteractionReceived(interaction: Interaction): Promise<v
     return;
   }
 
-  const { commandName } = interaction;
+  const commandMonitor = monitoring.trackCommand();
 
-  commands.forEach(async c => {
-    if (c.slashCommand?.name !== commandName) return;
+  const commandName = interaction.commandName;
+  const subCommandName = interaction.options.getSubcommand(false);
 
-    //TODO: check for admin permissions in a better way
-    if (c.requiresAdmin && !isAdmin(interaction.member as GuildMember)) {
-      return onError({
-        interaction: interaction,
-        title: 'That command requires Admin permissions.',
-        tip: 'Contact your server administrator for help.'
-      });
+  const fullCommandName = subCommandName ? `${commandName}:${subCommandName}` : commandName;
+
+  try {
+    const targetCommand = COMMANDS.find(cmd => cmd.slashCommand.name === commandName);
+
+    if (!targetCommand) {
+      throw new Error(`Error: Command not implemented: ${commandName}`);
     }
 
-    // TODO: Show a proper error when guild isn't configured yet
+    await interaction.deferReply();
 
-    try {
-      interaction.channel?.sendTyping();
-
-      await c.execute(interaction);
-    } catch (e) {
-      // If a command error was thrown during execution, handle the response here.
-      if (e instanceof CommandError) {
-        return onError({ interaction: interaction, title: e.message, tip: e.tip });
-      }
+    if (
+      requiresAdminPermissions(targetCommand, subCommandName) &&
+      !isAdmin(interaction.member as GuildMember)
+    ) {
+      throw new CommandError('That command requires Admin permissions.');
     }
-  });
+
+    await targetCommand.execute(interaction);
+
+    commandMonitor.endTracking(fullCommandName, 1, interaction.guildId ?? undefined);
+  } catch (error) {
+    console.log(error);
+    Sentry.captureException(error);
+    await interaction.followUp({ embeds: [buildErrorEmbed(error)] });
+    commandMonitor.endTracking(fullCommandName, 0, interaction.guildId ?? 'unknown guild id');
+  }
+}
+
+function buildErrorEmbed(error: Error) {
+  const response = new MessageEmbed().setColor(config.visuals.red);
+
+  if (error instanceof CommandError) {
+    response.setDescription(error.message);
+    if (error.tip) response.setFooter({ text: error.tip });
+  } else {
+    response.setDescription('An unexpected error occurred.');
+  }
+
+  return response;
 }

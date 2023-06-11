@@ -1,20 +1,13 @@
-import { getMetricName, Metric } from '@wise-old-man/utils';
-import { MessageEmbed } from 'discord.js';
+import { Competition, getMetricName } from '@wise-old-man/utils';
+import { Client, MessageEmbed } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
-import { BroadcastType, Event } from '../../types';
-import { getEmoji, broadcastMessage, durationBetween } from '../../utils';
+import { Event } from '../../utils/events';
+import { propagateMessage, NotificationType, durationBetween, getEmoji } from '../../utils';
 
 interface CompetitionStartingData {
   groupId: number;
-  competition: {
-    id: number;
-    metric: Metric;
-    type: string;
-    title: string;
-    startsAt: string;
-    endsAt: string;
-  };
+  competition: Competition;
   period: {
     hours?: number;
     minutes?: number;
@@ -28,7 +21,7 @@ class CompetitionStarting implements Event {
     this.type = 'COMPETITION_STARTING';
   }
 
-  async execute(data: CompetitionStartingData): Promise<void> {
+  async execute(data: CompetitionStartingData, client: Client) {
     const { groupId, competition, period } = data;
     const { id, metric, startsAt, endsAt, type, title } = competition;
 
@@ -38,8 +31,6 @@ class CompetitionStarting implements Event {
 
     if (!timeLeft) return;
 
-    const url = `https://wiseoldman.net/competitions/${id}`;
-
     const fields = [
       { name: 'Metric', value: `${getEmoji(metric)} ${getMetricName(metric)}` },
       { name: 'Type', value: capitalize(type) },
@@ -48,11 +39,11 @@ class CompetitionStarting implements Event {
 
     const message = new MessageEmbed()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji('clock')} ${title} is starting in ${timeLeft}`)
-      .setURL(url)
+      .setTitle(`🕒 ${title} is starting in ${timeLeft}`)
+      .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields(fields);
 
-    broadcastMessage(groupId, BroadcastType.CompetitionStatus, message);
+    await propagateMessage(client, groupId, NotificationType.COMPETITION_STATUS, message);
   }
 }
 

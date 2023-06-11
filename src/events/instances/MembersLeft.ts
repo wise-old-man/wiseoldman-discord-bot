@@ -1,12 +1,8 @@
-import { MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
+import { Player } from '@wise-old-man/utils';
 import config from '../../config';
-import { BroadcastType, Event } from '../../types';
-import { encodeURL, getEmoji, broadcastMessage } from '../../utils';
-
-interface Player {
-  id: number;
-  displayName: string;
-}
+import { Event } from '../../utils/events';
+import { encodeURL, propagateMessage, NotificationType } from '../../utils';
 
 interface MembersLeftData {
   groupId: number;
@@ -20,38 +16,38 @@ class MembersLeft implements Event {
     this.type = 'GROUP_MEMBERS_LEFT';
   }
 
-  async execute(data: MembersLeftData): Promise<void> {
+  async execute(data: MembersLeftData, client: Client) {
     const { groupId } = data;
 
     if (!groupId) return;
 
-    const message = this.buildMessage(data);
-    broadcastMessage(groupId, BroadcastType.MembersListChanged, message);
+    const message = buildMessage(data);
+    await propagateMessage(client, groupId, NotificationType.MEMBERS_LIST_CHANGED, message);
   }
+}
 
-  buildMessage(data: MembersLeftData) {
-    const { groupId, players } = data;
+function buildMessage(data: MembersLeftData) {
+  const { groupId, players } = data;
 
-    if (players.length === 1) {
-      const player = players[0];
-      const title = `${getEmoji('wave')} Group member left: ${player.displayName}`;
-
-      return new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setTitle(title)
-        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
-    }
-
-    const url = `https://wiseoldman.net/groups/${groupId}/members`;
-    const title = `${getEmoji('wave')} ${players.length} members have left the group`;
-    const content = players.map(p => `\`${p.displayName}\``).join(', ');
+  if (players.length === 1) {
+    const player = players[0];
+    const title = `👋 Group member left: ${player.displayName}`;
 
     return new MessageEmbed()
       .setColor(config.visuals.blue)
       .setTitle(title)
-      .setDescription(content)
-      .setURL(url);
+      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
   }
+
+  const url = `https://wiseoldman.net/groups/${groupId}/members`;
+  const title = `👋 ${players.length} members have left the group`;
+  const content = players.map(p => `\`${p.displayName}\``).join(', ');
+
+  return new MessageEmbed()
+    .setColor(config.visuals.blue)
+    .setTitle(title)
+    .setDescription(content)
+    .setURL(url);
 }
 
 export default new MembersLeft();

@@ -1,45 +1,46 @@
 import { CommandInteraction, GuildMember, MessageEmbed } from 'discord.js';
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { deletePlayer } from '../../../api/modules/players';
+import { deletePlayer } from '../../../services/wiseoldman';
 import config from '../../../config';
-import { Command } from '../../../types';
-import { getEmoji, hasModeratorRole } from '../../../utils';
-import CommandError from '../../CommandError';
+import { Command, CommandConfig, CommandError, hasModeratorRole } from '../../../utils';
 
-class DeletePlayerCommand implements Command {
-  slashCommand: SlashCommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'delete-player',
+  description: 'Delete a player from the database.',
+  options: [
+    {
+      type: 'string',
+      required: true,
+      name: 'username',
+      description: 'The username of the player to delete.'
+    }
+  ]
+};
 
+class DeletePlayerCommand extends Command {
   constructor() {
-    this.slashCommand = new SlashCommandBuilder()
-      .addStringOption(option =>
-        option.setName('username').setDescription('Username to delete').setRequired(true)
-      )
-      .setName('delete-player')
-      .setDescription('Delete a player from the database');
+    super(CONFIG);
+    this.private = true;
   }
 
-  async execute(message: CommandInteraction) {
-    if (!hasModeratorRole(message.member as GuildMember)) {
-      message.reply({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
+  async execute(interaction: CommandInteraction) {
+    if (!hasModeratorRole(interaction.member as GuildMember)) {
+      interaction.followUp({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
       return;
     }
 
-    const username = message.options.getString('username', true);
+    const username = interaction.options.getString('username', true);
 
-    try {
-      await message.deferReply();
+    await deletePlayer(username).catch(e => {
+      if (e.statusCode === 404) throw new CommandError('Player not found.');
+      throw e;
+    });
 
-      await deletePlayer(username);
+    // Respond on the WOM discord chat with a success status
+    const response = new MessageEmbed()
+      .setColor(config.visuals.green)
+      .setDescription(`✅ \`${username}\` has been successfully deleted!`);
 
-      // Respond on the WOM discord chat with a success status
-      const response = new MessageEmbed()
-        .setColor(config.visuals.green)
-        .setDescription(`${getEmoji('success')} \`${username}\` has been successfully deleted!`);
-
-      await message.editReply({ embeds: [response] });
-    } catch (error) {
-      throw new CommandError('Failed to delete player.');
-    }
+    await interaction.editReply({ embeds: [response] });
   }
 }
 

@@ -1,7 +1,6 @@
-import { Client, Intents, MessageEmbed, TextChannel } from 'discord.js';
-import * as router from './commands/router';
+import { Client, Guild, Intents, MessageEmbed, TextChannel } from 'discord.js';
 import config from './config';
-import { findOpenChannel, getEmoji } from './utils';
+import * as router from './commands/router';
 
 class Bot {
   client: Client;
@@ -19,7 +18,9 @@ class Bot {
     });
   }
 
-  init() {
+  async init() {
+    console.log('Starting bot...');
+
     this.client.once('ready', () => {
       // Init bot properties
       this.client.user?.setActivity('bot.wiseoldman.net');
@@ -28,21 +29,23 @@ class Bot {
       this.client.on('interactionCreate', router.onInteractionReceived);
 
       this.client.on('guildCreate', guild => {
-        const openChannel = <TextChannel>findOpenChannel(guild);
+        const openChannel = findOpenChannel(guild);
         if (openChannel) openChannel.send({ embeds: [buildJoinMessage()] });
       });
 
       console.log('Bot is running.');
     });
 
-    this.client.login(config.token);
+    await this.client.login(config.token);
+
+    return this.client;
   }
 }
 
 function buildJoinMessage() {
   return new MessageEmbed()
     .setColor(config.visuals.blue)
-    .setTitle(`${getEmoji('heart')} Thanks for adding me!`)
+    .setTitle(`❤️ Thanks for adding me!`)
     .setDescription(
       "You can now start using the Wise Old Man bot, but there's some quick configurations required if you want to take full advantage of all the features.\nCheck the bot website below, in it you will find the configuration commands."
     )
@@ -57,6 +60,17 @@ function buildJoinMessage() {
         value: 'https://wiseoldman.net'
       }
     ]);
+}
+
+/**
+ * Finds the first text channel where the bot has permissions to send messages to.
+ */
+function findOpenChannel(guild: Guild) {
+  const channel = guild.channels.cache.find(c => {
+    return c.type === 'GUILD_TEXT' && Boolean(guild.me?.permissions.has('SEND_MESSAGES'));
+  });
+
+  return channel as TextChannel;
 }
 
 export default new Bot();

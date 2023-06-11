@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("BOT_DATABASE_URL")
+}
+
+model Alias {
+  userId    String   @id @db.VarChar(256)
+  username  String   @db.VarChar(12)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  // Map
+  @@map("aliases")
+}
+
+model NotificationPreference {
+  guildId   String   @db.VarChar(256)
+  type      String   @db.VarChar(64)
+  channelId String?  @db.VarChar(256)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  // Constraints
+  @@id([guildId, type])
+  // Map
+  @@map("notificationPreferences")
+}
+
+model Server {
+  guildId      String   @id @db.VarChar(256)
+  groupId      Int?
+  botChannelId String?  @db.VarChar(256)
+  prefix       String   @default("!") @db.VarChar(20)
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+
+  // Map
+  @@map("servers")
+}

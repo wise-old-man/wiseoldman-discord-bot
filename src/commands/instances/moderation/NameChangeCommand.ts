@@ -1,3 +1,4 @@
+import { NameChangeDetails, NameChangeStatus } from '@wise-old-man/utils';
 import {
   ButtonInteraction,
   CommandInteraction,
@@ -6,129 +7,141 @@ import {
   MessageButton,
   MessageEmbed
 } from 'discord.js';
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { NameChangeStatus } from '@wise-old-man/utils';
-import { approve, deny } from '../../../api/modules/names';
+import womClient, { approveNameChange, denyNameChange } from '../../../services/wiseoldman';
 import config from '../../../config';
-import { Command } from '../../../types';
-import { getEmoji, hasModeratorRole } from '../../../utils/discord';
-import CommandError from '../../CommandError';
-import womClient from '../../../api/wom-api';
+import { Command, CommandConfig, CommandError, hasModeratorRole } from '../../../utils';
 
-class NameChangeCommand implements Command {
-  slashCommand: SlashCommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'namechange',
+  description: 'Review and take action on a name change.',
+  options: [
+    {
+      type: 'integer',
+      name: 'name_change_id',
+      description: 'The namechange Id.',
+      required: true
+    }
+  ]
+};
 
+class NameChangeCommand extends Command {
   constructor() {
-    this.slashCommand = new SlashCommandBuilder()
-      .addIntegerOption(option =>
-        option.setName('name_change_id').setDescription('Name change id').setRequired(true)
-      )
-      .setName('namechange')
-      .setDescription('Review and take action on a name change');
+    super(CONFIG);
+    this.private = true;
   }
 
-  async execute(message: CommandInteraction) {
-    const nameChangeId = message.options.getInteger('name_change_id', true);
-    try {
-      await message.deferReply();
+  async execute(interaction: CommandInteraction) {
+    const nameChangeId = interaction.options.getInteger('name_change_id', true);
 
-      const reviewData = await womClient.nameChanges.getNameChangeDetails(nameChangeId);
+    const reviewData = await womClient.nameChanges.getNameChangeDetails(nameChangeId).catch(e => {
+      if (e.statusCode === 404) throw new CommandError('Name change ID not found.');
+      if (e.statusCode === 500) throw new CommandError('Failed to load hiscores. Please try again.');
 
-      if (reviewData.nameChange.status !== NameChangeStatus.PENDING) {
-        throw new CommandError('This name change is not pending.');
+      throw e;
+    });
+
+    if (reviewData.nameChange.status !== NameChangeStatus.PENDING) {
+      throw new CommandError('This name change is not pending.');
+    }
+
+    if (!reviewData.data) {
+      throw new CommandError('Name change data was not found.');
+    }
+
+    const { nameChange, data } = reviewData;
+
+    const response = new MessageEmbed()
+      .setColor(config.visuals.blue)
+      .setTitle(`Name change review: ${nameChange.oldName} → ${nameChange.newName}`)
+      .setDescription(buildReviewMessage(data));
+
+    const actions = new MessageActionRow().addComponents(
+      new MessageButton()
+        .setCustomId(`namechange_approve/${nameChangeId}`)
+        .setLabel('Approve')
+        .setStyle('SUCCESS'),
+      new MessageButton()
+        .setCustomId(`namechange_deny/${nameChangeId}`)
+        .setLabel('Deny')
+        .setStyle('DANGER')
+    );
+
+    await interaction.editReply({
+      embeds: [response],
+      components: hasModeratorRole(interaction.member as GuildMember) ? [actions] : []
+    });
+
+    const filter = async (buttonInteraction: ButtonInteraction) => {
+      if (interaction.user.id !== buttonInteraction.user.id) {
+        await buttonInteraction.reply({ content: 'These buttons are not for you!', ephemeral: true });
+        return false;
       }
+      return true;
+    };
 
-      if (!reviewData.data) {
-        throw new CommandError('Name change data was not found.');
-      }
+    // Only create collector if moderator to not get the ugly (edited) tag on message
+    const collector = hasModeratorRole(interaction.member as GuildMember)
+      ? interaction.channel?.createMessageComponentCollector({
+          filter,
+          componentType: 'BUTTON',
+          max: 1,
+          time: 1000 * 300
+        })
+      : undefined;
 
-      const response = new MessageEmbed()
-        .setColor(config.visuals.blue)
-        .setTitle(
-          `Name change review: ${reviewData.nameChange.oldName} → ${reviewData.nameChange.newName}`
-        )
-        .setDescription(this.buildReviewMessage(reviewData.data));
+    collector?.on('end', async collection => {
+      const buttonClicked = collection.first()?.customId;
 
-      const row = new MessageActionRow().addComponents(
-        new MessageButton().setCustomId('namechange_approve').setLabel('Approve').setStyle('SUCCESS'),
-        new MessageButton().setCustomId('namechange_deny').setLabel('Deny').setStyle('DANGER')
-      );
-
-      await message.editReply({
-        embeds: [response],
-        components: hasModeratorRole(message.member as GuildMember) ? [row] : []
-      });
-
-      const filter = async (buttonInteraction: ButtonInteraction) => {
-        if (message.user.id !== buttonInteraction.user.id) {
-          await buttonInteraction.reply({ content: 'These buttons are not for you!', ephemeral: true });
-          return false;
-        }
-        return true;
-      };
-
-      // Only create collector if moderator to not get the ugly (edited) tag on message
-      const collector = hasModeratorRole(message.member as GuildMember)
-        ? message.channel?.createMessageComponentCollector({
-            filter,
-            componentType: 'BUTTON',
-            max: 1,
-            time: 1000 * 300
-          })
-        : undefined;
-
-      collector?.on('end', async collection => {
-        const buttonClicked = collection.first()?.customId;
-        if (buttonClicked === 'namechange_approve') {
-          try {
-            await approve(nameChangeId);
+      if (buttonClicked === `namechange_approve/${nameChangeId}`) {
+        try {
+          await approveNameChange(nameChangeId);
+          response.setFooter({ text: `Approved ✅` }).setColor(config.visuals.green);
+        } catch (error) {
+          if ('statusCode' in error && error.statusCode === 504) {
             response
-              .setFooter({ text: `Approved ${getEmoji('success')}` })
-              .setColor(config.visuals.green);
-          } catch (error) {
+              .setFooter({ text: 'Approval timed out. Check the status again in a few minutes.' })
+              .setColor(config.visuals.orange);
+          } else {
             response.setFooter({ text: 'Failed to approve name change' }).setColor(config.visuals.red);
           }
-        } else if (buttonClicked === 'namechange_deny') {
-          try {
-            await deny(nameChangeId);
-            response.setFooter({ text: `Denied ${getEmoji('error')}` }).setColor(config.visuals.red);
-          } catch (error) {
-            response.setFooter({ text: 'Failed to deny name change' }).setColor(config.visuals.red);
-          }
         }
+      } else if (buttonClicked === `namechange_deny/${nameChangeId}`) {
+        try {
+          await denyNameChange(nameChangeId);
+          response.setFooter({ text: `Denied ❌` }).setColor(config.visuals.red);
+        } catch (error) {
+          response.setFooter({ text: 'Failed to deny name change' }).setColor(config.visuals.red);
+        }
+      }
 
-        await message.editReply({ embeds: [response], components: [] });
-      });
-    } catch (error) {
-      console.log(error);
-
-      if (error instanceof CommandError) throw error;
-      throw new CommandError('Failed to review name change.');
-    }
+      await interaction.editReply({ embeds: [response], components: [] });
+    });
   }
+}
 
-  buildReviewMessage(data: any): string {
-    const { isNewOnHiscores, hasNegativeGains, hoursDiff, ehpDiff, ehbDiff, oldStats, newStats } = data;
-    const expDiff =
-      newStats.data.skills.overall && oldStats.data.skills.overall
-        ? newStats.data.skills.overall.experience - oldStats.data.skills.overall.experience
-        : 0;
-    const oldTotalLevel = oldStats.data.skills.overall?.level;
-    const newTotalLevel = newStats.data.skills.overall?.level;
+function buildReviewMessage(data: NonNullable<NameChangeDetails['data']>): string {
+  const { isNewOnHiscores, hasNegativeGains, hoursDiff, ehpDiff, ehbDiff, oldStats, newStats } = data;
 
-    const lines = [];
+  const expDiff =
+    newStats.data.skills.overall && oldStats.data.skills.overall
+      ? newStats.data.skills.overall.experience - oldStats.data.skills.overall.experience
+      : 0;
 
-    lines.push(`New name on the hiscores? ${isNewOnHiscores ? getEmoji('success') : getEmoji('error')}`);
-    lines.push(`Has no negative gains? ${!hasNegativeGains ? getEmoji('success') : getEmoji('error')}`);
-    lines.push(`Hours difference? \`${hoursDiff}\``);
-    lines.push(`EHP difference? \`${ehpDiff}\``);
-    lines.push(`EHB difference? \`${ehbDiff}\``);
-    lines.push(`Exp difference? \`${expDiff}\``);
-    lines.push(`Old total level? \`${oldTotalLevel}\``);
-    lines.push(`New total level? \`${newTotalLevel}\``);
+  const oldTotalLevel = oldStats.data.skills.overall?.level;
+  const newTotalLevel = newStats.data.skills.overall?.level;
 
-    return lines.join('\n');
-  }
+  const lines: Array<string> = [];
+
+  lines.push(`New name on the hiscores? ${isNewOnHiscores ? '✅' : '❌'}`);
+  lines.push(`Has no negative gains? ${!hasNegativeGains ? '✅' : '❌'}`);
+  lines.push(`Hours difference? \`${hoursDiff}\``);
+  lines.push(`EHP difference? \`${ehpDiff}\``);
+  lines.push(`EHB difference? \`${ehbDiff}\``);
+  lines.push(`Exp difference? \`${expDiff}\``);
+  lines.push(`Old total level? \`${oldTotalLevel}\``);
+  lines.push(`New total level? \`${newTotalLevel}\``);
+
+  return lines.join('\n');
 }
 
 export default new NameChangeCommand();

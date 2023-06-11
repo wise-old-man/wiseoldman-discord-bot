@@ -1,54 +1,53 @@
-import { SlashCommandSubcommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import womClient from '../../../api/wom-api';
 import config from '../../../config';
-import { updateGroup } from '../../../database/services/server';
-import { Command } from '../../../types';
-import { getEmoji } from '../../../utils';
-import CommandError from '../../CommandError';
+import { updateServerGroup } from '../../../services/prisma';
+import womClient from '../../../services/wiseoldman';
+import { Command, CommandConfig, CommandError } from '../../../utils';
 
-class ConfigGroupCommand implements Command {
-  subcommand?: boolean;
-  requiresAdmin: boolean;
-  slashCommand?: SlashCommandSubcommandBuilder;
+const CONFIG: CommandConfig = {
+  name: 'group',
+  description: "Configure the server's Wise Old Man group.",
+  options: [
+    {
+      type: 'integer',
+      name: 'group_id',
+      description: 'The group ID to link to the server.'
+    }
+  ]
+};
 
+class ConfigGroupCommand extends Command {
   constructor() {
-    this.subcommand = true;
+    super(CONFIG);
     this.requiresAdmin = true;
-
-    this.slashCommand = new SlashCommandSubcommandBuilder()
-      .addIntegerOption(option =>
-        option.setName('group_id').setDescription('Group id').setRequired(true)
-      )
-      .setName('group')
-      .setDescription("Configure the server's Wise Old Man group");
   }
 
-  async execute(message: CommandInteraction) {
-    const groupId = message.options.getInteger('group_id', true);
+  async execute(interaction: CommandInteraction) {
+    const guildId = interaction.guild?.id || '';
 
-    try {
-      await message.deferReply();
-
-      const group = await womClient.groups.getGroupDetails(groupId);
-
-      const guildId = message.guild?.id || '';
-      await updateGroup(guildId, groupId);
-
-      const response = new MessageEmbed()
-        .setColor(config.visuals.green)
-        .setTitle(`${getEmoji('success')} Server group updated`)
-        .setDescription(`All broadcasts and commands will be in reference to **${group.name}**`)
-        .addFields({ name: 'Page URL', value: `https://wiseoldman.net/groups/${groupId}` });
-
-      await message.editReply({ embeds: [response] });
-    } catch (e: any) {
-      if (e.response?.data?.message) {
-        throw new CommandError(e.response?.data?.message);
-      } else {
-        throw new CommandError("Failed to update the server's group.");
-      }
+    if (!guildId || guildId.length === 0) {
+      throw new CommandError('This command can only be used in a Discord server.');
     }
+
+    const groupId = interaction.options.getInteger('group_id', true);
+
+    const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
+      throw new CommandError("Couldn't find that group.");
+    });
+
+    // Update the server's group ID in the database
+    await updateServerGroup(guildId, groupId);
+
+    const response = new MessageEmbed()
+      .setColor(config.visuals.green)
+      .setTitle(`✅ Server group updated`)
+      .setDescription(`All notifications and commands will be in reference to **${group.name}**`)
+      .addFields({
+        name: 'Page URL',
+        value: `https://wiseoldman.net/groups/${groupId}`
+      });
+
+    await interaction.editReply({ embeds: [response] });
   }
 }
 
