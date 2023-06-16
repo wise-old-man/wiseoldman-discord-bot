@@ -54,7 +54,7 @@ class GroupGainedCommand extends Command {
     const gained = await womClient.groups.getGroupGains(groupId, { period, metric });
 
     const gainedList = gained
-      .map((g, i) => `${i + 1}. ${bold(g.player.displayName)} - ${formatNumber(g.gained, true)}`)
+      .map((g, i) => `${i + 1}. ${bold(g.player.displayName)} - ${formatNumber(g.data.gained, true)}`)
       .join('\n');
 
     const response = new MessageEmbed()
