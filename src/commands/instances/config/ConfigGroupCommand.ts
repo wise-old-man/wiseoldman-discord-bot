@@ -11,7 +11,8 @@ const CONFIG: CommandConfig = {
     {
       type: 'integer',
       name: 'group_id',
-      description: 'The group ID to link to the server.'
+      description: 'The group ID to link to the server.',
+      required: true
     }
   ]
 };
