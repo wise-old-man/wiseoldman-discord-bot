@@ -49,7 +49,7 @@ class GroupHiscoresCommand extends Command {
       .setColor(config.visuals.blue)
       .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} hiscores`)
       .setDescription(hiscoresList)
-      .setURL(`https://wiseoldman.net/groups/${groupId}/hiscores/`)
+      .setURL(`https://wiseoldman.net/groups/${groupId}/hiscores?metric=${metric}`)
       .setFooter({ text: `Tip: Try /group hiscores metric: zulrah` });
 
     await interaction.editReply({ embeds: [response] });
