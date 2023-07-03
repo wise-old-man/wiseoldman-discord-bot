@@ -5,7 +5,8 @@ import {
   CompetitionStatus,
   GroupListItem,
   NameChange,
-  Player
+  Player,
+  NameChangeDetails
 } from '@wise-old-man/utils';
 import env from '../env';
 import { durationBetween } from '../utils/dates';
@@ -83,6 +84,10 @@ export async function approveNameChange(id: number): Promise<NameChange> {
   return womClient.nameChanges.postRequest(`/names/${id}/approve`, {
     adminPassword: env.ADMIN_PASSWORD
   });
+}
+
+export async function fetchNameChangeDetails(id: number): Promise<NameChangeDetails> {
+  return womClient.nameChanges.getRequest(`/names/${id}`);
 }
 
 export async function denyNameChange(id: number): Promise<NameChange> {

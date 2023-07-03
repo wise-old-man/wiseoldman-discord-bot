@@ -7,7 +7,7 @@ import {
   MessageButton,
   MessageEmbed
 } from 'discord.js';
-import womClient, { approveNameChange, denyNameChange } from '../../../services/wiseoldman';
+import { approveNameChange, denyNameChange, fetchNameChangeDetails } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig, CommandError, hasModeratorRole } from '../../../utils';
 
@@ -33,7 +33,7 @@ class NameChangeCommand extends Command {
   async execute(interaction: CommandInteraction) {
     const nameChangeId = interaction.options.getInteger('name_change_id', true);
 
-    const reviewData = await womClient.nameChanges.getNameChangeDetails(nameChangeId).catch(e => {
+    const reviewData = await fetchNameChangeDetails(nameChangeId).catch(e => {
       if (e.statusCode === 404) throw new CommandError('Name change ID not found.');
       if (e.statusCode === 500) throw new CommandError('Failed to load hiscores. Please try again.');
 
