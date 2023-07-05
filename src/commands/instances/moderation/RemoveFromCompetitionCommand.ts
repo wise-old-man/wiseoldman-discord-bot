@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { removeFromCompetition } from '../../../services/wiseoldman';
 import config from '../../../config';
-import { Command, CommandConfig } from '../../../utils';
+import { Command, CommandConfig, sendModLog } from '../../../utils';
 
 const CONFIG: CommandConfig = {
   name: 'remove-from-competition',
@@ -18,6 +18,11 @@ const CONFIG: CommandConfig = {
       name: 'username',
       description: 'In-game username.',
       required: true
+    },
+    {
+      type: 'user',
+      name: 'requester',
+      description: "Requester's Discord user tag."
     }
   ]
 };
@@ -32,6 +37,9 @@ class RemoveFromCompetitionCommand extends Command {
   async execute(interaction: CommandInteraction) {
     const competitionId = interaction.options.getInteger('id', true);
     const username = interaction.options.getString('username', true);
+    const requesterId = interaction.options.getUser('requester', false)?.id;
+
+    const requester = interaction.guild?.members.cache.find(m => m.id === requesterId);
 
     await removeFromCompetition(competitionId, username);
 
@@ -41,6 +49,13 @@ class RemoveFromCompetitionCommand extends Command {
       .setDescription(`✅ ${username} has been successfully removed from the competition.`);
 
     await interaction.editReply({ embeds: [response] });
+
+    sendModLog(
+      interaction.guild,
+      `Removed \`${username}\` from competition (ID: ${competitionId})`,
+      interaction.user,
+      requester?.user
+    );
   }
 }
 

@@ -1,12 +1,7 @@
-import { GroupListItem } from '@wise-old-man/utils';
-import { CommandInteraction, GuildChannelManager, MessageEmbed, TextChannel } from 'discord.js';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { verifyGroup } from '../../../services/wiseoldman';
 import config from '../../../config';
-import { Command, CommandConfig, CommandError } from '../../../utils';
-
-const CHAT_MESSAGE = (groupName: string) => `✅ \`${groupName}\` has been successfully verified!`;
-
-const LOG_MESSAGE = (id: number, name: string, userId: string) => `${name} (${id}) - <@${userId}>`;
+import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
 
 const CONFIG: CommandConfig = {
   name: 'verify-group',
@@ -52,29 +47,19 @@ class VerifyGroupCommand extends Command {
     // Respond on the WOM discord chat with a success status
     const response = new MessageEmbed()
       .setColor(config.visuals.green)
-      .setDescription(CHAT_MESSAGE(group.name));
+      .setDescription(`✅ \`${group.name}\` has been successfully verified!`);
 
     await interaction.followUp({ embeds: [response] });
 
-    // Send a message to the WOM leaders log channel
-    sendConfirmationLog(interaction.guild?.channels, group, userId);
+    sendModLog(
+      interaction.guild,
+      `Verified ${group.name} (${group.id}) - Leader: <@${userId}>`,
+      interaction.user
+    );
 
     // Add the "Group Leader" role to the user
     user.roles.add(config.discord.roles.groupLeader).catch(console.log);
   }
-}
-
-function sendConfirmationLog(
-  channels: GuildChannelManager | undefined,
-  group: GroupListItem,
-  userId: string
-) {
-  const leadersLogChannel = channels?.cache.get(config.discord.channels.leadersLog);
-
-  if (!leadersLogChannel) return;
-  if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(leadersLogChannel)) return;
-
-  leadersLogChannel.send(LOG_MESSAGE(group.id, group.name, userId));
 }
 
 export default new VerifyGroupCommand();

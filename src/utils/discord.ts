@@ -1,5 +1,14 @@
 import { Metric, parseMetricAbbreviation } from '@wise-old-man/utils';
-import { Channel, DMChannel, GuildMember, PermissionResolvable, TextChannel } from 'discord.js';
+import {
+  Channel,
+  DMChannel,
+  Guild,
+  GuildMember,
+  MessageEmbed,
+  PermissionResolvable,
+  TextChannel,
+  User
+} from 'discord.js';
 import config from '../config';
 
 export const MAX_FIELD_SIZE = 25;
@@ -142,3 +151,26 @@ export function getEmoji(metric: string): string {
 
 const clientUserPermissions = (channel: TextChannel) =>
   channel.client.user ? channel.permissionsFor(channel.client.user) : null;
+
+export function sendModLog(
+  guild: Guild | null,
+  message: string,
+  mod: User | null,
+  requester?: User | null
+) {
+  if (!guild || !guild.channels) return;
+
+  const modLogsChannel = guild.channels.cache.get(config.discord.channels.modLogs);
+
+  if (!modLogsChannel) return;
+  if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(modLogsChannel)) return;
+
+  let embedMessage = message;
+  if (requester && requester.username) embedMessage += ` | Requested by: <@${requester.id}>`;
+
+  const logMessage = new MessageEmbed()
+    .setDescription(embedMessage)
+    .setFooter({ text: `Mod: ${mod ? mod.username : 'unknown'}` });
+
+  modLogsChannel.send({ embeds: [logMessage] });
+}

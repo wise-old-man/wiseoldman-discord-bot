@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { resetCompetitionCode } from '../../../services/wiseoldman';
 import config from '../../../config';
-import { Command, CommandConfig, CommandError } from '../../../utils';
+import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
 
 const DM_MESSAGE = (code: string) =>
   `Hey! Here's your new verification code: \n\`${code}\`\n\nPlease save it somewhere safe and be mindful of who you choose to share it with.`;
@@ -61,6 +61,12 @@ class ResetCompetitionCodeCommand extends Command {
       .setDescription(CHAT_MESSAGE(userId));
 
     await interaction.editReply({ embeds: [response] });
+
+    sendModLog(
+      interaction.guild,
+      `Reset competition code (ID: ${competitionId}) - Sent to <@${user.id}>`,
+      interaction.user
+    );
   }
 }
 
