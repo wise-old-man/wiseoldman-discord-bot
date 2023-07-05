@@ -80,6 +80,47 @@ export async function verifyGroup(groupId: number): Promise<GroupListItem> {
   });
 }
 
+/**
+ * Send an API request to remove a player from a group.
+ */
+export async function removeFromGroup(groupId: number, username: string): Promise<{ message: string }> {
+  return womClient.groups.deleteRequest(`/groups/${groupId}/members`, {
+    adminPassword: env.ADMIN_PASSWORD,
+    members: [username]
+  });
+}
+
+/**
+ * Send an API request to remove a player from a competition.
+ */
+export async function removeFromCompetition(
+  competitionId: number,
+  username: string
+): Promise<{ message: string }> {
+  return womClient.groups.deleteRequest(`/competitions/${competitionId}/participants`, {
+    adminPassword: env.ADMIN_PASSWORD,
+    participants: [username]
+  });
+}
+
+/**
+ * Send an API request to delete a group.
+ */
+export async function deleteGroup(groupId: number): Promise<{ message: string }> {
+  return womClient.groups.deleteRequest(`/groups/${groupId}`, {
+    adminPassword: env.ADMIN_PASSWORD
+  });
+}
+
+/**
+ * Send an API request to delete a competition.
+ */
+export async function deleteCompetition(competitionId: number): Promise<{ message: string }> {
+  return womClient.competitions.deleteRequest(`/competitions/${competitionId}`, {
+    adminPassword: env.ADMIN_PASSWORD
+  });
+}
+
 export async function approveNameChange(id: number): Promise<NameChange> {
   return womClient.nameChanges.postRequest(`/names/${id}/approve`, {
     adminPassword: env.ADMIN_PASSWORD
@@ -101,6 +142,17 @@ export async function denyNameChange(id: number): Promise<NameChange> {
  */
 export async function deletePlayer(username: string): Promise<{ message: string }> {
   return womClient.players.deleteRequest(`/players/${username}`, {
+    adminPassword: env.ADMIN_PASSWORD
+  });
+}
+
+/**
+ * Send an API request attempting to delete a player's name change history
+ */
+export async function clearNameChangeHistory(
+  username: string
+): Promise<{ count: number; message: string }> {
+  return womClient.players.postRequest(`/names/${username}/clear-history`, {
     adminPassword: env.ADMIN_PASSWORD
   });
 }

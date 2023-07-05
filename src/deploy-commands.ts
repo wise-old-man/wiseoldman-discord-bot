@@ -20,6 +20,12 @@ export async function deployCommands() {
     if (env.DISCORD_DEV_LOCAL) {
       guildCommands.push(slashCommand.setDescription(`[DEV 🧑‍💻]: ${slashCommand.description}`).toJSON());
     } else if (command.private) {
+      // Moderator+ commands (example: /reset-group-code)
+      if (command.moderation) {
+        slashCommand.setDescription(`[Mod 🔒]: ${slashCommand.description}`);
+      }
+
+      // Private commands, only visible in the WOM discord (example: /change-flag)
       guildCommands.push(slashCommand.toJSON());
     } else {
       globalCommands.push(slashCommand.toJSON());

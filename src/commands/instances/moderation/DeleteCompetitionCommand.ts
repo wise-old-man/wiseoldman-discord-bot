@@ -1,17 +1,17 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { deletePlayer } from '../../../services/wiseoldman';
+import { deleteCompetition } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
 
 const CONFIG: CommandConfig = {
-  name: 'delete-player',
-  description: 'Delete a player from the database.',
+  name: 'delete-competition',
+  description: 'Delete a competition.',
   options: [
     {
-      type: 'string',
-      required: true,
-      name: 'username',
-      description: 'The username of the player to delete.'
+      type: 'integer',
+      name: 'id',
+      description: 'The competition ID.',
+      required: true
     },
     {
       type: 'user',
@@ -21,7 +21,7 @@ const CONFIG: CommandConfig = {
   ]
 };
 
-class DeletePlayerCommand extends Command {
+class DeleteCompetitionCommand extends Command {
   constructor() {
     super(CONFIG);
     this.private = true;
@@ -29,30 +29,30 @@ class DeletePlayerCommand extends Command {
   }
 
   async execute(interaction: CommandInteraction) {
-    const username = interaction.options.getString('username', true);
+    const competitionId = interaction.options.getInteger('id', true);
     const requesterId = interaction.options.getUser('requester', false)?.id;
 
     const requester = interaction.guild?.members.cache.find(m => m.id === requesterId);
 
-    await deletePlayer(username).catch(e => {
-      if (e.statusCode === 404) throw new CommandError('Player not found.');
+    await deleteCompetition(competitionId).catch(e => {
+      if (e.statusCode === 404) throw new CommandError('Competition not found.');
       throw e;
     });
 
     // Respond on the WOM discord chat with a success status
     const response = new MessageEmbed()
       .setColor(config.visuals.green)
-      .setDescription(`✅ \`${username}\` has been successfully deleted!`);
+      .setDescription(`✅ Competition has been successfully deleted!`);
 
     await interaction.editReply({ embeds: [response] });
 
     sendModLog(
       interaction.guild,
-      `Deleted player (Username: ${username})`,
+      `Deleted competition (ID: ${competitionId})`,
       interaction.user,
       requester?.user
     );
   }
 }
 
-export default new DeletePlayerCommand();
+export default new DeleteCompetitionCommand();

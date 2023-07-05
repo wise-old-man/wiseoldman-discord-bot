@@ -1,17 +1,17 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
-import { deletePlayer } from '../../../services/wiseoldman';
+import { clearNameChangeHistory } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
 
 const CONFIG: CommandConfig = {
-  name: 'delete-player',
-  description: 'Delete a player from the database.',
+  name: 'clear-name-change-history',
+  description: "Clear a player's name change history.",
   options: [
     {
       type: 'string',
       required: true,
       name: 'username',
-      description: 'The username of the player to delete.'
+      description: 'The username of the player to clear the history from.'
     },
     {
       type: 'user',
@@ -21,7 +21,7 @@ const CONFIG: CommandConfig = {
   ]
 };
 
-class DeletePlayerCommand extends Command {
+class ClearNameChangeHistoryCommand extends Command {
   constructor() {
     super(CONFIG);
     this.private = true;
@@ -34,25 +34,27 @@ class DeletePlayerCommand extends Command {
 
     const requester = interaction.guild?.members.cache.find(m => m.id === requesterId);
 
-    await deletePlayer(username).catch(e => {
+    await clearNameChangeHistory(username).catch(e => {
       if (e.statusCode === 404) throw new CommandError('Player not found.');
+      if (e.message === 'No name changes were found for this player.') throw new CommandError(e.message);
+
       throw e;
     });
 
     // Respond on the WOM discord chat with a success status
     const response = new MessageEmbed()
       .setColor(config.visuals.green)
-      .setDescription(`✅ \`${username}\` has been successfully deleted!`);
+      .setDescription(`✅ Name change history successfully cleared for  \`${username}\`!`);
 
     await interaction.editReply({ embeds: [response] });
 
     sendModLog(
       interaction.guild,
-      `Deleted player (Username: ${username})`,
+      `Cleared name change history (Username: ${username})`,
       interaction.user,
       requester?.user
     );
   }
 }
 
-export default new DeletePlayerCommand();
+export default new ClearNameChangeHistoryCommand();

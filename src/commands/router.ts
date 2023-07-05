@@ -2,7 +2,13 @@ import * as Sentry from '@sentry/node';
 import { GuildMember, Interaction, MessageEmbed } from 'discord.js';
 import config from '../config';
 import monitoring from '../utils/monitoring';
-import { BaseCommand, CommandError, isAdmin, requiresAdminPermissions } from '../utils';
+import {
+  BaseCommand,
+  CommandError,
+  hasModeratorRole,
+  isAdmin,
+  requiresAdminPermissions
+} from '../utils';
 import {
   getCountryOptions,
   getHelpCategoryOptions,
@@ -26,6 +32,11 @@ import PlayerSetFlagCommand from './instances/player/PlayerSetFlagCommand';
 import PlayerSetUsernameCommand from './instances/player/PlayerSetUsernameCommand';
 import PlayerStatsCommand from './instances/player/PlayerStatsCommand';
 import UpdatePlayerCommand from './instances/player/UpdatePlayerCommand';
+import ClearNameChangeHistoryCommand from './instances/moderation/ClearNameChangeHistoryCommand';
+import DeleteGroupCommand from './instances/moderation/DeleteGroupCommand';
+import DeleteCompetitionCommand from './instances/moderation/DeleteCompetitionCommand';
+import RemoveFromGroupCommand from './instances/moderation/RemoveFromGroupCommand';
+import RemoveFromCompetitionCommand from './instances/moderation/RemoveFromCompetitionCommand';
 
 export const COMMANDS: BaseCommand[] = [
   HelpCommand,
@@ -48,7 +59,12 @@ export const COMMANDS: BaseCommand[] = [
   VerifyGroupCommand,
   DeletePlayerCommand,
   ResetGroupCodeCommand,
-  ResetCompetitionCodeCommand
+  ResetCompetitionCodeCommand,
+  ClearNameChangeHistoryCommand,
+  DeleteGroupCommand,
+  DeleteCompetitionCommand,
+  RemoveFromGroupCommand,
+  RemoveFromCompetitionCommand
 ];
 
 export async function onInteractionReceived(interaction: Interaction) {
@@ -93,6 +109,11 @@ export async function onInteractionReceived(interaction: Interaction) {
       !isAdmin(interaction.member as GuildMember)
     ) {
       throw new CommandError('That command requires Admin permissions.');
+    }
+
+    if (targetCommand.moderation && !hasModeratorRole(interaction.member as GuildMember)) {
+      interaction.followUp({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
+      return;
     }
 
     await targetCommand.execute(interaction);
