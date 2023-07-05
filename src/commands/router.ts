@@ -35,6 +35,8 @@ import UpdatePlayerCommand from './instances/player/UpdatePlayerCommand';
 import ClearNameChangeHistoryCommand from './instances/moderation/ClearNameChangeHistoryCommand';
 import DeleteGroupCommand from './instances/moderation/DeleteGroupCommand';
 import DeleteCompetitionCommand from './instances/moderation/DeleteCompetitionCommand';
+import RemoveFromGroupCommand from './instances/moderation/RemoveFromGroupCommand';
+import RemoveFromCompetitionCommand from './instances/moderation/RemoveFromCompetitionCommand';
 
 export const COMMANDS: BaseCommand[] = [
   HelpCommand,
@@ -60,7 +62,9 @@ export const COMMANDS: BaseCommand[] = [
   ResetCompetitionCodeCommand,
   ClearNameChangeHistoryCommand,
   DeleteGroupCommand,
-  DeleteCompetitionCommand
+  DeleteCompetitionCommand,
+  RemoveFromGroupCommand,
+  RemoveFromCompetitionCommand
 ];
 
 export async function onInteractionReceived(interaction: Interaction) {

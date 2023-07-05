@@ -81,6 +81,29 @@ export async function verifyGroup(groupId: number): Promise<GroupListItem> {
 }
 
 /**
+ * Send an API request to remove a player from a group.
+ */
+export async function removeFromGroup(groupId: number, username: string): Promise<{ message: string }> {
+  return womClient.groups.deleteRequest(`/groups/${groupId}/members`, {
+    adminPassword: env.ADMIN_PASSWORD,
+    members: [username]
+  });
+}
+
+/**
+ * Send an API request to remove a player from a competition.
+ */
+export async function removeFromCompetition(
+  competitionId: number,
+  username: string
+): Promise<{ message: string }> {
+  return womClient.groups.deleteRequest(`/competitions/${competitionId}/participants`, {
+    adminPassword: env.ADMIN_PASSWORD,
+    participants: [username]
+  });
+}
+
+/**
  * Send an API request to delete a group.
  */
 export async function deleteGroup(groupId: number): Promise<{ message: string }> {
