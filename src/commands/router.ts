@@ -32,6 +32,7 @@ import PlayerSetFlagCommand from './instances/player/PlayerSetFlagCommand';
 import PlayerSetUsernameCommand from './instances/player/PlayerSetUsernameCommand';
 import PlayerStatsCommand from './instances/player/PlayerStatsCommand';
 import UpdatePlayerCommand from './instances/player/UpdatePlayerCommand';
+import ClearNameChangeHistoryCommand from './instances/moderation/ClearNameChangeHistoryCommand';
 
 export const COMMANDS: BaseCommand[] = [
   HelpCommand,
@@ -54,7 +55,8 @@ export const COMMANDS: BaseCommand[] = [
   VerifyGroupCommand,
   DeletePlayerCommand,
   ResetGroupCodeCommand,
-  ResetCompetitionCodeCommand
+  ResetCompetitionCodeCommand,
+  ClearNameChangeHistoryCommand
 ];
 
 export async function onInteractionReceived(interaction: Interaction) {

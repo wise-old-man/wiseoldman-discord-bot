@@ -106,6 +106,17 @@ export async function deletePlayer(username: string): Promise<{ message: string 
 }
 
 /**
+ * Send an API request attempting to delete a player's name change history
+ */
+export async function clearNameChangeHistory(
+  username: string
+): Promise<{ count: number; message: string }> {
+  return womClient.players.postRequest(`/names/${username}/clear-history`, {
+    adminPassword: env.ADMIN_PASSWORD
+  });
+}
+
+/**
  * Send an API request attempting to update a player's country
  */
 export async function updateCountry(username: string, country: string): Promise<Player> {
