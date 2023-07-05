@@ -45,7 +45,7 @@ class VerifyGroupCommand extends Command {
     }
 
     const group = await verifyGroup(groupId).catch(e => {
-      if (e.statusCode === 404) throw new CommandError('Competition not found.');
+      if (e.statusCode === 404) throw new CommandError('Group not found.');
       throw e;
     });
 

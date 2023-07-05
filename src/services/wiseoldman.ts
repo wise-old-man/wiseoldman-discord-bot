@@ -80,6 +80,24 @@ export async function verifyGroup(groupId: number): Promise<GroupListItem> {
   });
 }
 
+/**
+ * Send an API request to delete a group.
+ */
+export async function deleteGroup(groupId: number): Promise<{ message: string }> {
+  return womClient.groups.deleteRequest(`/groups/${groupId}`, {
+    adminPassword: env.ADMIN_PASSWORD
+  });
+}
+
+/**
+ * Send an API request to delete a competition.
+ */
+export async function deleteCompetition(competitionId: number): Promise<{ message: string }> {
+  return womClient.competitions.deleteRequest(`/competitions/${competitionId}`, {
+    adminPassword: env.ADMIN_PASSWORD
+  });
+}
+
 export async function approveNameChange(id: number): Promise<NameChange> {
   return womClient.nameChanges.postRequest(`/names/${id}/approve`, {
     adminPassword: env.ADMIN_PASSWORD
