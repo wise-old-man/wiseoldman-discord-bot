@@ -2,7 +2,13 @@ import * as Sentry from '@sentry/node';
 import { GuildMember, Interaction, MessageEmbed } from 'discord.js';
 import config from '../config';
 import monitoring from '../utils/monitoring';
-import { BaseCommand, CommandError, isAdmin, requiresAdminPermissions } from '../utils';
+import {
+  BaseCommand,
+  CommandError,
+  hasModeratorRole,
+  isAdmin,
+  requiresAdminPermissions
+} from '../utils';
 import {
   getCountryOptions,
   getHelpCategoryOptions,
@@ -93,6 +99,11 @@ export async function onInteractionReceived(interaction: Interaction) {
       !isAdmin(interaction.member as GuildMember)
     ) {
       throw new CommandError('That command requires Admin permissions.');
+    }
+
+    if (targetCommand.moderation && !hasModeratorRole(interaction.member as GuildMember)) {
+      interaction.followUp({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
+      return;
     }
 
     await targetCommand.execute(interaction);

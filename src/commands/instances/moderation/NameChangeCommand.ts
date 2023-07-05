@@ -28,6 +28,7 @@ class NameChangeCommand extends Command {
   constructor() {
     super(CONFIG);
     this.private = true;
+    this.moderation = true;
   }
 
   async execute(interaction: CommandInteraction) {

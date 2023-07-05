@@ -20,6 +20,7 @@ export class CommandError extends Error {
 
 export interface BaseCommand {
   private?: boolean;
+  moderation?: boolean;
   requiresAdmin?: boolean;
   slashCommand: SlashCommandSubcommandBuilder | SlashCommandSubcommandsOnlyBuilder;
   execute(interaction: CommandInteraction): Promise<void>;
@@ -27,6 +28,7 @@ export interface BaseCommand {
 
 export class Command implements BaseCommand {
   private?: boolean;
+  moderation?: boolean;
   requiresAdmin?: boolean;
   slashCommand: SlashCommandSubcommandBuilder;
 
@@ -49,6 +51,7 @@ export class Command implements BaseCommand {
 
 export class AggregateCommand implements BaseCommand {
   private?: boolean;
+  moderation?: boolean;
   requiresAdmin?: boolean;
   slashCommand: SlashCommandSubcommandsOnlyBuilder;
   subCommands: Command[];

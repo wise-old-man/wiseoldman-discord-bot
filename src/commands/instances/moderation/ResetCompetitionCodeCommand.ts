@@ -1,7 +1,7 @@
-import { CommandInteraction, GuildMember, MessageEmbed } from 'discord.js';
+import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { resetCompetitionCode } from '../../../services/wiseoldman';
 import config from '../../../config';
-import { Command, CommandConfig, CommandError, hasModeratorRole } from '../../../utils';
+import { Command, CommandConfig, CommandError } from '../../../utils';
 
 const DM_MESSAGE = (code: string) =>
   `Hey! Here's your new verification code: \n\`${code}\`\n\nPlease save it somewhere safe and be mindful of who you choose to share it with.`;
@@ -32,14 +32,10 @@ class ResetCompetitionCodeCommand extends Command {
   constructor() {
     super(CONFIG);
     this.private = true;
+    this.moderation = true;
   }
 
   async execute(interaction: CommandInteraction) {
-    if (!hasModeratorRole(interaction.member as GuildMember)) {
-      interaction.followUp({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
-      return;
-    }
-
     const competitionId = interaction.options.getInteger('id', true);
     const userId = interaction.options.getUser('user', true).id;
 

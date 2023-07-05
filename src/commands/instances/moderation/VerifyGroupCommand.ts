@@ -1,14 +1,8 @@
 import { GroupListItem } from '@wise-old-man/utils';
-import {
-  CommandInteraction,
-  GuildChannelManager,
-  GuildMember,
-  MessageEmbed,
-  TextChannel
-} from 'discord.js';
+import { CommandInteraction, GuildChannelManager, MessageEmbed, TextChannel } from 'discord.js';
 import { verifyGroup } from '../../../services/wiseoldman';
 import config from '../../../config';
-import { Command, CommandConfig, CommandError, hasModeratorRole } from '../../../utils';
+import { Command, CommandConfig, CommandError } from '../../../utils';
 
 const CHAT_MESSAGE = (groupName: string) => `✅ \`${groupName}\` has been successfully verified!`;
 
@@ -37,14 +31,10 @@ class VerifyGroupCommand extends Command {
   constructor() {
     super(CONFIG);
     this.private = true;
+    this.moderation = true;
   }
 
   async execute(interaction: CommandInteraction) {
-    if (!hasModeratorRole(interaction.member as GuildMember)) {
-      interaction.followUp({ content: 'Nice try. This command is reserved for Moderators and Admins.' });
-      return;
-    }
-
     const groupId = interaction.options.getInteger('id', true);
     const userId = interaction.options.getUser('user', true).id;
 
