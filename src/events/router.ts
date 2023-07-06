@@ -12,6 +12,7 @@ import MemberNameChanged from './instances/MemberNameChanged';
 import MembersJoined from './instances/MembersJoined';
 import MembersLeft from './instances/MembersLeft';
 import PlayerFlaggedReview from './instances/PlayerFlaggedReview';
+import MemberRoleChanged from './instances/MemberRoleChanged';
 
 const EVENTS: Event[] = [
   CompetitionCreated,
@@ -24,12 +25,13 @@ const EVENTS: Event[] = [
   MemberNameChanged,
   MemberHardcoreDied,
   MemberAchievements,
-  PlayerFlaggedReview
+  PlayerFlaggedReview,
+  MemberRoleChanged
 ];
 
 function onEventReceived(client: Client, payload: { type: string; data: unknown }): void {
   EVENTS.forEach(event => {
-    if (payload.type === event.type) {
+    if (payload.type.toLowerCase() === event.type.toLowerCase()) {
       const eventMonitor = monitoring.trackEvent();
 
       event
