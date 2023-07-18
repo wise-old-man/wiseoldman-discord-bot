@@ -37,6 +37,7 @@ import DeleteGroupCommand from './instances/moderation/DeleteGroupCommand';
 import DeleteCompetitionCommand from './instances/moderation/DeleteCompetitionCommand';
 import RemoveFromGroupCommand from './instances/moderation/RemoveFromGroupCommand';
 import RemoveFromCompetitionCommand from './instances/moderation/RemoveFromCompetitionCommand';
+import CreateAPIKeyCommand from './instances/moderation/CreateAPIKeyCommand';
 
 export const COMMANDS: BaseCommand[] = [
   HelpCommand,
@@ -64,7 +65,8 @@ export const COMMANDS: BaseCommand[] = [
   DeleteGroupCommand,
   DeleteCompetitionCommand,
   RemoveFromGroupCommand,
-  RemoveFromCompetitionCommand
+  RemoveFromCompetitionCommand,
+  CreateAPIKeyCommand
 ];
 
 export async function onInteractionReceived(interaction: Interaction) {

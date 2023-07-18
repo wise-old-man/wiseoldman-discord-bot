@@ -157,6 +157,14 @@ export async function clearNameChangeHistory(
   });
 }
 
+export async function createAPIKey(application: string, developer: string): Promise<{ id: string }> {
+  return womClient.postRequest(`/api-key`, {
+    application,
+    developer,
+    adminPassword: env.ADMIN_PASSWORD
+  });
+}
+
 /**
  * Send an API request attempting to update a player's country
  */
