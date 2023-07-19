@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 import { createAPIKey } from '../../../services/wiseoldman';
 import config from '../../../config';
-import { Command, CommandConfig, sendModLog } from '../../../utils';
+import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
 
 const CONFIG: CommandConfig = {
   name: 'create-api-key',
@@ -39,12 +39,19 @@ class CreateAPIKeyCommand extends Command {
 
     const key = await createAPIKey(project, requester.user.username);
 
+    // DM the user back with the new API key
+    await requester
+      .send(
+        `Wise Old Man API key for "${project}":\n\`${key.id}\`\n\n<https://docs.wiseoldman.net/#rate-limits--api-keys>`
+      )
+      .catch(() => {
+        throw new CommandError(`Failed to send DM to <@${requesterId}>.`);
+      });
+
     // Respond on the WOM discord chat with a success status
     const response = new MessageEmbed()
       .setColor(config.visuals.green)
-      .setDescription(
-        `✅ API key created for "${project}":\n\`${key.id}\`\n\n<https://docs.wiseoldman.net/#rate-limits--api-keys>`
-      );
+      .setDescription(`✅ API key created for "${project}". A DM has been sent to <@${requesterId}>.`);
 
     await interaction.editReply({ embeds: [response] });
 
