@@ -31,7 +31,7 @@ const EVENTS: Event[] = [
 
 function onEventReceived(client: Client, payload: { type: string; data: unknown }): void {
   EVENTS.forEach(event => {
-    if (payload.type.toLowerCase() === event.type.toLowerCase()) {
+    if (payload.type === event.type) {
       const eventMonitor = monitoring.trackEvent();
 
       event

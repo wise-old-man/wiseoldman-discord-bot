@@ -20,24 +20,18 @@ interface MemberActivity {
   displayName: string;
 }
 
-interface DataPayload {
-  type: ActivityType;
-  memberActivity: MemberActivity[];
-}
-
 class MemberRoleChanged implements Event {
   type: string;
 
   constructor() {
-    this.type = 'CHANGED_ROLE';
+    this.type = 'GROUP_MEMBERS_CHANGED_ROLES';
   }
 
-  async execute(data: DataPayload, client: Client<boolean>): Promise<void> {
-    const { memberActivity } = data;
-    const message = buildMessage(memberActivity);
-    if (!memberActivity || memberActivity.length === 0) return;
+  async execute(data: MemberActivity[], client: Client<boolean>): Promise<void> {
+    const message = buildMessage(data);
+    if (!data || data.length === 0) return;
 
-    const groupId = memberActivity[0].groupId;
+    const groupId = data[0].groupId;
 
     await propagateMessage(client, groupId, NotificationType.MEMBERS_LIST_CHANGED, message);
   }
