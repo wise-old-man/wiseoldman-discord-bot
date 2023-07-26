@@ -12,8 +12,8 @@ import {
   getUsernameParam
 } from '../../../utils';
 
-const RENDER_WIDTH = 350;
-const RENDER_HEIGHT = 355;
+const RENDER_WIDTH = 415;
+const RENDER_HEIGHT = 325;
 const RENDER_PADDING = 15;
 
 enum RenderVariant {
@@ -98,8 +98,8 @@ class PlayerBossesCommand extends Command {
       rank: number,
       ehb?: number
     ) {
-      const x = Math.floor(index / 11);
-      const y = index % 11;
+      const x = Math.floor(index / 10);
+      const y = index % 10;
 
       const originX = RENDER_PADDING - 7 + x * 67;
       const originY = RENDER_PADDING - 5 + y * 31;
