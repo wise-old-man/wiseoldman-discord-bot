@@ -11,7 +11,7 @@ function matches(currentValue: string, ...options: string[]) {
 }
 
 export function getCountryOptions(currentValue: string): AutoCompleteOption[] {
-  if (!currentValue) return [];
+  if (!currentValue) return Object.entries(CountryProps).slice(0,24);
 
   return Object.entries(CountryProps)
     .map(value => value[1])
