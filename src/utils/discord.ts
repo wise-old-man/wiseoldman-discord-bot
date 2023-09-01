@@ -5,6 +5,7 @@ import {
   Guild,
   GuildMember,
   MessageEmbed,
+  NewsChannel,
   PermissionResolvable,
   TextChannel,
   User
@@ -138,7 +139,12 @@ export function isChannelSendable(channel: Channel | undefined | null): channel 
 
   const canView = clientUserPermissions(channel as TextChannel)?.has('VIEW_CHANNEL');
 
-  if (!(channel instanceof DMChannel) && !(channel instanceof TextChannel) && canView) {
+  if (
+    !(channel instanceof DMChannel) &&
+    !(channel instanceof TextChannel) &&
+    !(channel instanceof NewsChannel) &&
+    canView
+  ) {
     return false;
   }
 
