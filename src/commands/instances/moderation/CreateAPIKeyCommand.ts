@@ -61,6 +61,9 @@ class CreateAPIKeyCommand extends Command {
       interaction.user,
       requester?.user
     );
+
+    // Add the "API Consumer" role to the user
+    requester.roles.add(config.discord.roles.apiConsumer).catch(console.log);
   }
 }
 

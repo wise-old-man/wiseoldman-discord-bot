@@ -16,7 +16,8 @@ export default {
     clientId: env.DISCORD_DEV_CLIENT_ID || '719720369241718837',
     roles: {
       moderator: '705821689526747136',
-      groupLeader: '705826389474934845'
+      groupLeader: '705826389474934845',
+      apiConsumer: '713452544164233296'
     },
     channels: {
       flags: '802680940835897384',
