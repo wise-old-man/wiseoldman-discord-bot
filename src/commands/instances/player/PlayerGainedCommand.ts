@@ -59,10 +59,16 @@ class PlayerGainedCommand extends Command {
       );
     });
 
-    const playerGains = await womClient.players.getPlayerGains(username, { period });
+    const playerGains = await womClient.players.getPlayerGains(username, { period }).catch(e => {
+      throw new CommandError(`${e.message}`);
+    });
 
     if (!playerGains || !playerGains.startsAt || !playerGains.endsAt) {
-      throw new CommandError(`${player.displayName} has no "${PeriodProps[period].name}" gains.`);
+      throw new CommandError(
+        `${player.displayName} has no "${
+          period in PeriodProps ? PeriodProps[period].name : period
+        }" gains.`
+      );
     }
 
     const pages = buildPages(player.displayName, period, playerGains);
@@ -104,7 +110,9 @@ function buildPages(
   const pageCount = Math.ceil(gainsList.length / GAINS_PER_PAGE);
 
   if (pageCount === 0) {
-    throw new CommandError(`${displayName} has no "${PeriodProps[period].name}" gains.`);
+    throw new CommandError(
+      `${displayName} has no "${period in PeriodProps ? PeriodProps[period].name : period}" gains.`
+    );
   }
 
   const pages: Array<MessageEmbed> = [];
@@ -149,7 +157,9 @@ function buildGainsList(
   const valid = [...computedGains, ...skillGains, ...bossGains, ...activityGains];
 
   if (!valid || valid.length === 0) {
-    throw new CommandError(`${displayName} has no "${PeriodProps[period].name}" gains.`);
+    throw new CommandError(
+      `${displayName} has no "${period in PeriodProps ? PeriodProps[period].name : period}" gains.`
+    );
   }
 
   return valid.map(({ metric, gained }) => {
