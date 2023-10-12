@@ -6,8 +6,7 @@
   "license": "ISC",
   "main": "dist/index.js",
   "engines": {
-    "node": ">=18.18.0",
-    "npm": ">=9.8.1"
+    "node": ">=16.9"
   },
   "scripts": {
     "build": "rimraf ./dist && tsc",
@@ -48,7 +47,7 @@
     "@sapphire/discord.js-utilities": "^4.8.0",
     "@sentry/node": "^7.28.0",
     "@sentry/tracing": "^7.28.0",
-    "@wise-old-man/utils": "^3.0.3",
+    "@wise-old-man/utils": "^2.2.3-beta.0",
     "canvas": "^2.6.1",
     "cors": "^2.8.5",
     "discord-api-types": "^0.27.2",
