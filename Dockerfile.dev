@@ -1,4 +1,4 @@
-FROM node:18.18.0
+FROM node:18-bullseye
 WORKDIR /wise-old-man/discord-bot
 
 ENV NODE_ENV=development
