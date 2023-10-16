@@ -1,12 +1,15 @@
 import { Client, MessageEmbed } from 'discord.js';
-import { Player } from '@wise-old-man/utils';
+import { GroupRole, GroupRoleProps, Player } from '@wise-old-man/utils';
 import config from '../../config';
 import { Event } from '../../utils/events';
-import { encodeURL, propagateMessage, NotificationType } from '../../utils';
+import { propagateMessage, NotificationType, getGroupRoleEmoji } from '../../utils';
 
 interface MembersJoinedData {
   groupId: number;
-  players: Player[];
+  members: {
+    role: GroupRole;
+    player: Player;
+  }[];
 }
 
 class MembersJoined implements Event {
@@ -27,27 +30,28 @@ class MembersJoined implements Event {
 }
 
 function buildMessage(data: MembersJoinedData) {
-  const { groupId, players } = data;
+  const { groupId, members } = data;
 
-  if (players.length === 1) {
-    const player = players[0];
-    const title = `🎉 New group member: ${player.displayName}`;
+  let content = ``;
 
-    return new MessageEmbed()
-      .setColor(config.visuals.blue)
-      .setTitle(title)
-      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
+  for (let i = 0; i < Math.min(members.length, 10); i++) {
+    const member = members[i];
+    const role = GroupRoleProps[member.role].name;
+
+    content += `${getGroupRoleEmoji(role)} ${member.player.displayName}\n`;
   }
 
-  const url = `https://wiseoldman.net/groups/${groupId}/members`;
-  const title = `🎉 ${players.length} new group members!`;
-  const content = players.map(p => `\`${p.displayName}\``).join(', ');
+  // TODO: Link to the actual page for the activities
+  content +=
+    members.length > 10
+      ? `\n[+${members.length - 10} more changes](https://wiseoldman.net/groups/${groupId})`
+      : ``;
 
   return new MessageEmbed()
     .setColor(config.visuals.blue)
-    .setTitle(title)
-    .setDescription(content)
-    .setURL(url);
+    .setTitle(`🎉 ${members.length} New group members joined`)
+    .setURL(`https://wiseoldman.net/groups/${groupId})`)
+    .setDescription(content);
 }
 
 export default new MembersJoined();
