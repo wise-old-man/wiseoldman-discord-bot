@@ -56,7 +56,7 @@ function buildMessage(data: MemberActivity) {
 
   return new MessageEmbed()
     .setColor(config.visuals.blue)
-    .setURL(`https://wiseoldman.net/groups/${groupId}`)
+    .setURL(`https://wiseoldman.net/groups/${groupId}/members`)
     .setTitle(`${members.length} Member roles changed`)
     .setDescription(content);
 }

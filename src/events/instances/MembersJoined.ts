@@ -50,7 +50,7 @@ function buildMessage(data: MembersJoinedData) {
   return new MessageEmbed()
     .setColor(config.visuals.blue)
     .setTitle(`🎉 ${members.length} New group members joined`)
-    .setURL(`https://wiseoldman.net/groups/${groupId})`)
+    .setURL(`https://wiseoldman.net/groups/${groupId}/members`)
     .setDescription(content);
 }
 
