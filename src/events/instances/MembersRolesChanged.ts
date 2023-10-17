@@ -41,11 +41,9 @@ function buildMessage(data: MemberActivity) {
     const previousRole = GroupRoleProps[activity.previousRole].name;
     const newRole = GroupRoleProps[activity.role].name;
 
-    content += `${activity.player.displayName}: \`${
-      GroupRoleProps[activity.previousRole].name
-    }\` ${getGroupRoleEmoji(previousRole)} -> \`${
-      GroupRoleProps[activity.role].name
-    }\` ${getGroupRoleEmoji(newRole)}\n`;
+    content += `${activity.player.displayName}: \`${previousRole}\` ${getGroupRoleEmoji(
+      previousRole
+    )} -> \`${newRole}\` ${getGroupRoleEmoji(newRole)}\n`;
   }
 
   content +=
