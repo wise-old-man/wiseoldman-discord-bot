@@ -12,7 +12,7 @@ interface MemberActivity {
   }[];
 }
 
-class MemberRoleChanged implements Event {
+class MembersRolesChanged implements Event {
   type: string;
 
   constructor() {
@@ -48,7 +48,6 @@ function buildMessage(data: MemberActivity) {
     }\` ${getGroupRoleEmoji(newRole)}\n`;
   }
 
-  // TODO: Link to the actual page for the activities
   content +=
     members.length > 10
       ? `\n[+${members.length - 10} more changes](https://wiseoldman.net/groups/${groupId})`
@@ -56,9 +55,9 @@ function buildMessage(data: MemberActivity) {
 
   return new MessageEmbed()
     .setColor(config.visuals.blue)
-    .setURL(`https://wiseoldman.net/groups/${groupId}/members`)
+    .setURL(`https://wiseoldman.net/groups/${groupId}`)
     .setTitle(`${members.length} Member roles changed`)
     .setDescription(content);
 }
 
-export default new MemberRoleChanged();
+export default new MembersRolesChanged();

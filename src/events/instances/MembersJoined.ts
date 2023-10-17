@@ -34,6 +34,7 @@ function buildMessage(data: MembersJoinedData) {
 
   let content = ``;
 
+  // Show maximum of 10 member joins before linking to the full changelog on the website.
   for (let i = 0; i < Math.min(members.length, 10); i++) {
     const member = members[i];
     const role = GroupRoleProps[member.role].name;
@@ -41,7 +42,6 @@ function buildMessage(data: MembersJoinedData) {
     content += `${getGroupRoleEmoji(role)} ${member.player.displayName}\n`;
   }
 
-  // TODO: Link to the actual page for the activities
   content +=
     members.length > 10
       ? `\n[+${members.length - 10} more changes](https://wiseoldman.net/groups/${groupId})`
