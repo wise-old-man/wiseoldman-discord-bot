@@ -12,6 +12,7 @@ import MemberNameChanged from './instances/MemberNameChanged';
 import MembersJoined from './instances/MembersJoined';
 import MembersLeft from './instances/MembersLeft';
 import PlayerFlaggedReview from './instances/PlayerFlaggedReview';
+import MembersRolesChanged from './instances/MembersRolesChanged';
 
 const EVENTS: Event[] = [
   CompetitionCreated,
@@ -24,7 +25,8 @@ const EVENTS: Event[] = [
   MemberNameChanged,
   MemberHardcoreDied,
   MemberAchievements,
-  PlayerFlaggedReview
+  PlayerFlaggedReview,
+  MembersRolesChanged
 ];
 
 function onEventReceived(client: Client, payload: { type: string; data: unknown }): void {

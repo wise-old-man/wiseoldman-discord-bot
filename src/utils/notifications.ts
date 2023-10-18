@@ -10,7 +10,7 @@ export const NotificationType = {
   MEMBERS_LIST_CHANGED: 'MEMBERS_LIST_CHANGED'
 } as const;
 
-export type NotificationType = typeof NotificationType[keyof typeof NotificationType];
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
 
 export const NotificationName = {
   [NotificationType.DEFAULT]: 'Default',
