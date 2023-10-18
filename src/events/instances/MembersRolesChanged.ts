@@ -46,15 +46,16 @@ function buildMessage(data: MemberActivity) {
     )} -> \`${newRole}\` ${getGroupRoleEmoji(newRole)}\n`;
   }
 
-  content +=
-    members.length > 10
-      ? `\n[+${members.length - 10} more changes](https://wiseoldman.net/groups/${groupId})`
-      : ``;
+  if (members.length > 10) {
+    content += `\n[+${members.length - 10} more changes](https://wiseoldman.net/groups/${groupId})`;
+  }
+
+  const title = `${members.length} Member ${members.length === 1 ? 'role' : 'roles'} changed`;
 
   return new MessageEmbed()
     .setColor(config.visuals.blue)
     .setURL(`https://wiseoldman.net/groups/${groupId}`)
-    .setTitle(`${members.length} Member roles changed`)
+    .setTitle(title)
     .setDescription(content);
 }
 

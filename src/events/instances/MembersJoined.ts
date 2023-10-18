@@ -42,15 +42,16 @@ function buildMessage(data: MembersJoinedData) {
     content += `${getGroupRoleEmoji(role)} ${member.player.displayName}\n`;
   }
 
-  content +=
-    members.length > 10
-      ? `\n[+${members.length - 10} more changes](https://wiseoldman.net/groups/${groupId})`
-      : ``;
+  if (members.length > 10) {
+    content += `\n[+${members.length - 10} more changes](https://wiseoldman.net/groups/${groupId})`;
+  }
+
+  const title = `🎉 ${members.length} New group ${members.length === 1 ? 'member' : 'members'} joined`;
 
   return new MessageEmbed()
     .setColor(config.visuals.blue)
-    .setTitle(`🎉 ${members.length} New group members joined`)
-    .setURL(`https://wiseoldman.net/groups/${groupId}/members`)
+    .setTitle(title)
+    .setURL(`https://wiseoldman.net/groups/${groupId}`)
     .setDescription(content);
 }
 
