@@ -102,7 +102,9 @@ The current notification types are:
 - Member Achievements
 - Member Name Changed
 - Member (HCIM) Died
-- Members List Changed
+- Members Joined
+- Members Left
+- Members Roles Changed
 
 :::info
 The bot will check for permissions (by sending a message and immediately deleting it) in the selected channel before accepting this configuration, if you choose to remove permissions after configuration, it will simply stop working.
@@ -131,14 +133,14 @@ The bot will check for permissions (by sending a message and immediately deletin
 <CommandCall
   commandRoot="/config notifications"
   options={[
-    { key: 'notification_type', value: 'Members List Changed' },
-    { key: 'notification_channel', value: '#bot-channel' }
+    { key: 'notification_type', value: 'Members Roles Changed' },
+    { key: 'notification_channel', value: '#chat' }
   ]}
 />
 
 <br />
 
-![Config Notifications Command (default)](./assets/config_notifications_members.png)
+![Config Notifications Command (default)](./assets/config_notifications_roles.png)
 
 <br />
 
