@@ -9,7 +9,7 @@ export const NotificationType = {
   MEMBER_HCIM_DIED: 'MEMBER_HCIM_DIED',
   MEMBERS_JOINED: 'MEMBERS_JOINED',
   MEMBERS_LEFT: 'MEMBERS_LEFT',
-  MEMBERS_ROLES_CHANGES: 'MEMBERS_ROLES_CHANGED'
+  MEMBERS_ROLES_CHANGED: 'MEMBERS_ROLES_CHANGED'
 } as const;
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
@@ -22,7 +22,7 @@ export const NotificationName = {
   [NotificationType.MEMBER_HCIM_DIED]: 'Member (HCIM) Died',
   [NotificationType.MEMBERS_JOINED]: 'Members Joined',
   [NotificationType.MEMBERS_LEFT]: 'Members Left',
-  [NotificationType.MEMBERS_ROLES_CHANGES]: 'Members Roles Changed'
+  [NotificationType.MEMBERS_ROLES_CHANGED]: 'Members Roles Changed'
 };
 
 export async function propagateMessage(
