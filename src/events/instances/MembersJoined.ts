@@ -25,7 +25,7 @@ class MembersJoined implements Event {
     if (!groupId) return;
 
     const message = buildMessage(data);
-    await propagateMessage(client, groupId, NotificationType.MEMBERS_LIST_CHANGED, message);
+    await propagateMessage(client, groupId, NotificationType.MEMBERS_JOINED, message);
   }
 }
 
