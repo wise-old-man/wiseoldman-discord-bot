@@ -26,7 +26,7 @@ class MembersRolesChanged implements Event {
 
     const message = buildMessage(data);
 
-    await propagateMessage(client, groupId, NotificationType.MEMBERS_LIST_CHANGED, message);
+    await propagateMessage(client, groupId, NotificationType.MEMBERS_ROLES_CHANGES, message);
   }
 }
 
