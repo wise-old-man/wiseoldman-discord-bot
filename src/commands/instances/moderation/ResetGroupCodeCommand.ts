@@ -3,8 +3,8 @@ import { resetGroupCode } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
 
-const DM_MESSAGE = (code: string) =>
-  `Hey! Here's your new verification code: \n\`${code}\`\n\nPlease save it somewhere safe and be mindful of who you choose to share it with.`;
+const DM_MESSAGE = (code: string, groupId: number) =>
+  `Hey! Here's your new verification code for group ${groupId}: \n\`${code}\`\n\nPlease save it somewhere safe and be mindful of who you choose to share it with.`;
 
 const CHAT_MESSAGE = (userId: string) =>
   `Verification code successfully reset. A DM has been sent to <@${userId}>.`;
@@ -45,13 +45,20 @@ class ResetGroupCodeCommand extends Command {
       throw new CommandError("Couldn't find that user.");
     }
 
+    const sentDM = await user.send('Resetting group code...').catch(() => {
+      throw new CommandError(
+        `Failed to send DM to ${user}. Please go into Privacy Settings and enable Direct Messages.`
+      );
+    });
+
     const { newCode } = await resetGroupCode(groupId).catch(e => {
-      if (e.statusCode === 404) throw new CommandError('Competition not found.');
+      sentDM.edit('Failed to generate a new verification code.');
+      if (e.statusCode === 404) throw new CommandError(`Group '${groupId}' not found.`);
       throw e;
     });
 
     // DM the user back with the new verification code
-    await user.send(DM_MESSAGE(newCode));
+    await sentDM.edit(DM_MESSAGE(newCode, groupId));
 
     // Respond on the WOM discord chat with a success status
     const response = new MessageEmbed()
