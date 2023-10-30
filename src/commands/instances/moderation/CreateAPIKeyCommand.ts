@@ -37,16 +37,20 @@ class CreateAPIKeyCommand extends Command {
 
     if (!requester) throw new Error();
 
-    const key = await createAPIKey(project, requester.user.username);
+    const sentDM = await requester.send(`Generating API key...`).catch(() => {
+      throw new CommandError(
+        `Failed to send DM to <@${requesterId}>. Please go into Privacy Settings and enable Direct Messages.`
+      );
+    });
 
-    // DM the user back with the new API key
-    await requester
-      .send(
-        `Wise Old Man API key for "${project}":\n\`${key.id}\`\n\n<https://docs.wiseoldman.net/#rate-limits--api-keys>`
-      )
-      .catch(() => {
-        throw new CommandError(`Failed to send DM to <@${requesterId}>.`);
-      });
+    const key = await createAPIKey(project, requester.user.username).catch(e => {
+      sentDM.edit('Failed to generate API key.');
+      throw e;
+    });
+
+    sentDM.edit(
+      `Wise Old Man API key for "${project}":\n\`${key.id}\`\n\n<https://docs.wiseoldman.net/#rate-limits--api-keys>`
+    );
 
     // Respond on the WOM discord chat with a success status
     const response = new MessageEmbed()
