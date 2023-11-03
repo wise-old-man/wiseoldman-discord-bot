@@ -69,7 +69,7 @@ function getValue(result: GroupHiscoresEntry): string {
     return `${formatNumber(result.data.score || 0, true)}`;
   }
 
-  return `${result.data.value || 0}`;
+  return `${formatNumber(result.data.value || 0, true)}`;
 }
 
 export default new GroupHiscoresCommand();
