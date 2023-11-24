@@ -86,7 +86,7 @@ class PlayerFlaggedReview implements Event {
         lines.push(`**Time diff**: ${Math.floor(timeDiff / 1000 / 60)} minutes`);
       }
 
-      lines.push(`**Last updated**: <t:${Math.floor(new Date(rejected.createdAt).getTime() / 1000)}:f>`);
+      lines.push(`**Last updated**: <t:${Math.floor(new Date(previous.createdAt).getTime() / 1000)}:f>`);
 
       if (possibleRollback) {
         lines.push(`\n**🤔 Prediction 🤔**\n Name transfer (common) or Hiscores rollback (rare)`);
@@ -140,7 +140,7 @@ class PlayerFlaggedReview implements Event {
         lines.push(`**Time diff**: ${Math.floor(timeDiff / 1000 / 60)} minutes`);
       }
 
-      lines.push(`**Last updated**: <t:${Math.floor(new Date(rejected.createdAt).getTime() / 1000)}:f>`);
+      lines.push(`**Last updated**: <t:${Math.floor(new Date(previous.createdAt).getTime() / 1000)}:f>`);
 
       if (stackableGainedRatio > 0.7) {
         // If most of the gained EHP+EHB is in stackable skills, it's probably a large exp dump
