@@ -6,10 +6,14 @@ import {
   BOSSES,
   formatNumber,
   FormattedSnapshot,
+  isActivity,
+  isBoss,
+  isSkill,
   MetricProps,
   Player,
   REAL_SKILLS,
-  Skill
+  Skill,
+  SKILLS
 } from '@wise-old-man/utils';
 import { encodeURL } from '../../utils';
 import { Event } from '../../utils/events';
@@ -73,7 +77,16 @@ class PlayerFlaggedReview implements Event {
 
     if (negativeGains) {
       lines.push(`**Main cause**: Negative gains`);
-      lines.push(`**Time diff**: ${Math.floor(timeDiff / 1000 / 60 / 60)} hours`);
+
+      const hoursDiff = Math.floor(timeDiff / 1000 / 60 / 60);
+
+      if (hoursDiff > 6) {
+        lines.push(`**Time diff**: ${hoursDiff} hours`);
+      } else {
+        lines.push(`**Time diff**: ${Math.floor(timeDiff / 1000 / 60)} minutes`);
+      }
+
+      lines.push(`**Last updated**: <t:${Math.floor(new Date(rejected.createdAt).getTime() / 1000)}:f>`);
 
       if (possibleRollback) {
         lines.push(`\n**🤔 Prediction 🤔**\n Name transfer (common) or Hiscores rollback (rare)`);
@@ -118,7 +131,16 @@ class PlayerFlaggedReview implements Event {
       const expChange = getPercentageIncrease(previousExp, rejectedExp);
 
       lines.push(`**Main cause**: Excessive gains`);
-      lines.push(`**Time diff**: ${Math.floor(timeDiff / 1000 / 60 / 60)} hours`);
+
+      const hoursDiff = Math.floor(timeDiff / 1000 / 60 / 60);
+
+      if (hoursDiff > 6) {
+        lines.push(`**Time diff**: ${hoursDiff} hours`);
+      } else {
+        lines.push(`**Time diff**: ${Math.floor(timeDiff / 1000 / 60)} minutes`);
+      }
+
+      lines.push(`**Last updated**: <t:${Math.floor(new Date(rejected.createdAt).getTime() / 1000)}:f>`);
 
       if (stackableGainedRatio > 0.7) {
         // If most of the gained EHP+EHB is in stackable skills, it's probably a large exp dump
@@ -187,6 +209,41 @@ class PlayerFlaggedReview implements Event {
         ].join(' ')
       );
     }
+
+    const realMetrics = [...SKILLS, ...BOSSES, ...ACTIVITIES];
+
+    const sameMetrics = realMetrics.map(m => {
+      let previousValue;
+      let rejectedValue;
+
+      if (isSkill(m)) {
+        previousValue = previous.data.skills[m].experience;
+        rejectedValue = rejected.data.skills[m].experience;
+      } else if (isBoss(m)) {
+        previousValue = previous.data.bosses[m].kills;
+        rejectedValue = rejected.data.bosses[m].kills;
+      } else if (isActivity(m)) {
+        previousValue = previous.data.activities[m].score;
+        rejectedValue = rejected.data.activities[m].score;
+      }
+
+      if (previousValue === rejectedValue) {
+        return previousValue;
+      }
+
+      return null;
+    });
+
+    const equalityCount = sameMetrics.filter(v => v !== null).length;
+    const unrankedCount = sameMetrics.filter(v => v === -1).length;
+
+    const equalityPercent = Math.round((equalityCount / realMetrics.length) * 100);
+
+    lines.push(`\n`);
+    lines.push(`**Equality:**`);
+    lines.push(
+      `${equalityCount}/${realMetrics.length} **(${equalityPercent}%)** (${unrankedCount} unranked)`
+    );
 
     lines.push(...getLargestSkillChanges(previous, rejected));
     lines.push(...getLargestBossChanges(previous, rejected));
