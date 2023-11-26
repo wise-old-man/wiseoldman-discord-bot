@@ -234,16 +234,16 @@ class PlayerFlaggedReview implements Event {
       return null;
     });
 
-    const equalityCount = sameMetrics.filter(v => v !== null).length;
     const unrankedCount = sameMetrics.filter(v => v === -1).length;
 
-    const equalityPercent = Math.round((equalityCount / realMetrics.length) * 100);
+    const rankedCount = realMetrics.length - unrankedCount;
+    const equalityCount = sameMetrics.filter(v => v !== null).length - unrankedCount;
+
+    const equalityPercent = Math.round((equalityCount / rankedCount) * 100);
 
     lines.push(`\n`);
     lines.push(`**Equality:**`);
-    lines.push(
-      `${equalityCount}/${realMetrics.length} **(${equalityPercent}%)** (${unrankedCount} unranked)`
-    );
+    lines.push(`${equalityCount}/${rankedCount} **(${equalityPercent}%)** (${unrankedCount} unranked)`);
 
     lines.push(...getLargestSkillChanges(previous, rejected));
     lines.push(...getLargestBossChanges(previous, rejected));
