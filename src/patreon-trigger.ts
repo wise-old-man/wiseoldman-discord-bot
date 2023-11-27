@@ -87,16 +87,16 @@ export async function handlePatreonTrigger(interaction: ButtonInteraction) {
 
 export async function handlePatreonModalSubmit(interaction: ModalSubmitInteraction) {
   const username = interaction.fields.getTextInputValue('username');
-  const groupIdValue = interaction.fields.getTextInputValue('groupId');
-
-  let groupId: number | undefined;
 
   if (!username) {
     interaction.reply({ content: '❌ Please provide your in-game username.', ephemeral: true });
     return;
   }
 
-  if (groupIdValue) {
+  let groupId: number | undefined;
+
+  if (hasRole(interaction.member as GuildMember, config.discord.roles.patreonSupporterT2)) {
+    const groupIdValue = interaction.fields.getTextInputValue('groupId');
     const isInteger = typeof groupIdValue === 'string' && Number.isInteger(parseInt(groupIdValue));
 
     if (!isInteger) {
