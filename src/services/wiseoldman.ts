@@ -165,6 +165,18 @@ export async function createAPIKey(application: string, developer: string): Prom
   });
 }
 
+export async function claimBenefits(
+  discordId: string,
+  username: string,
+  groupId?: number
+): Promise<void> {
+  return womClient.putRequest(`/patrons/claim/${discordId}`, {
+    username,
+    groupId,
+    adminPassword: env.ADMIN_PASSWORD
+  });
+}
+
 /**
  * Send an API request attempting to update a player's country
  */
