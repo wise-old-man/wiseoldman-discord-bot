@@ -17,11 +17,14 @@ export default {
     roles: {
       moderator: '705821689526747136',
       groupLeader: '705826389474934845',
-      apiConsumer: '713452544164233296'
+      apiConsumer: '713452544164233296',
+      patreonSupporter: '1169327347032412300',
+      patreonSupporterT2: '1178310263154417735'
     },
     channels: {
       flags: '802680940835897384',
       modLogs: '830199626630955039',
+      patreonInfo: '1173680059526152272',
       flaggedPlayerReviews: '1086637095415722169'
     }
   }

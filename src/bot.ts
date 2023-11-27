@@ -1,6 +1,13 @@
-import { Client, Guild, Intents, MessageEmbed, TextChannel } from 'discord.js';
+import { Client, Guild, Intents, Interaction, MessageEmbed, TextChannel } from 'discord.js';
 import config from './config';
 import * as router from './commands/router';
+import {
+  PATREON_MODAL_ID,
+  PATREON_TRIGGER_ID,
+  handlePatreonModalSubmit,
+  handlePatreonTrigger,
+  setupPatreonTrigger
+} from './patreon-trigger';
 
 class Bot {
   client: Client;
@@ -26,12 +33,26 @@ class Bot {
       this.client.user?.setActivity('bot.wiseoldman.net');
 
       // Send received interaction to the command router
-      this.client.on('interactionCreate', router.onInteractionReceived);
+      this.client.on('interactionCreate', (interaction: Interaction) => {
+        if (interaction.isButton() && interaction.customId === PATREON_TRIGGER_ID) {
+          handlePatreonTrigger(interaction);
+          return;
+        }
+
+        if (interaction.isModalSubmit() && interaction.customId === PATREON_MODAL_ID) {
+          handlePatreonModalSubmit(interaction);
+          return;
+        }
+
+        router.onInteractionReceived(interaction);
+      });
 
       this.client.on('guildCreate', guild => {
         const openChannel = findOpenChannel(guild);
         if (openChannel) openChannel.send({ embeds: [buildJoinMessage()] });
       });
+
+      setupPatreonTrigger(this.client);
 
       console.log('Bot is running.');
     });

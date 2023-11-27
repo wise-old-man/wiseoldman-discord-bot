@@ -391,11 +391,15 @@ export function isAdmin(member: GuildMember | null): boolean {
   return member ? member?.permissions.has('ADMINISTRATOR') : false;
 }
 
-export function hasModeratorRole(member: GuildMember | null): boolean {
+export function hasRole(member: GuildMember | null, roleId: string): boolean {
   if (!member) return false;
   if (!member.roles || !member.roles.cache) return false;
 
-  return member.roles.cache.some(r => r.id === config.discord.roles.moderator);
+  return member.roles.cache.some(r => r.id === roleId);
+}
+
+export function hasModeratorRole(member: GuildMember | null): boolean {
+  return hasRole(member, config.discord.roles.moderator);
 }
 
 export function getMissingPermissions(channel: TextChannel) {
