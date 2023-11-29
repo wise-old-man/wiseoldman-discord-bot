@@ -445,7 +445,7 @@ const clientUserPermissions = (channel: TextChannel) =>
 export function sendModLog(
   guild: Guild | null,
   message: string,
-  mod: User | null,
+  mod?: User | null,
   requester?: User | null
 ) {
   if (!guild || !guild.channels) return;
@@ -460,7 +460,7 @@ export function sendModLog(
 
   const logMessage = new MessageEmbed()
     .setDescription(embedMessage)
-    .setFooter({ text: `Mod: ${mod ? mod.username : 'unknown'}` });
+    .setFooter({ text: mod ? `Mod: ${mod.username}` : '' });
 
   modLogsChannel.send({ embeds: [logMessage] });
 }

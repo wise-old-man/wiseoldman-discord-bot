@@ -11,7 +11,7 @@ import {
   TextInputComponent
 } from 'discord.js';
 import config from './config';
-import { hasRole } from './utils';
+import { hasRole, sendModLog } from './utils';
 import { claimBenefits } from './services/wiseoldman';
 
 export const PATREON_MODAL_ID = 'patreon-benefits-modal';
@@ -117,6 +117,13 @@ export async function handlePatreonModalSubmit(interaction: ModalSubmitInteracti
     }
 
     interaction.reply({ content: successMessage, ephemeral: true });
+
+    sendModLog(
+      interaction.guild,
+      `${interaction.user} has claimed ${
+        groupId ? 'Tier 2' : 'Tier 1'
+      } Patreon benefits for: \nUsername: ${username}${groupId ? `\nGroup id: ${groupId}` : ''}`
+    );
   } catch (error) {
     console.log(error);
     interaction.reply({ content: error.message, ephemeral: true });
