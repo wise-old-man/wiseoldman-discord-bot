@@ -53,9 +53,7 @@ class Bot {
           return;
         }
 
-        console.log('1');
         if (interaction.isModalSubmit() && interaction.customId === PATREON_LEAGUE_MODAL_ID) {
-          console.log('2');
           handlePatreonLeagueModalSubmit(interaction);
           return;
         }
