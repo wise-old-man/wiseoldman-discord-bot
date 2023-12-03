@@ -68,7 +68,7 @@ class PlayerFlaggedReview implements Event {
     const ehpChange = Math.round(getPercentageIncrease(previousEHP, rejectedEHP) * 100);
     const ehbChange = Math.round(getPercentageIncrease(previousEHB, rejectedEHB) * 100);
 
-    const uniqueId = `${player.id}_${rejected.createdAt}`;
+    const uniqueId = `${player.id}_${new Date(rejected.createdAt).getTime()}`;
     const actions = new MessageActionRow();
 
     const timeDiff = new Date(rejected.createdAt).getTime() - new Date(previous.createdAt).getTime();
