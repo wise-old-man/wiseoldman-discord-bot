@@ -372,6 +372,7 @@ function getLargestSkillChanges(previous: FormattedSnapshot, rejected: Formatted
   const map = new Map<Skill, number>();
 
   REAL_SKILLS.map(s => {
+    if (rejected.data.skills[s].experience === -1) return;
     map.set(
       s,
       Math.max(0, rejected.data.skills[s].experience) - Math.max(0, previous.data.skills[s].experience)
