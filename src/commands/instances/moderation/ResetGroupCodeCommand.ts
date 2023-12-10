@@ -45,7 +45,9 @@ class ResetGroupCodeCommand extends Command {
       throw new CommandError("Couldn't find that user.");
     }
 
-    const sentDM = await user.send('Resetting group code...').catch(() => {
+    const sentDM = await user.send('Resetting group code...').catch(e => {
+      console.log(e);
+
       throw new CommandError(
         `Failed to send DM to ${user}. Please go into Privacy Settings and enable Direct Messages.`
       );
