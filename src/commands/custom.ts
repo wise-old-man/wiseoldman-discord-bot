@@ -20,8 +20,7 @@ export const CUSTOM_COMMANDS = [
   {
     name: 'Verified',
     command: 'verified',
-    message: `To verify your group make sure you join our discord server <https://discord.gg/kJPakrJ2kW>, and then please privately message any Admin/Moderator (psikoi or b.oom) with a screenshot to prove ownership. We have attached an example of what we need to see below. The screenshot must contain:\n\n- Your WOM group number, Discord ID, and today’s date typed into your in-game chatbox.\n- Your Clan tab open showing your rank. **For clans, you must be Owner or Deputy Owner to verify the group.** For the old clan chat, you must be Owner or General(gold star).\n\nAfter verification is complete, we can reset the verification code for you if needed.\n**Example:**`,
-    image: 'https://imgur.com/ULvoPlH'
+    message: `To verify your group, navigate to the [# support](https://discord.gg/twmgEevbs2) channel in the Wise Old Man discord server. Afterwards, select the "Groups" and "Verify my group" options to open a support ticket. You'll then be given instructions to verify ownership of the group.`
   },
   {
     name: 'Permissions',
