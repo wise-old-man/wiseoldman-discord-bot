@@ -80,6 +80,7 @@ const MetricEmoji = {
   [Metric.PHANTOM_MUSPAH]: '<:phantom_muspah:1097840588000337973>',
   [Metric.SARACHNIS]: '<:sarachnis:729840085377220628>',
   [Metric.SCORPIA]: '<:scorpia:729840084962115666>',
+  [Metric.SCURRIUS]: '<:scurrius:1199712038193217606>',
   [Metric.SKOTIZO]: '<:skotizo:729840085398454273>',
   [Metric.SPINDEL]: '<:venenatis:729840086795157595>',
   [Metric.TEMPOROSS]: '<:tempoross:823292463456059452>',
