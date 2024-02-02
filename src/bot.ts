@@ -2,12 +2,8 @@ import { Client, Guild, Intents, Interaction, MessageEmbed, TextChannel } from '
 import config from './config';
 import * as router from './commands/router';
 import {
-  PATREON_LEAGUE_MODAL_ID,
-  PATREON_LEAGUE_TRIGGER_ID,
   PATREON_MODAL_ID,
   PATREON_TRIGGER_ID,
-  handlePatreonLeagueModalSubmit,
-  handlePatreonLeagueTrigger,
   handlePatreonModalSubmit,
   handlePatreonTrigger,
   setupPatreonTrigger
@@ -43,18 +39,8 @@ class Bot {
           return;
         }
 
-        if (interaction.isButton() && interaction.customId === PATREON_LEAGUE_TRIGGER_ID) {
-          handlePatreonLeagueTrigger(interaction);
-          return;
-        }
-
         if (interaction.isModalSubmit() && interaction.customId === PATREON_MODAL_ID) {
           handlePatreonModalSubmit(interaction);
-          return;
-        }
-
-        if (interaction.isModalSubmit() && interaction.customId === PATREON_LEAGUE_MODAL_ID) {
-          handlePatreonLeagueModalSubmit(interaction);
           return;
         }
 
