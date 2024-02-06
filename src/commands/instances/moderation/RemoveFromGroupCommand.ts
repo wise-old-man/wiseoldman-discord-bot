@@ -41,21 +41,26 @@ class RemoveFromGroupCommand extends Command {
 
     const requester = interaction.guild?.members.cache.find(m => m.id === requesterId);
 
-    await removeFromGroup(groupId, username);
-
     // Respond on the WOM discord chat with a success status
     const response = new MessageEmbed()
       .setColor(config.visuals.green)
       .setDescription(`✅ ${username} has been successfully removed from the group.`);
 
-    await interaction.editReply({ embeds: [response] });
+    try {
+      await removeFromGroup(groupId, username);
 
-    sendModLog(
-      interaction.guild,
-      `Removed \`${username}\` from group (ID: ${groupId})`,
-      interaction.user,
-      requester?.user
-    );
+      await interaction.editReply({ embeds: [response] });
+
+      sendModLog(
+        interaction.guild,
+        `Removed \`${username}\` from group (ID: ${groupId})`,
+        interaction.user,
+        requester?.user
+      );
+    } catch (e) {
+      response.setColor(config.visuals.red).setDescription(`${e.message}`);
+      await interaction.editReply({ embeds: [response] });
+    }
   }
 }
 
