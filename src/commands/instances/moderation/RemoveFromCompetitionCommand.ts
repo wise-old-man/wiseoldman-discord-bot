@@ -41,21 +41,26 @@ class RemoveFromCompetitionCommand extends Command {
 
     const requester = interaction.guild?.members.cache.find(m => m.id === requesterId);
 
-    await removeFromCompetition(competitionId, username);
-
     // Respond on the WOM discord chat with a success status
     const response = new MessageEmbed()
       .setColor(config.visuals.green)
       .setDescription(`✅ ${username} has been successfully removed from the competition.`);
 
-    await interaction.editReply({ embeds: [response] });
+    try {
+      await removeFromCompetition(competitionId, username);
 
-    sendModLog(
-      interaction.guild,
-      `Removed \`${username}\` from competition (ID: ${competitionId})`,
-      interaction.user,
-      requester?.user
-    );
+      await interaction.editReply({ embeds: [response] });
+
+      sendModLog(
+        interaction.guild,
+        `Removed \`${username}\` from competition (ID: ${competitionId})`,
+        interaction.user,
+        requester?.user
+      );
+    } catch (e) {
+      response.setColor(config.visuals.red).setDescription(`${e.message}`);
+      await interaction.editReply({ embeds: [response] });
+    }
   }
 }
 
