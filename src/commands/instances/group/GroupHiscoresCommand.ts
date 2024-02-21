@@ -5,7 +5,7 @@ import {
   Metric,
   parseMetricAbbreviation
 } from '@wise-old-man/utils';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
 import { bold, Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
@@ -15,7 +15,7 @@ const CONFIG: CommandConfig = {
   description: "View a group's hiscores.",
   options: [
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'metric',
       description: 'The metric to show hiscores for.',
       autocomplete: true,
@@ -29,7 +29,7 @@ class GroupHiscoresCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const groupId = await getLinkedGroupId(interaction);
 
     const metric =
@@ -45,7 +45,7 @@ class GroupHiscoresCommand extends Command {
       .map((g, i) => `${i + 1}. ${bold(g.player.displayName)} - ${getValue(g)}`)
       .join('\n');
 
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} hiscores`)
       .setDescription(hiscoresList)

@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import config from '../../../config';
 import prisma from '../../../services/prisma';
 import womClient from '../../../services/wiseoldman';
@@ -9,7 +9,7 @@ const CONFIG: CommandConfig = {
   description: 'Set your default username (alias).',
   options: [
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'username',
       description: 'In-game username.',
       required: true
@@ -22,7 +22,7 @@ class PlayerSetUsernameCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const username = interaction.options.getString('username', true);
     const userId = interaction.user.id;
 
@@ -40,7 +40,7 @@ class PlayerSetUsernameCommand extends Command {
       create: { userId, username }
     });
 
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.green)
       .setTitle('Player alias updated!')
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))

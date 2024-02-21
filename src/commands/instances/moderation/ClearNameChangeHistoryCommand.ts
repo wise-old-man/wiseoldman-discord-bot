@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { clearNameChangeHistory } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
@@ -8,13 +8,13 @@ const CONFIG: CommandConfig = {
   description: "Clear a player's name change history.",
   options: [
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       required: true,
       name: 'username',
       description: 'The username of the player to clear the history from.'
     },
     {
-      type: 'user',
+      type: ApplicationCommandOptionType.User,
       name: 'requester',
       description: "Requester's Discord user tag."
     }
@@ -28,7 +28,7 @@ class ClearNameChangeHistoryCommand extends Command {
     this.moderation = true;
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const username = interaction.options.getString('username', true);
     const requesterId = interaction.options.getUser('requester', false)?.id;
 
@@ -42,7 +42,7 @@ class ClearNameChangeHistoryCommand extends Command {
     });
 
     // Respond on the WOM discord chat with a success status
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.green)
       .setDescription(`✅ Name change history successfully cleared for  \`${username}\`!`);
 

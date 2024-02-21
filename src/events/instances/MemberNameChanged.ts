@@ -1,4 +1,4 @@
-import { Client, MessageEmbed } from 'discord.js';
+import { Client, EmbedBuilder } from 'discord.js';
 import { Player } from '@wise-old-man/utils';
 import config from '../../config';
 import { Event } from '../../utils/events';
@@ -22,7 +22,7 @@ class MemberNameChanged implements Event {
 
     if (!groupId) return;
 
-    const message = new MessageEmbed()
+    const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle('Member Name Changed')
       .setDescription(`\`${previousName}\` → \`${player.displayName}\``)

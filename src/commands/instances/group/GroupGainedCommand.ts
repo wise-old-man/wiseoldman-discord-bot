@@ -7,7 +7,7 @@ import {
   parseMetricAbbreviation,
   Period
 } from '@wise-old-man/utils';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId, bold } from '../../../utils';
@@ -17,14 +17,14 @@ const CONFIG: CommandConfig = {
   description: "View the group's gains leaderboards.",
   options: [
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'metric',
       description: 'The metric to show gains for',
       required: true,
       autocomplete: true
     },
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'period',
       description: 'You can use custom periods with this format: 1y6d5h',
       required: true,
@@ -38,7 +38,7 @@ class GroupGainedCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const groupId = await getLinkedGroupId(interaction);
 
     const periodParam = interaction.options.getString('period', true);
@@ -57,7 +57,7 @@ class GroupGainedCommand extends Command {
       .map((g, i) => `${i + 1}. ${bold(g.player.displayName)} - ${formatNumber(g.data.gained, true)}`)
       .join('\n');
 
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} gains (${period})`)
       .setURL(`https://wiseoldman.net/groups/${groupId}/gained/`)

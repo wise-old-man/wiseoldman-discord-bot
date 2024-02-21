@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { createAPIKey } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
@@ -8,13 +8,13 @@ const CONFIG: CommandConfig = {
   description: 'Create a new Wise Old Man API key.',
   options: [
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       required: true,
       name: 'project',
       description: 'The name of the project this key is meant to be used by.'
     },
     {
-      type: 'user',
+      type: ApplicationCommandOptionType.User,
       required: true,
       name: 'requester',
       description: "Requester's Discord user tag."
@@ -29,7 +29,7 @@ class CreateAPIKeyCommand extends Command {
     this.moderation = true;
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const project = interaction.options.getString('project', true);
     const requesterId = interaction.options.getUser('requester', false)?.id;
 
@@ -53,7 +53,7 @@ class CreateAPIKeyCommand extends Command {
     );
 
     // Respond on the WOM discord chat with a success status
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.green)
       .setDescription(`✅ API key created for "${project}". A DM has been sent to <@${requesterId}>.`);
 

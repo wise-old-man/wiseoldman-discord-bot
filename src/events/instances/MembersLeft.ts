@@ -1,4 +1,4 @@
-import { Client, MessageEmbed } from 'discord.js';
+import { Client, EmbedBuilder } from 'discord.js';
 import { Player } from '@wise-old-man/utils';
 import config from '../../config';
 import { Event } from '../../utils/events';
@@ -33,17 +33,17 @@ function buildMessage(data: MembersLeftData) {
     const player = players[0];
     const title = `👋 Group member left: ${player.displayName}`;
 
-    return new MessageEmbed()
+    return new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(title)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
   }
 
-  const url = `https://wiseoldman.net/groups/${groupId}/members`;
+  const url = `https://wiseoldman.net/groups/${groupId}`;
   const title = `👋 ${players.length} Members have left the group`;
   const content = players.map(p => `\`${p.displayName}\``).join(', ');
 
-  return new MessageEmbed()
+  return new EmbedBuilder()
     .setColor(config.visuals.blue)
     .setTitle(title)
     .setDescription(content)

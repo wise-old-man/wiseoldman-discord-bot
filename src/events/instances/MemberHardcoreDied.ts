@@ -1,4 +1,4 @@
-import { Client, MessageEmbed } from 'discord.js';
+import { Client, EmbedBuilder } from 'discord.js';
 import { Player } from '@wise-old-man/utils';
 import config from '../../config';
 import { Event } from '../../utils/events';
@@ -21,7 +21,7 @@ class MemberHardcoreDied implements Event {
 
     if (!groupId) return;
 
-    const message = new MessageEmbed()
+    const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`🪦 Hardcore Ironman Member Died`)
       .setDescription(`\`${player.displayName}\` has died and is now a regular Ironman.`)

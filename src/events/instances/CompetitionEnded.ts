@@ -1,5 +1,5 @@
 import { Competition, CompetitionType, formatNumber } from '@wise-old-man/utils';
-import { Client, MessageEmbed } from 'discord.js';
+import { Client, EmbedBuilder } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../config';
 import { Event } from '../../utils/events';
@@ -33,7 +33,7 @@ class CompetitionEnded implements Event {
     const isTeamCompetition = competition.type === CompetitionType.TEAM;
     const topParticipations = isTeamCompetition ? getTeamStandings(standings) : getStandings(standings);
 
-    const message = new MessageEmbed()
+    const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`📢 ${title} has ended!`)
       .setURL(`https://wiseoldman.net/competitions/${id}`)

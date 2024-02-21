@@ -1,11 +1,11 @@
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
-import { Constants, MessageEmbed } from 'discord.js';
+import { ButtonStyle, ComponentType, EmbedBuilder } from 'discord.js';
 
 const PAGINATION_BUTTONS = {
   NEXT: {
     customId: 'CustomNextAction',
-    type: Constants.MessageComponentTypes.BUTTON,
-    style: 'PRIMARY',
+    type: ComponentType.Button,
+    style: ButtonStyle.Primary,
     label: '>',
     run: ({ handler }) => {
       if (handler.index === handler.pages.length - 1) handler.index = 0;
@@ -14,8 +14,8 @@ const PAGINATION_BUTTONS = {
   },
   PREVIOUS: {
     customId: 'CustomPreviousAction',
-    type: Constants.MessageComponentTypes.BUTTON,
-    style: 'PRIMARY',
+    type: ComponentType.Button,
+    style: ButtonStyle.Primary,
     label: '<',
     run: ({ handler }) => {
       if (handler.index === 0) handler.index = handler.pages.length - 1;
@@ -24,7 +24,7 @@ const PAGINATION_BUTTONS = {
   }
 } as const;
 
-export function createPaginatedEmbed(template: MessageEmbed, idleDuration?: number) {
+export function createPaginatedEmbed(template: EmbedBuilder, idleDuration?: number) {
   const message = new PaginatedMessage({
     pageIndexPrefix: 'Page',
     embedFooterSeparator: '|',

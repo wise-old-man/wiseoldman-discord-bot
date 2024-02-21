@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { resetGroupCode } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
@@ -14,13 +14,13 @@ const CONFIG: CommandConfig = {
   description: "Reset a group's verification code.",
   options: [
     {
-      type: 'integer',
+      type: ApplicationCommandOptionType.Integer,
       name: 'id',
       description: 'The group ID.',
       required: true
     },
     {
-      type: 'user',
+      type: ApplicationCommandOptionType.User,
       name: 'user',
       description: 'Discord user tag.',
       required: true
@@ -35,7 +35,7 @@ class ResetGroupCodeCommand extends Command {
     this.moderation = true;
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const groupId = interaction.options.getInteger('id', true);
     const userId = interaction.options.getUser('user', true).id;
 
@@ -63,7 +63,7 @@ class ResetGroupCodeCommand extends Command {
     await sentDM.edit(DM_MESSAGE(newCode, groupId));
 
     // Respond on the WOM discord chat with a success status
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.green)
       .setDescription(CHAT_MESSAGE(userId));
 

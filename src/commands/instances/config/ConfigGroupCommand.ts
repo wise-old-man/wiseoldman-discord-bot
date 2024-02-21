@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import config from '../../../config';
 import { updateServerGroup } from '../../../services/prisma';
 import womClient from '../../../services/wiseoldman';
@@ -9,7 +9,7 @@ const CONFIG: CommandConfig = {
   description: "Configure the server's Wise Old Man group.",
   options: [
     {
-      type: 'integer',
+      type: ApplicationCommandOptionType.Integer,
       name: 'group_id',
       description: 'The group ID to link to the server.',
       required: true
@@ -23,7 +23,7 @@ class ConfigGroupCommand extends Command {
     this.requiresAdmin = true;
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const guildId = interaction.guild?.id || '';
 
     if (!guildId || guildId.length === 0) {
@@ -32,6 +32,10 @@ class ConfigGroupCommand extends Command {
 
     const groupId = interaction.options.getInteger('group_id', true);
 
+    if (groupId === null) {
+      throw new CommandError('The provided group ID is invalid.');
+    }
+
     const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
       throw new CommandError("Couldn't find that group.");
     });
@@ -39,7 +43,7 @@ class ConfigGroupCommand extends Command {
     // Update the server's group ID in the database
     await updateServerGroup(guildId, groupId);
 
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.green)
       .setTitle(`✅ Server group updated`)
       .setDescription(`All notifications and commands will be in reference to **${group.name}**`)

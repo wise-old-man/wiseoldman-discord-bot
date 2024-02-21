@@ -1,4 +1,13 @@
-import { Client, Guild, Intents, Interaction, MessageEmbed, TextChannel } from 'discord.js';
+import {
+  Client,
+  Guild,
+  Interaction,
+  EmbedBuilder,
+  TextChannel,
+  GatewayIntentBits,
+  ChannelType,
+  PermissionFlagsBits
+} from 'discord.js';
 import config from './config';
 import * as router from './commands/router';
 import {
@@ -15,11 +24,11 @@ class Bot {
   constructor() {
     this.client = new Client({
       intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_TYPING,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-        Intents.FLAGS.DIRECT_MESSAGE_TYPING
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMessageTyping,
+        GatewayIntentBits.GuildMessageReactions,
+        GatewayIntentBits.DirectMessageTyping
       ],
       shards: 'auto'
     });
@@ -64,7 +73,7 @@ class Bot {
 }
 
 function buildJoinMessage() {
-  return new MessageEmbed()
+  return new EmbedBuilder()
     .setColor(config.visuals.blue)
     .setTitle(`❤️ Thanks for adding me!`)
     .setDescription(
@@ -88,7 +97,10 @@ function buildJoinMessage() {
  */
 function findOpenChannel(guild: Guild) {
   const channel = guild.channels.cache.find(c => {
-    return c.type === 'GUILD_TEXT' && Boolean(guild.me?.permissions.has('SEND_MESSAGES'));
+    return (
+      c.type === ChannelType.GuildText &&
+      Boolean(guild.members.me?.permissions.has(PermissionFlagsBits.SendMessages))
+    );
   });
 
   return channel as TextChannel;

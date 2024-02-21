@@ -1,6 +1,11 @@
 import { Achievement, PlayerDetails } from '@wise-old-man/utils';
 import Canvas from 'canvas';
-import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
+import {
+  ChatInputCommandInteraction,
+  AttachmentBuilder,
+  EmbedBuilder,
+  ApplicationCommandOptionType
+} from 'discord.js';
 import config from '../../../config';
 import womClient from '../../../services/wiseoldman';
 import {
@@ -22,7 +27,7 @@ const CONFIG: CommandConfig = {
   description: "View a player's recent achievements.",
   options: [
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'username',
       description: 'In-game username or discord tag'
     }
@@ -34,7 +39,7 @@ class PlayerAchievementsCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     // Grab the username from the command's arguments or database alias
     const username = await getUsernameParam(interaction);
 
@@ -57,7 +62,7 @@ class PlayerAchievementsCommand extends Command {
 
     const { attachment, fileName } = await this.render(player, mostRecentAchievements);
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements/`))
       .setTitle(`${player.displayName} - Recent achievements`)
@@ -104,7 +109,7 @@ class PlayerAchievementsCommand extends Command {
     }
 
     const fileName = `${Date.now()}-${player.username.replace(/ /g, '_')}-achievements.jpeg`;
-    const attachment = new MessageAttachment(canvas.toBuffer(), fileName);
+    const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: fileName });
 
     return { attachment, fileName };
   }

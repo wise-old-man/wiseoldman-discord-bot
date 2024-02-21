@@ -1,9 +1,11 @@
 import {
   SlashCommandSubcommandBuilder,
   SlashCommandSubcommandsOnlyBuilder,
-  SlashCommandBuilder
-} from '@discordjs/builders';
-import { CommandInteraction } from 'discord.js';
+  SlashCommandBuilder,
+  ApplicationCommandOptionType,
+  ChatInputCommandInteraction,
+  ApplicationCommandOptionAllowedChannelTypes
+} from 'discord.js';
 import { getServer, getUsername } from '../services/prisma';
 
 const DISCORD_TAG_REGEX = /<@!?(\d+)>/;
@@ -23,7 +25,7 @@ export interface BaseCommand {
   moderation?: boolean;
   requiresAdmin?: boolean;
   slashCommand: SlashCommandSubcommandBuilder | SlashCommandSubcommandsOnlyBuilder;
-  execute(interaction: CommandInteraction): Promise<void>;
+  execute(interaction: ChatInputCommandInteraction): Promise<void>;
 }
 
 export class Command implements BaseCommand {
@@ -44,7 +46,7 @@ export class Command implements BaseCommand {
     this.slashCommand = command;
   }
 
-  async execute(interaction: CommandInteraction): Promise<void> {
+  async execute(interaction: ChatInputCommandInteraction): Promise<void> {
     throw new Error(`Command not implemented - ${interaction.commandName}`);
   }
 }
@@ -71,7 +73,7 @@ export class AggregateCommand implements BaseCommand {
     });
   }
 
-  async execute(interaction: CommandInteraction): Promise<void> {
+  async execute(interaction: ChatInputCommandInteraction): Promise<void> {
     const targetSubCommand = this.subCommands.find(
       s => s.slashCommand.name === interaction.options.getSubcommand()
     );
@@ -86,7 +88,11 @@ export class AggregateCommand implements BaseCommand {
 }
 
 interface BaseOption {
-  type: 'integer' | 'string' | 'channel' | 'user';
+  type:
+    | ApplicationCommandOptionType.Integer
+    | ApplicationCommandOptionType.String
+    | ApplicationCommandOptionType.Channel
+    | ApplicationCommandOptionType.User;
   name: string;
   description: string;
   required?: boolean;
@@ -94,22 +100,22 @@ interface BaseOption {
 }
 
 interface IntegerOption extends BaseOption {
-  type: 'integer';
-  choices?: Array<{ value: number; label: string }>;
+  type: ApplicationCommandOptionType.Integer;
+  choices?: Array<{ name: string; value: number }>;
 }
 
 interface StringOption extends BaseOption {
-  type: 'string';
-  choices?: Array<{ value: string; label: string }>;
+  type: ApplicationCommandOptionType.String;
+  choices?: Array<{ name: string; value: string }>;
 }
 
 interface ChannelOption extends BaseOption {
-  type: 'channel';
-  channelType: number;
+  type: ApplicationCommandOptionType.Channel;
+  channelType?: ApplicationCommandOptionAllowedChannelTypes;
 }
 
 interface UserOption extends BaseOption {
-  type: 'user';
+  type: ApplicationCommandOptionType.User;
 }
 
 export interface CommandConfig {
@@ -123,19 +129,21 @@ function attachOptions(
   config: CommandConfig
 ) {
   config.options?.forEach(option => {
-    if (option.type === 'integer') {
+    if (option.type === ApplicationCommandOptionType.Integer) {
       command.addIntegerOption(opt => {
         opt.setName(option.name).setDescription(option.description);
 
         if (option.required) opt.setRequired(true);
 
         if (option.choices && option.choices.length > 0) {
-          opt.addChoices(option.choices.map(c => [c.label, c.value]));
+          for (const c of option.choices) {
+            opt.addChoices({ name: c.name, value: c.value });
+          }
         }
 
         return opt;
       });
-    } else if (option.type === 'string') {
+    } else if (option.type === ApplicationCommandOptionType.String) {
       command.addStringOption(opt => {
         opt.setName(option.name).setDescription(option.description);
 
@@ -143,21 +151,23 @@ function attachOptions(
         if (option.required) opt.setRequired(true);
 
         if (option.choices && option.choices.length > 0) {
-          opt.addChoices(option.choices.map(c => [c.label, c.value]));
+          for (const c of option.choices) {
+            opt.addChoices({ name: c.name, value: c.value });
+          }
         }
 
         return opt;
       });
-    } else if (option.type === 'channel') {
+    } else if (option.type === ApplicationCommandOptionType.Channel) {
       command.addChannelOption(opt => {
         opt.setName(option.name).setDescription(option.description);
 
         if (option.required) opt.setRequired(true);
-        if (option.channelType) opt.addChannelType(option.channelType);
+        if (option.channelType) opt.addChannelTypes(option.channelType);
 
         return opt;
       });
-    } else if (option.type === 'user') {
+    } else if (option.type === ApplicationCommandOptionType.User) {
       command.addUserOption(opt => {
         opt.setName(option.name).setDescription(option.description);
 
@@ -169,7 +179,7 @@ function attachOptions(
   });
 }
 
-export async function getUsernameParam(interaction: CommandInteraction) {
+export async function getUsernameParam(interaction: ChatInputCommandInteraction) {
   const username = interaction.options.getString('username', false);
   const isDiscordId = username?.match(DISCORD_TAG_REGEX);
 
@@ -189,7 +199,7 @@ export async function getUsernameParam(interaction: CommandInteraction) {
   return inferredUsername;
 }
 
-export async function getLinkedGroupId(interaction: CommandInteraction) {
+export async function getLinkedGroupId(interaction: ChatInputCommandInteraction) {
   if (!interaction.inGuild()) {
     throw new CommandError('This command can only be used in a Discord server.');
   }

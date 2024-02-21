@@ -1,5 +1,5 @@
 import { GroupDetails } from '@wise-old-man/utils';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import config from '../../../config';
 import { CUSTOM_COMMANDS } from '../../../commands/custom';
 import prisma, { getServer } from '../../../services/prisma';
@@ -24,7 +24,7 @@ const CONFIG: CommandConfig = {
   description: 'Ask for help.',
   options: [
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'category',
       description: 'What do you need help with?',
       autocomplete: true
@@ -37,7 +37,7 @@ class HelpCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     if (!interaction.inGuild()) {
       throw new CommandError('This command can only be used in a Discord server.');
     }
@@ -93,7 +93,7 @@ class HelpCommand extends Command {
       };
     });
 
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`ℹ️ Need help?`)
       .setDescription(`${LINE_COMMANDS}\n\n${LINE_SUPPORT}\n\n⚠️${LINE_PERMS}`)

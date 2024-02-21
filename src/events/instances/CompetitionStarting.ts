@@ -1,5 +1,5 @@
 import { Competition, getMetricName } from '@wise-old-man/utils';
-import { Client, MessageEmbed } from 'discord.js';
+import { Client, EmbedBuilder } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
 import { Event } from '../../utils/events';
@@ -37,7 +37,7 @@ class CompetitionStarting implements Event {
       { name: 'Duration', value: durationBetween(new Date(startsAt), new Date(endsAt)) }
     ];
 
-    const message = new MessageEmbed()
+    const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`🕒 ${title} is starting in ${timeLeft}`)
       .setURL(`https://wiseoldman.net/competitions/${id}`)

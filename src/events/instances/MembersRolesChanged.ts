@@ -1,4 +1,4 @@
-import { Client, MessageEmbed } from 'discord.js';
+import { Client, EmbedBuilder } from 'discord.js';
 import { Event, propagateMessage, NotificationType, getGroupRoleEmoji } from '../../utils';
 import { GroupRole, GroupRoleProps, Player } from '@wise-old-man/utils';
 import config from '../../config';
@@ -52,7 +52,7 @@ function buildMessage(data: MemberActivity) {
 
   const title = `${members.length} Member ${members.length === 1 ? 'role' : 'roles'} changed`;
 
-  return new MessageEmbed()
+  return new EmbedBuilder()
     .setColor(config.visuals.blue)
     .setURL(`https://wiseoldman.net/groups/${groupId}`)
     .setTitle(title)

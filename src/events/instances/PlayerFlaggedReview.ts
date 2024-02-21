@@ -1,4 +1,13 @@
-import { Client, MessageActionRow, MessageButton, MessageEmbed, TextChannel } from 'discord.js';
+import {
+  Client,
+  ActionRowBuilder,
+  ButtonBuilder,
+  EmbedBuilder,
+  TextChannel,
+  ButtonStyle,
+  ChannelType,
+  ComponentType
+} from 'discord.js';
 import {
   ACTIVITIES,
   Activity,
@@ -69,7 +78,7 @@ class PlayerFlaggedReview implements Event {
     const ehbChange = Math.round(getPercentageIncrease(previousEHB, rejectedEHB) * 100);
 
     const uniqueId = `${player.id}_${new Date(rejected.createdAt).getTime()}`;
-    const actions = new MessageActionRow();
+    const actions = new ActionRowBuilder<ButtonBuilder>();
 
     const timeDiff = new Date(rejected.createdAt).getTime() - new Date(previous.createdAt).getTime();
 
@@ -95,14 +104,14 @@ class PlayerFlaggedReview implements Event {
       }
 
       actions.addComponents(
-        new MessageButton()
+        new ButtonBuilder()
           .setCustomId(`name_transfer/${uniqueId}`)
           .setLabel('Name Transfer')
-          .setStyle('PRIMARY'),
-        new MessageButton()
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
           .setCustomId(`rollback/${uniqueId}`)
           .setLabel('Hiscores Rollback')
-          .setStyle('SECONDARY')
+          .setStyle(ButtonStyle.Secondary)
       );
 
       lines.push('\n');
@@ -153,18 +162,18 @@ class PlayerFlaggedReview implements Event {
       }
 
       actions.addComponents(
-        new MessageButton()
+        new ButtonBuilder()
           .setCustomId(`name_transfer/${uniqueId}`)
           .setLabel('Name Transfer')
-          .setStyle('PRIMARY'),
-        new MessageButton()
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
           .setCustomId(`deironed/${uniqueId}`)
           .setLabel('De-ironed')
-          .setStyle('SECONDARY'),
-        new MessageButton()
+          .setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
           .setCustomId(`exp_dump/${uniqueId}`)
           .setLabel('Stackable Exp Dump')
-          .setStyle('SECONDARY')
+          .setStyle(ButtonStyle.Secondary)
       );
 
       lines.push('\n');
@@ -250,13 +259,13 @@ class PlayerFlaggedReview implements Event {
     lines.push(...getLargestActivityChanges(previous, rejected));
 
     actions.addComponents(
-      new MessageButton()
+      new ButtonBuilder()
         .setCustomId(`idk/${uniqueId}`)
         .setLabel("I'm not sure  🤷‍♂️")
-        .setStyle('SECONDARY')
+        .setStyle(ButtonStyle.Secondary)
     );
 
-    const message = new MessageEmbed()
+    const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
       .setTitle(`"${player.displayName}" flagged for review`)
@@ -265,7 +274,8 @@ class PlayerFlaggedReview implements Event {
     const reviewChannel = client.channels?.cache.get(config.discord.channels.flaggedPlayerReviews);
 
     if (!reviewChannel) return;
-    if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(reviewChannel)) return;
+    if (!((channel): channel is TextChannel => channel.type === ChannelType.GuildText)(reviewChannel))
+      return;
 
     const reportMessage = await reviewChannel.send({
       embeds: [message],
@@ -273,20 +283,15 @@ class PlayerFlaggedReview implements Event {
     });
 
     reviewChannel
-      .createMessageComponentCollector({ componentType: 'BUTTON', max: 1, time: 900 * 1000 })
+      .createMessageComponentCollector({ componentType: ComponentType.Button, max: 1, time: 900 * 1000 })
       .on('end', async collection => {
-        console.log('Button clicked.');
         if (!collection) return;
 
         const first = collection.first();
         if (!first) return;
 
-        console.log('Interaction found', first.customId);
-
         const username = first.member?.user.username;
         if (!username) return;
-
-        console.log('User found', username);
 
         const clickedId = first.customId;
 
