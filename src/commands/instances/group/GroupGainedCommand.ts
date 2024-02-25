@@ -50,7 +50,9 @@ class GroupGainedCommand extends Command {
       throw new CommandError("Couldn't find that group.");
     });
 
-    const gained = await womClient.groups.getGroupGains(groupId, { period, metric });
+    const gained = await womClient.groups.getGroupGains(groupId, { period, metric }).catch(e => {
+      throw new CommandError(`${e.message}`);
+    });
 
     const gainedList = gained
       .map((g, i) => `${i + 1}. ${bold(g.player.displayName)} - ${formatNumber(g.data.gained, true)}`)
