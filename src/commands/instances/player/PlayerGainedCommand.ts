@@ -3,6 +3,7 @@ import {
   getMetricName,
   GetPlayerGainsResponse,
   Metric,
+  parsePeriodExpression,
   PeriodProps,
   PlayerDeltasMap
 } from '@wise-old-man/utils';
@@ -71,6 +72,13 @@ class PlayerGainedCommand extends Command {
       );
     }
 
+    const urlPeriod =
+      period in PeriodProps
+        ? `period=${period}`
+        : `startDate=${new Date(
+            Date.now() - parsePeriodExpression(period).durationMs
+          ).toISOString()}&endDate=${new Date().toISOString()}`;
+
     const pages = buildPages(player.displayName, period, playerGains);
     const footer = `Tip: You can use custom periods with this format: /gained period: 2m6d7h`;
 
@@ -78,7 +86,7 @@ class PlayerGainedCommand extends Command {
       const response = pages[0]
         .setColor(config.visuals.blue)
         .setTitle(`${player.displayName} gains (${period})`)
-        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
+        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained?${urlPeriod}`))
         .setFooter({ text: footer });
 
       await interaction.editReply({ embeds: [response] });
@@ -88,7 +96,7 @@ class PlayerGainedCommand extends Command {
     const embedTemplate = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`${player.displayName} gains (${period})`)
-      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
+      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained?${urlPeriod}`))
       .setFooter({ text: footer });
 
     const paginatedMessage = createPaginatedEmbed(embedTemplate, 120_000);

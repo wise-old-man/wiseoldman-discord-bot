@@ -27,8 +27,7 @@ class GroupDetailsCommand extends Command {
       .addFields([
         { name: 'Clan chat', value: group.clanChat || '---' },
         { name: 'Members', value: group.memberCount?.toString() || '0' },
-        { name: 'Created at', value: formatDate(group.createdAt, 'DD MMM, YYYY') },
-        { name: '\u200B', value: group.verified ? `✅ Verified` : `❌ Unverified` }
+        { name: 'Created at', value: formatDate(group.createdAt, 'DD MMM, YYYY') }
       ]);
 
     if (!group.verified) {
