@@ -15,15 +15,20 @@ class PlayerClearUsernameCommand extends Command {
   }
 
   async execute(interaction: CommandInteraction) {
-    const username = interaction.options.getString('username', true);
     const userId = interaction.user.id;
 
-    const player = await womClient.players.getPlayerDetails(username).catch(() => {
-      throw new CommandError(
-        `Player "${username}" not found. Possibly hasn't been tracked yet on Wise Old Man.`,
-        'Tip: Try tracking them first using the /update command'
-      );
+    let recordCount = await prisma.alias.count({
+        where: {
+            userId: userId,
+        }
     });
+
+    if(recordCount == 0){
+        throw new CommandError(
+            `<@${userId}> does not have a player alias set.`,
+            'Tip: You can set an alias using the /setrsn command'
+          );
+    }
 
     // Update the database
     await prisma.alias.delete({
@@ -35,7 +40,6 @@ class PlayerClearUsernameCommand extends Command {
     const response = new MessageEmbed()
       .setColor(config.visuals.green)
       .setTitle('Player alias cleared!')
-      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
       .setDescription(`<@${userId}> has now cleared their player alias (RSN).`);
 
     await interaction.editReply({ embeds: [response] });
