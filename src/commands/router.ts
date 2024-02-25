@@ -26,6 +26,7 @@ import VerifyGroupCommand from './instances/moderation/VerifyGroupCommand';
 import PlayerAchievementsCommand from './instances/player/PlayerAchievementsCommand';
 import PlayerActivitiesCommand from './instances/player/PlayerActivitiesCommand';
 import PlayerBossesCommand from './instances/player/PlayerBossesCommand';
+import PlayerClearUsernameCommand from './instances/player/PlayerClearUsernameCommand';
 import PlayerEfficiencyCommand from './instances/player/PlayerEfficiencyCommand';
 import PlayerGainedCommand from './instances/player/PlayerGainedCommand';
 import PlayerSetFlagCommand from './instances/player/PlayerSetFlagCommand';
@@ -46,6 +47,7 @@ export const COMMANDS: BaseCommand[] = [
   UpdatePlayerCommand,
   PlayerGainedCommand,
   PlayerBossesCommand,
+  PlayerClearUsernameCommand,
   PlayerSetFlagCommand,
   PlayerActivitiesCommand,
   PlayerEfficiencyCommand,
