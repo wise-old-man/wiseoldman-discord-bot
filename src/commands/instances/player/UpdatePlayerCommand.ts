@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import config from '../../../config';
 import womClient from '../../../services/wiseoldman';
 import { Command, CommandConfig, CommandError, getUsernameParam } from '../../../utils';
@@ -8,7 +8,7 @@ const CONFIG: CommandConfig = {
   description: 'Update (track) a player.',
   options: [
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'username',
       description: 'In-game username or discord tag.'
     }
@@ -20,7 +20,7 @@ class UpdatePlayerCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     // Grab the username from the command's arguments or database alias
     const username = await getUsernameParam(interaction);
 
@@ -43,7 +43,7 @@ class UpdatePlayerCommand extends Command {
       throw e;
     });
 
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.green)
       .setDescription(`Successfully updated **${result.displayName}**.`)
       .setFooter({

@@ -8,7 +8,7 @@ import {
   isCompetitionStatus,
   MetricProps
 } from '@wise-old-man/utils';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../../config';
 import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '../../../services/wiseoldman';
@@ -27,22 +27,22 @@ const CONFIG: CommandConfig = {
   description: "View a group's ongoing/upcoming competition.",
   options: [
     {
-      type: 'integer',
+      type: ApplicationCommandOptionType.Integer,
       name: 'competition_id',
       description: 'Competition ID'
     },
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'status',
       description: 'View an ongoing or upcoming group competition.',
       choices: [
         {
-          value: CompetitionStatus.ONGOING,
-          label: CompetitionStatusProps[CompetitionStatus.ONGOING].name
+          name: CompetitionStatusProps[CompetitionStatus.ONGOING].name,
+          value: CompetitionStatus.ONGOING
         },
         {
-          value: CompetitionStatus.UPCOMING,
-          label: CompetitionStatusProps[CompetitionStatus.UPCOMING].name
+          name: CompetitionStatusProps[CompetitionStatus.UPCOMING].name,
+          value: CompetitionStatus.UPCOMING
         }
       ]
     }
@@ -54,7 +54,7 @@ class GroupCompetitionCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const groupId = await getLinkedGroupId(interaction);
 
     // Extract the "status" param, or fallback to "ongoing"
@@ -70,7 +70,7 @@ class GroupCompetitionCommand extends Command {
       throw new CommandError("Couldn't find that competition.");
     });
 
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(competition.title)
       .setURL(`https://wiseoldman.net/competitions/${competition.id}/`)

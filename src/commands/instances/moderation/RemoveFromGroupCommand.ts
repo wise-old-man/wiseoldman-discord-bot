@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { removeFromGroup } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig, sendModLog } from '../../../utils';
@@ -8,19 +8,19 @@ const CONFIG: CommandConfig = {
   description: 'Remove a player from a group.',
   options: [
     {
-      type: 'integer',
+      type: ApplicationCommandOptionType.Integer,
       name: 'id',
       description: 'The group ID.',
       required: true
     },
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'username',
       description: 'In-game username.',
       required: true
     },
     {
-      type: 'user',
+      type: ApplicationCommandOptionType.User,
       name: 'requester',
       description: "Requester's Discord user tag."
     }
@@ -34,7 +34,7 @@ class RemoveFromGroupCommand extends Command {
     this.moderation = true;
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const groupId = interaction.options.getInteger('id', true);
     const username = interaction.options.getString('username', true);
     const requesterId = interaction.options.getUser('requester', false)?.id;
@@ -42,7 +42,7 @@ class RemoveFromGroupCommand extends Command {
     const requester = interaction.guild?.members.cache.find(m => m.id === requesterId);
 
     // Respond on the WOM discord chat with a success status
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.green)
       .setDescription(`✅ ${username} has been successfully removed from the group.`);
 

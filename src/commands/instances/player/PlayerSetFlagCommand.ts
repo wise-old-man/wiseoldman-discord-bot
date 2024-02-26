@@ -1,5 +1,5 @@
 import { CountryProps, isCountry } from '@wise-old-man/utils';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { updateCountry } from '../../../services/wiseoldman';
 import { Command, CommandConfig, countryCodeEmoji, CommandError } from '../../../utils';
 import config from '../../../config';
@@ -9,13 +9,13 @@ const CONFIG: CommandConfig = {
   description: 'Set your country/flag',
   options: [
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'username',
       description: 'In-game username',
       required: true
     },
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'country',
       description: 'Country name.',
       required: true,
@@ -30,7 +30,7 @@ class PlayerSetFlagCommand extends Command {
     this.private = true;
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const username = interaction.options.getString('username', true);
     const countryCode = interaction.options.getString('country', true);
 
@@ -63,7 +63,7 @@ class PlayerSetFlagCommand extends Command {
       ? `${interaction.user} changed \`${username}\`'s country to ${CountryProps[countryCode].name}`
       : `Failed to update flag.`;
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor(hasUpdated ? config.visuals.green : config.visuals.red)
       .setTitle(title)
       .setDescription(description)

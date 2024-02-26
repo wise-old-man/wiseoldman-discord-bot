@@ -7,7 +7,7 @@ import {
   getEmoji,
   getLinkedGroupId
 } from '../../../utils';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
 
@@ -21,7 +21,7 @@ class GroupAchievements extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const groupId = await getLinkedGroupId(interaction);
 
     const groupAchievements = await womClient.groups
@@ -39,7 +39,7 @@ class GroupAchievements extends Command {
       )
       .join('\n');
 
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle('Recent Group Achievements')
       .setDescription(achievementList)

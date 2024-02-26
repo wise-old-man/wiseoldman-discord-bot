@@ -4,11 +4,13 @@ import {
   DMChannel,
   Guild,
   GuildMember,
-  MessageEmbed,
+  EmbedBuilder,
   NewsChannel,
   PermissionResolvable,
   TextChannel,
-  User
+  User,
+  ChannelType,
+  PermissionFlagsBits
 } from 'discord.js';
 import config from '../config';
 
@@ -389,7 +391,7 @@ const GroupRoleEmoji = {
 } as const;
 
 export function isAdmin(member: GuildMember | null): boolean {
-  return member ? member?.permissions.has('ADMINISTRATOR') : false;
+  return member ? member?.permissions.has(PermissionFlagsBits.Administrator) : false;
 }
 
 export function hasRole(member: GuildMember | null, roleId: string): boolean {
@@ -411,15 +413,15 @@ export function getMissingPermissions(channel: TextChannel) {
 
 export function isChannelSendable(channel: Channel | undefined | null): channel is TextChannel {
   if (!channel) return false;
-  if (!channel.isText()) return false;
+  if (channel.type !== ChannelType.GuildText) return false;
   if (!('guild' in channel)) return true;
 
-  const canView = clientUserPermissions(channel as TextChannel)?.has('VIEW_CHANNEL');
+  const canView = clientUserPermissions(channel as TextChannel)?.has(PermissionFlagsBits.ViewChannel);
 
   if (
     !(channel instanceof DMChannel) &&
-    !(channel instanceof TextChannel) &&
     !(channel instanceof NewsChannel) &&
+    !(channel instanceof TextChannel) &&
     canView
   ) {
     return false;
@@ -454,12 +456,13 @@ export function sendModLog(
   const modLogsChannel = guild.channels.cache.get(config.discord.channels.modLogs);
 
   if (!modLogsChannel) return;
-  if (!((channel): channel is TextChannel => channel.type === 'GUILD_TEXT')(modLogsChannel)) return;
+  if (!((channel): channel is TextChannel => channel.type === ChannelType.GuildText)(modLogsChannel))
+    return;
 
   let embedMessage = message;
   if (requester && requester.username) embedMessage += ` | Requested by: <@${requester.id}>`;
 
-  const logMessage = new MessageEmbed()
+  const logMessage = new EmbedBuilder()
     .setDescription(embedMessage)
     .setFooter({ text: mod ? `Mod: ${mod.username}` : '' });
 

@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { deletePlayer } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
@@ -8,13 +8,13 @@ const CONFIG: CommandConfig = {
   description: 'Delete a player from the database.',
   options: [
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       required: true,
       name: 'username',
       description: 'The username of the player to delete.'
     },
     {
-      type: 'user',
+      type: ApplicationCommandOptionType.User,
       name: 'requester',
       description: "Requester's Discord user tag."
     }
@@ -28,7 +28,7 @@ class DeletePlayerCommand extends Command {
     this.moderation = true;
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const username = interaction.options.getString('username', true);
     const requesterId = interaction.options.getUser('requester', false)?.id;
 
@@ -40,7 +40,7 @@ class DeletePlayerCommand extends Command {
     });
 
     // Respond on the WOM discord chat with a success status
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.green)
       .setDescription(`✅ \`${username}\` has been successfully deleted!`);
 

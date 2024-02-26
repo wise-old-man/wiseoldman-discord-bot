@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { deleteGroup } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
@@ -8,13 +8,13 @@ const CONFIG: CommandConfig = {
   description: 'Delete a group.',
   options: [
     {
-      type: 'integer',
+      type: ApplicationCommandOptionType.Integer,
       name: 'id',
       description: 'The group ID.',
       required: true
     },
     {
-      type: 'user',
+      type: ApplicationCommandOptionType.User,
       name: 'requester',
       description: "Requester's Discord user tag."
     }
@@ -28,7 +28,7 @@ class DeleteGroupCommand extends Command {
     this.moderation = true;
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const groupId = interaction.options.getInteger('id', true);
     const requesterId = interaction.options.getUser('requester', false)?.id;
 
@@ -40,7 +40,7 @@ class DeleteGroupCommand extends Command {
     });
 
     // Respond on the WOM discord chat with a success status
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.green)
       .setDescription(`✅ Group has been successfully deleted!`);
 

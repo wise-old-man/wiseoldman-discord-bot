@@ -4,11 +4,13 @@ import {
   ButtonInteraction,
   Client,
   GuildMember,
-  MessageActionRow,
-  MessageButton,
-  Modal,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ModalBuilder,
   ModalSubmitInteraction,
-  TextInputComponent
+  TextInputBuilder,
+  ButtonStyle,
+  ChannelType
 } from 'discord.js';
 import config from './config';
 import { hasRole, sendModLog } from './utils';
@@ -22,7 +24,7 @@ const NOT_A_PATRON_ERROR_MESSAGE = `Only Patreon supporters can claim benefits, 
 
 export async function setupPatreonTrigger(client: Client) {
   const patreonInfoChannel = client.channels.cache.get(config.discord.channels.patreonInfo);
-  if (!patreonInfoChannel?.isText()) return;
+  if (patreonInfoChannel?.type !== ChannelType.GuildText) return;
 
   const messages = await patreonInfoChannel.messages.fetch({ limit: 100 });
   const botMessages = messages.filter(msg => msg.author.id === client.user?.id);
@@ -34,11 +36,11 @@ export async function setupPatreonTrigger(client: Client) {
 
   const content = fs.readFileSync(path.join('src', 'content', 'patreon-info.md'), 'utf8');
 
-  const actions = new MessageActionRow().addComponents(
-    new MessageButton()
+  const actions = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
       .setCustomId(PATREON_TRIGGER_ID)
       .setLabel('Claim Patreon Benefits')
-      .setStyle('SUCCESS')
+      .setStyle(ButtonStyle.Success)
   );
 
   const message = await patreonInfoChannel.send({ content, components: [actions] });
@@ -57,11 +59,11 @@ export async function handlePatreonTrigger(interaction: ButtonInteraction) {
 
   const isTier2Supporter = hasRole(member, config.discord.roles.patreonSupporterT2);
 
-  const modal = new Modal()
+  const modal = new ModalBuilder()
     .setCustomId(PATREON_MODAL_ID)
     .setTitle(`Claim Patreon Benefits (Tier ${isTier2Supporter ? 2 : 1})`);
 
-  const usernameInput = new TextInputComponent()
+  const usernameInput = new TextInputBuilder()
     .setCustomId('username')
     .setLabel('Your in-game username')
     .setPlaceholder('Ex: Zezima')
@@ -69,18 +71,16 @@ export async function handlePatreonTrigger(interaction: ButtonInteraction) {
     .setStyle(1)
     .setRequired(true);
 
-  const groupIdInput = new TextInputComponent()
+  const groupIdInput = new TextInputBuilder()
     .setCustomId('groupId')
     .setLabel("Your group's ID")
     .setPlaceholder("Ex: 139 (Can be found on your group's page URL.)")
     .setStyle(1);
 
-  // @ts-expect-error -- Typings are wrong on discord.js v13.7.0 (can be deleted on a v14 upgrade)
-  modal.addComponents(new MessageActionRow().addComponents(usernameInput));
+  modal.addComponents(new ActionRowBuilder<TextInputBuilder>().addComponents(usernameInput));
 
   if (isTier2Supporter) {
-    // @ts-expect-error -- Typings are wrong on discord.js v13.7.0 (can be deleted on a v14 upgrade)
-    modal.addComponents(new MessageActionRow().addComponents(groupIdInput));
+    modal.addComponents(new ActionRowBuilder<TextInputBuilder>().addComponents(groupIdInput));
   }
 
   interaction.showModal(modal);

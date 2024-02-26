@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/node';
-import { GuildMember, Interaction, MessageEmbed } from 'discord.js';
+import { GuildMember, Interaction, EmbedBuilder } from 'discord.js';
 import config from '../config';
 import monitoring from '../utils/monitoring';
 import {
@@ -86,7 +86,7 @@ export async function onInteractionReceived(interaction: Interaction) {
     }
   }
 
-  if (!interaction.isCommand()) {
+  if (!interaction.isChatInputCommand()) {
     return;
   }
 
@@ -130,7 +130,7 @@ export async function onInteractionReceived(interaction: Interaction) {
 }
 
 function buildErrorEmbed(error: Error) {
-  const response = new MessageEmbed().setColor(config.visuals.red);
+  const response = new EmbedBuilder().setColor(config.visuals.red);
 
   if (error instanceof CommandError) {
     response.setDescription(error.message);

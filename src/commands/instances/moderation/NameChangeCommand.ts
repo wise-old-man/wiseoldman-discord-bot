@@ -1,11 +1,14 @@
 import { NameChangeDetails, NameChangeStatus } from '@wise-old-man/utils';
 import {
   ButtonInteraction,
-  CommandInteraction,
   GuildMember,
-  MessageActionRow,
-  MessageButton,
-  MessageEmbed
+  ActionRowBuilder,
+  ButtonBuilder,
+  EmbedBuilder,
+  ApplicationCommandOptionType,
+  ChatInputCommandInteraction,
+  ButtonStyle,
+  ComponentType
 } from 'discord.js';
 import { approveNameChange, denyNameChange, fetchNameChangeDetails } from '../../../services/wiseoldman';
 import config from '../../../config';
@@ -16,7 +19,7 @@ const CONFIG: CommandConfig = {
   description: 'Review and take action on a name change.',
   options: [
     {
-      type: 'integer',
+      type: ApplicationCommandOptionType.Integer,
       name: 'name_change_id',
       description: 'The namechange Id.',
       required: true
@@ -31,7 +34,7 @@ class NameChangeCommand extends Command {
     this.moderation = true;
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const nameChangeId = interaction.options.getInteger('name_change_id', true);
 
     const reviewData = await fetchNameChangeDetails(nameChangeId).catch(e => {
@@ -51,20 +54,20 @@ class NameChangeCommand extends Command {
 
     const { nameChange, data } = reviewData;
 
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`Name change review: ${nameChange.oldName} → ${nameChange.newName}`)
       .setDescription(buildReviewMessage(data));
 
-    const actions = new MessageActionRow().addComponents(
-      new MessageButton()
+    const actions = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
         .setCustomId(`namechange_approve/${nameChangeId}`)
         .setLabel('Approve')
-        .setStyle('SUCCESS'),
-      new MessageButton()
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
         .setCustomId(`namechange_deny/${nameChangeId}`)
         .setLabel('Deny')
-        .setStyle('DANGER')
+        .setStyle(ButtonStyle.Danger)
     );
 
     await interaction.editReply({
@@ -84,7 +87,7 @@ class NameChangeCommand extends Command {
     const collector = hasModeratorRole(interaction.member as GuildMember)
       ? interaction.channel?.createMessageComponentCollector({
           filter,
-          componentType: 'BUTTON',
+          componentType: ComponentType.Button,
           max: 1,
           time: 1000 * 300
         })

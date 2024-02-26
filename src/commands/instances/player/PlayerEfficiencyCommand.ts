@@ -1,5 +1,5 @@
 import { formatNumber, round } from '@wise-old-man/utils';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import config from '../../../config';
 import womClient from '../../../services/wiseoldman';
 import { Command, CommandConfig, CommandError, encodeURL, getUsernameParam } from '../../../utils';
@@ -9,7 +9,7 @@ const CONFIG: CommandConfig = {
   description: "View a player's efficiency stats.",
   options: [
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'username',
       description: 'In-game username or discord tag.'
     }
@@ -21,7 +21,7 @@ class PlayerEfficiencyCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     // Grab the username from the command's arguments or database alias
     const username = await getUsernameParam(interaction);
 
@@ -32,7 +32,7 @@ class PlayerEfficiencyCommand extends Command {
       );
     });
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
       .setTitle(`${player.displayName} - Efficiency Stats`)

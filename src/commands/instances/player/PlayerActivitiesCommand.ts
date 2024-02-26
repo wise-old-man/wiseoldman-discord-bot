@@ -1,6 +1,11 @@
 import { formatNumber, isActivity, PlayerDetails } from '@wise-old-man/utils';
 import Canvas from 'canvas';
-import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
+import {
+  ChatInputCommandInteraction,
+  AttachmentBuilder,
+  EmbedBuilder,
+  ApplicationCommandOptionType
+} from 'discord.js';
 import config from '../../../config';
 import womClient from '../../../services/wiseoldman';
 import {
@@ -26,17 +31,17 @@ const CONFIG: CommandConfig = {
   description: "View a player's activity scores.",
   options: [
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'variant',
       description: 'The variant to show stats for (scores / rank).',
       required: true,
       choices: [
-        { label: 'Scores', value: RenderVariant.SCORES },
-        { label: 'Ranks', value: RenderVariant.RANKS }
+        { name: 'Scores', value: RenderVariant.SCORES },
+        { name: 'Ranks', value: RenderVariant.RANKS }
       ]
     },
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'username',
       description: 'In-game username or discord tag.'
     }
@@ -48,7 +53,7 @@ class PlayerActivitiesCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     // Grab the username from the command's arguments or database alias
     const username = await getUsernameParam(interaction);
 
@@ -64,7 +69,7 @@ class PlayerActivitiesCommand extends Command {
 
     const { attachment, fileName } = await this.render(player, variant);
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/overview/activities`))
       .setTitle(`${player.displayName} - Activity ${variant}`)
@@ -135,7 +140,7 @@ class PlayerActivitiesCommand extends Command {
     }
 
     const fileName = `${Date.now()}-${username.replace(/ /g, '_')}-${variant}.jpeg`;
-    const attachment = new MessageAttachment(canvas.toBuffer(), fileName);
+    const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: fileName });
 
     return { attachment, fileName };
   }

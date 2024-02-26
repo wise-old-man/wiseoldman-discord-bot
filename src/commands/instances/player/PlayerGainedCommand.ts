@@ -3,10 +3,11 @@ import {
   getMetricName,
   GetPlayerGainsResponse,
   Metric,
+  parsePeriodExpression,
   PeriodProps,
   PlayerDeltasMap
 } from '@wise-old-man/utils';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { createPaginatedEmbed } from '../../../commands/pagination';
 import config from '../../../config';
 import womClient from '../../../services/wiseoldman';
@@ -26,14 +27,14 @@ const CONFIG: CommandConfig = {
   description: "View a player's gains.",
   options: [
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'period',
       description: 'Tip: You can use custom periods using the following format: 1y6d5h',
       required: true,
       autocomplete: true
     },
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'username',
       description: 'In-game username or discord tag.'
     }
@@ -45,7 +46,7 @@ class PlayerGainedCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     // Grab the username from the command's arguments or database alias
     const username = await getUsernameParam(interaction);
 
@@ -71,6 +72,13 @@ class PlayerGainedCommand extends Command {
       );
     }
 
+    const urlPeriod =
+      period in PeriodProps
+        ? `period=${period}`
+        : `startDate=${new Date(
+            Date.now() - parsePeriodExpression(period).durationMs
+          ).toISOString()}&endDate=${new Date().toISOString()}`;
+
     const pages = buildPages(player.displayName, period, playerGains);
     const footer = `Tip: You can use custom periods with this format: /gained period: 2m6d7h`;
 
@@ -78,17 +86,17 @@ class PlayerGainedCommand extends Command {
       const response = pages[0]
         .setColor(config.visuals.blue)
         .setTitle(`${player.displayName} gains (${period})`)
-        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
+        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained?${urlPeriod}`))
         .setFooter({ text: footer });
 
       await interaction.editReply({ embeds: [response] });
       return;
     }
 
-    const embedTemplate = new MessageEmbed()
+    const embedTemplate = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`${player.displayName} gains (${period})`)
-      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained/`))
+      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained?${urlPeriod}`))
       .setFooter({ text: footer });
 
     const paginatedMessage = createPaginatedEmbed(embedTemplate, 120_000);
@@ -115,12 +123,12 @@ function buildPages(
     );
   }
 
-  const pages: Array<MessageEmbed> = [];
+  const pages: Array<EmbedBuilder> = [];
 
   for (let i = 0; i < pageCount; i++) {
     const pageGains = gainsList.slice(i * GAINS_PER_PAGE, i * GAINS_PER_PAGE + GAINS_PER_PAGE);
     pages.push(
-      new MessageEmbed()
+      new EmbedBuilder()
         .setTitle(`${displayName} gains (${period})`)
         .setDescription(pageGains.join('\n'))
     );

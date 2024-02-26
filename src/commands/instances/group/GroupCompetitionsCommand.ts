@@ -4,7 +4,7 @@ import {
   CompetitionTypeProps,
   GroupDetails
 } from '@wise-old-man/utils';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
@@ -28,7 +28,7 @@ class GroupCompetitionsCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const groupId = await getLinkedGroupId(interaction);
 
     const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
@@ -56,7 +56,7 @@ class GroupCompetitionsCommand extends Command {
       return;
     }
 
-    const embedTemplate = new MessageEmbed()
+    const embedTemplate = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`${group.name} - Most Recent Competitions`)
       .setURL(`https://wiseoldman.net/groups/${groupId}/competitions`);
@@ -103,7 +103,7 @@ function buildPages(group: GroupDetails, competitions: CompetitionListItem[]) {
     throw new CommandError("Couldn't find any competitions for this group.");
   }
 
-  const pages: Array<MessageEmbed> = [];
+  const pages: Array<EmbedBuilder> = [];
 
   for (let i = 0; i < pageCount; i++) {
     const pageCompetitions = competitionsList.slice(
@@ -112,7 +112,7 @@ function buildPages(group: GroupDetails, competitions: CompetitionListItem[]) {
     );
 
     pages.push(
-      new MessageEmbed().setTitle(`${group.name} - Most Recent Competitions`).addFields(
+      new EmbedBuilder().setTitle(`${group.name} - Most Recent Competitions`).addFields(
         pageCompetitions.map(c => {
           return { name: c.name, value: c.value };
         })

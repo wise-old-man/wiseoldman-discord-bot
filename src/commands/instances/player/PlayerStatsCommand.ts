@@ -1,6 +1,11 @@
 import { formatNumber, isSkill, Metric, PlayerDetails, round } from '@wise-old-man/utils';
 import Canvas from 'canvas';
-import { CommandInteraction, MessageAttachment, MessageEmbed } from 'discord.js';
+import {
+  ChatInputCommandInteraction,
+  AttachmentBuilder,
+  EmbedBuilder,
+  ApplicationCommandOptionType
+} from 'discord.js';
 import config from '../../../config';
 import womClient from '../../../services/wiseoldman';
 import {
@@ -56,19 +61,19 @@ const CONFIG: CommandConfig = {
   description: "View a player's skilling stats.",
   options: [
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'variant',
       description: 'The variant to show stats for (levels / exp / rank / ehp).',
       required: true,
       choices: [
-        { label: 'Levels', value: RenderVariant.LEVELS },
-        { label: 'Ranks', value: RenderVariant.RANKS },
-        { label: 'Experience', value: RenderVariant.EXPERIENCE },
-        { label: 'Efficient Hours Played', value: RenderVariant.EHP }
+        { name: 'Levels', value: RenderVariant.LEVELS },
+        { name: 'Ranks', value: RenderVariant.RANKS },
+        { name: 'Experience', value: RenderVariant.EXPERIENCE },
+        { name: 'Efficient Hours Played', value: RenderVariant.EHP }
       ]
     },
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'username',
       description: 'In-game username or discord tag.'
     }
@@ -80,7 +85,7 @@ class PlayerStatsCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     // Grab the username from the command's arguments or database alias
     const username = await getUsernameParam(interaction);
 
@@ -96,7 +101,7 @@ class PlayerStatsCommand extends Command {
 
     const { attachment, fileName } = await this.render(player, variant);
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
       .setTitle(`${player.displayName} (Combat ${player.combatLevel}) - ${variant}`)
@@ -180,7 +185,7 @@ class PlayerStatsCommand extends Command {
     }
 
     const fileName = `${Date.now()}-${username.replace(/ /g, '_')}-${variant}.jpeg`;
-    const attachment = new MessageAttachment(canvas.toBuffer(), fileName);
+    const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: fileName });
 
     return { attachment, fileName };
   }

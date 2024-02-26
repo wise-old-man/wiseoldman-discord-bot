@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { resetCompetitionCode } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
@@ -15,12 +15,12 @@ const CONFIG: CommandConfig = {
   options: [
     {
       name: 'id',
-      type: 'integer',
+      type: ApplicationCommandOptionType.Integer,
       description: 'The competition ID.',
       required: true
     },
     {
-      type: 'user',
+      type: ApplicationCommandOptionType.User,
       name: 'user',
       description: 'Discord user tag.',
       required: true
@@ -35,7 +35,7 @@ class ResetCompetitionCodeCommand extends Command {
     this.moderation = true;
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const competitionId = interaction.options.getInteger('id', true);
     const userId = interaction.options.getUser('user', true).id;
 
@@ -63,7 +63,7 @@ class ResetCompetitionCodeCommand extends Command {
     await sentDM.edit(DM_MESSAGE(newCode, competitionId));
 
     // Respond on the WOM discord chat with a success status
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.green)
       .setDescription(CHAT_MESSAGE(userId));
 

@@ -1,4 +1,11 @@
-import { Channel, CommandInteraction, MessageEmbed } from 'discord.js';
+import {
+  ApplicationCommandOptionType,
+  Channel,
+  ChannelType,
+  ChatInputCommandInteraction,
+  EmbedBuilder,
+  PermissionFlagsBits
+} from 'discord.js';
 import config from '../../../config';
 import { updateBotDefaultChannel, updateNotificationPreferences } from '../../../services/prisma';
 import {
@@ -16,31 +23,31 @@ const CONFIG: CommandConfig = {
   description: "Configure the bot's notification preferences.",
   options: [
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       required: true,
       name: 'notification_type',
       description: 'The notification type to configure.',
       choices: [
         ...Object.values(NotificationType).map(type => ({
-          label: NotificationName[type],
+          name: NotificationName[type],
           value: type
         }))
       ]
     },
     {
-      type: 'channel',
+      type: ApplicationCommandOptionType.Channel,
       required: true,
       name: 'notification_channel',
       description: 'The channel to which notifications are sent.',
-      channelType: 0 //  Only add text channels
+      channelType: ChannelType.GuildText
     },
     {
-      type: 'string',
+      type: ApplicationCommandOptionType.String,
       name: 'status',
       description: `Enable or disable notifications of a certain type. Default channel cannot be disabled.`,
       choices: [
-        { label: 'Enable', value: 'enable' },
-        { label: 'Disable', value: 'disable' }
+        { name: 'Enable', value: 'enable' },
+        { name: 'Disable', value: 'disable' }
       ]
     }
   ]
@@ -52,7 +59,7 @@ class ConfigNotificationsCommand extends Command {
     this.requiresAdmin = true;
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const guildId = interaction.guild?.id || '';
 
     if (!guildId || guildId.length === 0) {
@@ -73,7 +80,7 @@ class ConfigNotificationsCommand extends Command {
       const channelPermissions =
         channel.client.user !== null ? channel.permissionsFor(channel.client.user) : null;
 
-      if (channelPermissions !== null && !channelPermissions.has('VIEW_CHANNEL')) {
+      if (channelPermissions !== null && !channelPermissions.has(PermissionFlagsBits.ViewChannel)) {
         throw new CommandError(`Error: The bot does not have access to <#${channel.id}>.`);
       }
 
@@ -113,7 +120,7 @@ class ConfigNotificationsCommand extends Command {
       description = `"${notificationName}" notifications will now be sent to <#${channel.id}>`;
     }
 
-    const response = new MessageEmbed()
+    const response = new EmbedBuilder()
       .setColor(config.visuals.green)
       .setTitle(`✅ Notification Preferences Updated`)
       .setDescription(description);

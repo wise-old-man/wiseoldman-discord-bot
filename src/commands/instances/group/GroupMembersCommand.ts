@@ -1,4 +1,4 @@
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
 import { CommandConfig, Command, getLinkedGroupId, CommandError, bold } from '../../../utils';
@@ -16,7 +16,7 @@ class GroupMembersCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     const groupId = await getLinkedGroupId(interaction);
 
     const group = await womClient.groups.getGroupDetails(groupId).catch(() => {
@@ -26,11 +26,14 @@ class GroupMembersCommand extends Command {
     // Restrict to 25 pages because that's the limit on a paginated message
     const pageCount = Math.min(25, Math.ceil(group.memberships.length / RESULTS_PER_PAGE));
 
-    const embedTemplate = new MessageEmbed()
+    const embedTemplate = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`${group.name} members list`)
-      .setURL(`https://wiseoldman.net/groups/${groupId}/members/`)
-      .setFooter({ text: group.memberships.length > 500 ? 'Click the title to view full list' : '' });
+      .setURL(`https://wiseoldman.net/groups/${groupId}`);
+
+    if (group.memberships.length > 500) {
+      embedTemplate.setFooter({ text: 'Click the title to view full list' });
+    }
 
     const paginatedMessage = createPaginatedEmbed(embedTemplate, 120_000);
 
@@ -40,7 +43,7 @@ class GroupMembersCommand extends Command {
         .map((g, idx) => `${i * RESULTS_PER_PAGE + idx + 1}. ${bold(g.player.displayName)}`)
         .join('\n');
 
-      paginatedMessage.addPageEmbed(new MessageEmbed().setDescription(memberList));
+      paginatedMessage.addPageEmbed(new EmbedBuilder().setDescription(memberList));
     }
 
     paginatedMessage.run(interaction);
