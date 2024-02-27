@@ -1,10 +1,16 @@
+import { PermissionFlagsBits } from 'discord.js';
 import env from './env';
 
 export default {
   token: env.DISCORD_TOKEN,
   apiKey: env.DISCORD_BOT_API_KEY,
   baseAPIUrl: env.BASE_API_URL || 'https://api.wiseoldman.net/v2',
-  requiredPermissions: ['MANAGE_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES', 'USE_APPLICATION_COMMANDS'],
+  requiredPermissions: [
+    PermissionFlagsBits.ManageMessages,
+    PermissionFlagsBits.EmbedLinks,
+    PermissionFlagsBits.AttachFiles,
+    PermissionFlagsBits.UseApplicationCommands
+  ],
   visuals: {
     blue: 0x2980b9,
     red: 0xcc4242,
