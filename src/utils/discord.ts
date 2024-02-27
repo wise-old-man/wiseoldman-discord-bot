@@ -406,7 +406,7 @@ export function hasModeratorRole(member: GuildMember | null): boolean {
 }
 
 export function getMissingPermissions(channel: TextChannel) {
-  return [...config.requiredPermissions, 'SEND_MESSAGES'].filter(permission => {
+  return [...config.requiredPermissions, PermissionFlagsBits.SendMessages].filter(permission => {
     return !clientUserPermissions(channel)?.has(permission as PermissionResolvable);
   });
 }
