@@ -462,9 +462,11 @@ export function sendModLog(
   let embedMessage = message;
   if (requester && requester.username) embedMessage += ` | Requested by: <@${requester.id}>`;
 
-  const logMessage = new EmbedBuilder()
-    .setDescription(embedMessage)
-    .setFooter({ text: mod ? `Mod: ${mod.username}` : '' });
+  const logMessage = new EmbedBuilder().setDescription(embedMessage);
+
+  if (mod) {
+    logMessage.setFooter({ text: `Mod: ${mod.username}` });
+  }
 
   modLogsChannel.send({ embeds: [logMessage] });
 }
