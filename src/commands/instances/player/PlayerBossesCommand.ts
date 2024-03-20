@@ -18,7 +18,7 @@ import {
 } from '../../../utils';
 
 const RENDER_WIDTH = 415;
-const RENDER_HEIGHT = 325;
+const RENDER_HEIGHT = 350;
 const RENDER_PADDING = 15;
 
 enum RenderVariant {
@@ -69,6 +69,13 @@ class PlayerBossesCommand extends Command {
       );
     });
 
+    if (!player.latestSnapshot) {
+      throw new CommandError(
+        `Could not find this player's stats.`,
+        'Tip: Try tracking them again using the /update command'
+      );
+    }
+
     const { attachment, fileName } = await this.render(player, variant);
 
     const embed = new EmbedBuilder()
@@ -84,7 +91,7 @@ class PlayerBossesCommand extends Command {
 
   async render(playerDetails: PlayerDetails, variant: RenderVariant) {
     const username = playerDetails.username;
-    const { bosses, computed } = playerDetails.latestSnapshot.data;
+    const { bosses, computed } = playerDetails.latestSnapshot!.data;
 
     // Create a scaled empty canvas
     const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
@@ -103,8 +110,8 @@ class PlayerBossesCommand extends Command {
       rank: number,
       ehb?: number
     ) {
-      const x = Math.floor(index / 10);
-      const y = index % 10;
+      const x = Math.floor(index / 11);
+      const y = index % 11;
 
       const originX = RENDER_PADDING - 7 + x * 67;
       const originY = RENDER_PADDING - 5 + y * 31;

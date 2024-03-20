@@ -74,6 +74,7 @@ const MetricEmoji = {
   [Metric.KRAKEN]: '<:kraken:729840084798406767>',
   [Metric.KREEARRA]: '<:kreearra:729840085033287680>',
   [Metric.KRIL_TSUTSAROTH]: '<:kril_tsutsaroth:729840084781760574>',
+  [Metric.LUNAR_CHESTS]: '<:lunar_chests:1220023608383115275>',
   [Metric.MIMIC]: '<:mimic:730169728357761145>',
   [Metric.NEX]: '<:nex:927846096611475466>',
   [Metric.NIGHTMARE]: '<:nightmare:729840084844675103>',
@@ -84,6 +85,7 @@ const MetricEmoji = {
   [Metric.SCORPIA]: '<:scorpia:729840084962115666>',
   [Metric.SCURRIUS]: '<:scurrius:1199712038193217606>',
   [Metric.SKOTIZO]: '<:skotizo:729840085398454273>',
+  [Metric.SOL_HEREDIT]: '<:sol_heredit:1220023750339334154>',
   [Metric.SPINDEL]: '<:venenatis:729840086795157595>',
   [Metric.TEMPOROSS]: '<:tempoross:823292463456059452>',
   [Metric.THE_GAUNTLET]: '<:the_gauntlet:729840085473820805>',
@@ -113,6 +115,7 @@ const MetricEmoji = {
   [Metric.CLUE_SCROLLS_ALL]: '<:clue_scrolls_all:729844134004785204>',
   [Metric.SOUL_WARS_ZEAL]: '<:soul_wars_zeal:1011956473615630396>',
   [Metric.GUARDIANS_OF_THE_RIFT]: '<:guardians_of_the_rift:963939589070934046>',
+  [Metric.COLOSSEUM_GLORY]: '<:colosseum_glory:1220023685881139312>',
   // Computed metric emojis
   [Metric.EHP]: '<:ehp:766260738221670432>',
   [Metric.EHB]: '<:ehb:766260773617795103>'

@@ -67,6 +67,13 @@ class PlayerActivitiesCommand extends Command {
       );
     });
 
+    if (!player.latestSnapshot) {
+      throw new CommandError(
+        `Could not find this player's stats.`,
+        'Tip: Try tracking them again using the /update command'
+      );
+    }
+
     const { attachment, fileName } = await this.render(player, variant);
 
     const embed = new EmbedBuilder()
@@ -82,7 +89,7 @@ class PlayerActivitiesCommand extends Command {
 
   async render(playerDetails: PlayerDetails, variant: RenderVariant) {
     const username = playerDetails.username;
-    const activities = playerDetails.latestSnapshot.data.activities;
+    const activities = playerDetails.latestSnapshot!.data.activities;
 
     // Create a scaled empty canvas
     const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
