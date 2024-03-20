@@ -127,12 +127,12 @@ function buildReviewMessage(data: NonNullable<NameChangeDetails['data']>): strin
   const { isNewOnHiscores, hasNegativeGains, hoursDiff, ehpDiff, ehbDiff, oldStats, newStats } = data;
 
   const expDiff =
-    newStats.data.skills.overall && oldStats.data.skills.overall
+    newStats?.data.skills.overall && oldStats.data.skills.overall
       ? newStats.data.skills.overall.experience - oldStats.data.skills.overall.experience
       : 0;
 
   const oldTotalLevel = oldStats.data.skills.overall?.level;
-  const newTotalLevel = newStats.data.skills.overall?.level;
+  const newTotalLevel = newStats?.data.skills.overall?.level;
 
   const lines: Array<string> = [];
 
