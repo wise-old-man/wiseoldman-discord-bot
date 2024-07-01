@@ -24,14 +24,13 @@ class MemberAchievements implements Event {
     if (!groupId) return;
 
     const userId = await getUserId(player.displayName);
-    const discordTag = userId ? `(<@${userId}>)` : '';
 
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`🎉 New member ${achievements.length > 1 ? 'achievements' : 'achievement'}`)
       .setDescription(
         achievements
-          .map(({ metric, name }) => `${player.displayName} ${discordTag} - ${getEmoji(metric)} ${name}`)
+          .map(({ metric, name }) => `${player.displayName} - ${getEmoji(metric)} ${name}`)
           .join('\n')
       )
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements`));
