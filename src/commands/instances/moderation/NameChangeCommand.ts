@@ -1,4 +1,4 @@
-import { NameChangeDetails, NameChangeStatus } from '@wise-old-man/utils';
+import { NameChange, NameChangeDetails, NameChangeStatus } from '@wise-old-man/utils';
 import {
   ButtonInteraction,
   GuildMember,
@@ -57,7 +57,7 @@ class NameChangeCommand extends Command {
     const response = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`Name change review: ${nameChange.oldName} → ${nameChange.newName}`)
-      .setDescription(buildReviewMessage(data));
+      .setDescription(buildReviewMessage(nameChange, data));
 
     const actions = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
@@ -123,7 +123,10 @@ class NameChangeCommand extends Command {
   }
 }
 
-function buildReviewMessage(data: NonNullable<NameChangeDetails['data']>): string {
+function buildReviewMessage(
+  nameChange: NameChange,
+  data: NonNullable<NameChangeDetails['data']>
+): string {
   const { isNewOnHiscores, hasNegativeGains, hoursDiff, ehpDiff, ehbDiff, oldStats, newStats } = data;
 
   const expDiff =
@@ -133,6 +136,19 @@ function buildReviewMessage(data: NonNullable<NameChangeDetails['data']>): strin
 
   const oldTotalLevel = oldStats.data.skills.overall?.level;
   const newTotalLevel = newStats?.data.skills.overall?.level;
+
+  let reason = `Reason: `;
+  switch (nameChange.reviewContext?.reason) {
+    case 'transition_period_too_long':
+      reason += `Transition period between the two names is too long. (>${nameChange.reviewContext.maxHoursDiff} hours)`;
+      break;
+    case 'excessive_gains':
+      reason += `Excessive gains between the two name changes.`;
+      break;
+    case 'total_level_too_low':
+      reason += `Total level of old name is too low. (<${nameChange.reviewContext.minTotalLevel})`;
+      break;
+  }
 
   const lines: Array<string> = [];
 
@@ -144,6 +160,7 @@ function buildReviewMessage(data: NonNullable<NameChangeDetails['data']>): strin
   lines.push(`Exp difference? \`${expDiff}\``);
   lines.push(`Old total level? \`${oldTotalLevel}\``);
   lines.push(`New total level? \`${newTotalLevel}\``);
+  lines.push(`\n${reason}`);
 
   return lines.join('\n');
 }
