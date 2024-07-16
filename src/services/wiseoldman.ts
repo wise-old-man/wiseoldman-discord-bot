@@ -165,6 +165,13 @@ export async function createAPIKey(application: string, developer: string): Prom
   });
 }
 
+export async function toggleUnderAttackMode(state: boolean): Promise<boolean> {
+  return womClient.postRequest(`/under-attack-mode`, {
+    state,
+    adminPassword: env.ADMIN_PASSWORD
+  });
+}
+
 export async function claimBenefits(
   discordId: string,
   username: string,

@@ -92,7 +92,8 @@ interface BaseOption {
     | ApplicationCommandOptionType.Integer
     | ApplicationCommandOptionType.String
     | ApplicationCommandOptionType.Channel
-    | ApplicationCommandOptionType.User;
+    | ApplicationCommandOptionType.User
+    | ApplicationCommandOptionType.Boolean;
   name: string;
   description: string;
   required?: boolean;
@@ -102,6 +103,10 @@ interface BaseOption {
 interface IntegerOption extends BaseOption {
   type: ApplicationCommandOptionType.Integer;
   choices?: Array<{ name: string; value: number }>;
+}
+
+interface BooleanOption extends BaseOption {
+  type: ApplicationCommandOptionType.Boolean;
 }
 
 interface StringOption extends BaseOption {
@@ -121,7 +126,7 @@ interface UserOption extends BaseOption {
 export interface CommandConfig {
   name: string;
   description: string;
-  options?: Array<IntegerOption | StringOption | ChannelOption | UserOption>;
+  options?: Array<IntegerOption | StringOption | BooleanOption | ChannelOption | UserOption>;
 }
 
 function attachOptions(
@@ -173,6 +178,13 @@ function attachOptions(
 
         if (option.required) opt.setRequired(true);
 
+        return opt;
+      });
+    } else if (option.type === ApplicationCommandOptionType.Boolean) {
+      command.addBooleanOption(opt => {
+        opt.setName(option.name).setDescription(option.description);
+
+        if (option.required) opt.setRequired(true);
         return opt;
       });
     }
