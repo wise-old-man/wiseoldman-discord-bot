@@ -109,11 +109,7 @@ class PlayerGainedCommand extends Command {
   }
 }
 
-function buildPages(
-  displayName: string,
-  period: string,
-  gained: GetPlayerGainsResponse<PlayerDeltasMap>
-) {
+function buildPages(displayName: string, period: string, gained: GetPlayerGainsResponse) {
   const gainsList = buildGainsList(displayName, period, gained);
   const pageCount = Math.ceil(gainsList.length / GAINS_PER_PAGE);
 
@@ -137,11 +133,7 @@ function buildPages(
   return pages;
 }
 
-function buildGainsList(
-  displayName: string,
-  period: string,
-  gained: GetPlayerGainsResponse<PlayerDeltasMap>
-) {
+function buildGainsList(displayName: string, period: string, gained: GetPlayerGainsResponse) {
   const computedGains = Array.from(Object.entries(gained.data.computed))
     .filter(([, e]) => e.value.gained > 0)
     .map(([key, val]) => ({ metric: key, gained: val.value.gained }))

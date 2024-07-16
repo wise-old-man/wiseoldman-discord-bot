@@ -6,18 +6,13 @@ import {
   TextChannel,
   GatewayIntentBits,
   ChannelType,
-  PermissionFlagsBits,
-  Options
+  Options,
+  PermissionFlagsBits
 } from 'discord.js';
 import config from './config';
 import * as router from './commands/router';
-import {
-  PATREON_MODAL_ID,
-  PATREON_TRIGGER_ID,
-  handlePatreonModalSubmit,
-  handlePatreonTrigger,
-  setupPatreonTrigger
-} from './patreon-trigger';
+import { PATREON_MODAL_ID, handlePatreonModalSubmit, setupPatreonTrigger } from './patreon-trigger';
+import { handleButtonInteraction } from './utils/buttonInteractions';
 
 const CACHED_ACTIVE_USER_IDS = new Set<string>(config.discord.cache.excludeUsers);
 const CACHED_ACTIVE_GUILD_IDS = new Set<string>(config.discord.cache.excludeGuilds);
@@ -79,10 +74,9 @@ class Bot {
       this.client.user?.setActivity('bot.wiseoldman.net');
 
       // Send received interaction to the command router
-      this.client.on('interactionCreate', (interaction: Interaction) => {
-        if (interaction.isButton() && interaction.customId === PATREON_TRIGGER_ID) {
-          handlePatreonTrigger(interaction);
-          return;
+      this.client.on('interactionCreate', async (interaction: Interaction) => {
+        if (interaction.isButton()) {
+          handleButtonInteraction(interaction);
         }
 
         if (interaction.isModalSubmit() && interaction.customId === PATREON_MODAL_ID) {

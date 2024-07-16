@@ -3,12 +3,11 @@ import {
   getMetricName,
   isMetric,
   Metric,
-  parseMetricAbbreviation,
   parsePeriodExpression,
   PeriodProps
 } from '@wise-old-man/utils';
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import womClient from '../../../services/wiseoldman';
+import womClient, { parseMetricAbbreviation } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId, bold } from '../../../utils';
 

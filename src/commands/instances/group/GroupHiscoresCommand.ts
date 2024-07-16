@@ -1,12 +1,6 @@
-import {
-  formatNumber,
-  getMetricName,
-  GroupHiscoresEntry,
-  Metric,
-  parseMetricAbbreviation
-} from '@wise-old-man/utils';
+import { formatNumber, getMetricName, GroupHiscoresEntry, Metric } from '@wise-old-man/utils';
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import womClient from '../../../services/wiseoldman';
+import womClient, { parseMetricAbbreviation } from '../../../services/wiseoldman';
 import config from '../../../config';
 import { bold, Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
 
