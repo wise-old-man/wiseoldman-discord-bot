@@ -32,6 +32,23 @@ export default {
       modLogs: env.DISCORD_DEV_MODSLOGS_CHANNEL_ID || '830199626630955039',
       patreonInfo: env.DISCORD_DEV_PATREON_INFO_CHANNEL_ID || '1173680059526152272',
       flaggedPlayerReviews: env.DISCORD_DEV_FLAGGED_REVIEWS_CHANNEL_ID || '1086637095415722169'
+    },
+    cache: {
+      excludeUsers: [
+        '719720369241718837' // The bot itself
+      ],
+      excludeGuilds: [
+        env.DISCORD_DEV_GUILD_ID ?? '',
+        '679454777708380161', // The WOM Discord server
+        '719722124301828138', // Psikoi's Emoji/Test server
+        '847787694213824512', // Rorro's Emoji/Test server
+        '1159473162342371458', // Rorro's Role server 1
+        '1159473499585400923', // Rorro's Role server 2
+        '1159473768859709450', // Rorro's Role server 3
+        '1159473857237897267', // Rorro's Role server 4
+        '1159473909708636161', // Rorro's Role server 5
+        '1159473951781683240' // Rorro's Role server 6
+      ]
     }
   }
 };
