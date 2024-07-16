@@ -6,7 +6,8 @@ import {
   TextChannel,
   GatewayIntentBits,
   ChannelType,
-  PermissionFlagsBits
+  PermissionFlagsBits,
+  Options
 } from 'discord.js';
 import config from './config';
 import * as router from './commands/router';
@@ -18,11 +19,15 @@ import {
   setupPatreonTrigger
 } from './patreon-trigger';
 
+const CACHED_ACTIVE_USER_IDS = new Set<string>(config.discord.cache.excludeUsers);
+const CACHED_ACTIVE_GUILD_IDS = new Set<string>(config.discord.cache.excludeGuilds);
+
 class Bot {
   client: Client;
 
   constructor() {
     this.client = new Client({
+      shards: 'auto',
       intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
@@ -30,7 +35,39 @@ class Bot {
         GatewayIntentBits.GuildMessageReactions,
         GatewayIntentBits.DirectMessageTyping
       ],
-      shards: 'auto'
+      makeCache: Options.cacheWithLimits({
+        // Disable caching for these
+        ThreadManager: { maxSize: 0 },
+        MessageManager: { maxSize: 0 },
+        PresenceManager: { maxSize: 0 },
+        VoiceStateManager: { maxSize: 0 },
+        GuildInviteManager: { maxSize: 0 },
+        GuildStickerManager: { maxSize: 0 },
+        ThreadMemberManager: { maxSize: 0 },
+        // Keep some cached items
+        UserManager: {
+          maxSize: 1000,
+          keepOverLimit: user => CACHED_ACTIVE_USER_IDS.has(user.id)
+        },
+        GuildMemberManager: {
+          maxSize: 200,
+          keepOverLimit: member => CACHED_ACTIVE_USER_IDS.has(member.user.id)
+        },
+        GuildEmojiManager: {
+          maxSize: 1,
+          keepOverLimit: i => CACHED_ACTIVE_GUILD_IDS.has(i.guild.id)
+        }
+      }),
+      sweepers: {
+        guildMembers: {
+          interval: 60 * 60,
+          filter: () => member => !CACHED_ACTIVE_USER_IDS.has(member.user.id)
+        },
+        users: {
+          interval: 60 * 60,
+          filter: () => user => !CACHED_ACTIVE_USER_IDS.has(user.id)
+        }
+      }
     });
   }
 
