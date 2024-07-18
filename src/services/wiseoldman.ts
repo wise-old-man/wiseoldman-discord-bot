@@ -133,6 +133,16 @@ export async function deleteCompetition(competitionId: number): Promise<{ messag
   });
 }
 
+/**
+ * Send an API request to set visibility of a group to true.
+ */
+export async function setCompetitionVisible(competitionId: number): Promise<{ message: string }> {
+  return womClient.competitions.putRequest(`/competitions/${competitionId}/visibility`, {
+    visible: true,
+    adminPassword: env.ADMIN_PASSWORD
+  });
+}
+
 export async function approveNameChange(id: number): Promise<NameChange> {
   return womClient.nameChanges.postRequest(`/names/${id}/approve`, {
     adminPassword: env.ADMIN_PASSWORD

@@ -77,6 +77,7 @@ class Bot {
       this.client.on('interactionCreate', async (interaction: Interaction) => {
         if (interaction.isButton()) {
           handleButtonInteraction(interaction);
+          return;
         }
 
         if (interaction.isModalSubmit() && interaction.customId === PATREON_MODAL_ID) {
