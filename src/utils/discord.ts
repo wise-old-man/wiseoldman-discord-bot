@@ -1,4 +1,4 @@
-import { GroupRole, Metric, parseMetricAbbreviation } from '@wise-old-man/utils';
+import { GroupRole, Metric } from '@wise-old-man/utils';
 import {
   Channel,
   DMChannel,
@@ -13,6 +13,7 @@ import {
   PermissionFlagsBits
 } from 'discord.js';
 import config from '../config';
+import { parseMetricAbbreviation } from '../services/wiseoldman';
 
 export const MAX_FIELD_SIZE = 25;
 

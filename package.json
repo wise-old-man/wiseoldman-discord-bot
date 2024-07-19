@@ -46,7 +46,7 @@
     "@sapphire/discord.js-utilities": "^7.1.6",
     "@sentry/node": "^7.28.0",
     "@sentry/tracing": "^7.28.0",
-    "@wise-old-man/utils": "^3.3.1",
+    "@wise-old-man/utils": "^3.3.3",
     "canvas": "^2.6.1",
     "cors": "^2.8.5",
     "discord.js": "^14.14.1",
