@@ -13,14 +13,16 @@ class HiddenGroupCreated implements Event {
   }
 
   async execute(data: GroupListItem, client: Client) {
-    const { id, name, description, memberCount } = data['group'];
+    const { id, name, description, clanChat, memberCount } = data['group'];
 
     const actions = createModerationButtons(ModerationType.GROUP, id);
 
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
-      .setTitle(`A hidden group was created`)
-      .setDescription(`Id: ${id}\nName: ${name}\nDescription: ${description}\nMembers: ${memberCount}`)
+      .setTitle(`Hidden group created`)
+      .setDescription(
+        `Id: ${id}\nName: ${name}\nDescription: ${description}\nClan chat: ${clanChat}\nMembers: ${memberCount}`
+      )
       .setURL(encodeURL(`https://wiseoldman.net/groups/${id}`));
 
     const reviewChannel = client.channels?.cache.get(config.discord.channels.underAttackModeFeed);

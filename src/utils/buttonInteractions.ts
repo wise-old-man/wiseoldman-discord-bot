@@ -13,7 +13,6 @@ import {
   setCompetitionVisible,
   setGroupVisible
 } from '../services/wiseoldman';
-import { CommandError } from './commands';
 
 enum Actions {
   DELETE = 'delete',
@@ -29,7 +28,7 @@ export enum ModerationType {
 
 export async function handleButtonInteraction(interaction: ButtonInteraction): Promise<void> {
   const [action, type, id, confirmation] = interaction.customId.split('/');
-  console.log(type, action, id, confirmation);
+  let notFound;
 
   if (action === PATREON_TRIGGER_ID) {
     handlePatreonTrigger(interaction);
@@ -42,21 +41,21 @@ export async function handleButtonInteraction(interaction: ButtonInteraction): P
       if (confirmation === Actions.DELETE) {
         try {
           await deleteGroup(parseInt(id)).catch(e => {
-            if (e.statusCode === 404) throw new CommandError('Group not found.');
-            throw e;
+            if (e.statusCode === 404) notFound = true;
+            else throw e;
           });
         } catch (error) {
-          await interaction.reply({ ephemeral: true, content: `${error}` });
+          await interaction.reply({ ephemeral: false, content: `${error}` });
           return;
         }
       } else if (confirmation === Actions.APPROVE) {
         try {
           await setGroupVisible(parseInt(id)).catch(e => {
-            if (e.statusCode === 404) throw new CommandError('Group not found.');
-            throw e;
+            if (e.statusCode === 404) notFound = true;
+            else throw e;
           });
         } catch (error) {
-          await interaction.reply({ ephemeral: true, content: `${error}` });
+          await interaction.reply({ ephemeral: false, content: `${error}` });
           return;
         }
       }
@@ -64,46 +63,65 @@ export async function handleButtonInteraction(interaction: ButtonInteraction): P
       if (confirmation === Actions.DELETE) {
         try {
           await deleteCompetition(parseInt(id)).catch(e => {
-            if (e.statusCode === 404) throw new CommandError('Competition not found.');
-            throw e;
+            if (e.statusCode === 404) notFound = true;
+            else throw e;
           });
         } catch (error) {
-          await interaction.reply({ ephemeral: true, content: `${error}` });
+          await interaction.reply({ ephemeral: false, content: `${error}` });
           return;
         }
       } else if (confirmation === Actions.APPROVE) {
         try {
           await setCompetitionVisible(parseInt(id)).catch(e => {
-            if (e.statusCode === 404) throw new CommandError('Competition not found.');
-            throw e;
+            if (e.statusCode === 404) notFound = true;
+            else throw e;
           });
         } catch (error) {
-          await interaction.reply({ ephemeral: true, content: `${error}` });
+          await interaction.reply({ ephemeral: false, content: `${error}` });
           return;
         }
       }
     }
 
-    const message = interaction.message;
-    const oldEmbed = message.embeds[0];
-
-    const editedEmbed = new EmbedBuilder()
-      .setTitle(oldEmbed.title)
-      .setDescription(oldEmbed.description)
-      .setURL(oldEmbed.url)
-      .setFooter({
-        text: `${confirmation == Actions.DELETE ? 'Deleted ' : 'Approved '} by ${
-          interaction.user.username
-        }`
-      })
-      .setColor(confirmation == Actions.DELETE ? config.visuals.red : config.visuals.green);
-
-    interaction.update({ embeds: [editedEmbed], components: [] });
+    interaction.update({
+      embeds: [await updateEmbed(confirmation, type, interaction, notFound)],
+      components: []
+    });
   } else if (action === Actions.CANCEL) {
     await interaction.update({
       components: [createModerationButtons(type as ModerationType, parseInt(id))]
     });
   }
+}
+
+async function updateEmbed(
+  confirmation: string,
+  type: string,
+  interaction: ButtonInteraction,
+  notFound: boolean
+) {
+  const message = interaction.message;
+  const oldEmbed = message.embeds[0];
+
+  const editedEmbed = new EmbedBuilder()
+    .setTitle(oldEmbed.title)
+    .setDescription(oldEmbed.description)
+    .setURL(oldEmbed.url)
+    .setColor(confirmation == Actions.DELETE ? config.visuals.red : config.visuals.green);
+
+  notFound
+    ? editedEmbed
+        .setFooter({
+          text: `${type === ModerationType.GROUP ? 'Group' : 'Competition'} not found`
+        })
+        .setColor(config.visuals.red)
+    : editedEmbed.setFooter({
+        text: `${confirmation == Actions.DELETE ? 'Deleted ' : 'Approved '} by ${
+          interaction.user.username
+        }`
+      });
+
+  return editedEmbed;
 }
 
 export function createModerationButtons(type: ModerationType, id: number) {

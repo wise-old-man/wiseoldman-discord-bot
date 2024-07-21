@@ -12,16 +12,15 @@ class HiddenCompetitionCreated implements Event {
   }
 
   async execute(data: CompetitionListItem, client: Client) {
-    const { id, title, groupId, participantCount } = data['competition'];
-
+    const { id, title, metric, groupId, participantCount } = data['competition'];
     const actions = createModerationButtons(ModerationType.COMPETITION, id);
 
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
-      .setTitle(`A hidden competition was created`)
+      .setTitle(`Hidden competition created`)
       .setDescription(
-        `Id: ${id}\nTitle: ${title}\nParticipants: ${participantCount}\nGroup Id: ${
-          groupId ? '[' + groupId + '](https://wiseoldman.net/groups/' + groupId + ')' : groupId
+        `Id: ${id}\nTitle: ${title}\nMetric: ${metric}\nParticipants: ${participantCount}${
+          groupId ? `\nGroup Id: [${groupId}](https://wiseoldman.net/groups/${groupId})` : ''
         }`
       )
       .setURL(encodeURL(`https://wiseoldman.net/competitions/${id}`));
