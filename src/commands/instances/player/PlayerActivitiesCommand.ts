@@ -78,7 +78,7 @@ class PlayerActivitiesCommand extends Command {
 
     const embed = new EmbedBuilder()
       .setColor(config.visuals.blue)
-      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/overview/activities`))
+      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}?view=activities`))
       .setTitle(`${player.displayName} - Activity ${variant}`)
       .setImage(`attachment://${fileName}`)
       .setFooter({ text: 'Last updated' })
