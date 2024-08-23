@@ -13,8 +13,7 @@ import MembersJoined from './instances/MembersJoined';
 import MembersLeft from './instances/MembersLeft';
 import PlayerFlaggedReview from './instances/PlayerFlaggedReview';
 import MembersRolesChanged from './instances/MembersRolesChanged';
-import HiddenGroupCreated from './instances/HiddenGroupCreated';
-import HiddenCompetitionCreated from './instances/HiddenCompetitionCreated';
+import PotentialCreationSpam from './instances/PotentialCreationSpam';
 
 const EVENTS: Event[] = [
   CompetitionCreated,
@@ -29,8 +28,7 @@ const EVENTS: Event[] = [
   MemberAchievements,
   PlayerFlaggedReview,
   MembersRolesChanged,
-  HiddenGroupCreated,
-  HiddenCompetitionCreated
+  PotentialCreationSpam
 ];
 
 function onEventReceived(client: Client, payload: { type: string; data: unknown }): void {

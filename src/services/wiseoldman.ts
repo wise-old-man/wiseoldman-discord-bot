@@ -115,30 +115,10 @@ export async function deleteGroup(groupId: number): Promise<{ message: string }>
 }
 
 /**
- * Send an API request to set visibility of a group to true.
- */
-export async function setGroupVisible(groupId: number): Promise<{ message: string }> {
-  return womClient.groups.putRequest(`/groups/${groupId}/visibility`, {
-    visible: true,
-    adminPassword: env.ADMIN_PASSWORD
-  });
-}
-
-/**
  * Send an API request to delete a competition.
  */
 export async function deleteCompetition(competitionId: number): Promise<{ message: string }> {
   return womClient.competitions.deleteRequest(`/competitions/${competitionId}`, {
-    adminPassword: env.ADMIN_PASSWORD
-  });
-}
-
-/**
- * Send an API request to set visibility of a group to true.
- */
-export async function setCompetitionVisible(competitionId: number): Promise<{ message: string }> {
-  return womClient.competitions.putRequest(`/competitions/${competitionId}/visibility`, {
-    visible: true,
     adminPassword: env.ADMIN_PASSWORD
   });
 }
@@ -187,13 +167,6 @@ export async function createAPIKey(application: string, developer: string): Prom
   });
 }
 
-export async function toggleUnderAttackMode(state: boolean): Promise<boolean> {
-  return womClient.postRequest(`/under-attack-mode`, {
-    state,
-    adminPassword: env.ADMIN_PASSWORD
-  });
-}
-
 export async function claimBenefits(
   discordId: string,
   username: string,
@@ -233,6 +206,26 @@ export async function forceUpdate(username: string) {
   return womClient.players.postRequest(`/players/${username}`, {
     adminPassword: env.ADMIN_PASSWORD,
     force: true
+  });
+}
+
+/**
+ * Send an API request to approve potential spam as legitmate.
+ */
+export async function approveActions(ipHash: string): Promise<{ message: string }> {
+  return womClient.postRequest(`/approve-actions`, {
+    adminPassword: env.ADMIN_PASSWORD,
+    ipHash
+  });
+}
+
+/**
+ * Send an API request to block potential spam.
+ */
+export async function blockActions(ipHash: string): Promise<{ message: string }> {
+  return womClient.postRequest(`/block-actions`, {
+    adminPassword: env.ADMIN_PASSWORD,
+    ipHash
   });
 }
 
