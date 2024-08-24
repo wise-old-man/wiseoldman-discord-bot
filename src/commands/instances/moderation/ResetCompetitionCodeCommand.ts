@@ -4,7 +4,7 @@ import config from '../../../config';
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
 
 const DM_MESSAGE = (code: string, competitionId: number) =>
-  `Hey! Here's your new verification code for competition ${competitionId}: \n\`${code}\`\n\nPlease save it somewhere safe and be mindful of who you choose to share it with.`;
+  `Hey! Here's your new verification code for competition [${competitionId}](<https://wiseoldman.net/competitions/${competitionId}>): \n\`${code}\`\n\nPlease save it somewhere safe and be mindful of who you choose to share it with.`;
 
 const CHAT_MESSAGE = (userId: string) =>
   `Verification code successfully reset. A DM has been sent to <@${userId}>.`;
@@ -71,7 +71,7 @@ class ResetCompetitionCodeCommand extends Command {
 
     sendModLog(
       interaction.guild,
-      `Reset competition code (ID: ${competitionId}) - Sent to <@${user.id}>`,
+      `**Competition Code Reset**\nCompetition: [${competitionId}](<https://wiseoldman.net/competitions/${competitionId}>)\nSent to: <@${userId}>, \`${userId}\`, \`${user.user.username}\``,
       interaction.user
     );
   }

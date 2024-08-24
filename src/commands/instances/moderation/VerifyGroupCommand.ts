@@ -53,7 +53,7 @@ class VerifyGroupCommand extends Command {
 
     sendModLog(
       interaction.guild,
-      `Verified ${group.name} (${group.id}) - Leader: <@${userId}>`,
+      `**Verified Group**\nGroup: [(${group.id}) ${group.name}](<https://wiseoldman.net/groups/${group.id}>)\nLeader: <@${userId}>, \`${userId}\`, \`${user.user.username}\``,
       interaction.user
     );
 

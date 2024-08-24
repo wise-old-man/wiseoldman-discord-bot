@@ -48,9 +48,11 @@ class DeletePlayerCommand extends Command {
 
     sendModLog(
       interaction.guild,
-      `Deleted player (Username: ${username})`,
-      interaction.user,
-      requester?.user
+      `**Deleted User**\nUsername: \`${username}\`` +
+        (requesterId
+          ? `\nRequested by: <@${requesterId}>, \`${requesterId}\`, \`${requester?.user.username}\``
+          : ''),
+      interaction.user
     );
   }
 }

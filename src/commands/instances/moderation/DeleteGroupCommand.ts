@@ -46,7 +46,14 @@ class DeleteGroupCommand extends Command {
 
     await interaction.editReply({ embeds: [response] });
 
-    sendModLog(interaction.guild, `Deleted group (ID: ${groupId})`, interaction.user, requester?.user);
+    sendModLog(
+      interaction.guild,
+      `**Deleted Group**\nGroup: \`${groupId}\`` +
+        (requesterId
+          ? `\nRequested by: <@${requesterId}>, \`${requesterId}\`, \`${requester?.user.username}\``
+          : ''),
+      interaction.user
+    );
   }
 }
 
