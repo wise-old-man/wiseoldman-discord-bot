@@ -50,9 +50,11 @@ class ClearNameChangeHistoryCommand extends Command {
 
     sendModLog(
       interaction.guild,
-      `Cleared name change history (Username: ${username})`,
-      interaction.user,
-      requester?.user
+      `**Name Change History Cleared**\nUsername: \`${username}\`` +
+        (requesterId
+          ? `\nRequested by: <@${requesterId}>, \`${requesterId}\`, \`${requester?.user.username}\``
+          : ''),
+      interaction.user
     );
   }
 }

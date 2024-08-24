@@ -44,7 +44,7 @@ class RemoveFromGroupCommand extends Command {
     // Respond on the WOM discord chat with a success status
     const response = new EmbedBuilder()
       .setColor(config.visuals.green)
-      .setDescription(`✅ ${username} has been successfully removed from the group.`);
+      .setDescription(`✅ \`${username}\` has been successfully removed from the group.`);
 
     try {
       await removeFromGroup(groupId, username);
@@ -53,9 +53,11 @@ class RemoveFromGroupCommand extends Command {
 
       sendModLog(
         interaction.guild,
-        `Removed \`${username}\` from group (ID: ${groupId})`,
-        interaction.user,
-        requester?.user
+        `**Removed User From Group**\nUsername: \`${username}\`\nGroup: [${groupId}](<https://wiseoldman.net/groups/${groupId}>)` +
+          (requesterId
+            ? `\nRequested by: <@${requesterId}>, \`${requesterId}\`, \`${requester?.user.username}\``
+            : ''),
+        interaction.user
       );
     } catch (e) {
       response.setColor(config.visuals.red).setDescription(`${e.message}`);

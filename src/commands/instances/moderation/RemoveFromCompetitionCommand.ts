@@ -44,7 +44,7 @@ class RemoveFromCompetitionCommand extends Command {
     // Respond on the WOM discord chat with a success status
     const response = new EmbedBuilder()
       .setColor(config.visuals.green)
-      .setDescription(`✅ ${username} has been successfully removed from the competition.`);
+      .setDescription(`✅ \`${username}\` has been successfully removed from the competition.`);
 
     try {
       await removeFromCompetition(competitionId, username);
@@ -53,9 +53,11 @@ class RemoveFromCompetitionCommand extends Command {
 
       sendModLog(
         interaction.guild,
-        `Removed \`${username}\` from competition (ID: ${competitionId})`,
-        interaction.user,
-        requester?.user
+        `**Removed User From Competition**\nUsername: \`${username}\`\nCompetition: [${competitionId}](<https://wiseoldman.net/competitions/${competitionId}>)` +
+          (requesterId
+            ? `\nRequested by: <@${requesterId}>, \`${requesterId}\`, \`${requester?.user.username}\``
+            : ''),
+        interaction.user
       );
     } catch (e) {
       response.setColor(config.visuals.red).setDescription(`${e.message}`);

@@ -31,7 +31,7 @@ class CreateAPIKeyCommand extends Command {
 
   async execute(interaction: ChatInputCommandInteraction) {
     const project = interaction.options.getString('project', true);
-    const requesterId = interaction.options.getUser('requester', false)?.id;
+    const requesterId = interaction.options.getUser('requester', true).id;
 
     const requester = interaction.guild?.members.cache.find(m => m.id === requesterId);
 
@@ -49,7 +49,7 @@ class CreateAPIKeyCommand extends Command {
     });
 
     sentDM.edit(
-      `Wise Old Man API key for "${project}":\n\`${key.id}\`\n\n<https://docs.wiseoldman.net/#rate-limits--api-keys>`
+      `Wise Old Man API key for \`${project}\`:\n\`${key.id}\`\n\n<https://docs.wiseoldman.net/#rate-limits--api-keys>`
     );
 
     // Respond on the WOM discord chat with a success status
@@ -61,9 +61,8 @@ class CreateAPIKeyCommand extends Command {
 
     sendModLog(
       interaction.guild,
-      `API Key created (Project: ${project})`,
-      interaction.user,
-      requester?.user
+      `**API Key Created**\nProject: \`${project}\`\nRequested by: <@${requesterId}>, \`${requesterId}\`, \`${requester.user.username}\``,
+      interaction.user
     );
 
     // Add the "API Consumer" role to the user

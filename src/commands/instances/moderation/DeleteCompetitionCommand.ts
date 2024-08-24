@@ -48,9 +48,11 @@ class DeleteCompetitionCommand extends Command {
 
     sendModLog(
       interaction.guild,
-      `Deleted competition (ID: ${competitionId})`,
-      interaction.user,
-      requester?.user
+      `**Deleted Competition**\nCompetition: \`${competitionId}\`` +
+        (requesterId
+          ? `\nRequested by: <@${requesterId}>, \`${requesterId}\`, \`${requester?.user.username}\``
+          : ''),
+      interaction.user
     );
   }
 }
