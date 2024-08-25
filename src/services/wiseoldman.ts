@@ -214,8 +214,8 @@ export async function forceUpdate(username: string) {
  */
 export async function allowActions(ipHash: string): Promise<{ message: string }> {
   return womClient.postRequest(`/allow-actions`, {
-    adminPassword: env.ADMIN_PASSWORD,
-    ipHash
+    ipHash,
+    adminPassword: env.ADMIN_PASSWORD
   });
 }
 
@@ -224,8 +224,8 @@ export async function allowActions(ipHash: string): Promise<{ message: string }>
  */
 export async function blockActions(ipHash: string): Promise<{ message: string }> {
   return womClient.postRequest(`/block-actions`, {
-    adminPassword: env.ADMIN_PASSWORD,
-    ipHash
+    ipHash,
+    adminPassword: env.ADMIN_PASSWORD
   });
 }
 
