@@ -7,11 +7,11 @@ import {
 } from 'discord.js';
 import config from '../config';
 import { handlePatreonTrigger, PATREON_TRIGGER_ID } from '../patreon-trigger';
-import { approveActions, blockActions } from '../services/wiseoldman';
+import { allowActions, blockActions } from '../services/wiseoldman';
 
 enum Actions {
   BLOCK = 'block',
-  APPROVE = 'approve',
+  ALLOW = 'allow',
   CONFIRM = 'confirm',
   CANCEL = 'cancel'
 }
@@ -26,7 +26,7 @@ export async function handleButtonInteraction(interaction: ButtonInteraction): P
 
   if (action === PATREON_TRIGGER_ID) {
     handlePatreonTrigger(interaction);
-  } else if (action === Actions.BLOCK || action === Actions.APPROVE) {
+  } else if (action === Actions.BLOCK || action === Actions.ALLOW) {
     await interaction.update({
       components: [createConfirmationButtons(action, type as ModerationType, ipHash)]
     });
@@ -43,9 +43,9 @@ export async function handleButtonInteraction(interaction: ButtonInteraction): P
           await interaction.reply({ ephemeral: false, content: `${error}` });
           return;
         }
-      } else if (confirmation === Actions.APPROVE) {
+      } else if (confirmation === Actions.ALLOW) {
         try {
-          await approveActions(ipHash).catch(e => {
+          await allowActions(ipHash).catch(e => {
             // TODO handle exceptions correctly
             if (e.statusCode === 404) notFound = true;
             else throw e;
@@ -90,7 +90,7 @@ async function updateEmbed(
         })
         .setColor(config.visuals.red)
     : editedEmbed.setFooter({
-        text: `${confirmation == Actions.BLOCK ? 'Blocked ' : 'Approved '} by ${
+        text: `${confirmation == Actions.BLOCK ? 'Blocked ' : 'Allowed '} by ${
           interaction.user.username
         }`
       });
@@ -103,8 +103,8 @@ export function createModerationButtons(type: ModerationType, ipHash: string) {
 
   actions.addComponents(
     new ButtonBuilder()
-      .setCustomId(`${Actions.APPROVE}/${type}/${ipHash}`)
-      .setLabel('Approve')
+      .setCustomId(`${Actions.ALLOW}/${type}/${ipHash}`)
+      .setLabel('Allow')
       .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
       .setCustomId(`${Actions.BLOCK}/${type}/${ipHash}`)

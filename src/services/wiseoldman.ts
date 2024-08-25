@@ -210,10 +210,10 @@ export async function forceUpdate(username: string) {
 }
 
 /**
- * Send an API request to approve potential spam as legitmate.
+ * Send an API request to allow potential spam as legitmate.
  */
-export async function approveActions(ipHash: string): Promise<{ message: string }> {
-  return womClient.postRequest(`/approve-actions`, {
+export async function allowActions(ipHash: string): Promise<{ message: string }> {
+  return womClient.postRequest(`/allow-actions`, {
     adminPassword: env.ADMIN_PASSWORD,
     ipHash
   });
