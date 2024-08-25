@@ -7,74 +7,44 @@ import {
 } from 'discord.js';
 import config from '../config';
 import { handlePatreonTrigger, PATREON_TRIGGER_ID } from '../patreon-trigger';
-import {
-  deleteCompetition,
-  deleteGroup,
-  setCompetitionVisible,
-  setGroupVisible
-} from '../services/wiseoldman';
+import { allowActions, blockActions } from '../services/wiseoldman';
+import { CommandError } from './commands';
 
 enum Actions {
-  DELETE = 'delete',
-  APPROVE = 'approve',
+  BLOCK = 'block',
+  ALLOW = 'allow',
   CONFIRM = 'confirm',
   CANCEL = 'cancel'
 }
 
 export enum ModerationType {
-  GROUP = 'group',
-  COMPETITION = 'competition'
+  SPAM = 'spam'
 }
 
 export async function handleButtonInteraction(interaction: ButtonInteraction): Promise<void> {
-  const [action, type, id, confirmation] = interaction.customId.split('/');
-  let notFound;
+  const [action, type, ipHash, confirmation] = interaction.customId.split('/');
 
   if (action === PATREON_TRIGGER_ID) {
     handlePatreonTrigger(interaction);
-  } else if (action === Actions.DELETE || action === Actions.APPROVE) {
+  } else if (action === Actions.BLOCK || action === Actions.ALLOW) {
     await interaction.update({
-      components: [createConfirmationButtons(action, type as ModerationType, id)]
+      components: [createConfirmationButtons(action, type as ModerationType, ipHash)]
     });
   } else if (action === Actions.CONFIRM) {
-    if (type === ModerationType.GROUP) {
-      if (confirmation === Actions.DELETE) {
+    if (type === ModerationType.SPAM) {
+      if (confirmation === Actions.BLOCK) {
         try {
-          await deleteGroup(parseInt(id)).catch(e => {
-            if (e.statusCode === 404) notFound = true;
-            else throw e;
+          await blockActions(ipHash).catch(e => {
+            throw new CommandError(e.message);
           });
         } catch (error) {
           await interaction.reply({ ephemeral: false, content: `${error}` });
           return;
         }
-      } else if (confirmation === Actions.APPROVE) {
+      } else if (confirmation === Actions.ALLOW) {
         try {
-          await setGroupVisible(parseInt(id)).catch(e => {
-            if (e.statusCode === 404) notFound = true;
-            else throw e;
-          });
-        } catch (error) {
-          await interaction.reply({ ephemeral: false, content: `${error}` });
-          return;
-        }
-      }
-    } else if (type === ModerationType.COMPETITION) {
-      if (confirmation === Actions.DELETE) {
-        try {
-          await deleteCompetition(parseInt(id)).catch(e => {
-            if (e.statusCode === 404) notFound = true;
-            else throw e;
-          });
-        } catch (error) {
-          await interaction.reply({ ephemeral: false, content: `${error}` });
-          return;
-        }
-      } else if (confirmation === Actions.APPROVE) {
-        try {
-          await setCompetitionVisible(parseInt(id)).catch(e => {
-            if (e.statusCode === 404) notFound = true;
-            else throw e;
+          await allowActions(ipHash).catch(e => {
+            throw new CommandError(e.message);
           });
         } catch (error) {
           await interaction.reply({ ephemeral: false, content: `${error}` });
@@ -84,22 +54,17 @@ export async function handleButtonInteraction(interaction: ButtonInteraction): P
     }
 
     interaction.update({
-      embeds: [await updateEmbed(confirmation, type, interaction, notFound)],
+      embeds: [await updateEmbed(confirmation, type, interaction)],
       components: []
     });
   } else if (action === Actions.CANCEL) {
     await interaction.update({
-      components: [createModerationButtons(type as ModerationType, parseInt(id))]
+      components: [createModerationButtons(type as ModerationType, ipHash)]
     });
   }
 }
 
-async function updateEmbed(
-  confirmation: string,
-  type: string,
-  interaction: ButtonInteraction,
-  notFound: boolean
-) {
+async function updateEmbed(confirmation: string, type: string, interaction: ButtonInteraction) {
   const message = interaction.message;
   const oldEmbed = message.embeds[0];
 
@@ -107,34 +72,26 @@ async function updateEmbed(
     .setTitle(oldEmbed.title)
     .setDescription(oldEmbed.description)
     .setURL(oldEmbed.url)
-    .setColor(confirmation == Actions.DELETE ? config.visuals.red : config.visuals.green);
+    .setColor(confirmation == Actions.BLOCK ? config.visuals.red : config.visuals.green);
 
-  notFound
-    ? editedEmbed
-        .setFooter({
-          text: `${type === ModerationType.GROUP ? 'Group' : 'Competition'} not found`
-        })
-        .setColor(config.visuals.red)
-    : editedEmbed.setFooter({
-        text: `${confirmation == Actions.DELETE ? 'Deleted ' : 'Approved '} by ${
-          interaction.user.username
-        }`
-      });
+  editedEmbed.setFooter({
+    text: `${confirmation == Actions.BLOCK ? 'Blocked ' : 'Allowed '} by ${interaction.user.username}`
+  });
 
   return editedEmbed;
 }
 
-export function createModerationButtons(type: ModerationType, id: number) {
+export function createModerationButtons(type: ModerationType, ipHash: string) {
   const actions = new ActionRowBuilder<ButtonBuilder>();
 
   actions.addComponents(
     new ButtonBuilder()
-      .setCustomId(`${Actions.APPROVE}/${type}/${id}`)
-      .setLabel('Approve')
+      .setCustomId(`${Actions.ALLOW}/${type}/${ipHash}`)
+      .setLabel('Allow')
       .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
-      .setCustomId(`${Actions.DELETE}/${type}/${id}`)
-      .setLabel('Delete')
+      .setCustomId(`${Actions.BLOCK}/${type}/${ipHash}`)
+      .setLabel('Block')
       .setStyle(ButtonStyle.Danger)
   );
 
@@ -144,17 +101,17 @@ export function createModerationButtons(type: ModerationType, id: number) {
 function createConfirmationButtons(
   action: Actions,
   type: ModerationType,
-  id: string
+  ipHash: string
 ): ActionRowBuilder<ButtonBuilder> {
   const actions = new ActionRowBuilder<ButtonBuilder>();
 
   actions.addComponents(
     new ButtonBuilder()
-      .setCustomId(`${Actions.CONFIRM}/${type}/${id}/${action}`)
-      .setLabel(`Confirm ${action === Actions.DELETE ? 'deletion' : 'approval'}`)
-      .setStyle(action === Actions.DELETE ? ButtonStyle.Danger : ButtonStyle.Success),
+      .setCustomId(`${Actions.CONFIRM}/${type}/${ipHash}/${action}`)
+      .setLabel(`Confirm ${action === Actions.BLOCK ? 'blocking' : 'approval'}`)
+      .setStyle(action === Actions.BLOCK ? ButtonStyle.Danger : ButtonStyle.Success),
     new ButtonBuilder()
-      .setCustomId(`${Actions.CANCEL}/${type}/${id}`)
+      .setCustomId(`${Actions.CANCEL}/${type}/${ipHash}`)
       .setLabel('Cancel')
       .setStyle(ButtonStyle.Secondary)
   );
