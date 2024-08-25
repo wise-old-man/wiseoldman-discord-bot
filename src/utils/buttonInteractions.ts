@@ -8,6 +8,7 @@ import {
 import config from '../config';
 import { handlePatreonTrigger, PATREON_TRIGGER_ID } from '../patreon-trigger';
 import { allowActions, blockActions } from '../services/wiseoldman';
+import { CommandError } from './commands';
 
 enum Actions {
   BLOCK = 'block',
@@ -22,7 +23,6 @@ export enum ModerationType {
 
 export async function handleButtonInteraction(interaction: ButtonInteraction): Promise<void> {
   const [action, type, ipHash, confirmation] = interaction.customId.split('/');
-  let notFound;
 
   if (action === PATREON_TRIGGER_ID) {
     handlePatreonTrigger(interaction);
@@ -34,10 +34,8 @@ export async function handleButtonInteraction(interaction: ButtonInteraction): P
     if (type === ModerationType.SPAM) {
       if (confirmation === Actions.BLOCK) {
         try {
-          // TODO handle exceptions correctly
           await blockActions(ipHash).catch(e => {
-            if (e.statusCode === 404) notFound = true;
-            else throw e;
+            throw new CommandError(e.message);
           });
         } catch (error) {
           await interaction.reply({ ephemeral: false, content: `${error}` });
@@ -46,9 +44,7 @@ export async function handleButtonInteraction(interaction: ButtonInteraction): P
       } else if (confirmation === Actions.ALLOW) {
         try {
           await allowActions(ipHash).catch(e => {
-            // TODO handle exceptions correctly
-            if (e.statusCode === 404) notFound = true;
-            else throw e;
+            throw new CommandError(e.message);
           });
         } catch (error) {
           await interaction.reply({ ephemeral: false, content: `${error}` });
@@ -58,7 +54,7 @@ export async function handleButtonInteraction(interaction: ButtonInteraction): P
     }
 
     interaction.update({
-      embeds: [await updateEmbed(confirmation, type, interaction, notFound)],
+      embeds: [await updateEmbed(confirmation, type, interaction)],
       components: []
     });
   } else if (action === Actions.CANCEL) {
@@ -68,12 +64,7 @@ export async function handleButtonInteraction(interaction: ButtonInteraction): P
   }
 }
 
-async function updateEmbed(
-  confirmation: string,
-  type: string,
-  interaction: ButtonInteraction,
-  notFound: boolean
-) {
+async function updateEmbed(confirmation: string, type: string, interaction: ButtonInteraction) {
   const message = interaction.message;
   const oldEmbed = message.embeds[0];
 
@@ -83,17 +74,9 @@ async function updateEmbed(
     .setURL(oldEmbed.url)
     .setColor(confirmation == Actions.BLOCK ? config.visuals.red : config.visuals.green);
 
-  notFound
-    ? editedEmbed
-        .setFooter({
-          text: `${type === ModerationType.SPAM ? 'Spam' : 'N/A'} not found`
-        })
-        .setColor(config.visuals.red)
-    : editedEmbed.setFooter({
-        text: `${confirmation == Actions.BLOCK ? 'Blocked ' : 'Allowed '} by ${
-          interaction.user.username
-        }`
-      });
+  editedEmbed.setFooter({
+    text: `${confirmation == Actions.BLOCK ? 'Blocked ' : 'Allowed '} by ${interaction.user.username}`
+  });
 
   return editedEmbed;
 }
