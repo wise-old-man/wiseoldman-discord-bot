@@ -48,6 +48,7 @@ const MetricEmoji = {
   // Boss emojis
   [Metric.ABYSSAL_SIRE]: '<:abyssal_sire:729839920969023519>',
   [Metric.ALCHEMICAL_HYDRA]: '<:alchemical_hydra:729839921207967765>',
+  [Metric.ARAXXOR]: '<:araxxor:1278337345069781082>',
   [Metric.ARTIO]: '<:callisto:729839921170481153>',
   [Metric.BARROWS_CHESTS]: '<:barrows_chests:729839921484923000>',
   [Metric.BRYOPHYTA]: '<:bryophyta:730167225226362952>',
