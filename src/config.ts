@@ -4,7 +4,7 @@ import env from './env';
 export default {
   token: env.DISCORD_TOKEN,
   apiKey: env.DISCORD_BOT_API_KEY,
-  baseAPIUrl: env.BASE_API_URL || 'https://api.wiseoldman.net/v2',
+  baseAPIUrl: env.BASE_API_URL || 'https://api.wiseoldman.net/league',
   requiredPermissions: [
     PermissionFlagsBits.ManageMessages,
     PermissionFlagsBits.EmbedLinks,
