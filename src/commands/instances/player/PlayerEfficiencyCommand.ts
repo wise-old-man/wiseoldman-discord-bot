@@ -21,7 +21,7 @@ class PlayerEfficiencyCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: ChatInputCommandInteraction) {
+  async runCommandLogic(interaction: ChatInputCommandInteraction) {
     // Grab the username from the command's arguments or database alias
     const username = await getUsernameParam(interaction);
 

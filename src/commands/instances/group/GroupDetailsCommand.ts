@@ -13,7 +13,7 @@ class GroupDetailsCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+  async runCommandLogic(interaction: ChatInputCommandInteraction): Promise<void> {
     const groupId = await getLinkedGroupId(interaction);
 
     const group = await womClient.groups.getGroupDetails(groupId).catch(() => {

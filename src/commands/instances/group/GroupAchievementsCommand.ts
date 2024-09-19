@@ -21,7 +21,7 @@ class GroupAchievements extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: ChatInputCommandInteraction) {
+  async runCommandLogic(interaction: ChatInputCommandInteraction) {
     const groupId = await getLinkedGroupId(interaction);
 
     const groupAchievements = await womClient.groups

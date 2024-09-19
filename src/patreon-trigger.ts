@@ -40,7 +40,7 @@ export async function setupPatreonTrigger(client: Client) {
     new ButtonBuilder()
       .setCustomId(PATREON_TRIGGER_ID)
       .setLabel('Claim Patreon Benefits')
-      .setStyle(ButtonStyle.Success)
+      .setStyle(ButtonStyle.Primary)
   );
 
   const message = await patreonInfoChannel.send({ content, components: [actions] });

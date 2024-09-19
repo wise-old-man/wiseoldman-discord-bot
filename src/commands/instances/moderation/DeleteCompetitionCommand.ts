@@ -28,7 +28,7 @@ class DeleteCompetitionCommand extends Command {
     this.moderation = true;
   }
 
-  async execute(interaction: ChatInputCommandInteraction) {
+  async runCommandLogic(interaction: ChatInputCommandInteraction) {
     const competitionId = interaction.options.getInteger('id', true);
     const requesterId = interaction.options.getUser('requester', false)?.id;
 

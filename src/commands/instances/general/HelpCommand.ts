@@ -21,15 +21,7 @@ const LINE_PERMS = `If some commands don't seem to be responding, it might be a 
 
 const CONFIG: CommandConfig = {
   name: 'help',
-  description: 'Ask for help.',
-  options: [
-    {
-      type: ApplicationCommandOptionType.String,
-      name: 'category',
-      description: 'What do you need help with?',
-      autocomplete: true
-    }
-  ]
+  description: 'Ask for help.'
 };
 
 class HelpCommand extends Command {
@@ -37,7 +29,7 @@ class HelpCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: ChatInputCommandInteraction) {
+  async runCommandLogic(interaction: ChatInputCommandInteraction) {
     if (!interaction.inGuild()) {
       throw new CommandError('This command can only be used in a Discord server.');
     }
@@ -53,24 +45,6 @@ class HelpCommand extends Command {
     }
 
     const { botChannelId, groupId, guildId } = server;
-
-    const category = interaction.options.getString('category');
-
-    if (category) {
-      const command = CUSTOM_COMMANDS.find(c => c.command === category);
-
-      if (!command) {
-        throw new CommandError('Invalid command.');
-      }
-
-      const { image, message } = command;
-
-      await interaction.editReply({
-        content: image === undefined ? message : message + '\n' + image
-      });
-
-      return;
-    }
 
     let group: GroupDetails | null = null;
 
