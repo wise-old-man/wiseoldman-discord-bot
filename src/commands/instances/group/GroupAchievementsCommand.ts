@@ -43,7 +43,7 @@ class GroupAchievements extends Command {
       .setColor(config.visuals.blue)
       .setTitle('Recent Group Achievements')
       .setDescription(achievementList)
-      .setURL(`https:/league.wiseoldman.net/groups/${groupId}/achievements/`);
+      .setURL(`https://league.wiseoldman.net/groups/${groupId}/achievements/`);
 
     await interaction.editReply({ embeds: [response] });
   }
