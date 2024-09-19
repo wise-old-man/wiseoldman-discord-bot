@@ -32,7 +32,7 @@ class CompetitionStarted implements Event {
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`📢 ${title} has started!`)
-      .setURL(`https://wiseoldman.net/competitions/${id}`)
+      .setURL(`https://league.wiseoldman.net/competitions/${id}`)
       .addFields(fields);
 
     await propagateMessage(client, groupId, NotificationType.COMPETITION_STATUS, message);

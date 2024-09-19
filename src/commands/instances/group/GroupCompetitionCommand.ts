@@ -73,7 +73,7 @@ class GroupCompetitionCommand extends Command {
     const response = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(competition.title)
-      .setURL(`https://wiseoldman.net/competitions/${competition.id}/`)
+      .setURL(`https://league.wiseoldman.net/competitions/${competition.id}/`)
       .setDescription(buildContent(competition))
       .setTimestamp(getFooterDate(competition))
       .setFooter({ text: getFooterLabel(competition) });

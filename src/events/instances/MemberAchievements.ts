@@ -33,7 +33,7 @@ class MemberAchievements implements Event {
           .map(({ metric, name }) => `${player.displayName} - ${getEmoji(metric)} ${name}`)
           .join('\n')
       )
-      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements`));
+      .setURL(encodeURL(`https://league.wiseoldman.net/players/${player.displayName}/achievements`));
 
     await propagateMessage(client, groupId, NotificationType.MEMBER_ACHIEVEMENTS, message);
   }

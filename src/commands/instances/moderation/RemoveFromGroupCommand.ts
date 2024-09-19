@@ -53,7 +53,7 @@ class RemoveFromGroupCommand extends Command {
 
       sendModLog(
         interaction.guild,
-        `**Removed User From Group**\nUsername: \`${username}\`\nGroup: [${groupId}](<https://wiseoldman.net/groups/${groupId}>)` +
+        `**Removed User From Group**\nUsername: \`${username}\`\nGroup: [${groupId}](<https://league.wiseoldman.net/groups/${groupId}>)` +
           (requesterId
             ? `\nRequested by: <@${requesterId}>, \`${requesterId}\`, \`${requester?.user.username}\``
             : ''),

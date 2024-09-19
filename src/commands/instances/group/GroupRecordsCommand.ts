@@ -62,7 +62,9 @@ class GroupRecordsCommand extends Command {
       .setColor(config.visuals.blue)
       .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} records (${period})`)
       .setDescription(recordsList)
-      .setURL(`https://wiseoldman.net/groups/${groupId}/records?period=${period}&metric=${metric}`)
+      .setURL(
+        `https://league.wiseoldman.net/groups/${groupId}/records?period=${period}&metric=${metric}`
+      )
       .setFooter({ text: `Tip: Try /group records metric: zulrah period: day` });
 
     await interaction.editReply({ embeds: [response] });

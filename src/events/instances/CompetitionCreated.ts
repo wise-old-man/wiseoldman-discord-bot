@@ -33,7 +33,7 @@ class CompetitionCreated implements Event {
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`🎉 New competition created!`)
-      .setURL(`https://wiseoldman.net/competitions/${id}`)
+      .setURL(`https://league.wiseoldman.net/competitions/${id}`)
       .addFields(fields)
       .setFooter({ text: 'Starts at' })
       .setTimestamp(new Date(startsAt));

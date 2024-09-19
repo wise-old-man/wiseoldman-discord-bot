@@ -64,7 +64,7 @@ class PlayerAchievementsCommand extends Command {
 
     const embed = new EmbedBuilder()
       .setColor(config.visuals.blue)
-      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements/`))
+      .setURL(encodeURL(`https://league.wiseoldman.net/players/${player.displayName}/achievements/`))
       .setTitle(`${player.displayName} - Recent achievements`)
       .setImage(`attachment://${fileName}`)
       .setFooter({ text: 'Last updated' })

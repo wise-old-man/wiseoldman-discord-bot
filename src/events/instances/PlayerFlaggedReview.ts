@@ -267,7 +267,7 @@ class PlayerFlaggedReview implements Event {
 
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
-      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
+      .setURL(encodeURL(`https://league.wiseoldman.net/players/${player.displayName}`))
       .setTitle(`"${player.displayName}" flagged for review`)
       .setDescription(lines.join('\n'));
 

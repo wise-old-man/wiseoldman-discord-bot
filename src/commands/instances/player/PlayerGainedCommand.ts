@@ -86,7 +86,9 @@ class PlayerGainedCommand extends Command {
       const response = pages[0]
         .setColor(config.visuals.blue)
         .setTitle(`${player.displayName} gains (${period})`)
-        .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained?${urlPeriod}`))
+        .setURL(
+          encodeURL(`https://league.wiseoldman.net/players/${player.displayName}/gained?${urlPeriod}`)
+        )
         .setFooter({ text: footer });
 
       await interaction.editReply({ embeds: [response] });
@@ -96,7 +98,9 @@ class PlayerGainedCommand extends Command {
     const embedTemplate = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`${player.displayName} gains (${period})`)
-      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/gained?${urlPeriod}`))
+      .setURL(
+        encodeURL(`https://league.wiseoldman.net/players/${player.displayName}/gained?${urlPeriod}`)
+      )
       .setFooter({ text: footer });
 
     const paginatedMessage = createPaginatedEmbed(embedTemplate, 120_000);

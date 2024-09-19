@@ -29,7 +29,7 @@ class GroupMembersCommand extends Command {
     const embedTemplate = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`${group.name} members list`)
-      .setURL(`https://wiseoldman.net/groups/${groupId}`);
+      .setURL(`https://league.wiseoldman.net/groups/${groupId}`);
 
     if (group.memberships.length > 500) {
       embedTemplate.setFooter({ text: 'Click the title to view full list' });

@@ -49,7 +49,7 @@ class ConfigGroupCommand extends Command {
       .setDescription(`All notifications and commands will be in reference to **${group.name}**`)
       .addFields({
         name: 'Page URL',
-        value: `https://wiseoldman.net/groups/${groupId}`
+        value: `https://league.wiseoldman.net/groups/${groupId}`
       });
 
     await interaction.editReply({ embeds: [response] });

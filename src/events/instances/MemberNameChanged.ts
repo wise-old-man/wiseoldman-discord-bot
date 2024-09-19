@@ -26,7 +26,7 @@ class MemberNameChanged implements Event {
       .setColor(config.visuals.blue)
       .setTitle('Member Name Changed')
       .setDescription(`\`${previousName}\` → \`${player.displayName}\``)
-      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
+      .setURL(encodeURL(`https://league.wiseoldman.net/players/${player.displayName}`));
 
     await propagateMessage(client, groupId, NotificationType.MEMBER_NAME_CHANGED, message);
   }

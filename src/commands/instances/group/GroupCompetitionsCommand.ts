@@ -50,7 +50,7 @@ class GroupCompetitionsCommand extends Command {
       const response = pages[0]
         .setColor(config.visuals.blue)
         .setTitle(`${group.name} - Most Recent Competitions`)
-        .setURL(`https://wiseoldman.net/groups/${groupId}/competitions`);
+        .setURL(`https://league.wiseoldman.net/groups/${groupId}/competitions`);
 
       await interaction.editReply({ embeds: [response] });
       return;
@@ -59,7 +59,7 @@ class GroupCompetitionsCommand extends Command {
     const embedTemplate = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`${group.name} - Most Recent Competitions`)
-      .setURL(`https://wiseoldman.net/groups/${groupId}/competitions`);
+      .setURL(`https://league.wiseoldman.net/groups/${groupId}/competitions`);
 
     const paginatedMessage = createPaginatedEmbed(embedTemplate, 120_000);
 

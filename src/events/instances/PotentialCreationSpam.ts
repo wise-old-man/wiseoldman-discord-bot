@@ -27,14 +27,13 @@ class HiddenGroupCreated implements Event {
     let description = `ipHash: ${ipHash}\nGroups created: ${groups.length}\nCompetitions created: ${competitions.length}\n\nSample:`;
 
     for (const group of getRandomSample(groups)) {
-      description += `\n[${group.id}](https://wiseoldman.net/groups/${group.id}): ${group.name.slice(
-        0,
-        50
-      )}`;
+      description += `\n[${group.id}](https://league.wiseoldman.net/groups/${
+        group.id
+      }): ${group.name.slice(0, 50)}`;
     }
 
     for (const competition of getRandomSample(competitions)) {
-      description += `\n[${competition.id}](https://wiseoldman.net/competitions/${
+      description += `\n[${competition.id}](https://league.wiseoldman.net/competitions/${
         competition.id
       }): ${competition.title.slice(0, 50)}`;
     }

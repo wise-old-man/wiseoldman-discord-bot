@@ -53,7 +53,7 @@ class RemoveFromCompetitionCommand extends Command {
 
       sendModLog(
         interaction.guild,
-        `**Removed User From Competition**\nUsername: \`${username}\`\nCompetition: [${competitionId}](<https://wiseoldman.net/competitions/${competitionId}>)` +
+        `**Removed User From Competition**\nUsername: \`${username}\`\nCompetition: [${competitionId}](<https://league.wiseoldman.net/competitions/${competitionId}>)` +
           (requesterId
             ? `\nRequested by: <@${requesterId}>, \`${requesterId}\`, \`${requester?.user.username}\``
             : ''),
