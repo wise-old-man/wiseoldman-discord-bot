@@ -43,7 +43,7 @@ class PlayerSetUsernameCommand extends Command {
     const response = new EmbedBuilder()
       .setColor(config.visuals.green)
       .setTitle('Player alias updated!')
-      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
+      .setURL(encodeURL(`https://league.wiseoldman.net/players/${player.displayName}`))
       .setDescription(`<@${userId}> is now associated with the username \`${player.displayName}\`.`)
       .setFooter({ text: `They can now call any player command without including the username.` });
 

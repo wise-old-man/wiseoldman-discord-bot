@@ -36,10 +36,10 @@ function buildMessage(data: MembersLeftData) {
     return new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(title)
-      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
+      .setURL(encodeURL(`https://league.wiseoldman.net/players/${player.displayName}`));
   }
 
-  const url = `https://wiseoldman.net/groups/${groupId}`;
+  const url = `https://league.wiseoldman.net/groups/${groupId}`;
   const title = `👋 ${players.length} Members have left the group`;
   const content = players.map(p => `\`${p.displayName}\``).join(', ');
 

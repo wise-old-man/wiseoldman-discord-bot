@@ -25,7 +25,7 @@ class MemberHardcoreDied implements Event {
       .setColor(config.visuals.blue)
       .setTitle(`🪦 Hardcore Ironman Member Died`)
       .setDescription(`\`${player.displayName}\` has died and is now a regular Ironman.`)
-      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
+      .setURL(encodeURL(`https://league.wiseoldman.net/players/${player.displayName}`));
 
     await propagateMessage(client, groupId, NotificationType.MEMBER_HCIM_DIED, message);
   }

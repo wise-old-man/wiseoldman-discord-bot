@@ -121,7 +121,7 @@ function buildJoinMessage() {
       },
       {
         name: 'Main Website',
-        value: 'https://wiseoldman.net'
+        value: 'https://league.wiseoldman.net'
       }
     ]);
 }

@@ -36,7 +36,7 @@ class CompetitionEnded implements Event {
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`📢 ${title} has ended!`)
-      .setURL(`https://wiseoldman.net/competitions/${id}`)
+      .setURL(`https://league.wiseoldman.net/competitions/${id}`)
       .addFields([
         {
           name: isTeamCompetition ? 'Top Teams' : 'Top participants',

@@ -23,7 +23,7 @@ class GroupDetailsCommand extends Command {
     const response = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(group.name)
-      .setURL(`https://wiseoldman.net/groups/${group.id}`)
+      .setURL(`https://league.wiseoldman.net/groups/${group.id}`)
       .addFields([
         { name: 'Clan chat', value: group.clanChat || '---' },
         { name: 'Members', value: group.memberCount?.toString() || '0' },

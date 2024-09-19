@@ -67,7 +67,7 @@ class GroupGainedCommand extends Command {
     const response = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} gains (${period})`)
-      .setURL(`https://wiseoldman.net/groups/${groupId}/gained?${urlPeriod}&metric=${metric}`)
+      .setURL(`https://league.wiseoldman.net/groups/${groupId}/gained?${urlPeriod}&metric=${metric}`)
       .setFooter({ text: `Tip: Try /group gained metric: zulrah period: day` })
       .setDescription(gainedList);
 

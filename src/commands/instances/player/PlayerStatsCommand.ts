@@ -110,7 +110,7 @@ class PlayerStatsCommand extends Command {
 
     const embed = new EmbedBuilder()
       .setColor(config.visuals.blue)
-      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`))
+      .setURL(encodeURL(`https://league.wiseoldman.net/players/${player.displayName}`))
       .setTitle(`${player.displayName} (Combat ${player.combatLevel}) - ${variant}`)
       .setImage(`attachment://${fileName}`)
       .setFooter({ text: 'Last updated' })
