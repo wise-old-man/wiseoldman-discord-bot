@@ -60,7 +60,7 @@ class ConfigNotificationsCommand extends Command {
     this.requiresAdmin = true;
   }
 
-  async execute(interaction: ChatInputCommandInteraction) {
+  async runCommandLogic(interaction: ChatInputCommandInteraction) {
     const guildId = interaction.guild?.id || '';
 
     if (!guildId || guildId.length === 0) {

@@ -4,7 +4,8 @@ import {
   SlashCommandBuilder,
   ApplicationCommandOptionType,
   ChatInputCommandInteraction,
-  ApplicationCommandOptionAllowedChannelTypes
+  ApplicationCommandOptionAllowedChannelTypes,
+  EmbedBuilder
 } from 'discord.js';
 import { getServer, getUsername } from '../services/prisma';
 
@@ -47,6 +48,23 @@ export class Command implements BaseCommand {
   }
 
   async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+    if (
+      (interaction.commandName === 'config' &&
+        interaction.options.getSubcommand() === 'notifications') ||
+      interaction.commandName === 'help'
+    ) {
+      await this.runCommandLogic(interaction);
+      return;
+    }
+    const infoEmbed = new EmbedBuilder()
+      .setTitle('Command Disabled')
+      .setDescription(
+        'Commands are disabled because leagues is not live yet. **Leagues V: Raging Echoes** is coming late November. You can read more about it [here](<https://secure.runescape.com/m=news/leagues-v-raging-echoes---summer-summit-2024?oldschool=1>).\n\nFor now, only the `/config notifications` and `/help` commands are enabled.\n\nYou can join our [Discord server](<https://wiseoldman.net/discord>) to stay up to date with the latest Wise Old Man news.'
+      );
+    await interaction.followUp({ embeds: [infoEmbed] });
+  }
+
+  protected async runCommandLogic(interaction: ChatInputCommandInteraction): Promise<void> {
     throw new Error(`Command not implemented - ${interaction.commandName}`);
   }
 }

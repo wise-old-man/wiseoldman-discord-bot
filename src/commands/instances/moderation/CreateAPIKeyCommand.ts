@@ -29,7 +29,7 @@ class CreateAPIKeyCommand extends Command {
     this.moderation = true;
   }
 
-  async execute(interaction: ChatInputCommandInteraction) {
+  async runCommandLogic(interaction: ChatInputCommandInteraction) {
     const project = interaction.options.getString('project', true);
     const requesterId = interaction.options.getUser('requester', true).id;
 

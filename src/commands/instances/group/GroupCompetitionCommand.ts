@@ -54,7 +54,7 @@ class GroupCompetitionCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: ChatInputCommandInteraction) {
+  async runCommandLogic(interaction: ChatInputCommandInteraction) {
     const groupId = await getLinkedGroupId(interaction);
 
     // Extract the "status" param, or fallback to "ongoing"

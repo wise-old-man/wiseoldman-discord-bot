@@ -102,7 +102,9 @@ class Bot {
         if (openChannel) openChannel.send({ embeds: [buildJoinMessage()] });
       });
 
-      setupPatreonTrigger(this.client);
+      // TODO: Enable this when the leagues website is up and running so people can claim benefits
+      // on the leagues site.
+      // setupPatreonTrigger(this.client);
 
       console.log('Bot is running.');
     });
@@ -116,7 +118,7 @@ class Bot {
 function buildJoinMessage() {
   return new EmbedBuilder()
     .setColor(config.visuals.blue)
-    .setTitle(`❤️ Thanks for adding me!`)
+    .setTitle(`❤️ Thanks for adding the Leagues version of me!`)
     .setDescription(
       "You can now start using the Wise Old Man bot, but there's some quick configurations required if you want to take full advantage of all the features.\nCheck the bot website below, in it you will find the configuration commands."
     )

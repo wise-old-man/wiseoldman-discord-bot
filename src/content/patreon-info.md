@@ -1,6 +1,6 @@
-To keep Wise Old Man free without any ads, we depend on generous support from our patrons to cover our servers costs. Please consider supporting us.
+## Leagues: Raging Echoes Patreon benefits
 
-<https://wiseoldman.net/patreon>
+If you are a Patreon supporter already, you **DO NOT** need to resubscribe. You can just claim benefits on the leagues version of the website by using the button below.
 
 # Benefits
 

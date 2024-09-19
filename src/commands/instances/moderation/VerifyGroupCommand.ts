@@ -29,7 +29,7 @@ class VerifyGroupCommand extends Command {
     this.moderation = true;
   }
 
-  async execute(interaction: ChatInputCommandInteraction) {
+  async runCommandLogic(interaction: ChatInputCommandInteraction) {
     const groupId = interaction.options.getInteger('id', true);
     const userId = interaction.options.getUser('user', true).id;
 

@@ -28,7 +28,7 @@ class DeletePlayerCommand extends Command {
     this.moderation = true;
   }
 
-  async execute(interaction: ChatInputCommandInteraction) {
+  async runCommandLogic(interaction: ChatInputCommandInteraction) {
     const username = interaction.options.getString('username', true);
     const requesterId = interaction.options.getUser('requester', false)?.id;
 

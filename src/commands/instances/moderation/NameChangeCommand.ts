@@ -34,7 +34,7 @@ class NameChangeCommand extends Command {
     this.moderation = true;
   }
 
-  async execute(interaction: ChatInputCommandInteraction) {
+  async runCommandLogic(interaction: ChatInputCommandInteraction) {
     const nameChangeId = interaction.options.getInteger('name_change_id', true);
 
     const reviewData = await fetchNameChangeDetails(nameChangeId).catch(e => {

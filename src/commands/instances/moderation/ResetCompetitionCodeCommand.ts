@@ -35,7 +35,7 @@ class ResetCompetitionCodeCommand extends Command {
     this.moderation = true;
   }
 
-  async execute(interaction: ChatInputCommandInteraction) {
+  async runCommandLogic(interaction: ChatInputCommandInteraction) {
     const competitionId = interaction.options.getInteger('id', true);
     const userId = interaction.options.getUser('user', true).id;
 

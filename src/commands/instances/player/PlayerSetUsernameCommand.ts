@@ -22,7 +22,7 @@ class PlayerSetUsernameCommand extends Command {
     super(CONFIG);
   }
 
-  async execute(interaction: ChatInputCommandInteraction) {
+  async runCommandLogic(interaction: ChatInputCommandInteraction) {
     const username = interaction.options.getString('username', true);
     const userId = interaction.user.id;
 

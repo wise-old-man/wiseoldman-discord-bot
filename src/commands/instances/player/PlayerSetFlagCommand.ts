@@ -30,7 +30,7 @@ class PlayerSetFlagCommand extends Command {
     this.private = true;
   }
 
-  async execute(interaction: ChatInputCommandInteraction) {
+  async runCommandLogic(interaction: ChatInputCommandInteraction) {
     const username = interaction.options.getString('username', true);
     const countryCodeInput = interaction.options.getString('country', true);
     const countryCode = countryCodeInput === 'null' ? null : countryCodeInput;
