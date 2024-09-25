@@ -48,7 +48,7 @@ const MetricEmoji = {
   // Boss emojis
   [Metric.ABYSSAL_SIRE]: '<:abyssal_sire:729839920969023519>',
   [Metric.ALCHEMICAL_HYDRA]: '<:alchemical_hydra:729839921207967765>',
-  [Metric.AMOXLIATL]: '<:amoxliatl:1288583172342288515>',
+  [Metric.AMOXLIATL]: '<:amoxliatl:1288593574400622644>',
   [Metric.ARAXXOR]: '<:araxxor:1278337345069781082>',
   [Metric.ARTIO]: '<:callisto:729839921170481153>',
   [Metric.BARROWS_CHESTS]: '<:barrows_chests:729839921484923000>',
@@ -93,7 +93,7 @@ const MetricEmoji = {
   [Metric.TEMPOROSS]: '<:tempoross:823292463456059452>',
   [Metric.THE_GAUNTLET]: '<:the_gauntlet:729840085473820805>',
   [Metric.THE_CORRUPTED_GAUNTLET]: '<:the_corrupted_gauntlet:729840085159247873>',
-  [Metric.THE_HUEYCOATL]: '<:the_hueycoatl:1288583174217269358>',
+  [Metric.THE_HUEYCOATL]: '<:the_hueycoatl:1288593575969292423>',
   [Metric.THE_LEVIATHAN]: '<:the_leviathan:1133832625006592021>',
   [Metric.THE_WHISPERER]: '<:the_whisperer:1133832628114567242>',
   [Metric.THEATRE_OF_BLOOD]: '<:theatre_of_blood:729840085406711819>',
