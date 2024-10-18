@@ -4,7 +4,8 @@ import {
   ChannelType,
   ChatInputCommandInteraction,
   EmbedBuilder,
-  PermissionFlagsBits
+  PermissionFlagsBits,
+  PermissionsBitField
 } from 'discord.js';
 import config from '../../../config';
 import { updateBotDefaultChannel, updateNotificationPreferences } from '../../../services/prisma';
@@ -39,7 +40,7 @@ const CONFIG: CommandConfig = {
       required: true,
       name: 'notification_channel',
       description: 'The channel to which notifications are sent.',
-      channelType: ChannelType.GuildText
+      channelTypes: [ChannelType.GuildText, ChannelType.GuildAnnouncement]
     },
     {
       type: ApplicationCommandOptionType.String,
@@ -80,14 +81,25 @@ class ConfigNotificationsCommand extends Command {
       const channelPermissions =
         channel.client.user !== null ? channel.permissionsFor(channel.client.user) : null;
 
-      if (channelPermissions !== null && !channelPermissions.has(PermissionFlagsBits.ViewChannel)) {
-        throw new CommandError(`Error: The bot does not have access to <#${channel.id}>.`);
+      if (channelPermissions !== null) {
+        if (!channelPermissions.has(PermissionFlagsBits.ViewChannel)) {
+          throw new CommandError(
+            `Error: The bot does not have \`View Channel\` permissions for <#${channel.id}>.`
+          );
+        } else if (!channelPermissions.has(PermissionFlagsBits.SendMessages)) {
+          throw new CommandError(
+            `Error: The bot does not have \`Send Messages\` permissions for <#${channel.id}>.`
+          );
+        }
       }
 
       const missingPermissions = getMissingPermissions(channel);
 
       if (missingPermissions.length > 0) {
-        const missingPermissionsList = missingPermissions.map(p => `\`${p}\``).join(', ');
+        const missingPermissionsList = new PermissionsBitField(missingPermissions)
+          .toArray()
+          .map(p => `\`${p}\``)
+          .join(', ');
 
         throw new CommandError(
           `Error: The bot is missing the following permissions on <#${channel.id}>: \n\n${missingPermissionsList}`

@@ -1,11 +1,9 @@
 import { GroupRole, Metric } from '@wise-old-man/utils';
 import {
   Channel,
-  DMChannel,
   Guild,
   GuildMember,
   EmbedBuilder,
-  NewsChannel,
   PermissionResolvable,
   TextChannel,
   User,
@@ -418,21 +416,11 @@ export function getMissingPermissions(channel: TextChannel) {
   });
 }
 
-export function isChannelSendable(channel: Channel | undefined | null): channel is TextChannel {
-  if (!channel) return false;
-  if (channel.type !== ChannelType.GuildText) return false;
-  if (!('guild' in channel)) return true;
+export function isChannelSendable(channel: Channel): channel is TextChannel {
+  if (!channel || channel.isDMBased()) return false;
 
-  const canView = clientUserPermissions(channel as TextChannel)?.has(PermissionFlagsBits.ViewChannel);
-
-  if (
-    !(channel instanceof DMChannel) &&
-    !(channel instanceof NewsChannel) &&
-    !(channel instanceof TextChannel) &&
-    canView
-  ) {
+  if (channel.type !== ChannelType.GuildAnnouncement && channel.type !== ChannelType.GuildText)
     return false;
-  }
 
   return true;
 }
