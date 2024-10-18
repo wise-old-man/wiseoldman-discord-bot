@@ -1,4 +1,4 @@
-import { ChannelType, Client, EmbedBuilder, TextChannel } from 'discord.js';
+import { ChannelType, Client, EmbedBuilder } from 'discord.js';
 import { getServers, getNotificationPreferences } from '../services/prisma';
 
 export const NotificationType = {
@@ -53,7 +53,7 @@ export async function propagateMessage(
       const channel = await client.channels.fetch(targetChannelId);
 
       if (!channel) return;
-      if (!((channel): channel is TextChannel => channel.type === ChannelType.GuildText)(channel))
+      if (channel.type !== ChannelType.GuildText && channel.type !== ChannelType.GuildAnnouncement)
         return;
 
       try {

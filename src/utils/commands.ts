@@ -116,7 +116,7 @@ interface StringOption extends BaseOption {
 
 interface ChannelOption extends BaseOption {
   type: ApplicationCommandOptionType.Channel;
-  channelType?: ApplicationCommandOptionAllowedChannelTypes;
+  channelTypes?: Array<ApplicationCommandOptionAllowedChannelTypes>;
 }
 
 interface UserOption extends BaseOption {
@@ -168,7 +168,7 @@ function attachOptions(
         opt.setName(option.name).setDescription(option.description);
 
         if (option.required) opt.setRequired(true);
-        if (option.channelType) opt.addChannelTypes(option.channelType);
+        if (option.channelTypes) opt.addChannelTypes(...option.channelTypes);
 
         return opt;
       });
