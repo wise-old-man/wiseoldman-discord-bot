@@ -39,7 +39,7 @@ function buildMessage(data: MembersLeftData) {
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
   }
 
-  const url = `https://wiseoldman.net/groups/${groupId}`;
+  const url = `https://wiseoldman.net/groups/${groupId}?dialog=group-activity`;
   const title = `👋 ${players.length} Members have left the group`;
   const content = players.map(p => `\`${p.displayName}\``).join(', ');
 
