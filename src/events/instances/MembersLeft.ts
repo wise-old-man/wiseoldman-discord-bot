@@ -36,7 +36,7 @@ function buildMessage(data: MembersLeftData) {
     return new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(title)
-      .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
+      .setURL(encodeURL(`https://wiseoldman.net/groups/${groupId}?dialog=group-activity`));
   }
 
   const url = `https://wiseoldman.net/groups/${groupId}?dialog=group-activity`;
