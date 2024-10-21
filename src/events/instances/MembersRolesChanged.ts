@@ -47,14 +47,14 @@ function buildMessage(data: MemberActivity) {
   }
 
   if (members.length > 10) {
-    content += `\n[+${members.length - 10} more changes](https://wiseoldman.net/groups/${groupId})`;
+    content += `\n[+${members.length - 10} more changes](https://wiseoldman.net/groups/${groupId}?dialog=group-activity)`;
   }
 
   const title = `${members.length} Member ${members.length === 1 ? 'role' : 'roles'} changed`;
 
   return new EmbedBuilder()
     .setColor(config.visuals.blue)
-    .setURL(`https://wiseoldman.net/groups/${groupId}`)
+    .setURL(`https://wiseoldman.net/groups/${groupId}?dialog=group-activity`)
     .setTitle(title)
     .setDescription(content);
 }

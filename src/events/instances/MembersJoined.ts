@@ -43,7 +43,7 @@ function buildMessage(data: MembersJoinedData) {
   }
 
   if (members.length > 10) {
-    content += `\n[+${members.length - 10} more changes](https://wiseoldman.net/groups/${groupId})`;
+    content += `\n[+${members.length - 10} more changes](https://wiseoldman.net/groups/${groupId}?dialog=group-activity)`;
   }
 
   const title = `🎉 ${members.length} New group ${members.length === 1 ? 'member' : 'members'} joined`;
@@ -51,7 +51,7 @@ function buildMessage(data: MembersJoinedData) {
   return new EmbedBuilder()
     .setColor(config.visuals.blue)
     .setTitle(title)
-    .setURL(`https://wiseoldman.net/groups/${groupId}`)
+    .setURL(`https://wiseoldman.net/groups/${groupId}?dialog=group-activity`)
     .setDescription(content);
 }
 
