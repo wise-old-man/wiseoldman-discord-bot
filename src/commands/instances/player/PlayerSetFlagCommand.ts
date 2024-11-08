@@ -17,7 +17,7 @@ const CONFIG: CommandConfig = {
     {
       type: ApplicationCommandOptionType.String,
       name: 'country',
-      description: 'Country name.',
+      description: 'Country name. Start typing to search.',
       required: true,
       autocomplete: true
     }
@@ -32,7 +32,8 @@ class PlayerSetFlagCommand extends Command {
 
   async execute(interaction: ChatInputCommandInteraction) {
     const username = interaction.options.getString('username', true);
-    const countryCode = interaction.options.getString('country', true);
+    const countryCodeInput = interaction.options.getString('country', true);
+    const countryCode = countryCodeInput === 'null' ? null : countryCodeInput;
 
     if (
       interaction.guildId !== config.discord.guildId ||
@@ -44,7 +45,7 @@ class PlayerSetFlagCommand extends Command {
       );
     }
 
-    if (!isCountry(countryCode)) {
+    if (countryCode !== null && !isCountry(countryCode)) {
       throw new CommandError(
         `Invalid country. You must supply a valid country name or code, according to the ISO 3166-1 standard.\
          Please see: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2`
@@ -59,9 +60,11 @@ class PlayerSetFlagCommand extends Command {
       ? `${countryCodeEmoji(countryCode)} Player flag updated!`
       : `❌ Failed to update flag`;
 
-    const description = hasUpdated
-      ? `${interaction.user} changed \`${username}\`'s country to ${CountryProps[countryCode].name}`
-      : `Failed to update flag.`;
+    const description = !hasUpdated
+      ? `Failed to update flag.`
+      : countryCode === null
+      ? `${interaction.user} unset \`${username}\`'s country`
+      : `${interaction.user} changed \`${username}\`'s country to ${CountryProps[countryCode].name}`;
 
     const embed = new EmbedBuilder()
       .setColor(hasUpdated ? config.visuals.green : config.visuals.red)
@@ -69,7 +72,7 @@ class PlayerSetFlagCommand extends Command {
       .setDescription(description)
       .addFields([
         { name: 'Username', value: username },
-        { name: 'Country Code:', value: countryCode }
+        { name: 'Country Code:', value: countryCode !== null ? countryCode : 'None' }
       ]);
 
     if (!hasUpdated) {
