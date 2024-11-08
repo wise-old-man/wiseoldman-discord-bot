@@ -182,7 +182,7 @@ export async function claimBenefits(
 /**
  * Send an API request attempting to update a player's country
  */
-export async function updateCountry(username: string, country: string): Promise<Player> {
+export async function updateCountry(username: string, country: string | null): Promise<Player> {
   return womClient.players.putRequest(`/players/${username}/country`, {
     country,
     adminPassword: env.ADMIN_PASSWORD

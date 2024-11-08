@@ -11,12 +11,13 @@ function matches(currentValue: string, ...options: string[]) {
 }
 
 export function getCountryOptions(currentValue: string): AutoCompleteOption[] {
-  if (!currentValue) return [];
-
-  return Object.entries(CountryProps)
-    .map(value => value[1])
-    .filter(c => matches(currentValue, c.name, c.code))
-    .map(c => ({ name: c.name, value: c.code }));
+  return [
+    { name: 'None', value: 'null' },
+    ...Object.entries(CountryProps)
+      .map(value => value[1])
+      .filter(c => matches(currentValue, c.name, c.code))
+      .map(c => ({ name: c.name, value: c.code }))
+  ];
 }
 
 export function getPeriodOptions(currentValue: string): AutoCompleteOption[] {
