@@ -6,12 +6,7 @@ import {
   EmbedBuilder
 } from 'discord.js';
 import config from '../config';
-import {
-  handlePatreonTrigger,
-  PATREON_TRIGGER_ID,
-  PATREON_LEAGUE_TRIGGER_ID,
-  handlePatreonLeagueTrigger
-} from '../patreon-trigger';
+import { handlePatreonTrigger, PATREON_TRIGGER_ID } from '../patreon-trigger';
 import { allowActions, blockActions } from '../services/wiseoldman';
 import { CommandError } from './commands';
 
@@ -31,8 +26,6 @@ export async function handleButtonInteraction(interaction: ButtonInteraction): P
 
   if (action === PATREON_TRIGGER_ID) {
     handlePatreonTrigger(interaction);
-  } else if (action === PATREON_LEAGUE_TRIGGER_ID) {
-    handlePatreonLeagueTrigger(interaction);
   } else if (action === Actions.BLOCK || action === Actions.ALLOW) {
     await interaction.update({
       components: [createConfirmationButtons(action, type as ModerationType, ipHash)]

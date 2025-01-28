@@ -32,6 +32,4 @@ The avatar and banner size guide can be found [here](https://www.figma.com/desig
 # How to claim your benefits
 
 After subscribing to our [Patreon](https://wiseoldman.net/patreon), you should connect your Discord account on Patreon (
-see a guide [here](https://support.patreon.com/hc/en-us/articles/212052266-Getting-Discord-access)), and then you can click the button below to claim your benefits.
-
-Note: If you'd like to also claim these benefits for your Leagues website group, click the Leagues button below, and make sure to insert the correct (league) group ID.
+see a guide [here](https://support.patreon.com/hc/en-us/articles/212052266-Getting-Discord-access>)), and then you can click the button below to claim your benefits.
