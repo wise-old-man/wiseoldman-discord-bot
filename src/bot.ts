@@ -11,13 +11,7 @@ import {
 } from 'discord.js';
 import config from './config';
 import * as router from './commands/router';
-import {
-  PATREON_LEAGUE_MODAL_ID,
-  handlePatreonLeagueModalSubmit,
-  PATREON_MODAL_ID,
-  handlePatreonModalSubmit,
-  setupPatreonTrigger
-} from './patreon-trigger';
+import { PATREON_MODAL_ID, handlePatreonModalSubmit, setupPatreonTrigger } from './patreon-trigger';
 import { handleButtonInteraction } from './utils/buttonInteractions';
 
 const CACHED_ACTIVE_USER_IDS = new Set<string>(config.discord.cache.excludeUsers);
@@ -86,11 +80,8 @@ class Bot {
           return;
         }
 
-        if (interaction.isModalSubmit()) {
-          const customId = interaction.customId;
-
-          if (customId === PATREON_MODAL_ID) handlePatreonModalSubmit(interaction);
-          else if (customId === PATREON_LEAGUE_MODAL_ID) handlePatreonLeagueModalSubmit(interaction);
+        if (interaction.isModalSubmit() && interaction.customId === PATREON_MODAL_ID) {
+          handlePatreonModalSubmit(interaction);
           return;
         }
 
