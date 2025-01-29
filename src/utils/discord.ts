@@ -118,6 +118,7 @@ const MetricEmoji = {
   [Metric.SOUL_WARS_ZEAL]: '<:soul_wars_zeal:1011956473615630396>',
   [Metric.GUARDIANS_OF_THE_RIFT]: '<:guardians_of_the_rift:963939589070934046>',
   [Metric.COLOSSEUM_GLORY]: '<:colosseum_glory:1220023685881139312>',
+  [Metric.COLLECTIONS_LOGGED]: '<:collections_logged:1334259592565358603>',
   // Computed metric emojis
   [Metric.EHP]: '<:ehp:766260738221670432>',
   [Metric.EHB]: '<:ehb:766260773617795103>'
