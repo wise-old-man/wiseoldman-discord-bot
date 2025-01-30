@@ -1,7 +1,6 @@
 import { Client, EmbedBuilder } from 'discord.js';
 import { Achievement, Player } from '@wise-old-man/utils';
 import config from '../../config';
-import { getUserId } from '../../services/prisma';
 import { Event } from '../../utils/events';
 import { encodeURL, getEmoji, propagateMessage, NotificationType } from '../../utils';
 
@@ -23,14 +22,12 @@ class MemberAchievements implements Event {
 
     if (!groupId) return;
 
-    const userId = await getUserId(player.displayName);
-
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`🎉 New member ${achievements.length > 1 ? 'achievements' : 'achievement'}`)
       .setDescription(
         achievements
-          .map(({ metric, name }) => `${player.displayName} - ${getEmoji(metric)} ${name}`)
+          .map(({ metric, name }) => `${player.displayName} - ${getEmoji(metric) ?? ''} ${name}`)
           .join('\n')
       )
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements`));
