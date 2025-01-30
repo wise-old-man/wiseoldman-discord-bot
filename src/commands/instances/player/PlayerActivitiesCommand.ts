@@ -17,8 +17,8 @@ import {
   getUsernameParam
 } from '../../../utils';
 
-const RENDER_WIDTH = 357;
-const RENDER_HEIGHT = 100;
+const RENDER_WIDTH = 285;
+const RENDER_HEIGHT = 130;
 const RENDER_PADDING = 15;
 
 enum RenderVariant {
@@ -104,8 +104,8 @@ class PlayerActivitiesCommand extends Command {
     for (const [index, activity] of Object.keys(activities).entries()) {
       if (!isActivity(activity)) continue;
 
-      const x = Math.floor(index / 3);
-      const y = index % 3;
+      const x = Math.floor(index / 4);
+      const y = index % 4;
 
       const originX = RENDER_PADDING - 7 + x * 69;
       const originY = RENDER_PADDING - 8 + y * 31;
