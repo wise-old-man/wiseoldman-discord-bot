@@ -4,8 +4,7 @@ import {
   GetPlayerGainsResponse,
   Metric,
   parsePeriodExpression,
-  PeriodProps,
-  PlayerDeltasMap
+  PeriodProps
 } from '@wise-old-man/utils';
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { createPaginatedEmbed } from '../../../commands/pagination';
@@ -163,7 +162,15 @@ function buildGainsList(displayName: string, period: string, gained: GetPlayerGa
   }
 
   return valid.map(({ metric, gained }) => {
-    return `${getEmoji(metric)} ${getMetricName(metric as Metric)} - **${formatNumber(gained, true)}**`;
+    let metricName = '';
+
+    try {
+      metricName = getMetricName(metric as Metric);
+    } catch (e) {
+      metricName = metric;
+    }
+
+    return `${getEmoji(metric)} ${metricName} - **${formatNumber(gained, true)}**`;
   });
 }
 
