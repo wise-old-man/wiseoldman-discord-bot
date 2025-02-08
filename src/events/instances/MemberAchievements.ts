@@ -27,7 +27,7 @@ class MemberAchievements implements Event {
       .setTitle(`🎉 New member ${achievements.length > 1 ? 'achievements' : 'achievement'}`)
       .setDescription(
         achievements
-          .map(({ metric, name }) => `${player.displayName} - ${getEmoji(metric) ?? ''} ${name}`)
+          .map(({ metric, name }) => `${player.displayName} - ${getEmoji(metric)} ${name}`)
           .join('\n')
       )
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements`));

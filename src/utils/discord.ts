@@ -431,7 +431,7 @@ export function getEmoji(metric: string): string {
     ? Metric.CLUE_SCROLLS_ALL
     : parseMetricAbbreviation(metric) || metric.toLocaleLowerCase();
 
-  return MetricEmoji[emojiKey];
+  return MetricEmoji[emojiKey] ?? '';
 }
 
 export function getGroupRoleEmoji(role: string): string {
