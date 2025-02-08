@@ -93,6 +93,7 @@ const MetricEmoji = {
   [Metric.THE_CORRUPTED_GAUNTLET]: '<:the_corrupted_gauntlet:729840085159247873>',
   [Metric.THE_HUEYCOATL]: '<:the_hueycoatl:1288593575969292423>',
   [Metric.THE_LEVIATHAN]: '<:the_leviathan:1133832625006592021>',
+  [Metric.THE_ROYAL_TITANS]: '<:the_royal_titans:1337779462259085332>',
   [Metric.THE_WHISPERER]: '<:the_whisperer:1133832628114567242>',
   [Metric.THEATRE_OF_BLOOD]: '<:theatre_of_blood:729840085406711819>',
   [Metric.THEATRE_OF_BLOOD_HARD_MODE]: '<:theatre_of_blood_hard_mode:850017967164751933>',
