@@ -1,7 +1,7 @@
 import { CountryProps, isCountry } from '@wise-old-man/utils';
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { updateCountry } from '../../../services/wiseoldman';
-import { Command, CommandConfig, countryCodeEmoji, CommandError } from '../../../utils';
+import { Command, CommandConfig, countryCodeEmoji, CommandError, sendModLog } from '../../../utils';
 import config from '../../../config';
 
 const CONFIG: CommandConfig = {
@@ -80,6 +80,11 @@ class PlayerSetFlagCommand extends Command {
     }
 
     await interaction.editReply({ embeds: [embed] });
+
+    sendModLog(
+      interaction.guild,
+      `**Changed User Flag**\nUsername: \`${username}\`\nFlag: \`${countryCode}\`\nChanged by: ${interaction.user}, \`${interaction.user.id}\`, \`${interaction.user.username}\``
+    );
   }
 }
 
