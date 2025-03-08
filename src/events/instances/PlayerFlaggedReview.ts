@@ -27,7 +27,7 @@ import {
 import { encodeURL } from '../../utils';
 import { Event } from '../../utils/events';
 import config from '../../config';
-import { archive, forceUpdate, rollback } from '../../services/wiseoldman';
+import { archive, forceUpdate, rollback, rollbackColLog } from '../../services/wiseoldman';
 
 interface PlayerFlaggedData {
   player: Player;
@@ -111,6 +111,10 @@ class PlayerFlaggedReview implements Event {
         new ButtonBuilder()
           .setCustomId(`rollback/${uniqueId}`)
           .setLabel('Hiscores Rollback')
+          .setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+          .setCustomId(`col-log-rollback/${uniqueId}`)
+          .setLabel('Col. Log Rollback')
           .setStyle(ButtonStyle.Secondary)
       );
 
@@ -309,6 +313,21 @@ class PlayerFlaggedReview implements Event {
           } catch (error) {
             console.log(error);
             message.setColor(config.visuals.red).setFooter({ text: `Rollback failed` });
+          }
+
+          await reportMessage.edit({ embeds: [message], components: [] });
+          return;
+        }
+
+        if (clickedId === `col-log-rollback/${uniqueId}`) {
+          try {
+            await rollbackColLog(player.username);
+            message
+              .setColor(config.visuals.green)
+              .setFooter({ text: `Col Log rolled back by ${username}` });
+          } catch (error) {
+            console.log(error);
+            message.setColor(config.visuals.red).setFooter({ text: `Col Log rollback failed` });
           }
 
           await reportMessage.edit({ embeds: [message], components: [] });
