@@ -14,6 +14,7 @@ import MembersLeft from './instances/MembersLeft';
 import PlayerFlaggedReview from './instances/PlayerFlaggedReview';
 import MembersRolesChanged from './instances/MembersRolesChanged';
 import PotentialCreationSpam from './instances/PotentialCreationSpam';
+import OffensiveNamesFound from './instances/OffensiveNamesFound';
 
 const EVENTS: Event[] = [
   CompetitionCreated,
@@ -28,7 +29,8 @@ const EVENTS: Event[] = [
   MemberAchievements,
   PlayerFlaggedReview,
   MembersRolesChanged,
-  PotentialCreationSpam
+  PotentialCreationSpam,
+  OffensiveNamesFound
 ];
 
 function onEventReceived(client: Client, payload: { type: string; data: unknown }): void {

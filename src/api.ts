@@ -4,7 +4,7 @@ import express from 'express';
 import { onEventReceived } from './events/router';
 import monitoring from './utils/monitoring';
 
-const PORT = 7000;
+const PORT = process.env.BOT_PORT || 7000;
 
 export function init(client: Client) {
   const app = express();
