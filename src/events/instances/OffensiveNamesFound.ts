@@ -16,9 +16,8 @@ class OffensiveNamesFound implements Event {
   }
 
   async execute(data: DataType, client: Client) {
-
+  
     const description = data.map(a => `Name: ${a.name} | Type: ${a.type} | ID: ${a.id}`).join("\n")
-
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`Offensive/spam names found.`)
