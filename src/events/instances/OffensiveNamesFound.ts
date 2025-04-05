@@ -35,7 +35,6 @@ function buildEmbed(entity: DataType[number]): EmbedBuilder {
   const embed = new EmbedBuilder()
     .setColor(config.visuals.blue)
     .setTitle(`Offensive/spam ${entity.type} found.`)
-    .setDescription(`Reason: ${entity.reason}`)
     .setURL(
       entity.type === 'group'
         ? `https://wiseoldman.net/groups/${entity.id}`
