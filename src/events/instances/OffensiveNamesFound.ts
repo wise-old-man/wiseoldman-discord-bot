@@ -3,10 +3,12 @@ import config from '../../config';
 import { Event } from '../../utils/events';
 
 type DataType = {
-    id: number,
-    name: string,
-    type: string,
-}[]
+  id: number;
+  type: string;
+  name: string;
+  description: string;
+  reason: string;
+}[];
 
 class OffensiveNamesFound implements Event {
   type: string;
@@ -16,12 +18,7 @@ class OffensiveNamesFound implements Event {
   }
 
   async execute(data: DataType, client: Client) {
-  
-    const description = data.map(a => `Name: ${a.name} | Type: ${a.type} | ID: ${a.id}`).join("\n")
-    const message = new EmbedBuilder()
-      .setColor(config.visuals.blue)
-      .setTitle(`Offensive/spam names found.`)
-      .setDescription(description);
+    const embeds = data.map(buildEmbed);
 
     const reviewChannel = client.channels?.cache.get(config.discord.channels.potentialSpamReviews);
     if (!reviewChannel) return;
@@ -29,9 +26,48 @@ class OffensiveNamesFound implements Event {
       return;
 
     await reviewChannel.send({
-      embeds: [message],
+      embeds
     });
   }
+}
+
+function buildEmbed(entity: DataType[number]): EmbedBuilder {
+  const embed = new EmbedBuilder()
+    .setColor(config.visuals.blue)
+    .setTitle(`Offensive/spam ${entity.type} found.`)
+    .setDescription(`Reason: ${entity.reason}`)
+    .setURL(
+      entity.type === 'group'
+        ? `https://wiseoldman.net/groups/${entity.id}`
+        : `https://wiseoldman.net/competitions/${entity.id}`
+    )
+    .addFields([
+      {
+        name: 'ID',
+        value: entity.id.toString(),
+        inline: true
+      },
+      {
+        name: 'Name',
+        value: entity.name,
+        inline: true
+      },
+      ...(entity.type === 'group'
+        ? [
+            {
+              name: 'Description',
+              value: entity.description,
+              inline: true
+            }
+          ]
+        : []),
+      {
+        name: 'Reason',
+        value: entity.reason
+      }
+    ]);
+
+  return embed;
 }
 
 export default new OffensiveNamesFound();
