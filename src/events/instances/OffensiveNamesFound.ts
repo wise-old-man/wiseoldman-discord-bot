@@ -18,12 +18,7 @@ class OffensiveNamesFound implements Event {
   }
 
   async execute(data: DataType, client: Client) {
-    const embeds: Array<EmbedBuilder> = [];
-
-    for (const entity of data) {
-      const embed = await buildEmbed(entity);
-      embeds.push(embed);
-    }
+    const embeds = data.map(buildEmbed);
 
     const reviewChannel = client.channels?.cache.get(config.discord.channels.potentialSpamReviews);
     if (!reviewChannel) return;
@@ -36,7 +31,7 @@ class OffensiveNamesFound implements Event {
   }
 }
 
-async function buildEmbed(entity: DataType[number]): Promise<EmbedBuilder> {
+function buildEmbed(entity: DataType[number]): EmbedBuilder {
   const embed = new EmbedBuilder()
     .setColor(config.visuals.blue)
     .setTitle(`Offensive/spam ${entity.type} found.`)
