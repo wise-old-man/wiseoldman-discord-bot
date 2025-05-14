@@ -107,6 +107,7 @@ const MetricEmoji = {
   [Metric.VETION]: '<:vetion:729840085553381387>',
   [Metric.VORKATH]: '<:vorkath:729840086056960100>',
   [Metric.WINTERTODT]: '<:wintertodt:730170636189696071>',
+  [Metric.YAMA]: '<:yama:1372321594021511188>',
   [Metric.ZALCANO]: '<:zalcano:729840085587066882>',
   [Metric.ZULRAH]: '<:zulrah:729840085721284629>',
   // Activity emojis
