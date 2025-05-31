@@ -8,7 +8,8 @@ import {
   Player,
   NameChangeDetails,
   isMetric,
-  Metric
+  Metric,
+  PlayerAnnotationType
 } from '@wise-old-man/utils';
 import env from '../env';
 import { durationBetween } from '../utils/dates';
@@ -78,6 +79,25 @@ export async function resetGroupCode(groupId: number): Promise<{ newCode: string
  */
 export async function verifyGroup(groupId: number): Promise<GroupListItem> {
   return womClient.groups.putRequest(`/groups/${groupId}/verify`, {
+    adminPassword: env.ADMIN_PASSWORD
+  });
+}
+
+export async function deletePlayerAnnotation(
+  username: string,
+  annotation: PlayerAnnotationType
+): Promise<{ message: string }> {
+  return womClient.players.deleteRequest(`/players/${username}/annotations/${annotation}`, {
+    adminPassword: env.ADMIN_PASSWORD
+  });
+}
+
+export async function addPlayerAnnotation(
+  username: string,
+  annotation: PlayerAnnotationType
+): Promise<{ message: string }> {
+  return womClient.players.postRequest(`/players/${username}/annotations`, {
+    annotationType: annotation,
     adminPassword: env.ADMIN_PASSWORD
   });
 }
