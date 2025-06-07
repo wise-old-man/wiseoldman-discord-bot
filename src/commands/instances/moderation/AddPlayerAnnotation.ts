@@ -35,8 +35,8 @@ const CONFIG: CommandConfig = {
 class AddPlayerAnnotationCommand extends Command {
   constructor() {
     super(CONFIG);
-    this.private = true;
-    this.moderation = true;
+    // this.private = true;
+    // this.moderation = true;
   }
 
   async execute(interaction: ChatInputCommandInteraction): Promise<void> {
@@ -45,11 +45,12 @@ class AddPlayerAnnotationCommand extends Command {
     const requesterId = interaction.options.getUser('requester')?.id;
 
     const requester = interaction.guild?.members.cache.find(m => m.id === requesterId);
-
+    console.log('here');
     await addPlayerAnnotation(playerName, annotation).catch(e => {
       if (e.statusCode === 404 || e.statusCode === 409) throw new CommandError(`${e.message}`);
       throw e;
     });
+    console.log('here2');
 
     const response = new EmbedBuilder()
       .setColor(config.visuals.green)

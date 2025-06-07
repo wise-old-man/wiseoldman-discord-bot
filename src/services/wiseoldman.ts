@@ -87,7 +87,7 @@ export async function deletePlayerAnnotation(
   username: string,
   annotation: PlayerAnnotationType
 ): Promise<{ message: string }> {
-  return womClient.players.deleteRequest(`/players/${username}/annotations/${annotation}`, {
+  return womClient.players.deleteRequest(`/players/${username}/annotation/${annotation}`, {
     adminPassword: env.ADMIN_PASSWORD
   });
 }
@@ -96,7 +96,7 @@ export async function addPlayerAnnotation(
   username: string,
   annotation: PlayerAnnotationType
 ): Promise<{ message: string }> {
-  return womClient.players.postRequest(`/players/${username}/annotations`, {
+  return womClient.players.postRequest(`/players/${username}/annotation`, {
     annotationType: annotation,
     adminPassword: env.ADMIN_PASSWORD
   });
