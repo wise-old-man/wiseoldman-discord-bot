@@ -1,12 +1,12 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import { deletePlayerAnnotation } from '../../../services/wiseoldman';
+import { addPlayerAnnotation } from '../../../services/wiseoldman';
 import { PlayerAnnotationType } from '@wise-old-man/utils';
 import config from '../../../config';
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
 
 const CONFIG: CommandConfig = {
-  name: 'remove-player-annotation',
-  description: 'Delete a player annotation.',
+  name: 'add-player-annotation',
+  description: 'Add a player annotation.',
   options: [
     {
       type: ApplicationCommandOptionType.String,
@@ -17,7 +17,7 @@ const CONFIG: CommandConfig = {
     {
       type: ApplicationCommandOptionType.String,
       name: 'annotation',
-      description: 'The annotation name.',
+      description: 'The annotation type.',
       required: true,
       choices: Object.values(PlayerAnnotationType).map(value => ({
         name: value,
@@ -32,7 +32,7 @@ const CONFIG: CommandConfig = {
   ]
 };
 
-class DeleteAnnotationCommand extends Command {
+class AddPlayerAnnotationCommand extends Command {
   constructor() {
     super(CONFIG);
     this.private = true;
@@ -46,21 +46,21 @@ class DeleteAnnotationCommand extends Command {
 
     const requester = interaction.guild?.members.cache.find(m => m.id === requesterId);
 
-    await deletePlayerAnnotation(playerName, annotation).catch(e => {
-      if (e.statusCode === 404) throw new CommandError(`${e.message}`);
+    await addPlayerAnnotation(playerName, annotation).catch(e => {
+      if (e.statusCode === 404 || e.statusCode === 409) throw new CommandError(`${e.message}`);
       throw e;
     });
 
     const response = new EmbedBuilder()
       .setColor(config.visuals.green)
       .setDescription(
-        `✅ Annotation \`${annotation}\` for player \`${playerName}\` has been successfully deleted!`
+        `✅ Successfully created annotation \`${annotation}\` for player \`${playerName}\`!`
       );
     await interaction.editReply({ embeds: [response] });
 
     sendModLog(
       interaction.guild,
-      `**Deleted Player Annotation**\nPlayer: \`${playerName}\`\nAnnotation: \`${annotation}\`` +
+      `**Added Player Annotation**\nPlayer: \`${playerName}\`\nAnnotation: \`${annotation}\`` +
         (requesterId
           ? `\nRequested by: <@${requesterId}>, \`${requesterId}\`, \`${requester?.user.username}\``
           : ''),
@@ -69,4 +69,4 @@ class DeleteAnnotationCommand extends Command {
   }
 }
 
-export default new DeleteAnnotationCommand();
+export default new AddPlayerAnnotationCommand();
