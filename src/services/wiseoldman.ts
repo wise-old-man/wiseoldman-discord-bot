@@ -95,11 +95,11 @@ export async function deletePlayerAnnotation(
 
 export async function addPlayerAnnotation(
   username: string,
-  annotation: PlayerAnnotationType
+  annotationType: PlayerAnnotationType
 ): Promise<{ message: string }> {
   return womClient.players.postRequest(`/players/${username}/annotation`, {
-    annotationType: annotation,
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.ADMIN_PASSWORD,
+    annotationType
   });
 }
 
