@@ -85,10 +85,11 @@ export async function verifyGroup(groupId: number): Promise<GroupListItem> {
 
 export async function deletePlayerAnnotation(
   username: string,
-  annotation: PlayerAnnotationType
+  annotationType: PlayerAnnotationType
 ): Promise<{ message: string }> {
-  return womClient.players.deleteRequest(`/players/${username}/annotation/${annotation}`, {
-    adminPassword: env.ADMIN_PASSWORD
+  return womClient.players.deleteRequest(`/players/${username}/annotation`, {
+    adminPassword: env.ADMIN_PASSWORD,
+    annotationType
   });
 }
 
