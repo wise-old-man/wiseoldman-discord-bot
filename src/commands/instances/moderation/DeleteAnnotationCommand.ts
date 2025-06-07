@@ -5,7 +5,7 @@ import config from '../../../config';
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
 
 const CONFIG: CommandConfig = {
-  name: 'delete-annotation',
+  name: 'remove-player-annotation',
   description: 'Delete a player annotation.',
   options: [
     {
