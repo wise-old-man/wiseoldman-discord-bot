@@ -32,7 +32,7 @@ const CONFIG: CommandConfig = {
   ]
 };
 
-class DeleteAnnotationCommand extends Command {
+class DeletePlayerAnnotationCommand extends Command {
   constructor() {
     super(CONFIG);
     this.private = true;
