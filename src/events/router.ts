@@ -33,20 +33,31 @@ const EVENTS: Event[] = [
   OffensiveNamesFound
 ];
 
-function onEventReceived(client: Client, payload: { type: string; data: unknown }): void {
-  EVENTS.forEach(event => {
-    if (payload.type === event.type) {
-      const eventMonitor = monitoring.trackEvent();
+async function onEventReceived(
+  client: Client,
+  payload: {
+    eventId: string;
+    type: string;
+    data: unknown;
+  }
+) {
+  const matchingEvent = EVENTS.find(event => event.type === payload.type);
 
-      event
-        .execute(payload.data, client)
-        .then(() => eventMonitor.endTracking(event.type, 1))
-        .catch(error => {
-          console.log(error);
-          eventMonitor.endTracking(event.type, 0);
-        });
-    }
-  });
+  if (!matchingEvent) {
+    throw new Error('Event type not found: ' + payload.type);
+  }
+
+  const eventMonitor = monitoring.trackEvent();
+
+  try {
+    matchingEvent.execute(payload.data, client);
+
+    console.log('Event executed successfully:', payload);
+    eventMonitor.endTracking(matchingEvent.type, 1);
+  } catch (error) {
+    console.log('Error executing event', payload, error);
+    eventMonitor.endTracking(matchingEvent.type, 0);
+  }
 }
 
 export { onEventReceived };

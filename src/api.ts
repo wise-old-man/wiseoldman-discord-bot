@@ -24,7 +24,6 @@ export function init(client: Client) {
   app.post('/event', (req, res) => {
     onEventReceived(client, req.body);
 
-    console.log('Event received: ', req.body);
     return res.json('Event received.');
   });
 
