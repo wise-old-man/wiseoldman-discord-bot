@@ -38,6 +38,8 @@ import DeleteCompetitionCommand from './instances/moderation/DeleteCompetitionCo
 import RemoveFromGroupCommand from './instances/moderation/RemoveFromGroupCommand';
 import RemoveFromCompetitionCommand from './instances/moderation/RemoveFromCompetitionCommand';
 import CreateAPIKeyCommand from './instances/moderation/CreateAPIKeyCommand';
+import DeleteAnnotationCommand from './instances/moderation/DeletePlayerAnnotationCommand';
+import AddPlayerAnnotation from './instances/moderation/AddPlayerAnnotationCommand';
 
 export const COMMANDS: BaseCommand[] = [
   HelpCommand,
@@ -66,7 +68,9 @@ export const COMMANDS: BaseCommand[] = [
   DeleteCompetitionCommand,
   RemoveFromGroupCommand,
   RemoveFromCompetitionCommand,
-  CreateAPIKeyCommand
+  CreateAPIKeyCommand,
+  DeleteAnnotationCommand,
+  AddPlayerAnnotation
 ];
 
 export async function onInteractionReceived(interaction: Interaction) {
