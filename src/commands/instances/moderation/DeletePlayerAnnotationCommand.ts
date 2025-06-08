@@ -69,4 +69,4 @@ class DeletePlayerAnnotationCommand extends Command {
   }
 }
 
-export default new DeleteAnnotationCommand();
+export default new DeletePlayerAnnotationCommand();
