@@ -1,9 +1,12 @@
+import axios from 'axios';
 import prometheus, { Histogram, Registry } from 'prom-client';
 
-class MonitoringService {
+class PrometheusService {
   private registry: Registry;
   private eventHistogram: Histogram;
   private commandHistogram: Histogram;
+
+  private pushInterval: NodeJS.Timeout | null = null;
 
   constructor() {
     this.registry = new prometheus.Registry();
@@ -11,11 +14,6 @@ class MonitoringService {
 
     prometheus.collectDefaultMetrics({ register: this.registry });
 
-    this.setupEventHistogram();
-    this.setupCommandHistogram();
-  }
-
-  private setupEventHistogram() {
     this.eventHistogram = new prometheus.Histogram({
       name: 'event_duration_seconds',
       help: 'Duration of event execution in microseconds',
@@ -23,10 +21,6 @@ class MonitoringService {
       buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10, 30]
     });
 
-    this.registry.registerMetric(this.eventHistogram);
-  }
-
-  private setupCommandHistogram() {
     this.commandHistogram = new prometheus.Histogram({
       name: 'command_duration_seconds',
       help: 'Duration of command execution in microseconds',
@@ -34,7 +28,41 @@ class MonitoringService {
       buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10, 30]
     });
 
+    this.registry.registerMetric(this.eventHistogram);
     this.registry.registerMetric(this.commandHistogram);
+  }
+
+  init() {
+    if (process.env.NODE_ENV === 'development') {
+      return;
+    }
+
+    this.pushInterval = setInterval(() => {
+      this.pushMetrics();
+    }, 60_000);
+  }
+
+  shutdown() {
+    if (this.pushInterval !== null) {
+      clearInterval(this.pushInterval);
+    }
+  }
+
+  async pushMetrics() {
+    if (!process.env.PROMETHEUS_METRICS_SERVICE_URL) {
+      throw new Error('PROMETHEUS_METRICS_SERVICE_URL is not set');
+    }
+
+    const metrics = await this.registry.getMetricsAsJSON();
+
+    try {
+      await axios.post(process.env.PROMETHEUS_METRICS_SERVICE_URL, {
+        source: 'discord-bot',
+        data: metrics
+      });
+    } catch (error) {
+      console.error('Failed to push metrics:', error);
+    }
   }
 
   trackCommand() {
@@ -56,10 +84,6 @@ class MonitoringService {
       }
     };
   }
-
-  getMetrics() {
-    return this.registry.metrics();
-  }
 }
 
-export default new MonitoringService();
+export default new PrometheusService();

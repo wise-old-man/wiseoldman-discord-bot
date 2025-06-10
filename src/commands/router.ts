@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node';
 import { GuildMember, Interaction, EmbedBuilder } from 'discord.js';
 import config from '../config';
-import monitoring from '../utils/monitoring';
+import prometheus from '../services/prometheus';
 import {
   BaseCommand,
   CommandError,
@@ -94,7 +94,7 @@ export async function onInteractionReceived(interaction: Interaction) {
     return;
   }
 
-  const commandMonitor = monitoring.trackCommand();
+  const commandMonitor = prometheus.trackCommand();
 
   const commandName = interaction.commandName;
   const subCommandName = interaction.options.getSubcommand(false);

@@ -1,6 +1,6 @@
 import { Client } from 'discord.js';
 import { Event } from '../utils/events';
-import monitoring from '../utils/monitoring';
+import prometheus from '../services/prometheus';
 import CompetitionCreated from './instances/CompetitionCreated';
 import CompetitionEnded from './instances/CompetitionEnded';
 import CompetitionEnding from './instances/CompetitionEnding';
@@ -47,7 +47,7 @@ async function onEventReceived(
     throw new Error('Event type not found: ' + payload.type);
   }
 
-  const eventMonitor = monitoring.trackEvent();
+  const eventMonitor = prometheus.trackEvent();
 
   try {
     matchingEvent.execute(payload.data, client);
