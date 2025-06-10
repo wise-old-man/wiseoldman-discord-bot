@@ -8,7 +8,7 @@ interface MemberActivity {
   members: {
     role: GroupRole;
     previousRole: GroupRole;
-    player: Player;
+    player: Pick<Player, 'displayName'>;
   }[];
 }
 
@@ -47,7 +47,9 @@ function buildMessage(data: MemberActivity) {
   }
 
   if (members.length > 10) {
-    content += `\n[+${members.length - 10} more changes](https://wiseoldman.net/groups/${groupId}?dialog=group-activity)`;
+    content += `\n[+${
+      members.length - 10
+    } more changes](https://wiseoldman.net/groups/${groupId}?dialog=group-activity)`;
   }
 
   const title = `${members.length} Member ${members.length === 1 ? 'role' : 'roles'} changed`;
