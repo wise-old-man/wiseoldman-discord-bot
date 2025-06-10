@@ -6,7 +6,7 @@ import { encodeURL, propagateMessage, NotificationType } from '../../utils';
 
 interface MembersLeftData {
   groupId: number;
-  players: Player[];
+  players: Pick<Player, 'displayName'>[];
 }
 
 class MembersLeft implements Event {

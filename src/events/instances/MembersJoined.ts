@@ -8,7 +8,7 @@ interface MembersJoinedData {
   groupId: number;
   members: {
     role: GroupRole;
-    player: Player;
+    player: Pick<Player, 'displayName'>;
   }[];
 }
 
@@ -43,7 +43,9 @@ function buildMessage(data: MembersJoinedData) {
   }
 
   if (members.length > 10) {
-    content += `\n[+${members.length - 10} more changes](https://wiseoldman.net/groups/${groupId}?dialog=group-activity)`;
+    content += `\n[+${
+      members.length - 10
+    } more changes](https://wiseoldman.net/groups/${groupId}?dialog=group-activity)`;
   }
 
   const title = `🎉 ${members.length} New group ${members.length === 1 ? 'member' : 'members'} joined`;
