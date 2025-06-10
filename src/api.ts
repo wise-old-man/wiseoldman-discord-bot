@@ -2,7 +2,6 @@ import cors from 'cors';
 import { Client } from 'discord.js';
 import express from 'express';
 import { onEventReceived } from './events/router';
-import monitoring from './utils/monitoring';
 
 const PORT = process.env.BOT_PORT || 7000;
 
@@ -25,11 +24,6 @@ export function init(client: Client) {
     onEventReceived(client, req.body);
 
     return res.json('Event received.');
-  });
-
-  app.get('/monitoring', async (req, res) => {
-    const metrics = await monitoring.getMetrics();
-    res.end(metrics);
   });
 
   return app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
