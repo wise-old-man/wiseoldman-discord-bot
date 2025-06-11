@@ -1,8 +1,9 @@
-import { Client, EmbedBuilder } from 'discord.js';
+import { AsyncResult, errored } from '@attio/fetchable';
 import { Player } from '@wise-old-man/utils';
+import { Client, EmbedBuilder } from 'discord.js';
 import config from '../../config';
+import { encodeURL, MessagePropagationError, NotificationType, propagateMessage } from '../../utils';
 import { Event } from '../../utils/events';
-import { encodeURL, propagateMessage, NotificationType } from '../../utils';
 
 interface MembersLeftData {
   groupId: number;
@@ -16,13 +17,20 @@ class MembersLeft implements Event {
     this.type = 'GROUP_MEMBERS_LEFT';
   }
 
-  async execute(data: MembersLeftData, client: Client) {
+  async execute(
+    data: MembersLeftData,
+    client: Client
+  ): AsyncResult<true, { code: 'MISSING_GROUP_ID' } | MessagePropagationError> {
     const { groupId } = data;
 
-    if (!groupId) return;
+    if (!groupId) {
+      return errored({
+        code: 'MISSING_GROUP_ID'
+      });
+    }
 
     const message = buildMessage(data);
-    await propagateMessage(client, groupId, NotificationType.MEMBERS_LEFT, message);
+    return propagateMessage(client, groupId, NotificationType.MEMBERS_LEFT, message);
   }
 }
 

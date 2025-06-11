@@ -1,8 +1,14 @@
-import { Client, EmbedBuilder } from 'discord.js';
+import { AsyncResult, errored } from '@attio/fetchable';
 import { GroupRole, GroupRoleProps, Player } from '@wise-old-man/utils';
+import { Client, EmbedBuilder } from 'discord.js';
 import config from '../../config';
+import {
+  getGroupRoleEmoji,
+  MessagePropagationError,
+  NotificationType,
+  propagateMessage
+} from '../../utils';
 import { Event } from '../../utils/events';
-import { propagateMessage, NotificationType, getGroupRoleEmoji } from '../../utils';
 
 interface MembersJoinedData {
   groupId: number;
@@ -19,13 +25,20 @@ class MembersJoined implements Event {
     this.type = 'GROUP_MEMBERS_JOINED';
   }
 
-  async execute(data: MembersJoinedData, client: Client) {
+  async execute(
+    data: MembersJoinedData,
+    client: Client
+  ): AsyncResult<true, { code: 'MISSING_GROUP_ID' } | MessagePropagationError> {
     const { groupId } = data;
 
-    if (!groupId) return;
+    if (!groupId) {
+      return errored({
+        code: 'MISSING_GROUP_ID'
+      });
+    }
 
     const message = buildMessage(data);
-    await propagateMessage(client, groupId, NotificationType.MEMBERS_JOINED, message);
+    return propagateMessage(client, groupId, NotificationType.MEMBERS_JOINED, message);
   }
 }
 

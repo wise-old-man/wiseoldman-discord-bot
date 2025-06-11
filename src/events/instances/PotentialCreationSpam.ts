@@ -1,8 +1,9 @@
-import { ChannelType, Client, EmbedBuilder, TextChannel } from 'discord.js';
-import { Event } from '../../utils/events';
+import { AsyncResult, complete, errored, fromPromise, isErrored } from '@attio/fetchable';
 import { Competition, Group } from '@wise-old-man/utils';
+import { ChannelType, Client, EmbedBuilder, TextChannel } from 'discord.js';
 import config from '../../config';
 import { createModerationButtons, ModerationType } from '../../utils/buttonInteractions';
+import { Event } from '../../utils/events';
 
 interface DataType {
   ipHash: string;
@@ -19,7 +20,15 @@ class HiddenGroupCreated implements Event {
     this.type = 'POTENTIAL_CREATION_SPAM';
   }
 
-  async execute(data: DataType, client: Client) {
+  async execute(
+    data: DataType,
+    client: Client
+  ): AsyncResult<
+    true,
+    | { code: 'CHANNEL_NOT_FOUND' }
+    | { code: 'CHANNEL_INVALID_TYPE' }
+    | { code: 'FAILED_TO_SEND_REVIEW_MESSAGE' }
+  > {
     const { ipHash, groups, competitions } = data;
 
     const actions = createModerationButtons(ModerationType.SPAM, ipHash);
@@ -27,16 +36,13 @@ class HiddenGroupCreated implements Event {
     let description = `ipHash: ${ipHash}\nGroups created: ${groups.length}\nCompetitions created: ${competitions.length}\n\nSample:`;
 
     for (const group of getRandomSample(groups)) {
-      description += `\n[${group.id}](https://wiseoldman.net/groups/${group.id}): ${group.name.slice(
-        0,
-        50
-      )}`;
+      const url = `https://wiseoldman.net/groups/${group.id}`;
+      description += `\n[${group.id}](${url}): ${group.name.slice(0, 50)}`;
     }
 
     for (const competition of getRandomSample(competitions)) {
-      description += `\n[${competition.id}](https://wiseoldman.net/competitions/${
-        competition.id
-      }): ${competition.title.slice(0, 50)}`;
+      const url = `https://wiseoldman.net/competitions/${competition.id}`;
+      description += `\n[${competition.id}](${url}): ${competition.title.slice(0, 50)}`;
     }
 
     const message = new EmbedBuilder()
@@ -45,14 +51,33 @@ class HiddenGroupCreated implements Event {
       .setDescription(description);
 
     const reviewChannel = client.channels?.cache.get(config.discord.channels.potentialSpamReviews);
-    if (!reviewChannel) return;
-    if (!((channel): channel is TextChannel => channel.type === ChannelType.GuildText)(reviewChannel))
-      return;
 
-    await reviewChannel.send({
-      embeds: [message],
-      components: [actions]
-    });
+    if (!reviewChannel) {
+      return errored({
+        code: 'CHANNEL_NOT_FOUND'
+      });
+    }
+
+    if (!((channel): channel is TextChannel => channel.type === ChannelType.GuildText)(reviewChannel)) {
+      return errored({
+        code: 'CHANNEL_INVALID_TYPE'
+      });
+    }
+
+    const sendResult = await fromPromise(
+      reviewChannel.send({
+        embeds: [message],
+        components: [actions]
+      })
+    );
+
+    if (isErrored(sendResult)) {
+      return errored({
+        code: 'FAILED_TO_SEND_REVIEW_MESSAGE'
+      });
+    }
+
+    return complete(true);
   }
 }
 

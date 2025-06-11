@@ -48,12 +48,12 @@ Sentry.init({
 
   process.on('unhandledRejection', reason => {
     console.error('Unhandled Rejection:', reason, true);
-    handleShutdown();
+    Sentry.captureException(reason);
   });
 
   process.on('uncaughtException', error => {
     console.error('Uncaught Exception:', error, true);
-    handleShutdown();
+    Sentry.captureException(error);
   });
 
   prometheus.init();

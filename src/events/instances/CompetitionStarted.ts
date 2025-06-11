@@ -1,9 +1,16 @@
+import { AsyncResult, errored } from '@attio/fetchable';
 import { Competition, getMetricName } from '@wise-old-man/utils';
 import { Client, EmbedBuilder } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
+import {
+  durationBetween,
+  getEmoji,
+  MessagePropagationError,
+  NotificationType,
+  propagateMessage
+} from '../../utils';
 import { Event } from '../../utils/events';
-import { getEmoji, propagateMessage, durationBetween, NotificationType } from '../../utils';
 
 interface CompetitionStartedData {
   groupId: number;
@@ -17,11 +24,18 @@ class CompetitionStarted implements Event {
     this.type = 'COMPETITION_STARTED';
   }
 
-  async execute(data: CompetitionStartedData, client: Client) {
+  async execute(
+    data: CompetitionStartedData,
+    client: Client
+  ): AsyncResult<true, { code: 'MISSING_GROUP_ID' } | MessagePropagationError> {
     const { groupId, competition } = data;
     const { id, metric, startsAt, endsAt, type, title } = competition;
 
-    if (!groupId) return;
+    if (!groupId) {
+      return errored({
+        code: 'MISSING_GROUP_ID'
+      });
+    }
 
     const fields = [
       { name: 'Metric', value: `${getEmoji(metric)} ${getMetricName(metric)}` },
@@ -35,7 +49,7 @@ class CompetitionStarted implements Event {
       .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields(fields);
 
-    await propagateMessage(client, groupId, NotificationType.COMPETITION_STATUS, message);
+    return propagateMessage(client, groupId, NotificationType.COMPETITION_STATUS, message);
   }
 }
 

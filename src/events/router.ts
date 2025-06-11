@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node';
 import { Client } from 'discord.js';
 import { Event } from '../utils/events';
 import prometheus from '../services/prometheus';
@@ -15,6 +16,7 @@ import PlayerFlaggedReview from './instances/PlayerFlaggedReview';
 import MembersRolesChanged from './instances/MembersRolesChanged';
 import PotentialCreationSpam from './instances/PotentialCreationSpam';
 import OffensiveNamesFound from './instances/OffensiveNamesFound';
+import { AsyncResult, complete, isErrored } from '@attio/fetchable';
 
 const EVENTS: Event[] = [
   CompetitionCreated,
@@ -40,7 +42,7 @@ async function onEventReceived(
     type: string;
     data: unknown;
   }
-) {
+): AsyncResult<true, unknown> {
   const matchingEvent = EVENTS.find(event => event.type === payload.type);
 
   if (!matchingEvent) {
@@ -49,15 +51,21 @@ async function onEventReceived(
 
   const eventMonitor = prometheus.trackEvent();
 
-  try {
-    await matchingEvent.execute(payload.data, client);
+  const executionResult = await matchingEvent.execute(payload.data, client);
 
-    console.log('Event executed successfully:', payload);
-    eventMonitor.endTracking(matchingEvent.type, 1);
-  } catch (error) {
-    console.log('Error executing event', payload, error);
+  if (isErrored(executionResult)) {
+    console.error('Error executing event', payload, executionResult.error);
+    Sentry.captureException(executionResult.error);
+
     eventMonitor.endTracking(matchingEvent.type, 0);
+
+    return executionResult;
   }
+
+  console.log('Event executed successfully:', payload);
+  eventMonitor.endTracking(matchingEvent.type, 1);
+
+  return complete(true);
 }
 
 export { onEventReceived };

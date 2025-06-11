@@ -1,3 +1,4 @@
+import { AsyncResult, complete, errored, fromPromise, isErrored } from '@attio/fetchable';
 import { ChannelType, Client, EmbedBuilder, TextChannel } from 'discord.js';
 import config from '../../config';
 import { Event } from '../../utils/events';
@@ -17,17 +18,44 @@ class OffensiveNamesFound implements Event {
     this.type = 'OFFENSIVE_NAMES_FOUND';
   }
 
-  async execute(data: DataType, client: Client) {
+  async execute(
+    data: DataType,
+    client: Client
+  ): AsyncResult<
+    true,
+    | { code: 'CHANNEL_NOT_FOUND' }
+    | { code: 'CHANNEL_INVALID_TYPE' }
+    | { code: 'FAILED_TO_SEND_REVIEW_MESSAGE' }
+  > {
     const embeds = data.map(buildEmbed);
 
     const reviewChannel = client.channels?.cache.get(config.discord.channels.potentialSpamReviews);
-    if (!reviewChannel) return;
-    if (!((channel): channel is TextChannel => channel.type === ChannelType.GuildText)(reviewChannel))
-      return;
 
-    await reviewChannel.send({
-      embeds
-    });
+    if (!reviewChannel) {
+      return errored({
+        code: 'CHANNEL_NOT_FOUND'
+      });
+    }
+
+    if (!((channel): channel is TextChannel => channel.type === ChannelType.GuildText)(reviewChannel)) {
+      return errored({
+        code: 'CHANNEL_INVALID_TYPE'
+      });
+    }
+
+    const sendResult = await fromPromise(
+      reviewChannel.send({
+        embeds
+      })
+    );
+
+    if (isErrored(sendResult)) {
+      return errored({
+        code: 'FAILED_TO_SEND_REVIEW_MESSAGE'
+      });
+    }
+
+    return complete(true);
   }
 }
 

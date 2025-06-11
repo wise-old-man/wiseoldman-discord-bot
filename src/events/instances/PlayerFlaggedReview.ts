@@ -1,13 +1,4 @@
-import {
-  Client,
-  ActionRowBuilder,
-  ButtonBuilder,
-  EmbedBuilder,
-  TextChannel,
-  ButtonStyle,
-  ChannelType,
-  ComponentType
-} from 'discord.js';
+import { AsyncResult, complete, errored, fromPromise, isErrored } from '@attio/fetchable';
 import {
   ACTIVITIES,
   Activity,
@@ -24,10 +15,20 @@ import {
   Skill,
   SKILLS
 } from '@wise-old-man/utils';
-import { encodeURL } from '../../utils';
-import { Event } from '../../utils/events';
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ChannelType,
+  Client,
+  ComponentType,
+  EmbedBuilder,
+  TextChannel
+} from 'discord.js';
 import config from '../../config';
 import { archive, forceUpdate, rollback, rollbackColLog } from '../../services/wiseoldman';
+import { encodeURL } from '../../utils';
+import { Event } from '../../utils/events';
 
 interface PlayerFlaggedData {
   player: Player;
@@ -57,7 +58,15 @@ class PlayerFlaggedReview implements Event {
     this.type = 'PLAYER_FLAGGED_REVIEW';
   }
 
-  async execute(data: PlayerFlaggedData, client: Client) {
+  async execute(
+    data: PlayerFlaggedData,
+    client: Client
+  ): AsyncResult<
+    true,
+    | { code: 'CHANNEL_NOT_FOUND' }
+    | { code: 'CHANNEL_INVALID_TYPE' }
+    | { code: 'FAILED_TO_SEND_REVIEW_MESSAGE' }
+  > {
     const { player, flagContext } = data;
     const { previous, rejected, possibleRollback, negativeGains, excessiveGains } = flagContext;
 
@@ -277,101 +286,125 @@ class PlayerFlaggedReview implements Event {
 
     const reviewChannel = client.channels?.cache.get(config.discord.channels.flaggedPlayerReviews);
 
-    if (!reviewChannel) return;
-    if (!((channel): channel is TextChannel => channel.type === ChannelType.GuildText)(reviewChannel))
-      return;
+    if (!reviewChannel) {
+      return errored({
+        code: 'CHANNEL_NOT_FOUND'
+      });
+    }
 
-    const reportMessage = await reviewChannel.send({
-      embeds: [message],
-      components: [actions]
-    });
+    if (!((channel): channel is TextChannel => channel.type === ChannelType.GuildText)(reviewChannel)) {
+      return errored({
+        code: 'CHANNEL_INVALID_TYPE'
+      });
+    }
+
+    const sendResult = await fromPromise(
+      reviewChannel.send({
+        embeds: [message],
+        components: [actions]
+      })
+    );
+
+    if (isErrored(sendResult)) {
+      return errored({
+        code: 'FAILED_TO_SEND_REVIEW_MESSAGE'
+      });
+    }
+
+    const reportMessage = sendResult.value;
 
     reviewChannel
       .createMessageComponentCollector({ componentType: ComponentType.Button, max: 1, time: 900 * 1000 })
       .on('end', async collection => {
-        if (!collection) return;
+        try {
+          if (!collection) return;
 
-        const first = collection.first();
-        if (!first) return;
+          const first = collection.first();
+          if (!first) return;
 
-        const username = first.member?.user.username;
-        if (!username) return;
+          const username = first.member?.user.username;
+          if (!username) return;
 
-        const clickedId = first.customId;
+          const clickedId = first.customId;
 
-        if (clickedId === `idk/${uniqueId}`) {
-          message.setColor(config.visuals.orange).setFooter({ text: `Marked as "🤷‍♂️" by ${username}` });
-          await reportMessage.edit({ embeds: [message], components: [] });
-          await reportMessage.reply(`Paging <@329256344798494773>`);
-          return;
-        }
-
-        if (clickedId === `rollback/${uniqueId}`) {
-          try {
-            await rollback(player.username, false);
-            message.setColor(config.visuals.green).setFooter({ text: `Rolled back by ${username}` });
-          } catch (error) {
-            console.log(error);
-            message.setColor(config.visuals.red).setFooter({ text: `Rollback failed` });
+          if (clickedId === `idk/${uniqueId}`) {
+            message.setColor(config.visuals.orange).setFooter({ text: `Marked as "🤷‍♂️" by ${username}` });
+            await reportMessage.edit({ embeds: [message], components: [] });
+            await reportMessage.reply(`Paging <@329256344798494773>`);
+            return;
           }
 
-          await reportMessage.edit({ embeds: [message], components: [] });
-          return;
-        }
+          if (clickedId === `rollback/${uniqueId}`) {
+            try {
+              await rollback(player.username, false);
+              message.setColor(config.visuals.green).setFooter({ text: `Rolled back by ${username}` });
+            } catch (error) {
+              console.log(error);
+              message.setColor(config.visuals.red).setFooter({ text: `Rollback failed` });
+            }
 
-        if (clickedId === `col-log-rollback/${uniqueId}`) {
-          try {
-            await rollbackColLog(player.username);
-            message
-              .setColor(config.visuals.green)
-              .setFooter({ text: `Col Log rolled back by ${username}` });
-          } catch (error) {
-            console.log(error);
-            message.setColor(config.visuals.red).setFooter({ text: `Col Log rollback failed` });
+            await reportMessage.edit({ embeds: [message], components: [] });
+            return;
           }
 
-          await reportMessage.edit({ embeds: [message], components: [] });
-          return;
-        }
+          if (clickedId === `col-log-rollback/${uniqueId}`) {
+            try {
+              await rollbackColLog(player.username);
+              message
+                .setColor(config.visuals.green)
+                .setFooter({ text: `Col Log rolled back by ${username}` });
+            } catch (error) {
+              console.log(error);
+              message.setColor(config.visuals.red).setFooter({ text: `Col Log rollback failed` });
+            }
 
-        if (clickedId === `deironed/${uniqueId}`) {
-          try {
-            await handleRollback(player.username);
-            message.setColor(config.visuals.green).setFooter({ text: `De-iron fix by ${username}` });
-          } catch (error) {
-            console.log(error);
-            message.setColor(config.visuals.red).setFooter({ text: `De-iron fix failed` });
+            await reportMessage.edit({ embeds: [message], components: [] });
+            return;
           }
-          await reportMessage.edit({ embeds: [message], components: [] });
-          return;
-        }
 
-        if (clickedId === `exp_dump/${uniqueId}`) {
-          try {
-            await forceUpdate(player.username);
-            message.setColor(config.visuals.green).setFooter({ text: `Force updated by ${username}` });
-          } catch (error) {
-            console.log(error);
-            message.setColor(config.visuals.red).setFooter({ text: `Force update failed` });
+          if (clickedId === `deironed/${uniqueId}`) {
+            try {
+              await handleRollback(player.username);
+              message.setColor(config.visuals.green).setFooter({ text: `De-iron fix by ${username}` });
+            } catch (error) {
+              console.log(error);
+              message.setColor(config.visuals.red).setFooter({ text: `De-iron fix failed` });
+            }
+            await reportMessage.edit({ embeds: [message], components: [] });
+            return;
           }
-          await reportMessage.edit({ embeds: [message], components: [] });
-          return;
-        }
 
-        if (clickedId === `name_transfer/${uniqueId}`) {
-          try {
-            const archivedPlayer = await archive(player.username);
-            message.setColor(config.visuals.green).setFooter({
-              text: `Archived by ${username} (archived username: ${archivedPlayer.username})`
-            });
-          } catch (error) {
-            console.log(error);
-            message.setColor(config.visuals.red).setFooter({ text: `Archive failed` });
+          if (clickedId === `exp_dump/${uniqueId}`) {
+            try {
+              await forceUpdate(player.username);
+              message.setColor(config.visuals.green).setFooter({ text: `Force updated by ${username}` });
+            } catch (error) {
+              console.log(error);
+              message.setColor(config.visuals.red).setFooter({ text: `Force update failed` });
+            }
+            await reportMessage.edit({ embeds: [message], components: [] });
+            return;
           }
-          await reportMessage.edit({ embeds: [message], components: [] });
-          return;
+
+          if (clickedId === `name_transfer/${uniqueId}`) {
+            try {
+              const archivedPlayer = await archive(player.username);
+              message.setColor(config.visuals.green).setFooter({
+                text: `Archived by ${username} (archived username: ${archivedPlayer.username})`
+              });
+            } catch (error) {
+              console.log(error);
+              message.setColor(config.visuals.red).setFooter({ text: `Archive failed` });
+            }
+            await reportMessage.edit({ embeds: [message], components: [] });
+            return;
+          }
+        } catch (error) {
+          console.error('Error while handling button interaction:', error);
         }
       });
+
+    return complete(true);
   }
 }
 

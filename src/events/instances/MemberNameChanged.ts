@@ -1,8 +1,9 @@
-import { Client, EmbedBuilder } from 'discord.js';
+import { AsyncResult, errored } from '@attio/fetchable';
 import { Player } from '@wise-old-man/utils';
+import { Client, EmbedBuilder } from 'discord.js';
 import config from '../../config';
+import { encodeURL, MessagePropagationError, NotificationType, propagateMessage } from '../../utils';
 import { Event } from '../../utils/events';
-import { encodeURL, propagateMessage, NotificationType } from '../../utils';
 
 interface MemberNameChangedData {
   groupId: number;
@@ -17,10 +18,17 @@ class MemberNameChanged implements Event {
     this.type = 'MEMBER_NAME_CHANGED';
   }
 
-  async execute(data: MemberNameChangedData, client: Client) {
+  async execute(
+    data: MemberNameChangedData,
+    client: Client
+  ): AsyncResult<true, { code: 'MISSING_GROUP_ID' } | MessagePropagationError> {
     const { groupId, player, previousName } = data;
 
-    if (!groupId) return;
+    if (!groupId) {
+      return errored({
+        code: 'MISSING_GROUP_ID'
+      });
+    }
 
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
@@ -28,7 +36,7 @@ class MemberNameChanged implements Event {
       .setDescription(`\`${previousName}\` → \`${player.displayName}\``)
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}`));
 
-    await propagateMessage(client, groupId, NotificationType.MEMBER_NAME_CHANGED, message);
+    return propagateMessage(client, groupId, NotificationType.MEMBER_NAME_CHANGED, message);
   }
 }
 
