@@ -1,9 +1,16 @@
+import { AsyncResult, errored } from '@attio/fetchable';
 import { Competition, getMetricName } from '@wise-old-man/utils';
 import { Client, EmbedBuilder } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
+import {
+  durationBetween,
+  getEmoji,
+  MessagePropagationError,
+  NotificationType,
+  propagateMessage
+} from '../../utils';
 import { Event } from '../../utils/events';
-import { getEmoji, propagateMessage, durationBetween, NotificationType } from '../../utils';
 
 interface CompetitionEndingData {
   groupId: number;
@@ -21,15 +28,29 @@ class CompetitionEnding implements Event {
     this.type = 'COMPETITION_ENDING';
   }
 
-  async execute(data: CompetitionEndingData, client: Client) {
+  async execute(
+    data: CompetitionEndingData,
+    client: Client
+  ): AsyncResult<
+    true,
+    { code: 'MISSING_GROUP_ID' } | { code: 'MISSING_TIME_LEFT' } | MessagePropagationError
+  > {
     const { groupId, competition, period } = data;
     const { id, metric, type, title, startsAt, endsAt } = competition;
 
-    if (!groupId) return;
+    if (!groupId) {
+      return errored({
+        code: 'MISSING_GROUP_ID'
+      });
+    }
 
     const timeLeft = getTimeLeft(period);
 
-    if (!timeLeft) return;
+    if (!timeLeft) {
+      return errored({
+        code: 'MISSING_TIME_LEFT'
+      });
+    }
 
     const fields = [
       { name: 'Metric', value: `${getEmoji(metric)} ${getMetricName(metric)}` },
@@ -50,7 +71,7 @@ class CompetitionEnding implements Event {
       .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields(fields);
 
-    await propagateMessage(client, groupId, NotificationType.COMPETITION_STATUS, message);
+    return propagateMessage(client, groupId, NotificationType.COMPETITION_STATUS, message);
   }
 }
 

@@ -41,13 +41,6 @@ async function getServer(guildId: string | null | undefined) {
 }
 
 /**
- * Find all the Server objects that are tracking a given groupId.
- */
-async function getServers(groupId: number) {
-  return prisma.server.findMany({ where: { groupId } });
-}
-
-/**
  * Update the bot's default notification channel for a given guild.
  */
 async function updateBotDefaultChannel(guildId: string, channelId: string) {
@@ -87,24 +80,13 @@ async function updateNotificationPreferences(guildId: string, type: string, chan
   });
 }
 
-async function getNotificationPreferences(guildIds: string[], type: string) {
-  const preferences = await prisma.notificationPreference.findMany({
-    where: { guildId: { in: guildIds }, type },
-    select: { guildId: true, channelId: true }
-  });
-
-  return Object.fromEntries(preferences.map(p => [p.guildId, p.channelId]));
-}
-
 export default prisma;
 
 export {
   getUserId,
   getUsername,
   getServer,
-  getServers,
   updateServerGroup,
   updateBotDefaultChannel,
-  updateNotificationPreferences,
-  getNotificationPreferences
+  updateNotificationPreferences
 };

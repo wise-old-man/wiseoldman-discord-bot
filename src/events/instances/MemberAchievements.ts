@@ -1,8 +1,15 @@
-import { Client, EmbedBuilder } from 'discord.js';
+import { AsyncResult, errored } from '@attio/fetchable';
 import { Achievement, Player } from '@wise-old-man/utils';
+import { Client, EmbedBuilder } from 'discord.js';
 import config from '../../config';
+import {
+  encodeURL,
+  getEmoji,
+  MessagePropagationError,
+  NotificationType,
+  propagateMessage
+} from '../../utils';
 import { Event } from '../../utils/events';
-import { encodeURL, getEmoji, propagateMessage, NotificationType } from '../../utils';
 
 interface MemberAchievementsData {
   groupId: number;
@@ -17,10 +24,17 @@ class MemberAchievements implements Event {
     this.type = 'MEMBER_ACHIEVEMENTS';
   }
 
-  async execute(data: MemberAchievementsData, client: Client) {
+  async execute(
+    data: MemberAchievementsData,
+    client: Client
+  ): AsyncResult<true, { code: 'MISSING_GROUP_ID' } | MessagePropagationError> {
     const { groupId, player, achievements } = data;
 
-    if (!groupId) return;
+    if (!groupId) {
+      return errored({
+        code: 'MISSING_GROUP_ID'
+      });
+    }
 
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
@@ -32,7 +46,7 @@ class MemberAchievements implements Event {
       )
       .setURL(encodeURL(`https://wiseoldman.net/players/${player.displayName}/achievements`));
 
-    await propagateMessage(client, groupId, NotificationType.MEMBER_ACHIEVEMENTS, message);
+    return propagateMessage(client, groupId, NotificationType.MEMBER_ACHIEVEMENTS, message);
   }
 }
 

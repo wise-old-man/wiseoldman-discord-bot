@@ -1,7 +1,14 @@
-import { Client, EmbedBuilder } from 'discord.js';
-import { Event, propagateMessage, NotificationType, getGroupRoleEmoji } from '../../utils';
+import { AsyncResult, errored } from '@attio/fetchable';
 import { GroupRole, GroupRoleProps, Player } from '@wise-old-man/utils';
+import { Client, EmbedBuilder } from 'discord.js';
 import config from '../../config';
+import {
+  Event,
+  getGroupRoleEmoji,
+  MessagePropagationError,
+  NotificationType,
+  propagateMessage
+} from '../../utils';
 
 interface MemberActivity {
   groupId: number;
@@ -19,14 +26,30 @@ class MembersRolesChanged implements Event {
     this.type = 'GROUP_MEMBERS_CHANGED_ROLES';
   }
 
-  async execute(data: MemberActivity, client: Client<boolean>): Promise<void> {
+  async execute(
+    data: MemberActivity,
+    client: Client<boolean>
+  ): AsyncResult<
+    true,
+    { code: 'MISSING_GROUP_ID' } | { code: 'EMPTY_MEMBER_LIST' } | MessagePropagationError
+  > {
     const { groupId } = data;
 
-    if (!data || data.members.length === 0 || !groupId) return;
+    if (!data || data.members?.length === 0) {
+      return errored({
+        code: 'EMPTY_MEMBER_LIST'
+      });
+    }
+
+    if (!groupId) {
+      return errored({
+        code: 'MISSING_GROUP_ID'
+      });
+    }
 
     const message = buildMessage(data);
 
-    await propagateMessage(client, groupId, NotificationType.MEMBERS_ROLES_CHANGED, message);
+    return propagateMessage(client, groupId, NotificationType.MEMBERS_ROLES_CHANGED, message);
   }
 }
 

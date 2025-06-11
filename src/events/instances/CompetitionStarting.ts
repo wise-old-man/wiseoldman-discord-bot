@@ -3,7 +3,14 @@ import { Client, EmbedBuilder } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
 import { Event } from '../../utils/events';
-import { propagateMessage, NotificationType, durationBetween, getEmoji } from '../../utils';
+import {
+  propagateMessage,
+  NotificationType,
+  durationBetween,
+  getEmoji,
+  MessagePropagationError
+} from '../../utils';
+import { AsyncResult, errored } from '@attio/fetchable';
 
 interface CompetitionStartingData {
   groupId: number;
@@ -21,15 +28,29 @@ class CompetitionStarting implements Event {
     this.type = 'COMPETITION_STARTING';
   }
 
-  async execute(data: CompetitionStartingData, client: Client) {
+  async execute(
+    data: CompetitionStartingData,
+    client: Client
+  ): AsyncResult<
+    true,
+    { code: 'MISSING_GROUP_ID' } | { code: 'MISSING_TIME_LEFT' } | MessagePropagationError
+  > {
     const { groupId, competition, period } = data;
     const { id, metric, startsAt, endsAt, type, title } = competition;
 
-    if (!groupId) return;
+    if (!groupId) {
+      return errored({
+        code: 'MISSING_GROUP_ID'
+      });
+    }
 
     const timeLeft = getTimeLeft(period);
 
-    if (!timeLeft) return;
+    if (!timeLeft) {
+      return errored({
+        code: 'MISSING_TIME_LEFT'
+      });
+    }
 
     const fields = [
       { name: 'Metric', value: `${getEmoji(metric)} ${getMetricName(metric)}` },
@@ -43,7 +64,7 @@ class CompetitionStarting implements Event {
       .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields(fields);
 
-    await propagateMessage(client, groupId, NotificationType.COMPETITION_STATUS, message);
+    return propagateMessage(client, groupId, NotificationType.COMPETITION_STATUS, message);
   }
 }
 

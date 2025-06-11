@@ -1,9 +1,10 @@
+import { AsyncResult, errored } from '@attio/fetchable';
 import { Competition, CompetitionType, formatNumber } from '@wise-old-man/utils';
 import { Client, EmbedBuilder } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../config';
+import { bold, MessagePropagationError, NotificationType, propagateMessage } from '../../utils';
 import { Event } from '../../utils/events';
-import { bold, propagateMessage, NotificationType } from '../../utils';
 
 interface CompetitionStanding {
   gained: number;
@@ -24,11 +25,18 @@ class CompetitionEnded implements Event {
     this.type = 'COMPETITION_ENDED';
   }
 
-  async execute(data: CompetitionEndedData, client: Client) {
+  async execute(
+    data: CompetitionEndedData,
+    client: Client
+  ): AsyncResult<true, { code: 'MISSING_GROUP_ID' } | MessagePropagationError> {
     const { groupId, competition, standings } = data;
     const { id, title } = competition;
 
-    if (!groupId) return;
+    if (!groupId) {
+      return errored({
+        code: 'MISSING_GROUP_ID'
+      });
+    }
 
     const isTeamCompetition = competition.type === CompetitionType.TEAM;
     const topParticipations = isTeamCompetition ? getTeamStandings(standings) : getStandings(standings);
@@ -44,7 +52,7 @@ class CompetitionEnded implements Event {
         }
       ]);
 
-    await propagateMessage(client, groupId, NotificationType.COMPETITION_STATUS, message);
+    return propagateMessage(client, groupId, NotificationType.COMPETITION_STATUS, message);
   }
 }
 
