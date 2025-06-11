@@ -22,7 +22,7 @@ class Bot {
 
   constructor() {
     this.client = new Client({
-      shards: 'auto',
+      shardCount: 6,
       intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
