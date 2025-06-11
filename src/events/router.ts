@@ -50,7 +50,7 @@ async function onEventReceived(
   const eventMonitor = prometheus.trackEvent();
 
   try {
-    matchingEvent.execute(payload.data, client);
+    await matchingEvent.execute(payload.data, client);
 
     console.log('Event executed successfully:', payload);
     eventMonitor.endTracking(matchingEvent.type, 1);
