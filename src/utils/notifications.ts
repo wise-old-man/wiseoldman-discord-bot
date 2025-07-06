@@ -1,6 +1,6 @@
+import { AsyncResult, combineAsync, complete, errored, fromPromise, isErrored } from '@attio/fetchable';
 import { ChannelType, Client, EmbedBuilder } from 'discord.js';
 import prisma from '../services/prisma';
-import { AsyncResult, combineAsync, complete, errored, fromPromise, isErrored } from '@attio/fetchable';
 
 export const NotificationType = {
   DEFAULT: 'DEFAULT',
