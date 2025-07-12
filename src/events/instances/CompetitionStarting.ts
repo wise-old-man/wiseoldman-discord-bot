@@ -1,25 +1,28 @@
+import { AsyncResult, errored } from '@attio/fetchable';
 import { Competition, getMetricName } from '@wise-old-man/utils';
 import { Client, EmbedBuilder } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
-import { Event } from '../../utils/events';
 import {
-  propagateMessage,
-  NotificationType,
   durationBetween,
   getEmoji,
-  MessagePropagationError
+  MessagePropagationError,
+  NotificationType,
+  propagateMessage
 } from '../../utils';
-import { AsyncResult, errored } from '@attio/fetchable';
+import { Event } from '../../utils/events';
 
-interface CompetitionStartingData {
+type CompetitionStartingData = {
   groupId: number;
   competition: Competition;
-  period: {
-    hours?: number;
-    minutes?: number;
-  };
-}
+} & (
+  | {
+      period: { hours?: number; minutes?: number };
+    }
+  | {
+      minutesLeft: number;
+    }
+);
 
 class CompetitionStarting implements Event {
   type: string;
@@ -35,7 +38,7 @@ class CompetitionStarting implements Event {
     true,
     { code: 'MISSING_GROUP_ID' } | { code: 'MISSING_TIME_LEFT' } | MessagePropagationError
   > {
-    const { groupId, competition, period } = data;
+    const { groupId, competition } = data;
     const { id, metric, startsAt, endsAt, type, title } = competition;
 
     if (!groupId) {
@@ -44,7 +47,8 @@ class CompetitionStarting implements Event {
       });
     }
 
-    const timeLeft = getTimeLeft(period);
+    // Soon the API will always return "minutesLeft", so "period" can be removed
+    const timeLeft = 'period' in data ? getPeriodTimeLeft(data.period) : getTimeLeft(data.minutesLeft);
 
     if (!timeLeft) {
       return errored({
@@ -68,7 +72,16 @@ class CompetitionStarting implements Event {
   }
 }
 
-function getTimeLeft(period: { hours?: number; minutes?: number }) {
+function getTimeLeft(minutesLeft: number) {
+  if (minutesLeft >= 60) {
+    const hours = Math.floor(minutesLeft / 60);
+    return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
+  }
+
+  return `${minutesLeft} ${minutesLeft === 1 ? 'minute' : 'minutes'}`;
+}
+
+function getPeriodTimeLeft(period: { hours?: number; minutes?: number }) {
   const { hours, minutes } = period;
 
   if (hours && hours > 0) {
