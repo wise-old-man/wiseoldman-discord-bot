@@ -12,14 +12,17 @@ import {
 } from '../../utils';
 import { Event } from '../../utils/events';
 
-interface CompetitionEndingData {
+type CompetitionEndingData = {
   groupId: number;
   competition: Competition;
-  period: {
-    hours?: number;
-    minutes?: number;
-  };
-}
+} & (
+  | {
+      period: { hours?: number; minutes?: number };
+    }
+  | {
+      minutesLeft: number;
+    }
+);
 
 class CompetitionEnding implements Event {
   type: string;
@@ -35,7 +38,7 @@ class CompetitionEnding implements Event {
     true,
     { code: 'MISSING_GROUP_ID' } | { code: 'MISSING_TIME_LEFT' } | MessagePropagationError
   > {
-    const { groupId, competition, period } = data;
+    const { groupId, competition } = data;
     const { id, metric, type, title, startsAt, endsAt } = competition;
 
     if (!groupId) {
@@ -44,7 +47,8 @@ class CompetitionEnding implements Event {
       });
     }
 
-    const timeLeft = getTimeLeft(period);
+    // Soon the API will always return "minutesLeft", so "period" can be removed
+    const timeLeft = 'period' in data ? getPeriodTimeLeft(data.period) : getTimeLeft(data.minutesLeft);
 
     if (!timeLeft) {
       return errored({
@@ -58,11 +62,17 @@ class CompetitionEnding implements Event {
       { name: 'Duration', value: durationBetween(new Date(startsAt), new Date(endsAt)) }
     ];
 
-    if (period.minutes && period.minutes < 60) {
-      fields.push({
-        name: `\u200B`,
-        value: `⚠️ Don't forget to update your account's hiscores **before the time is up!**`
-      });
+    const warningField = {
+      name: `\u200B`,
+      value: `⚠️ Don't forget to update your account's hiscores **before the time is up!**`
+    };
+
+    if ('period' in data) {
+      if (data.period.minutes && data.period.minutes < 60) {
+        fields.push(warningField);
+      }
+    } else if (data.minutesLeft < 60) {
+      fields.push(warningField);
     }
 
     const message = new EmbedBuilder()
@@ -75,7 +85,16 @@ class CompetitionEnding implements Event {
   }
 }
 
-function getTimeLeft(period: { hours?: number; minutes?: number }) {
+function getTimeLeft(minutesLeft: number) {
+  if (minutesLeft >= 60) {
+    const hours = Math.floor(minutesLeft / 60);
+    return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
+  }
+
+  return `${minutesLeft} ${minutesLeft === 1 ? 'minute' : 'minutes'}`;
+}
+
+function getPeriodTimeLeft(period: { hours?: number; minutes?: number }) {
   const { hours, minutes } = period;
 
   if (hours && hours > 0) {
