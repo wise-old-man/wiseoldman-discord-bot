@@ -95,9 +95,14 @@ export async function handlePatreonModalSubmit(interaction: ModalSubmitInteracti
     return;
   }
 
+  const isTier2Supporter = hasRole(
+    interaction.member as GuildMember,
+    config.discord.roles.patreonSupporterT2
+  );
+
   let groupId: number | undefined;
 
-  if (hasRole(interaction.member as GuildMember, config.discord.roles.patreonSupporterT2)) {
+  if (isTier2Supporter) {
     const groupIdValue = interaction.fields.getTextInputValue('groupId');
     const isInteger = typeof groupIdValue === 'string' && Number.isInteger(parseInt(groupIdValue));
 
@@ -123,8 +128,10 @@ export async function handlePatreonModalSubmit(interaction: ModalSubmitInteracti
     sendModLog(
       interaction.guild,
       `${interaction.user} has claimed ${
-        groupId ? 'Tier 2' : 'Tier 1'
-      } Patreon benefits for: \nUsername: ${username}${groupId ? `\nGroup id: ${groupId}` : ''}`
+        isTier2Supporter ? 'Tier 2' : 'Tier 1'
+      } Patreon benefits for: \nUsername: ${username}${
+        isTier2Supporter ? `\nGroup id: ${groupId ?? '--'}` : ''
+      }`
     );
   } catch (error) {
     interaction.reply({ content: error.message, ephemeral: true });
