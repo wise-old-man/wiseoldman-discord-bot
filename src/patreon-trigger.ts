@@ -75,7 +75,8 @@ export async function handlePatreonTrigger(interaction: ButtonInteraction) {
     .setCustomId('groupId')
     .setLabel("Your group's ID")
     .setPlaceholder("Ex: 139 (Can be found on your group's page URL.)")
-    .setStyle(1);
+    .setStyle(1)
+    .setRequired(false);
 
   modal.addComponents(new ActionRowBuilder<TextInputBuilder>().addComponents(usernameInput));
 
@@ -100,12 +101,12 @@ export async function handlePatreonModalSubmit(interaction: ModalSubmitInteracti
     const groupIdValue = interaction.fields.getTextInputValue('groupId');
     const isInteger = typeof groupIdValue === 'string' && Number.isInteger(parseInt(groupIdValue));
 
-    if (!isInteger) {
+    if (groupIdValue !== '' && !isInteger) {
       interaction.reply({ content: '❌ Please provide a valid group ID.', ephemeral: true });
       return;
     }
 
-    groupId = parseInt(groupIdValue);
+    groupId = groupIdValue === '' ? undefined : parseInt(groupIdValue);
   }
 
   try {
