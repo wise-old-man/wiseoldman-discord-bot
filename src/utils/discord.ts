@@ -1,14 +1,14 @@
 import { GroupRole, Metric } from '@wise-old-man/utils';
 import {
   Channel,
+  ChannelType,
+  EmbedBuilder,
   Guild,
   GuildMember,
-  EmbedBuilder,
+  PermissionFlagsBits,
   PermissionResolvable,
   TextChannel,
-  User,
-  ChannelType,
-  PermissionFlagsBits
+  User
 } from 'discord.js';
 import config from '../config';
 import { parseMetricAbbreviation } from '../services/wiseoldman';
@@ -65,6 +65,7 @@ const MetricEmoji = {
   [Metric.DAGANNOTH_REX]: '<:dagannoth_rex:729839922097422336>',
   [Metric.DAGANNOTH_SUPREME]: '<:dagannoth_supreme:729839921959010345>',
   [Metric.DERANGED_ARCHAEOLOGIST]: '<:deranged_archaeologist:729839922139234374>',
+  [Metric.DOOM_OF_MOKHAIOTL]: '<:doom_of_mokhaiotl:1397692326163255457>',
   [Metric.DUKE_SUCELLUS]: '<:duke_sucellus:1133832623458881586>',
   [Metric.GENERAL_GRAARDOR]: '<:general_graardor:729839922298618026>',
   [Metric.GIANT_MOLE]: '<:giant_mole:729839922076319875>',
@@ -117,6 +118,12 @@ const MetricEmoji = {
   [Metric.BOUNTY_HUNTER_HUNTER]: '<:bounty_hunter_hunter:730171196410298378>',
   [Metric.BOUNTY_HUNTER_ROGUE]: '<:bounty_hunter_rogue:730171196561293392>',
   [Metric.CLUE_SCROLLS_ALL]: '<:clue_scrolls_all:729844134004785204>',
+  [Metric.CLUE_SCROLLS_BEGINNER]: '<:clue_scrolls_all:729844134004785204>',
+  [Metric.CLUE_SCROLLS_EASY]: '<:clue_scrolls_all:729844134004785204>',
+  [Metric.CLUE_SCROLLS_MEDIUM]: '<:clue_scrolls_all:729844134004785204>',
+  [Metric.CLUE_SCROLLS_HARD]: '<:clue_scrolls_all:729844134004785204>',
+  [Metric.CLUE_SCROLLS_ELITE]: '<:clue_scrolls_all:729844134004785204>',
+  [Metric.CLUE_SCROLLS_MASTER]: '<:clue_scrolls_all:729844134004785204>',
   [Metric.SOUL_WARS_ZEAL]: '<:soul_wars_zeal:1011956473615630396>',
   [Metric.GUARDIANS_OF_THE_RIFT]: '<:guardians_of_the_rift:963939589070934046>',
   [Metric.COLOSSEUM_GLORY]: '<:colosseum_glory:1220023685881139312>',
@@ -124,7 +131,7 @@ const MetricEmoji = {
   // Computed metric emojis
   [Metric.EHP]: '<:ehp:766260738221670432>',
   [Metric.EHB]: '<:ehb:766260773617795103>'
-} as const;
+} satisfies Record<Metric, string>;
 
 const GroupRoleEmoji = {
   [GroupRole.ACHIEVER]: '<:achiever:1159528170580627517>',
@@ -396,7 +403,7 @@ const GroupRoleEmoji = {
   [GroupRole.ZAROSIAN]: '<:zarosian:1159539628068585516>',
   [GroupRole.ZEALOT]: '<:zealot:1159539629876334644>',
   [GroupRole.ZENYTE]: '<:zenyte:1159539675942371328>'
-} as const;
+} satisfies Record<GroupRole, string>;
 
 export function isAdmin(member: GuildMember | null): boolean {
   return member ? member?.permissions.has(PermissionFlagsBits.Administrator) : false;
@@ -429,11 +436,7 @@ export function isChannelSendable(channel: Channel): channel is TextChannel {
 }
 
 export function getEmoji(metric: string): string {
-  const emojiKey = metric.startsWith('clue')
-    ? Metric.CLUE_SCROLLS_ALL
-    : parseMetricAbbreviation(metric) || metric.toLocaleLowerCase();
-
-  return MetricEmoji[emojiKey] ?? '';
+  return MetricEmoji[parseMetricAbbreviation(metric) || metric.toLocaleLowerCase()] ?? '';
 }
 
 export function getGroupRoleEmoji(role: string): string {
