@@ -4,7 +4,7 @@ import config from '../../../config';
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
 
 const DM_MESSAGE = (code: string, groupId: number) =>
-  `Hey! Here's your new verification code for group [${groupId}](<https://wiseoldman.net/${groupId}>): \n\`${code}\`\n\nPlease save it somewhere safe and be mindful of who you choose to share it with.`;
+  `Hey! Here's your new verification code for group [${groupId}](<https://wiseoldman.net/groups/${groupId}>): \n\`${code}\`\n\nPlease save it somewhere safe and be mindful of who you choose to share it with.`;
 
 const CHAT_MESSAGE = (userId: string) =>
   `Verification code successfully reset. A DM has been sent to <@${userId}>.`;
