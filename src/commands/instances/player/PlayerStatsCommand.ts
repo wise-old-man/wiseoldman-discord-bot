@@ -1,20 +1,20 @@
-import { formatNumber, isSkill, Metric, PlayerDetails, round } from '@wise-old-man/utils';
+import { formatNumber, isSkill, Metric, PlayerDetailsResponse, roundNumber } from '@wise-old-man/utils';
 import Canvas from 'canvas';
 import {
-  ChatInputCommandInteraction,
+  ApplicationCommandOptionType,
   AttachmentBuilder,
-  EmbedBuilder,
-  ApplicationCommandOptionType
+  ChatInputCommandInteraction,
+  EmbedBuilder
 } from 'discord.js';
 import config from '../../../config';
 import womClient from '../../../services/wiseoldman';
 import {
   Command,
   CommandConfig,
-  getUsernameParam,
-  getScaledCanvas,
+  CommandError,
   encodeURL,
-  CommandError
+  getScaledCanvas,
+  getUsernameParam
 } from '../../../utils';
 
 const RENDER_WIDTH = 215;
@@ -119,7 +119,7 @@ class PlayerStatsCommand extends Command {
     await interaction.editReply({ embeds: [embed], files: [attachment] });
   }
 
-  async render(playerDetails: PlayerDetails, variant: RenderVariant) {
+  async render(playerDetails: PlayerDetailsResponse, variant: RenderVariant) {
     const username = playerDetails.username;
     const skills = playerDetails.latestSnapshot!.data.skills;
 
@@ -183,7 +183,7 @@ class PlayerStatsCommand extends Command {
       } else if (variant === RenderVariant.EHP) {
         ctx.font = '9px sans-serif';
 
-        const ehp = isRanked ? `${round(skills[skill]?.ehp ?? 0, 1)}` : '?';
+        const ehp = isRanked ? `${roundNumber(skills[skill]?.ehp ?? 0, 1)}` : '?';
         const ehpWidth = ctx.measureText(ehp).width;
 
         // Skill EHP

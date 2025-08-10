@@ -1,10 +1,10 @@
-import { Achievement, PlayerDetails } from '@wise-old-man/utils';
+import { AchievementResponse, PlayerDetailsResponse } from '@wise-old-man/utils';
 import Canvas from 'canvas';
 import {
-  ChatInputCommandInteraction,
+  ApplicationCommandOptionType,
   AttachmentBuilder,
-  EmbedBuilder,
-  ApplicationCommandOptionType
+  ChatInputCommandInteraction,
+  EmbedBuilder
 } from 'discord.js';
 import config from '../../../config';
 import womClient from '../../../services/wiseoldman';
@@ -73,7 +73,7 @@ class PlayerAchievementsCommand extends Command {
     await interaction.editReply({ embeds: [embed], files: [attachment] });
   }
 
-  async render(player: PlayerDetails, achievements: Achievement[]) {
+  async render(player: PlayerDetailsResponse, achievements: AchievementResponse[]) {
     const calculatedHeight = Math.min(10 + achievements.length * 31, RENDER_HEIGHT);
 
     // Create a scaled empty canvas

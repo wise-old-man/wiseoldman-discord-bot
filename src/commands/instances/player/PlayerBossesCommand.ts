@@ -1,10 +1,10 @@
-import { formatNumber, isBoss, Metric, PlayerDetails, round } from '@wise-old-man/utils';
+import { formatNumber, isBoss, Metric, PlayerDetailsResponse, roundNumber } from '@wise-old-man/utils';
 import Canvas from 'canvas';
 import {
-  ChatInputCommandInteraction,
+  ApplicationCommandOptionType,
   AttachmentBuilder,
-  EmbedBuilder,
-  ApplicationCommandOptionType
+  ChatInputCommandInteraction,
+  EmbedBuilder
 } from 'discord.js';
 import config from '../../../config';
 import womClient from '../../../services/wiseoldman';
@@ -89,7 +89,7 @@ class PlayerBossesCommand extends Command {
     await interaction.editReply({ embeds: [embed], files: [attachment] });
   }
 
-  async render(playerDetails: PlayerDetails, variant: RenderVariant) {
+  async render(playerDetails: PlayerDetailsResponse, variant: RenderVariant) {
     const username = playerDetails.username;
     const { bosses, computed } = playerDetails.latestSnapshot!.data;
 
@@ -146,7 +146,7 @@ class PlayerBossesCommand extends Command {
       } else if (variant === RenderVariant.EHB) {
         ctx.font = '10px Arial';
 
-        const ehbLabel = `${round(ehb ? ehb : 0, 1)}`;
+        const ehbLabel = `${roundNumber(ehb ? ehb : 0, 1)}`;
         const ehbWidth = ctx.measureText(ehbLabel).width;
 
         // Boss EHB

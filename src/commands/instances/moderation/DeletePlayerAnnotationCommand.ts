@@ -1,7 +1,7 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import { deletePlayerAnnotation } from '../../../services/wiseoldman';
 import { PlayerAnnotationType } from '@wise-old-man/utils';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import config from '../../../config';
+import { deletePlayerAnnotation } from '../../../services/wiseoldman';
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
 
 const CONFIG: CommandConfig = {

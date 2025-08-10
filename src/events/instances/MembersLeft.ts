@@ -1,5 +1,5 @@
 import { AsyncResult, errored } from '@attio/fetchable';
-import { Player } from '@wise-old-man/utils';
+import { PlayerResponse } from '@wise-old-man/utils';
 import { Client, EmbedBuilder } from 'discord.js';
 import config from '../../config';
 import { encodeURL, MessagePropagationError, NotificationType, propagateMessage } from '../../utils';
@@ -7,7 +7,7 @@ import { Event } from '../../utils/events';
 
 interface MembersLeftData {
   groupId: number;
-  players: Pick<Player, 'displayName'>[];
+  players: Pick<PlayerResponse, 'displayName'>[];
 }
 
 class MembersLeft implements Event {

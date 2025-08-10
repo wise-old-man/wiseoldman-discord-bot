@@ -1,4 +1,4 @@
-import { CountryProps, getMetricName, METRICS, PeriodProps, PERIODS } from '@wise-old-man/utils';
+import { CountryProps, MetricProps, METRICS, PeriodProps, PERIODS } from '@wise-old-man/utils';
 import { CUSTOM_COMMANDS } from './custom';
 
 interface AutoCompleteOption {
@@ -30,7 +30,7 @@ export function getPeriodOptions(currentValue: string): AutoCompleteOption[] {
 export function getMetricOptions(currentValue: string): AutoCompleteOption[] {
   return METRICS.filter(metric => (!currentValue ? true : matches(currentValue, metric))).map(
     metric => ({
-      name: getMetricName(metric),
+      name: MetricProps[metric].name,
       value: metric
     })
   );

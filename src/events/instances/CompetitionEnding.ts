@@ -1,5 +1,5 @@
 import { AsyncResult, errored } from '@attio/fetchable';
-import { Competition, getMetricName } from '@wise-old-man/utils';
+import { CompetitionResponse, MetricProps } from '@wise-old-man/utils';
 import { Client, EmbedBuilder } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
@@ -14,7 +14,7 @@ import { Event } from '../../utils/events';
 
 type CompetitionEndingData = {
   groupId: number;
-  competition: Competition;
+  competition: CompetitionResponse;
 } & (
   | {
       period: { hours?: number; minutes?: number };
@@ -57,7 +57,7 @@ class CompetitionEnding implements Event {
     }
 
     const fields = [
-      { name: 'Metric', value: `${getEmoji(metric)} ${getMetricName(metric)}` },
+      { name: 'Metric', value: `${getEmoji(metric)} ${MetricProps[metric].name}` },
       { name: 'Type', value: capitalize(type) },
       { name: 'Duration', value: durationBetween(new Date(startsAt), new Date(endsAt)) }
     ];

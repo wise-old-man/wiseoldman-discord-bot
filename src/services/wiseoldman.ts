@@ -1,15 +1,14 @@
 import {
-  WOMClient,
-  CompetitionDetails,
-  CompetitionListItem,
+  CompetitionResponse,
   CompetitionStatus,
-  GroupListItem,
-  NameChange,
-  Player,
-  NameChangeDetails,
+  GroupResponse,
   isMetric,
   Metric,
-  PlayerAnnotationType
+  NameChangeDetailsResponse,
+  NameChangeResponse,
+  PlayerAnnotationType,
+  PlayerResponse,
+  WOMClient
 } from '@wise-old-man/utils';
 import env from '../env';
 import { durationBetween } from '../utils/dates';
@@ -22,7 +21,9 @@ const womClient = new WOMClient({
   apiKey: config.apiKey
 });
 
-export function getCompetitionStatus(competition: CompetitionDetails | CompetitionListItem) {
+export function getCompetitionStatus<T extends Pick<CompetitionResponse, 'startsAt' | 'endsAt'>>(
+  competition: T
+) {
   const now = new Date();
   const endsAt = competition.endsAt;
   const startsAt = competition.startsAt;
@@ -38,7 +39,9 @@ export function getCompetitionStatus(competition: CompetitionDetails | Competiti
   return CompetitionStatus.UPCOMING;
 }
 
-export function getCompetitionTimeLeft(competition: CompetitionDetails | CompetitionListItem): string {
+export function getCompetitionTimeLeft<T extends Pick<CompetitionResponse, 'startsAt' | 'endsAt'>>(
+  competition: T
+) {
   const now = new Date();
   const endsAt = competition.endsAt;
   const startsAt = competition.startsAt;
@@ -77,7 +80,7 @@ export async function resetGroupCode(groupId: number): Promise<{ newCode: string
 /**
  * Send an API request attempting to verify a group.
  */
-export async function verifyGroup(groupId: number): Promise<GroupListItem> {
+export async function verifyGroup(groupId: number): Promise<GroupResponse> {
   return womClient.groups.putRequest(`/groups/${groupId}/verify`, {
     adminPassword: env.ADMIN_PASSWORD
   });
@@ -144,17 +147,17 @@ export async function deleteCompetition(competitionId: number): Promise<{ messag
   });
 }
 
-export async function approveNameChange(id: number): Promise<NameChange> {
+export async function approveNameChange(id: number): Promise<NameChangeResponse> {
   return womClient.nameChanges.postRequest(`/names/${id}/approve`, {
     adminPassword: env.ADMIN_PASSWORD
   });
 }
 
-export async function fetchNameChangeDetails(id: number): Promise<NameChangeDetails> {
+export async function fetchNameChangeDetails(id: number): Promise<NameChangeDetailsResponse> {
   return womClient.nameChanges.getRequest(`/names/${id}`);
 }
 
-export async function denyNameChange(id: number): Promise<NameChange> {
+export async function denyNameChange(id: number): Promise<NameChangeResponse> {
   return womClient.nameChanges.postRequest(`/names/${id}/deny`, {
     adminPassword: env.ADMIN_PASSWORD
   });
@@ -203,7 +206,7 @@ export async function claimBenefits(
 /**
  * Send an API request attempting to update a player's country
  */
-export async function updateCountry(username: string, country: string | null): Promise<Player> {
+export async function updateCountry(username: string, country: string | null): Promise<PlayerResponse> {
   return womClient.players.putRequest(`/players/${username}/country`, {
     country,
     adminPassword: env.ADMIN_PASSWORD
@@ -224,7 +227,7 @@ export async function rollbackColLog(username: string) {
 }
 
 export async function archive(username: string) {
-  return womClient.players.postRequest<Player>(`/players/${username}/archive`, {
+  return womClient.players.postRequest<PlayerResponse>(`/players/${username}/archive`, {
     adminPassword: env.ADMIN_PASSWORD
   });
 }

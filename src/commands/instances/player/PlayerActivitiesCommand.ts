@@ -1,10 +1,10 @@
-import { formatNumber, isActivity, PlayerDetails } from '@wise-old-man/utils';
+import { formatNumber, isActivity, PlayerDetailsResponse } from '@wise-old-man/utils';
 import Canvas from 'canvas';
 import {
-  ChatInputCommandInteraction,
+  ApplicationCommandOptionType,
   AttachmentBuilder,
-  EmbedBuilder,
-  ApplicationCommandOptionType
+  ChatInputCommandInteraction,
+  EmbedBuilder
 } from 'discord.js';
 import config from '../../../config';
 import womClient from '../../../services/wiseoldman';
@@ -87,7 +87,7 @@ class PlayerActivitiesCommand extends Command {
     await interaction.editReply({ embeds: [embed], files: [attachment] });
   }
 
-  async render(playerDetails: PlayerDetails, variant: RenderVariant) {
+  async render(playerDetails: PlayerDetailsResponse, variant: RenderVariant) {
     const username = playerDetails.username;
     const activities = playerDetails.latestSnapshot!.data.activities;
 

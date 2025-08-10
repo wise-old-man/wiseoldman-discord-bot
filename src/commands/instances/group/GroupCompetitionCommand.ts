@@ -1,11 +1,10 @@
 import {
-  CompetitionDetails,
+  CompetitionDetailsResponse,
   CompetitionStatus,
   CompetitionStatusProps,
   CompetitionType,
   CompetitionTypeProps,
   formatNumber,
-  isCompetitionStatus,
   MetricProps
 } from '@wise-old-man/utils';
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
@@ -59,8 +58,11 @@ class GroupCompetitionCommand extends Command {
 
     // Extract the "status" param, or fallback to "ongoing"
     const statusParam = interaction.options.getString('status');
+
     const status =
-      statusParam !== null && isCompetitionStatus(statusParam) ? statusParam : CompetitionStatus.ONGOING;
+      statusParam !== null && statusParam in CompetitionStatusProps
+        ? (statusParam as CompetitionStatus)
+        : CompetitionStatus.ONGOING;
 
     // Extract the "competition_id" param, or fallback to the default competition
     const competitionIdParam = interaction.options.getInteger('competition_id');
@@ -82,13 +84,13 @@ class GroupCompetitionCommand extends Command {
   }
 }
 
-function getFooterDate(competition: CompetitionDetails) {
+function getFooterDate(competition: CompetitionDetailsResponse) {
   return getCompetitionStatus(competition) === CompetitionStatus.UPCOMING
     ? new Date(competition.startsAt)
     : new Date(competition.endsAt);
 }
 
-function getFooterLabel(competition: CompetitionDetails) {
+function getFooterLabel(competition: CompetitionDetailsResponse) {
   const status = getCompetitionStatus(competition);
 
   if (status === CompetitionStatus.UPCOMING) return 'Starts at';
@@ -96,7 +98,7 @@ function getFooterLabel(competition: CompetitionDetails) {
   return 'Ended at';
 }
 
-function buildContent(competition: CompetitionDetails) {
+function buildContent(competition: CompetitionDetailsResponse) {
   const { metric, type, participations, participantCount } = competition;
   const timeLeft = getCompetitionTimeLeft(competition).split(' ');
 
@@ -135,7 +137,7 @@ function buildContent(competition: CompetitionDetails) {
   return lines.join('\n');
 }
 
-function aggregateTeamData(competition: CompetitionDetails) {
+function aggregateTeamData(competition: CompetitionDetailsResponse) {
   const participants = competition.participations;
 
   if (!participants || participants.length === 0) return [];

@@ -5,15 +5,15 @@ import {
   Boss,
   BOSSES,
   formatNumber,
-  FormattedSnapshot,
   isActivity,
   isBoss,
   isSkill,
   MetricProps,
-  Player,
+  PlayerResponse,
   REAL_SKILLS,
   Skill,
-  SKILLS
+  SKILLS,
+  SnapshotResponse
 } from '@wise-old-man/utils';
 import {
   ActionRowBuilder,
@@ -31,10 +31,10 @@ import { encodeURL } from '../../utils';
 import { Event } from '../../utils/events';
 
 interface PlayerFlaggedData {
-  player: Player;
+  player: PlayerResponse;
   flagContext: {
-    previous: FormattedSnapshot;
-    rejected: FormattedSnapshot;
+    previous: SnapshotResponse;
+    rejected: SnapshotResponse;
     negativeGains: boolean;
     excessiveGains: boolean;
     possibleRollback: boolean;
@@ -423,7 +423,7 @@ async function handleRollback(username: string) {
   await rollback(username, false);
 }
 
-function getLargestSkillChanges(previous: FormattedSnapshot, rejected: FormattedSnapshot) {
+function getLargestSkillChanges(previous: SnapshotResponse, rejected: SnapshotResponse) {
   const lines: string[] = [];
 
   const map = new Map<Skill, number>();
@@ -460,7 +460,7 @@ function getLargestSkillChanges(previous: FormattedSnapshot, rejected: Formatted
   return lines;
 }
 
-function getLargestBossChanges(previous: FormattedSnapshot, rejected: FormattedSnapshot) {
+function getLargestBossChanges(previous: SnapshotResponse, rejected: SnapshotResponse) {
   const lines: string[] = [];
 
   const map = new Map<Boss, number>();
@@ -493,7 +493,7 @@ function getLargestBossChanges(previous: FormattedSnapshot, rejected: FormattedS
   return lines;
 }
 
-function getLargestActivityChanges(previous: FormattedSnapshot, rejected: FormattedSnapshot) {
+function getLargestActivityChanges(previous: SnapshotResponse, rejected: SnapshotResponse) {
   const lines: string[] = [];
 
   const map = new Map<Activity, number>();

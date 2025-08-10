@@ -1,4 +1,4 @@
-import { formatNumber, round } from '@wise-old-man/utils';
+import { formatNumber, roundNumber } from '@wise-old-man/utils';
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import config from '../../../config';
 import womClient from '../../../services/wiseoldman';
@@ -39,19 +39,19 @@ class PlayerEfficiencyCommand extends Command {
       .addFields([
         {
           name: 'Time To Max',
-          value: player.ttm ? `${round(player.ttm, 2)} hours` : '---'
+          value: player.ttm ? `${roundNumber(player.ttm, 2)} hours` : '---'
         },
         {
           name: 'Time To 200m All',
-          value: player.tt200m ? `${round(player.tt200m, 2)} hours` : '---'
+          value: player.tt200m ? `${roundNumber(player.tt200m, 2)} hours` : '---'
         },
         {
           name: 'Efficient Hours Played',
-          value: player.ehp ? `${round(player.ehp, 2)}` : '---'
+          value: player.ehp ? `${roundNumber(player.ehp, 2)}` : '---'
         },
         {
           name: 'Efficient Hours Bossed',
-          value: player.ehb ? `${round(player.ehb, 2)}` : '---'
+          value: player.ehb ? `${roundNumber(player.ehb, 2)}` : '---'
         },
         {
           name: 'Total Experience',

@@ -1,5 +1,5 @@
 import { AsyncResult, complete, errored, fromPromise, isErrored } from '@attio/fetchable';
-import { Competition, Group } from '@wise-old-man/utils';
+import { CompetitionResponse, GroupResponse } from '@wise-old-man/utils';
 import { ChannelType, Client, EmbedBuilder, TextChannel } from 'discord.js';
 import config from '../../config';
 import { createModerationButtons, ModerationType } from '../../utils/buttonInteractions';
@@ -7,8 +7,8 @@ import { Event } from '../../utils/events';
 
 interface DataType {
   ipHash: string;
-  groups: Group[];
-  competitions: Competition[];
+  groups: GroupResponse[];
+  competitions: CompetitionResponse[];
 }
 
 const SAMPLES_AMOUNT = 5;

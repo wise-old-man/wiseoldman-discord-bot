@@ -1,10 +1,9 @@
 import {
   formatNumber,
-  getMetricName,
-  GetPlayerGainsResponse,
   Metric,
   parsePeriodExpression,
-  PeriodProps
+  PeriodProps,
+  PlayerDeltasMapResponse
 } from '@wise-old-man/utils';
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { createPaginatedEmbed } from '../../../commands/pagination';
@@ -75,7 +74,7 @@ class PlayerGainedCommand extends Command {
       period in PeriodProps
         ? `period=${period}`
         : `startDate=${new Date(
-            Date.now() - parsePeriodExpression(period).durationMs
+            Date.now() - parsePeriodExpression(period)!.durationMs
           ).toISOString()}&endDate=${new Date().toISOString()}`;
 
     const pages = buildPages(player.displayName, period, playerGains);
@@ -108,7 +107,15 @@ class PlayerGainedCommand extends Command {
   }
 }
 
-function buildPages(displayName: string, period: string, gained: GetPlayerGainsResponse) {
+function buildPages(
+  displayName: string,
+  period: string,
+  gained: {
+    startsAt: Date | null;
+    endsAt: Date | null;
+    data: PlayerDeltasMapResponse;
+  }
+) {
   const gainsList = buildGainsList(displayName, period, gained);
   const pageCount = Math.ceil(gainsList.length / GAINS_PER_PAGE);
 
@@ -132,7 +139,15 @@ function buildPages(displayName: string, period: string, gained: GetPlayerGainsR
   return pages;
 }
 
-function buildGainsList(displayName: string, period: string, gained: GetPlayerGainsResponse) {
+function buildGainsList(
+  displayName: string,
+  period: string,
+  gained: {
+    startsAt: Date | null;
+    endsAt: Date | null;
+    data: PlayerDeltasMapResponse;
+  }
+) {
   const computedGains = Array.from(Object.entries(gained.data.computed))
     .filter(([, e]) => e.value.gained > 0)
     .map(([key, val]) => ({ metric: key, gained: val.value.gained }))
@@ -165,7 +180,7 @@ function buildGainsList(displayName: string, period: string, gained: GetPlayerGa
     let metricName = '';
 
     try {
-      metricName = getMetricName(metric as Metric);
+      metricName = Metric[metric as Metric].name;
     } catch (e) {
       metricName = metric;
     }

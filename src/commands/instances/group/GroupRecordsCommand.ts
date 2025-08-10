@@ -1,16 +1,16 @@
 import {
   formatNumber,
-  getMetricName,
   isMetric,
   isPeriod,
   Metric,
+  MetricProps,
   Period,
   PeriodProps,
   PERIODS
 } from '@wise-old-man/utils';
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import womClient, { parseMetricAbbreviation } from '../../../services/wiseoldman';
 import config from '../../../config';
+import womClient, { parseMetricAbbreviation } from '../../../services/wiseoldman';
 import { bold, Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
 
 const CONFIG: CommandConfig = {
@@ -60,7 +60,7 @@ class GroupRecordsCommand extends Command {
 
     const response = new EmbedBuilder()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} records (${period})`)
+      .setTitle(`${getEmoji(metric)} ${group.name} ${MetricProps[metric].name} records (${period})`)
       .setDescription(recordsList)
       .setURL(`https://wiseoldman.net/groups/${groupId}/records?period=${period}&metric=${metric}`)
       .setFooter({ text: `Tip: Try /group records metric: zulrah period: day` });
