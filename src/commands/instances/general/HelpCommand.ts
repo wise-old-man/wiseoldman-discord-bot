@@ -1,15 +1,15 @@
-import { GroupDetails } from '@wise-old-man/utils';
+import { GroupDetailsResponse } from '@wise-old-man/utils';
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import config from '../../../config';
 import { CUSTOM_COMMANDS } from '../../../commands/custom';
+import config from '../../../config';
 import prisma, { getServer } from '../../../services/prisma';
 import womClient from '../../../services/wiseoldman';
 import {
   Command,
   CommandConfig,
+  CommandError,
   NotificationName,
-  NotificationType,
-  CommandError
+  NotificationType
 } from '../../../utils';
 
 const BOT_URL = 'https://bot.wiseoldman.net';
@@ -72,7 +72,7 @@ class HelpCommand extends Command {
       return;
     }
 
-    let group: GroupDetails | null = null;
+    let group: GroupDetailsResponse | null = null;
 
     if (groupId && groupId > -1) {
       try {

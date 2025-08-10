@@ -1,5 +1,5 @@
 import { AsyncResult, errored } from '@attio/fetchable';
-import { GroupRole, GroupRoleProps, Player } from '@wise-old-man/utils';
+import { GroupRole, GroupRoleProps, PlayerResponse } from '@wise-old-man/utils';
 import { Client, EmbedBuilder } from 'discord.js';
 import config from '../../config';
 import {
@@ -14,7 +14,7 @@ interface MembersJoinedData {
   groupId: number;
   members: {
     role: GroupRole;
-    player: Pick<Player, 'displayName'>;
+    player: Pick<PlayerResponse, 'displayName'>;
   }[];
 }
 

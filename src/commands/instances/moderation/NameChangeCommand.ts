@@ -1,17 +1,17 @@
-import { NameChange, NameChangeDetails, NameChangeStatus } from '@wise-old-man/utils';
+import { NameChangeDetailsResponse, NameChangeResponse, NameChangeStatus } from '@wise-old-man/utils';
 import {
-  ButtonInteraction,
-  GuildMember,
   ActionRowBuilder,
-  ButtonBuilder,
-  EmbedBuilder,
   ApplicationCommandOptionType,
-  ChatInputCommandInteraction,
+  ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
-  ComponentType
+  ChatInputCommandInteraction,
+  ComponentType,
+  EmbedBuilder,
+  GuildMember
 } from 'discord.js';
-import { approveNameChange, denyNameChange, fetchNameChangeDetails } from '../../../services/wiseoldman';
 import config from '../../../config';
+import { approveNameChange, denyNameChange, fetchNameChangeDetails } from '../../../services/wiseoldman';
 import { Command, CommandConfig, CommandError, hasModeratorRole } from '../../../utils';
 
 const CONFIG: CommandConfig = {
@@ -124,8 +124,8 @@ class NameChangeCommand extends Command {
 }
 
 function buildReviewMessage(
-  nameChange: NameChange,
-  data: NonNullable<NameChangeDetails['data']>
+  nameChange: NameChangeResponse,
+  data: NonNullable<NameChangeDetailsResponse['data']>
 ): string {
   const { isNewOnHiscores, hasNegativeGains, hoursDiff, ehpDiff, ehbDiff, oldStats, newStats } = data;
 

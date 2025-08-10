@@ -1,5 +1,5 @@
 import { AsyncResult, errored } from '@attio/fetchable';
-import { Achievement, Player } from '@wise-old-man/utils';
+import { AchievementResponse, PlayerResponse } from '@wise-old-man/utils';
 import { Client, EmbedBuilder } from 'discord.js';
 import config from '../../config';
 import {
@@ -13,8 +13,8 @@ import { Event } from '../../utils/events';
 
 interface MemberAchievementsData {
   groupId: number;
-  player: Player;
-  achievements: Achievement[];
+  player: PlayerResponse;
+  achievements: AchievementResponse[];
 }
 
 class MemberAchievements implements Event {

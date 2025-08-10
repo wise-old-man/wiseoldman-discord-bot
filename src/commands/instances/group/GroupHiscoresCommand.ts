@@ -1,7 +1,7 @@
-import { formatNumber, getMetricName, GroupHiscoresEntry, Metric } from '@wise-old-man/utils';
+import { formatNumber, GroupHiscoresEntryResponse, Metric, MetricProps } from '@wise-old-man/utils';
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import womClient, { parseMetricAbbreviation } from '../../../services/wiseoldman';
 import config from '../../../config';
+import womClient, { parseMetricAbbreviation } from '../../../services/wiseoldman';
 import { bold, Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
 
 const CONFIG: CommandConfig = {
@@ -41,7 +41,7 @@ class GroupHiscoresCommand extends Command {
 
     const response = new EmbedBuilder()
       .setColor(config.visuals.blue)
-      .setTitle(`${getEmoji(metric)} ${group.name} ${getMetricName(metric)} hiscores`)
+      .setTitle(`${getEmoji(metric)} ${group.name} ${MetricProps[metric].name} hiscores`)
       .setDescription(hiscoresList)
       .setURL(`https://wiseoldman.net/groups/${groupId}/hiscores?metric=${metric}`)
       .setFooter({ text: `Tip: Try /group hiscores metric: zulrah` });
@@ -50,7 +50,7 @@ class GroupHiscoresCommand extends Command {
   }
 }
 
-function getValue(result: GroupHiscoresEntry): string {
+function getValue(result: GroupHiscoresEntryResponse): string {
   if ('level' in result.data) {
     return `${result.data.level} (${formatNumber(result.data.experience || 0, true)})`;
   }

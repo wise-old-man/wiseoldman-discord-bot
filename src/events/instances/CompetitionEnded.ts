@@ -1,5 +1,5 @@
 import { AsyncResult, errored } from '@attio/fetchable';
-import { Competition, CompetitionType, formatNumber } from '@wise-old-man/utils';
+import { CompetitionResponse, CompetitionType, formatNumber } from '@wise-old-man/utils';
 import { Client, EmbedBuilder } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../config';
@@ -14,7 +14,7 @@ interface CompetitionStanding {
 
 interface CompetitionEndedData {
   groupId: number;
-  competition: Competition;
+  competition: CompetitionResponse;
   standings: CompetitionStanding[];
 }
 

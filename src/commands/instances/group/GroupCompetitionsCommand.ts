@@ -1,12 +1,12 @@
 import {
-  CompetitionListItem,
+  CompetitionResponse,
   CompetitionStatus,
   CompetitionTypeProps,
-  GroupDetails
+  GroupDetailsResponse
 } from '@wise-old-man/utils';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '../../../services/wiseoldman';
 import config from '../../../config';
+import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '../../../services/wiseoldman';
 import { Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
 import { createPaginatedEmbed } from '../../pagination';
 
@@ -71,7 +71,7 @@ class GroupCompetitionsCommand extends Command {
   }
 }
 
-function buildCompetitionsList(competitions: CompetitionListItem[]) {
+function buildCompetitionsList(competitions: CompetitionResponse[]) {
   return competitions
     .map(c => ({ ...c, status: getCompetitionStatus(c) }))
     .sort(
@@ -95,7 +95,7 @@ function buildCompetitionsList(competitions: CompetitionListItem[]) {
     });
 }
 
-function buildPages(group: GroupDetails, competitions: CompetitionListItem[]) {
+function buildPages(group: GroupDetailsResponse, competitions: CompetitionResponse[]) {
   const competitionsList = buildCompetitionsList(competitions);
   const pageCount = Math.ceil(competitionsList.length / COMPETITIONS_PER_PAGE);
 
