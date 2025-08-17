@@ -1,6 +1,7 @@
 import {
   formatNumber,
   Metric,
+  MetricProps,
   parsePeriodExpression,
   PeriodProps,
   PlayerDeltasMapResponse
@@ -180,7 +181,7 @@ function buildGainsList(
     let metricName = '';
 
     try {
-      metricName = Metric[metric as Metric].name;
+      metricName = MetricProps[metric as Metric].name;
     } catch (e) {
       metricName = metric;
     }
