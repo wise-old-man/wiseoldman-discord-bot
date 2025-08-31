@@ -1,3 +1,4 @@
+import { isErrored } from '@attio/fetchable';
 import cors from 'cors';
 import { Client } from 'discord.js';
 import express from 'express';
@@ -12,7 +13,7 @@ export function init(client: Client) {
   app.use(express.urlencoded({ extended: true }));
   app.use(cors());
 
-  app.get('/', (req, res) => {
+  app.get('/', (_req, res) => {
     res.json(true);
   });
 
@@ -20,8 +21,17 @@ export function init(client: Client) {
    * The bot opens up port 7000 to receive http requests from the WOM API.
    * These requests contain events that the bot should attempt to propagate to relevant discord servers.
    */
-  app.post('/event', (req, res) => {
-    onEventReceived(client, req.body);
+  app.post('/event', async (req, res) => {
+    const result = await onEventReceived(client, req.body);
+
+    if (isErrored(result)) {
+      switch (result.error.code) {
+        case 'EVENT_TYPE_NOT_FOUND':
+          return res.status(400).json(result.error);
+        case 'FAILED_TO_EXECUTE_EVENT':
+          return res.status(500).json(result.error);
+      }
+    }
 
     return res.json('Event received.');
   });
