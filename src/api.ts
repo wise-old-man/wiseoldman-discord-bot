@@ -29,7 +29,9 @@ export function init(client: Client) {
         case 'EVENT_TYPE_NOT_FOUND':
           return res.status(400).json(result.error);
         case 'FAILED_TO_EXECUTE_EVENT':
-          return res.status(500).json(result.error);
+          // This shouldn't be propagated to the API. The API has done its job by sending the event to the bot.
+          // If we were to propagate this error, the API would just retry sending the event, which would likely fail again.
+          break;
       }
     }
 

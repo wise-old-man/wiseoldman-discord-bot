@@ -61,7 +61,7 @@ class PrometheusService {
         data: metrics
       });
     } catch (error) {
-      console.error('Failed to push metrics:', error);
+      console.error('Failed to push prometheus metrics:', error);
     }
   }
 
