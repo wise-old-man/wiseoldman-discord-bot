@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/node';
-import { GuildMember, Interaction, EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, GuildMember, Interaction } from 'discord.js';
 import config from '../config';
 import prometheus from '../services/prometheus';
 import {
@@ -18,8 +18,16 @@ import {
 import ConfigRootCommand from './instances/config';
 import HelpCommand from './instances/general/HelpCommand';
 import GroupRootCommand from './instances/group';
+import AddPlayerAnnotation from './instances/moderation/AddPlayerAnnotationCommand';
+import ClearNameChangeHistoryCommand from './instances/moderation/ClearNameChangeHistoryCommand';
+import CreateAPIKeyCommand from './instances/moderation/CreateAPIKeyCommand';
+import DeleteCompetitionCommand from './instances/moderation/DeleteCompetitionCommand';
+import DeleteGroupCommand from './instances/moderation/DeleteGroupCommand';
+import DeleteAnnotationCommand from './instances/moderation/DeletePlayerAnnotationCommand';
 import DeletePlayerCommand from './instances/moderation/DeletePlayerCommand';
 import NameChangeCommand from './instances/moderation/NameChangeCommand';
+import RemoveFromCompetitionCommand from './instances/moderation/RemoveFromCompetitionCommand';
+import RemoveFromGroupCommand from './instances/moderation/RemoveFromGroupCommand';
 import ResetCompetitionCodeCommand from './instances/moderation/ResetCompetitionCodeCommand';
 import ResetGroupCodeCommand from './instances/moderation/ResetGroupCodeCommand';
 import VerifyGroupCommand from './instances/moderation/VerifyGroupCommand';
@@ -32,14 +40,6 @@ import PlayerSetFlagCommand from './instances/player/PlayerSetFlagCommand';
 import PlayerSetUsernameCommand from './instances/player/PlayerSetUsernameCommand';
 import PlayerStatsCommand from './instances/player/PlayerStatsCommand';
 import UpdatePlayerCommand from './instances/player/UpdatePlayerCommand';
-import ClearNameChangeHistoryCommand from './instances/moderation/ClearNameChangeHistoryCommand';
-import DeleteGroupCommand from './instances/moderation/DeleteGroupCommand';
-import DeleteCompetitionCommand from './instances/moderation/DeleteCompetitionCommand';
-import RemoveFromGroupCommand from './instances/moderation/RemoveFromGroupCommand';
-import RemoveFromCompetitionCommand from './instances/moderation/RemoveFromCompetitionCommand';
-import CreateAPIKeyCommand from './instances/moderation/CreateAPIKeyCommand';
-import DeleteAnnotationCommand from './instances/moderation/DeletePlayerAnnotationCommand';
-import AddPlayerAnnotation from './instances/moderation/AddPlayerAnnotationCommand';
 
 export const COMMANDS: BaseCommand[] = [
   HelpCommand,
@@ -126,7 +126,7 @@ export async function onInteractionReceived(interaction: Interaction) {
 
     commandMonitor.endTracking(fullCommandName, 1, interaction.guildId ?? undefined);
   } catch (error) {
-    console.log(error);
+    console.log('Command execution error', fullCommandName, error);
     Sentry.captureException(error);
     await interaction.followUp({ embeds: [buildErrorEmbed(error)] });
     commandMonitor.endTracking(fullCommandName, 0, interaction.guildId ?? 'unknown guild id');
