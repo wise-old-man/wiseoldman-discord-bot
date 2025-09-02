@@ -53,7 +53,7 @@ class PrometheusService {
       throw new Error('PROMETHEUS_METRICS_SERVICE_URL is not set');
     }
 
-    const metrics = await this.registry.getMetricsAsJSON();
+    const metrics = await this.registry.metrics();
 
     try {
       await axios.post(process.env.PROMETHEUS_METRICS_SERVICE_URL, {
