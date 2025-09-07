@@ -21,7 +21,7 @@ const DESCRIPTION = `Track your Old School Runescape clan's progress from your o
 
 // Could I make this dynamic? yes sure, but who cares,
 // I'll just manually update it every few months
-const STATIC_SERVER_COUNT = '7k';
+const STATIC_SERVER_COUNT = '8k';
 
 function Homepage() {
   // This is a scroll effect for the bg glow and WOM character
