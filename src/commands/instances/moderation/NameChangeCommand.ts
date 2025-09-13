@@ -113,7 +113,7 @@ class NameChangeCommand extends Command {
         try {
           await denyNameChange(nameChangeId);
           response.setFooter({ text: `Denied ❌` }).setColor(config.visuals.red);
-        } catch (error) {
+        } catch (_error) {
           response.setFooter({ text: 'Failed to deny name change' }).setColor(config.visuals.red);
         }
       }
