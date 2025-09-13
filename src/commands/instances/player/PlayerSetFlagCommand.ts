@@ -63,8 +63,8 @@ class PlayerSetFlagCommand extends Command {
     const description = !hasUpdated
       ? `Failed to update flag.`
       : countryCode === null
-      ? `${interaction.user} unset \`${username}\`'s country`
-      : `${interaction.user} changed \`${username}\`'s country to ${CountryProps[countryCode].name}`;
+        ? `${interaction.user} unset \`${username}\`'s country`
+        : `${interaction.user} changed \`${username}\`'s country to ${CountryProps[countryCode].name}`;
 
     const embed = new EmbedBuilder()
       .setColor(hasUpdated ? config.visuals.green : config.visuals.red)

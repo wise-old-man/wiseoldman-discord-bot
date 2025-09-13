@@ -77,7 +77,7 @@ class HelpCommand extends Command {
     if (groupId && groupId > -1) {
       try {
         group = await womClient.groups.getGroupDetails(groupId);
-      } catch (e) {
+      } catch (_e) {
         console.log("Couldn't fetch group details for group", groupId);
       }
     }

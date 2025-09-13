@@ -182,7 +182,7 @@ function buildGainsList(
 
     try {
       metricName = MetricProps[metric as Metric].name;
-    } catch (e) {
+    } catch (_e) {
       metricName = metric;
     }
 

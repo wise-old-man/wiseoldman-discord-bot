@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build": "rimraf ./dist && tsc",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint",
     "dev": "docker-compose up --build -d && docker logs -f bot",
     "prod": "prisma migrate deploy && pm2-runtime dist/index.js",
     "watch": "prisma migrate dev && ts-node-dev --poll --exit-child --respawn --transpile-only --ignore-watch node_modules src/index.ts"
@@ -30,16 +30,15 @@
     "@types/express": "^4.17.6",
     "@types/lodash": "^4.14.155",
     "@types/node": "^16.11.47",
-    "@typescript-eslint/eslint-plugin": "^5.43.0",
-    "@typescript-eslint/parser": "^5.43.0",
-    "eslint": "^8.28.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "prettier": "^2.7.1",
+    "eslint": "~9.35.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.6.2",
     "prisma": "^4.6.1",
     "rimraf": "^3.0.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^8.43.0"
   },
   "dependencies": {
     "@attio/fetchable": "^0.0.1-experimental.5",
