@@ -52,6 +52,8 @@ async function onEventReceived(
     return errored({ code: 'EVENT_TYPE_NOT_FOUND', type: payload.type });
   }
 
+  console.log('Received event:', JSON.stringify(payload));
+  
   const eventMonitor = prometheus.trackEvent();
 
   const executionResult = await matchingEvent.execute(payload.data, client);
