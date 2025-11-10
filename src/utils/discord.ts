@@ -43,6 +43,7 @@ const MetricEmoji = {
   [Metric.RUNECRAFTING]: '<:runecrafting:706462611327287347>',
   [Metric.HUNTER]: '<:hunter:706462611218366534>',
   [Metric.CONSTRUCTION]: '<:construction:706462610853330986>',
+  [Metric.SAILING]: '<:sailing:1437131470698446990>',
   // Boss emojis
   [Metric.ABYSSAL_SIRE]: '<:abyssal_sire:729839920969023519>',
   [Metric.ALCHEMICAL_HYDRA]: '<:alchemical_hydra:729839921207967765>',
@@ -86,6 +87,7 @@ const MetricEmoji = {
   [Metric.SARACHNIS]: '<:sarachnis:729840085377220628>',
   [Metric.SCORPIA]: '<:scorpia:729840084962115666>',
   [Metric.SCURRIUS]: '<:scurrius:1199712038193217606>',
+  [Metric.SHELLBANE_GRYPHON]: '<:shellbane_gryphon:1437131472254406738>',
   [Metric.SKOTIZO]: '<:skotizo:729840085398454273>',
   [Metric.SOL_HEREDIT]: '<:sol_heredit:1220023750339334154>',
   [Metric.SPINDEL]: '<:venenatis:729840086795157595>',

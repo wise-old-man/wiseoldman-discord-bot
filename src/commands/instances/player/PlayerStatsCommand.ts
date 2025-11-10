@@ -18,7 +18,7 @@ import {
 } from '../../../utils';
 
 const RENDER_WIDTH = 215;
-const RENDER_HEIGHT = 260;
+const RENDER_HEIGHT = 294;
 const RENDER_PADDING = 15;
 
 // Used to render stats in correct order
@@ -46,6 +46,7 @@ const INGAME_SKILL_ORDER = [
   Metric.FIREMAKING,
   Metric.WOODCUTTING,
   Metric.FARMING,
+  Metric.SAILING,
   Metric.OVERALL
 ] as string[];
 
@@ -141,8 +142,13 @@ class PlayerStatsCommand extends Command {
 
       const isRanked = skills[skill].experience > -1;
 
-      const x = Math.floor(index / 8);
-      const y = index % 8;
+      let x = Math.floor(index / 8);
+      let y = index % 8;
+
+      if (skill === 'overall') {
+        x = 1;
+        y = 8;
+      }
 
       const originX = RENDER_PADDING - 7 + x * 67;
       const originY = RENDER_PADDING - 5 + y * 31;
