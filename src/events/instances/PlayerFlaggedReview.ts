@@ -1,18 +1,14 @@
 import { AsyncResult, complete, errored, fromPromise, isErrored } from '@attio/fetchable';
 import {
-  ACTIVITIES,
   Activity,
   Boss,
-  BOSSES,
   formatNumber,
   isActivity,
   isBoss,
   isSkill,
   MetricProps,
   PlayerResponse,
-  REAL_SKILLS,
   Skill,
-  SKILLS,
   SnapshotResponse
 } from '@wise-old-man/utils';
 import {
@@ -35,10 +31,15 @@ interface PlayerFlaggedData {
   flagContext: {
     previous: SnapshotResponse;
     rejected: SnapshotResponse;
-    negativeGains: boolean;
-    excessiveGains: boolean;
-    possibleRollback: boolean;
-    excessiveGainsReversed: boolean;
+    hasNegativeGains: boolean;
+    hasExcessiveGains: boolean;
+    hasExcessiveGainsReversed: boolean;
+    isPossibleRollback: boolean;
+    rollbackContext: {
+      earliestMatchDate: string;
+      latestMatchDate: string;
+      totalMatches: number;
+    } | null;
     data: {
       stackableGainedRatio: number;
       previousEHP: number;
@@ -68,7 +69,14 @@ class PlayerFlaggedReview implements Event {
     | { code: 'FAILED_TO_SEND_REVIEW_MESSAGE' }
   > {
     const { player, flagContext } = data;
-    const { previous, rejected, possibleRollback, negativeGains, excessiveGains } = flagContext;
+    const {
+      previous,
+      rejected,
+      rollbackContext,
+      isPossibleRollback,
+      hasNegativeGains,
+      hasExcessiveGains
+    } = flagContext;
 
     const {
       previousEHP,
@@ -89,27 +97,36 @@ class PlayerFlaggedReview implements Event {
     const uniqueId = `${player.id}_${new Date(rejected.createdAt).getTime()}`;
     const actions = new ActionRowBuilder<ButtonBuilder>();
 
-    const timeDiff = new Date(rejected.createdAt).getTime() - new Date(previous.createdAt).getTime();
+    const timeDiff = getTimeDiff(new Date(rejected.createdAt), new Date(previous.createdAt));
 
     const lines: string[] = [];
 
-    if (negativeGains) {
+    if (hasNegativeGains) {
       lines.push(`**Main cause**: Negative gains`);
-
-      const hoursDiff = Math.floor(timeDiff / 1000 / 60 / 60);
-
-      if (hoursDiff > 6) {
-        lines.push(`**Time diff**: ${hoursDiff} hours`);
-      } else {
-        lines.push(`**Time diff**: ${Math.floor(timeDiff / 1000 / 60)} minutes`);
-      }
-
+      lines.push(`**Time diff**: ${timeDiff}`);
       lines.push(`**Last updated**: <t:${Math.floor(new Date(previous.createdAt).getTime() / 1000)}:f>`);
 
-      if (possibleRollback) {
+      if (isPossibleRollback) {
         lines.push(`\n**🤔 Prediction 🤔**\n Name transfer (common) or Hiscores rollback (rare)`);
       } else {
         lines.push(`\n**🤔 Prediction 🤔**\n Name transfer`);
+      }
+
+      if (rollbackContext !== null) {
+        const rollbackTimeDiff = getTimeDiff(
+          new Date(rollbackContext.latestMatchDate),
+          new Date(rollbackContext.earliestMatchDate)
+        );
+
+        lines.push(`\n**Rollback info:**`);
+        lines.push(`Rollback matches: ${rollbackContext.totalMatches}`);
+        lines.push(
+          `Earliest match: <t:${Math.floor(new Date(rollbackContext.earliestMatchDate).getTime() / 1000)}:f>`
+        );
+        lines.push(
+          `Latest match: <t:${Math.floor(new Date(rollbackContext.latestMatchDate).getTime() / 1000)}:f>`
+        );
+        lines.push(`Matches time diff: ${rollbackTimeDiff}`);
       }
 
       actions.addComponents(
@@ -145,7 +162,7 @@ class PlayerFlaggedReview implements Event {
           `\`${formatNumber(ehbDiff, false, 3)}\` (\`${ehbChange}%\`)`
         ].join(' · ')
       );
-    } else if (excessiveGains) {
+    } else if (hasExcessiveGains) {
       const previousExp = previous.data.skills.overall.experience;
       const rejectedExp = rejected.data.skills.overall.experience;
 
@@ -153,15 +170,7 @@ class PlayerFlaggedReview implements Event {
       const expChange = getPercentageIncrease(previousExp, rejectedExp);
 
       lines.push(`**Main cause**: Excessive gains`);
-
-      const hoursDiff = Math.floor(timeDiff / 1000 / 60 / 60);
-
-      if (hoursDiff > 6) {
-        lines.push(`**Time diff**: ${hoursDiff} hours`);
-      } else {
-        lines.push(`**Time diff**: ${Math.floor(timeDiff / 1000 / 60)} minutes`);
-      }
-
+      lines.push(`**Time diff**: ${timeDiff}`);
       lines.push(`**Last updated**: <t:${Math.floor(new Date(previous.createdAt).getTime() / 1000)}:f>`);
 
       if (stackableGainedRatio > 0.7) {
@@ -232,9 +241,13 @@ class PlayerFlaggedReview implements Event {
       );
     }
 
-    const realMetrics = [...SKILLS, ...BOSSES, ...ACTIVITIES];
+    const metrics = [
+      ...Object.keys(previous.data.skills),
+      ...Object.keys(previous.data.bosses),
+      ...Object.keys(previous.data.activities)
+    ];
 
-    const sameMetrics = realMetrics.map(m => {
+    const sameMetrics = metrics.map(m => {
       let previousValue;
       let rejectedValue;
 
@@ -258,7 +271,7 @@ class PlayerFlaggedReview implements Event {
 
     const unrankedCount = sameMetrics.filter(v => v === -1).length;
 
-    const rankedCount = realMetrics.length - unrankedCount;
+    const rankedCount = metrics.length - unrankedCount;
     const equalityCount = sameMetrics.filter(v => v !== null).length - unrankedCount;
 
     const equalityPercent = Math.round((equalityCount / rankedCount) * 100);
@@ -428,10 +441,10 @@ function getLargestSkillChanges(previous: SnapshotResponse, rejected: SnapshotRe
 
   const map = new Map<Skill, number>();
 
-  REAL_SKILLS.map(s => {
+  Object.keys(previous.data.skills).map(s => {
     if (rejected.data.skills[s].experience === -1) return;
     map.set(
-      s,
+      s as Skill,
       Math.max(0, rejected.data.skills[s].experience) - Math.max(0, previous.data.skills[s].experience)
     );
   });
@@ -465,8 +478,11 @@ function getLargestBossChanges(previous: SnapshotResponse, rejected: SnapshotRes
 
   const map = new Map<Boss, number>();
 
-  BOSSES.map(b => {
-    map.set(b, Math.max(0, rejected.data.bosses[b].kills) - Math.max(0, previous.data.bosses[b].kills));
+  Object.keys(previous.data.bosses).map(b => {
+    map.set(
+      b as Boss,
+      Math.max(0, rejected.data.bosses[b].kills) - Math.max(0, previous.data.bosses[b].kills)
+    );
   });
 
   const entries = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
@@ -498,9 +514,9 @@ function getLargestActivityChanges(previous: SnapshotResponse, rejected: Snapsho
 
   const map = new Map<Activity, number>();
 
-  ACTIVITIES.map(a => {
+  Object.keys(previous.data.activities).map(a => {
     map.set(
-      a,
+      a as Activity,
       Math.max(0, rejected.data.activities[a].score) - Math.max(0, previous.data.activities[a].score)
     );
   });
@@ -533,6 +549,17 @@ function getPercentageIncrease(previous: number, current: number) {
   if (previous === 0) return 0;
 
   return (current - previous) / previous;
+}
+
+function getTimeDiff(a: Date, b: Date) {
+  const timeDiff = a.getTime() - b.getTime();
+  const hoursDiff = Math.floor(timeDiff / 1000 / 60 / 60);
+
+  if (hoursDiff > 6) {
+    return `${hoursDiff} hours`;
+  }
+
+  return `${Math.floor(timeDiff / 1000 / 60)} minutes`;
 }
 
 export default new PlayerFlaggedReview();
