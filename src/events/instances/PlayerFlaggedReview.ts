@@ -69,7 +69,14 @@ class PlayerFlaggedReview implements Event {
     | { code: 'FAILED_TO_SEND_REVIEW_MESSAGE' }
   > {
     const { player, flagContext } = data;
-    const { previous, rejected, rollbackContext, isPossibleRollback, hasNegativeGains, hasExcessiveGains } = flagContext;
+    const {
+      previous,
+      rejected,
+      rollbackContext,
+      isPossibleRollback,
+      hasNegativeGains,
+      hasExcessiveGains
+    } = flagContext;
 
     const {
       previousEHP,
@@ -78,7 +85,7 @@ class PlayerFlaggedReview implements Event {
       rejectedEHP,
       rejectedEHB,
       rejectedRank,
-      stackableGainedRatio,
+      stackableGainedRatio
     } = flagContext.data;
 
     const ehpDiff = rejectedEHP - previousEHP;
@@ -90,7 +97,7 @@ class PlayerFlaggedReview implements Event {
     const uniqueId = `${player.id}_${new Date(rejected.createdAt).getTime()}`;
     const actions = new ActionRowBuilder<ButtonBuilder>();
 
-    const timeDiff = getTimeDiff(new Date(rejected.createdAt), new Date(previous.createdAt))
+    const timeDiff = getTimeDiff(new Date(rejected.createdAt), new Date(previous.createdAt));
 
     const lines: string[] = [];
 
@@ -105,7 +112,7 @@ class PlayerFlaggedReview implements Event {
         lines.push(`\n**🤔 Prediction 🤔**\n Name transfer`);
       }
 
-      if(rollbackContext !== null) {
+      if (rollbackContext !== null) {
         const rollbackTimeDiff = getTimeDiff(
           new Date(rollbackContext.latestMatchDate),
           new Date(rollbackContext.earliestMatchDate)
@@ -121,7 +128,6 @@ class PlayerFlaggedReview implements Event {
         );
         lines.push(`Matches time diff: ${rollbackTimeDiff}`);
       }
-
 
       actions.addComponents(
         new ButtonBuilder()
@@ -235,7 +241,11 @@ class PlayerFlaggedReview implements Event {
       );
     }
 
-    const metrics = [...Object.keys(previous.data.skills), ...Object.keys(previous.data.bosses), ...Object.keys(previous.data.activities)];
+    const metrics = [
+      ...Object.keys(previous.data.skills),
+      ...Object.keys(previous.data.bosses),
+      ...Object.keys(previous.data.activities)
+    ];
 
     const sameMetrics = metrics.map(m => {
       let previousValue;
@@ -469,7 +479,10 @@ function getLargestBossChanges(previous: SnapshotResponse, rejected: SnapshotRes
   const map = new Map<Boss, number>();
 
   Object.keys(previous.data.bosses).map(b => {
-    map.set(b as Boss, Math.max(0, rejected.data.bosses[b].kills) - Math.max(0, previous.data.bosses[b].kills));
+    map.set(
+      b as Boss,
+      Math.max(0, rejected.data.bosses[b].kills) - Math.max(0, previous.data.bosses[b].kills)
+    );
   });
 
   const entries = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
@@ -538,16 +551,15 @@ function getPercentageIncrease(previous: number, current: number) {
   return (current - previous) / previous;
 }
 
-function getTimeDiff(a: Date, b :Date) {
+function getTimeDiff(a: Date, b: Date) {
   const timeDiff = a.getTime() - b.getTime();
   const hoursDiff = Math.floor(timeDiff / 1000 / 60 / 60);
 
   if (hoursDiff > 6) {
     return `${hoursDiff} hours`;
   }
-  
+
   return `${Math.floor(timeDiff / 1000 / 60)} minutes`;
 }
 
 export default new PlayerFlaggedReview();
-
