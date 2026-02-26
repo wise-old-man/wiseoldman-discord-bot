@@ -51,6 +51,7 @@ const MetricEmoji = {
   [Metric.ARAXXOR]: '<:araxxor:1278337345069781082>',
   [Metric.ARTIO]: '<:callisto:729839921170481153>',
   [Metric.BARROWS_CHESTS]: '<:barrows_chests:729839921484923000>',
+  [Metric.BRUTUS]: '<:brutus:1476544459767545997>',
   [Metric.BRYOPHYTA]: '<:bryophyta:1283096848017391646>',
   [Metric.CALLISTO]: '<:callisto:729839921170481153>',
   [Metric.CALVARION]: '<:vetion:729840085553381387>',
