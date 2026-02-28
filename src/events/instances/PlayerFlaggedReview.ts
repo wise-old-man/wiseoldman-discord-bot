@@ -475,7 +475,7 @@ function getLargestSkillChanges(previous: SnapshotResponse, rejected: SnapshotRe
     lines.push(
       ...biggestLosses.map(
         l =>
-          `${MetricProps[l[0]].name}: \`${formatNumber(l[1].delta, true)}\` (lvl: \`${getLevel(l[1].end)}\` -> \`${getLevel(l[1].start)}\`)`
+          `${MetricProps[l[0]].name}: \`${formatNumber(l[1].delta, true)}\` (lvl: \`${getLevel(l[1].start)}\` -> \`${getLevel(l[1].end)}\`)`
       )
     );
   }
