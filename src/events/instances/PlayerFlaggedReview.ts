@@ -3,6 +3,7 @@ import {
   Activity,
   Boss,
   formatNumber,
+  getLevel,
   isActivity,
   isBoss,
   isSkill,
@@ -439,35 +440,44 @@ async function handleRollback(username: string) {
 function getLargestSkillChanges(previous: SnapshotResponse, rejected: SnapshotResponse) {
   const lines: string[] = [];
 
-  const map = new Map<Skill, number>();
+  const map = new Map<Skill, { start: number; end: number; delta: number }>();
 
   Object.keys(previous.data.skills).map(s => {
     if (rejected.data.skills[s].experience === -1) return;
-    map.set(
-      s as Skill,
-      Math.max(0, rejected.data.skills[s].experience) - Math.max(0, previous.data.skills[s].experience)
-    );
+    const start = Math.max(0, previous.data.skills[s].experience);
+    const end = Math.max(0, rejected.data.skills[s].experience);
+    map.set(s as Skill, { start, end, delta: end - start });
   });
 
-  const entries = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
+  const entries = Array.from(map.entries()).sort((a, b) => b[1].delta - a[1].delta);
 
-  const biggestGains = entries.slice(0, 3).filter(v => v[1] > 0);
+  const biggestGains = entries.slice(0, 3).filter(v => v[1].delta > 0);
 
   const biggestLosses = entries
     .slice(entries.length - 3, entries.length)
     .reverse()
-    .filter(v => v[1] < 0);
+    .filter(v => v[1].delta < 0);
 
   if (biggestGains.length > 0) {
     lines.push('\n');
     lines.push(`**Top Skill gains**`);
-    lines.push(...biggestGains.map(g => `${MetricProps[g[0]].name}: \`+${formatNumber(g[1], true)}\``));
+    lines.push(
+      ...biggestGains.map(
+        g =>
+          `${MetricProps[g[0]].name}: \`+${formatNumber(g[1].delta, true)}\` (lvl: \`${getLevel(g[1].start)}\` -> \`${getLevel(g[1].end)}\`)`
+      )
+    );
   }
 
   if (biggestLosses.length > 0) {
     lines.push('\n');
     lines.push(`**🔻 Top Skill losses🔻**`);
-    lines.push(...biggestLosses.map(l => `${MetricProps[l[0]].name}: \`${formatNumber(l[1], true)}\``));
+    lines.push(
+      ...biggestLosses.map(
+        l =>
+          `${MetricProps[l[0]].name}: \`${formatNumber(l[1].delta, true)}\` (lvl: \`${getLevel(l[1].end)}\` -> \`${getLevel(l[1].start)}\`)`
+      )
+    );
   }
 
   return lines;
@@ -476,34 +486,43 @@ function getLargestSkillChanges(previous: SnapshotResponse, rejected: SnapshotRe
 function getLargestBossChanges(previous: SnapshotResponse, rejected: SnapshotResponse) {
   const lines: string[] = [];
 
-  const map = new Map<Boss, number>();
+  const map = new Map<Boss, { start: number; end: number; delta: number }>();
 
   Object.keys(previous.data.bosses).map(b => {
-    map.set(
-      b as Boss,
-      Math.max(0, rejected.data.bosses[b].kills) - Math.max(0, previous.data.bosses[b].kills)
-    );
+    const start = Math.max(0, previous.data.bosses[b].kills);
+    const end = Math.max(0, rejected.data.bosses[b].kills);
+    map.set(b as Boss, { start, end, delta: end - start });
   });
 
-  const entries = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
+  const entries = Array.from(map.entries()).sort((a, b) => b[1].delta - a[1].delta);
 
-  const biggestGains = entries.slice(0, 3).filter(v => v[1] > 0);
+  const biggestGains = entries.slice(0, 3).filter(v => v[1].delta > 0);
 
   const biggestLosses = entries
     .slice(entries.length - 3, entries.length)
     .reverse()
-    .filter(v => v[1] < 0);
+    .filter(v => v[1].delta < 0);
 
   if (biggestGains.length > 0) {
     lines.push('\n');
     lines.push(`**Top Boss gains**`);
-    lines.push(...biggestGains.map(g => `${MetricProps[g[0]].name}: \`+${formatNumber(g[1], true)}\``));
+    lines.push(
+      ...biggestGains.map(
+        g =>
+          `${MetricProps[g[0]].name}: \`+${formatNumber(g[1].delta, true)}\` (\`${formatNumber(g[1].start, true)}\` -> \`${formatNumber(g[1].end, true)}\`)`
+      )
+    );
   }
 
   if (biggestLosses.length > 0) {
     lines.push('\n');
     lines.push(`**🔻 Top Boss losses 🔻**`);
-    lines.push(...biggestLosses.map(l => `${MetricProps[l[0]].name}: \`${formatNumber(l[1], true)}\``));
+    lines.push(
+      ...biggestLosses.map(
+        l =>
+          `${MetricProps[l[0]].name}: \`${formatNumber(l[1].delta, true)}\` (\`${formatNumber(l[1].start, true)}\` -> \`${formatNumber(l[1].end, true)}\`)`
+      )
+    );
   }
 
   return lines;
@@ -512,34 +531,43 @@ function getLargestBossChanges(previous: SnapshotResponse, rejected: SnapshotRes
 function getLargestActivityChanges(previous: SnapshotResponse, rejected: SnapshotResponse) {
   const lines: string[] = [];
 
-  const map = new Map<Activity, number>();
+  const map = new Map<Activity, { start: number; end: number; delta: number }>();
 
   Object.keys(previous.data.activities).map(a => {
-    map.set(
-      a as Activity,
-      Math.max(0, rejected.data.activities[a].score) - Math.max(0, previous.data.activities[a].score)
-    );
+    const start = Math.max(0, previous.data.activities[a].score);
+    const end = Math.max(0, rejected.data.activities[a].score);
+    map.set(a as Activity, { start, end, delta: end - start });
   });
 
-  const entries = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
+  const entries = Array.from(map.entries()).sort((a, b) => b[1].delta - a[1].delta);
 
-  const biggestGains = entries.slice(0, 3).filter(v => v[1] > 0);
+  const biggestGains = entries.slice(0, 3).filter(v => v[1].delta > 0);
 
   const biggestLosses = entries
     .slice(entries.length - 3, entries.length)
     .reverse()
-    .filter(v => v[1] < 0);
+    .filter(v => v[1].delta < 0);
 
   if (biggestGains.length > 0) {
     lines.push('\n');
     lines.push(`**Top Activity gains**`);
-    lines.push(...biggestGains.map(g => `${MetricProps[g[0]].name}: \`+${formatNumber(g[1], true)}\``));
+    lines.push(
+      ...biggestGains.map(
+        g =>
+          `${MetricProps[g[0]].name}: \`+${formatNumber(g[1].delta, true)}\` (\`${formatNumber(g[1].start, true)}\` -> \`${formatNumber(g[1].end, true)}\`)`
+      )
+    );
   }
 
   if (biggestLosses.length > 0) {
     lines.push('\n');
     lines.push(`**🔻 Top Activity losses 🔻**`);
-    lines.push(...biggestLosses.map(l => `${MetricProps[l[0]].name}: \`${formatNumber(l[1], true)}\``));
+    lines.push(
+      ...biggestLosses.map(
+        l =>
+          `${MetricProps[l[0]].name}: \`${formatNumber(l[1].delta, true)}\` (\`${formatNumber(l[1].start, true)}\` -> \`${formatNumber(l[1].end, true)}\`)`
+      )
+    );
   }
 
   return lines;
