@@ -15,9 +15,7 @@ import MemberNameChanged from './instances/MemberNameChanged';
 import MembersJoined from './instances/MembersJoined';
 import MembersLeft from './instances/MembersLeft';
 import MembersRolesChanged from './instances/MembersRolesChanged';
-import OffensiveNamesFound from './instances/OffensiveNamesFound';
 import PlayerFlaggedReview from './instances/PlayerFlaggedReview';
-import PotentialCreationSpam from './instances/PotentialCreationSpam';
 
 const EVENTS: Event[] = [
   CompetitionCreated,
@@ -32,8 +30,6 @@ const EVENTS: Event[] = [
   MemberAchievements,
   PlayerFlaggedReview,
   MembersRolesChanged,
-  PotentialCreationSpam,
-  OffensiveNamesFound,
   CreationSpamWarning
 ];
 

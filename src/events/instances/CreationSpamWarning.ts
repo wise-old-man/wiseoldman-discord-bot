@@ -9,19 +9,14 @@ const SAMPLES_AMOUNT = 5;
 
 interface DataType {
   creatorIpHash: string;
+  type: string;
   groups: Array<{
     group: GroupResponse;
-    issue: {
-      type: string;
-      reason?: string;
-    };
+    reason?: string;
   }>;
   competitions: Array<{
     competition: CompetitionResponse;
-    issue: {
-      type: string;
-      reason?: string;
-    };
+    reason?: string;
   }>;
 }
 
@@ -41,7 +36,7 @@ class CreationSpamWarning implements Event {
     | { code: 'CHANNEL_INVALID_TYPE' }
     | { code: 'FAILED_TO_SEND_REVIEW_MESSAGE' }
   > {
-    const { creatorIpHash, groups, competitions } = data;
+    const { creatorIpHash, type, groups, competitions } = data;
 
     const actions = createModerationButtons(ModerationType.SPAM, creatorIpHash);
 
@@ -52,10 +47,11 @@ class CreationSpamWarning implements Event {
       const groupSampleLabel =
         groupSample.length < groups.length ? ` — showing ${groupSample.length} of ${groups.length}` : '';
       lines.push(`\n**Groups (${groups.length}${groupSampleLabel}):**`);
-      for (const { group, issue } of groupSample) {
-        lines.push(`- [${group.name.slice(0, 50)}](https://wiseoldman.net/groups/${group.id})`);
-        if (group.description) lines.push(`  - *${group.description.slice(0, 100)}*`);
-        lines.push(`  - [${issue.type}]${issue.reason ? `: ${issue.reason}` : ''}`);
+      for (const { group, reason } of groupSample) {
+        lines.push(
+          `- [${group.name.slice(0, 50)}](https://wiseoldman.net/groups/${group.id}) ${group.description ? `| ${group.description}` : ''}`
+        );
+        if (reason) lines.push(`  - Reason: ${reason}`);
       }
     }
 
@@ -66,17 +62,17 @@ class CreationSpamWarning implements Event {
           ? ` — showing ${competitionSample.length} of ${competitions.length}`
           : '';
       lines.push(`\n**Competitions (${competitions.length}${competitionSampleLabel}):**`);
-      for (const { competition, issue } of competitionSample) {
+      for (const { competition, reason } of competitionSample) {
         lines.push(
           `- [${competition.title.slice(0, 50)}](https://wiseoldman.net/competitions/${competition.id})`
         );
-        lines.push(`  - [${issue.type}]${issue.reason ? `: ${issue.reason}` : ''}`);
+        if (reason) lines.push(`  - ${reason}`);
       }
     }
 
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
-      .setTitle(`Creation Spam Warning`)
+      .setTitle(`Creation Spam Warning (${type})`)
       .setDescription(lines.join('\n'));
 
     const reviewChannel = client.channels?.cache.get(config.discord.channels.spamReviews);
