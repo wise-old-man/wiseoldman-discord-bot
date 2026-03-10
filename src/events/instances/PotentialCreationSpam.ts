@@ -50,7 +50,7 @@ class HiddenGroupCreated implements Event {
       .setTitle(`Potential Spam Detected`)
       .setDescription(description);
 
-    const reviewChannel = client.channels?.cache.get(config.discord.channels.potentialSpamReviews);
+    const reviewChannel = client.channels?.cache.get(config.discord.channels.spamReviews);
 
     if (!reviewChannel) {
       return errored({
