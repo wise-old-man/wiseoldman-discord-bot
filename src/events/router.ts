@@ -8,6 +8,7 @@ import CompetitionEnded from './instances/CompetitionEnded';
 import CompetitionEnding from './instances/CompetitionEnding';
 import CompetitionStarted from './instances/CompetitionStarted';
 import CompetitionStarting from './instances/CompetitionStarting';
+import CreationSpamWarning from './instances/CreationSpamWarning';
 import MemberAchievements from './instances/MemberAchievements';
 import MemberHardcoreDied from './instances/MemberHardcoreDied';
 import MemberNameChanged from './instances/MemberNameChanged';
@@ -32,7 +33,8 @@ const EVENTS: Event[] = [
   PlayerFlaggedReview,
   MembersRolesChanged,
   PotentialCreationSpam,
-  OffensiveNamesFound
+  OffensiveNamesFound,
+  CreationSpamWarning
 ];
 
 async function onEventReceived(
@@ -53,7 +55,7 @@ async function onEventReceived(
   }
 
   console.log('Received event:', JSON.stringify(payload));
-  
+
   const eventMonitor = prometheus.trackEvent();
 
   const executionResult = await matchingEvent.execute(payload.data, client);

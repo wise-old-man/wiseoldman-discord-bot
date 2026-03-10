@@ -75,7 +75,7 @@ async function updateEmbed(confirmation: string, type: string, interaction: Butt
     .setColor(confirmation == Actions.BLOCK ? config.visuals.red : config.visuals.green);
 
   editedEmbed.setFooter({
-    text: `${confirmation == Actions.BLOCK ? 'Blocked ' : 'Allowed '} by ${interaction.user.username}`
+    text: `${confirmation == Actions.BLOCK ? 'Blocked' : 'Allowed'} by ${interaction.user.username}`
   });
 
   return editedEmbed;
