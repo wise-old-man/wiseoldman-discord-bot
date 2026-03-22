@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("BOT_DATABASE_URL")
+  url      = env("DISCORD_BOT_DATABASE_URL")
 }
 
 model Alias {
