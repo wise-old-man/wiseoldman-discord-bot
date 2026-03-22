@@ -1,3 +1,5 @@
+import env from '../env';
+
 import {
   CompetitionResponse,
   CompetitionStatus,
@@ -10,7 +12,6 @@ import {
   PlayerResponse,
   WOMClient
 } from '@wise-old-man/utils';
-import env from '../env';
 import { durationBetween } from '../utils/dates';
 
 import config from '../config';

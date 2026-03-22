@@ -1,8 +1,9 @@
-import { PermissionFlagsBits } from 'discord.js';
 import env from './env';
 
+import { PermissionFlagsBits } from 'discord.js';
+
 export default {
-  token: env.DISCORD_TOKEN,
+  token: env.DISCORD_BOT_DISCORD_BEARER_TOKEN,
   apiKey: env.DISCORD_BOT_API_KEY,
   baseAPIUrl: env.DISCORD_BOT_BASE_API_URL || 'https://api.wiseoldman.net/v2',
   requiredPermissions: [

@@ -1,4 +1,5 @@
 import env from './env';
+
 import * as Sentry from '@sentry/node';
 import '@sentry/tracing';
 import * as api from './api';
@@ -7,7 +8,7 @@ import { deployCommands } from './deploy-commands';
 import prometheus from './services/prometheus';
 
 Sentry.init({
-  dsn: env.BOT_SENTRY_DSN,
+  dsn: env.DISCORD_BOT_SENTRY_DSN,
   tracesSampleRate: 0.01
 });
 

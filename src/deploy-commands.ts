@@ -1,6 +1,7 @@
+import env from './env';
+
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
-import env from './env';
 import { COMMANDS } from './commands/router';
 import config from './config';
 

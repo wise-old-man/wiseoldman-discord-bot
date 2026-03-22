@@ -9,6 +9,6 @@ function parseTemplate(originTemplate: string) {
   return originTemplate.replace(/{([^{}]+)}/g, (_, key) => process.env[key] ?? '').replace(/\$/g, '');
 }
 
-process.env.BOT_DATABASE_URL = parseTemplate(process.env.BOT_DATABASE_URL ?? '');
+process.env.DISCORD_BOT_DATABASE_URL = parseTemplate(process.env.DISCORD_BOT_DATABASE_URL ?? '');
 
 export default process.env;
