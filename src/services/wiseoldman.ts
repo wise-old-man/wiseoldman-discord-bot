@@ -65,7 +65,7 @@ export function getCompetitionTimeLeft<T extends Pick<CompetitionResponse, 'star
  */
 export async function resetCompetitionCode(competitionId: number): Promise<{ newCode: string }> {
   return womClient.competitions.putRequest(`/competitions/${competitionId}/reset-code`, {
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
@@ -74,7 +74,7 @@ export async function resetCompetitionCode(competitionId: number): Promise<{ new
  */
 export async function resetGroupCode(groupId: number): Promise<{ newCode: string }> {
   return womClient.groups.putRequest(`/groups/${groupId}/reset-code`, {
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
@@ -83,7 +83,7 @@ export async function resetGroupCode(groupId: number): Promise<{ newCode: string
  */
 export async function verifyGroup(groupId: number): Promise<GroupResponse> {
   return womClient.groups.putRequest(`/groups/${groupId}/verify`, {
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
@@ -92,7 +92,7 @@ export async function deletePlayerAnnotation(
   annotationType: PlayerAnnotationType
 ): Promise<{ message: string }> {
   return womClient.players.deleteRequest(`/players/${username}/annotation`, {
-    adminPassword: env.ADMIN_PASSWORD,
+    adminPassword: env.SHARED_ADMIN_PASSWORD,
     annotationType
   });
 }
@@ -102,7 +102,7 @@ export async function addPlayerAnnotation(
   annotationType: PlayerAnnotationType
 ): Promise<{ message: string }> {
   return womClient.players.postRequest(`/players/${username}/annotation`, {
-    adminPassword: env.ADMIN_PASSWORD,
+    adminPassword: env.SHARED_ADMIN_PASSWORD,
     annotationType
   });
 }
@@ -112,7 +112,7 @@ export async function addPlayerAnnotation(
  */
 export async function removeFromGroup(groupId: number, username: string): Promise<{ message: string }> {
   return womClient.groups.deleteRequest(`/groups/${groupId}/members`, {
-    adminPassword: env.ADMIN_PASSWORD,
+    adminPassword: env.SHARED_ADMIN_PASSWORD,
     members: [username]
   });
 }
@@ -125,7 +125,7 @@ export async function removeFromCompetition(
   username: string
 ): Promise<{ message: string }> {
   return womClient.groups.deleteRequest(`/competitions/${competitionId}/participants`, {
-    adminPassword: env.ADMIN_PASSWORD,
+    adminPassword: env.SHARED_ADMIN_PASSWORD,
     participants: [username]
   });
 }
@@ -135,7 +135,7 @@ export async function removeFromCompetition(
  */
 export async function deleteGroup(groupId: number): Promise<{ message: string }> {
   return womClient.groups.deleteRequest(`/groups/${groupId}`, {
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
@@ -144,13 +144,13 @@ export async function deleteGroup(groupId: number): Promise<{ message: string }>
  */
 export async function deleteCompetition(competitionId: number): Promise<{ message: string }> {
   return womClient.competitions.deleteRequest(`/competitions/${competitionId}`, {
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
 export async function approveNameChange(id: number): Promise<NameChangeResponse> {
   return womClient.nameChanges.postRequest(`/names/${id}/approve`, {
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
@@ -160,7 +160,7 @@ export async function fetchNameChangeDetails(id: number): Promise<NameChangeDeta
 
 export async function denyNameChange(id: number): Promise<NameChangeResponse> {
   return womClient.nameChanges.postRequest(`/names/${id}/deny`, {
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
@@ -169,7 +169,7 @@ export async function denyNameChange(id: number): Promise<NameChangeResponse> {
  */
 export async function deletePlayer(username: string): Promise<{ message: string }> {
   return womClient.players.deleteRequest(`/players/${username}`, {
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
@@ -180,7 +180,7 @@ export async function clearNameChangeHistory(
   username: string
 ): Promise<{ count: number; message: string }> {
   return womClient.players.postRequest(`/names/${username}/clear-history`, {
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
@@ -188,7 +188,7 @@ export async function createAPIKey(application: string, developer: string): Prom
   return womClient.postRequest(`/api-key`, {
     application,
     developer,
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
@@ -200,7 +200,7 @@ export async function claimBenefits(
   return womClient.putRequest(`/patrons/claim/${discordId}`, {
     username,
     groupId,
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
@@ -210,32 +210,32 @@ export async function claimBenefits(
 export async function updateCountry(username: string, country: string | null): Promise<PlayerResponse> {
   return womClient.players.putRequest(`/players/${username}/country`, {
     country,
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
 export async function rollback(username: string, untilLastChange: boolean) {
   return womClient.players.postRequest(`/players/${username}/rollback`, {
-    adminPassword: env.ADMIN_PASSWORD,
+    adminPassword: env.SHARED_ADMIN_PASSWORD,
     untilLastChange
   });
 }
 
 export async function rollbackColLog(username: string) {
   return womClient.players.postRequest(`/players/${username}/rollback-col-log`, {
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
 export async function archive(username: string) {
   return womClient.players.postRequest<PlayerResponse>(`/players/${username}/archive`, {
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
 export async function forceUpdate(username: string) {
   return womClient.players.postRequest(`/players/${username}`, {
-    adminPassword: env.ADMIN_PASSWORD,
+    adminPassword: env.SHARED_ADMIN_PASSWORD,
     force: true
   });
 }
@@ -246,7 +246,7 @@ export async function forceUpdate(username: string) {
 export async function allowActions(ipHash: string): Promise<{ message: string }> {
   return womClient.postRequest(`/allow-actions`, {
     ipHash,
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
@@ -256,7 +256,7 @@ export async function allowActions(ipHash: string): Promise<{ message: string }>
 export async function blockActions(ipHash: string): Promise<{ message: string }> {
   return womClient.postRequest(`/block-actions`, {
     ipHash,
-    adminPassword: env.ADMIN_PASSWORD
+    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 
