@@ -18,7 +18,7 @@ import {
 import ConfigRootCommand from './instances/config';
 import HelpCommand from './instances/general/HelpCommand';
 import GroupRootCommand from './instances/group';
-import AddPlayerAnnotation from './instances/moderation/AddPlayerAnnotationCommand';
+import AddPlayerAnnotationCommand from './instances/moderation/AddPlayerAnnotationCommand';
 import ClearNameChangeHistoryCommand from './instances/moderation/ClearNameChangeHistoryCommand';
 import CreateAPIKeyCommand from './instances/moderation/CreateAPIKeyCommand';
 import DeleteCompetitionCommand from './instances/moderation/DeleteCompetitionCommand';
@@ -30,6 +30,7 @@ import RemoveFromCompetitionCommand from './instances/moderation/RemoveFromCompe
 import RemoveFromGroupCommand from './instances/moderation/RemoveFromGroupCommand';
 import ResetCompetitionCodeCommand from './instances/moderation/ResetCompetitionCodeCommand';
 import ResetGroupCodeCommand from './instances/moderation/ResetGroupCodeCommand';
+import RollbackPlayerSnapshotMetricValuesCommand from './instances/moderation/RollbackPlayerSnapshotMetricValuesCommand';
 import VerifyGroupCommand from './instances/moderation/VerifyGroupCommand';
 import PlayerAchievementsCommand from './instances/player/PlayerAchievementsCommand';
 import PlayerActivitiesCommand from './instances/player/PlayerActivitiesCommand';
@@ -70,7 +71,8 @@ export const COMMANDS: BaseCommand[] = [
   RemoveFromCompetitionCommand,
   CreateAPIKeyCommand,
   DeleteAnnotationCommand,
-  AddPlayerAnnotation
+  AddPlayerAnnotationCommand,
+  RollbackPlayerSnapshotMetricValuesCommand
 ];
 
 export async function onInteractionReceived(interaction: Interaction) {
@@ -128,7 +130,7 @@ export async function onInteractionReceived(interaction: Interaction) {
   } catch (error) {
     console.log('Command execution error', fullCommandName, error);
     Sentry.captureException(error);
-    await interaction.followUp({ embeds: [buildErrorEmbed(error)] });
+    await interaction.followUp({ embeds: [buildErrorEmbed(error as unknown as Error)] });
     commandMonitor.endTracking(fullCommandName, 0, interaction.guildId ?? 'unknown guild id');
   }
 }
