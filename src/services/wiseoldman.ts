@@ -184,6 +184,16 @@ export async function clearNameChangeHistory(
   });
 }
 
+export async function rollbackSnapshotMetricValues(
+  username: string,
+  metric: Metric
+): Promise<{ message: string }> {
+  return womClient.players.postRequest(`/players/${username}/rollback-snapshot-metric-values`, {
+    metric,
+    adminPassword: env.SHARED_ADMIN_PASSWORD
+  });
+}
+
 export async function createAPIKey(application: string, developer: string): Promise<{ id: string }> {
   return womClient.postRequest(`/api-key`, {
     application,
@@ -218,12 +228,6 @@ export async function rollback(username: string, untilLastChange: boolean) {
   return womClient.players.postRequest(`/players/${username}/rollback`, {
     adminPassword: env.SHARED_ADMIN_PASSWORD,
     untilLastChange
-  });
-}
-
-export async function rollbackColLog(username: string) {
-  return womClient.players.postRequest(`/players/${username}/rollback-col-log`, {
-    adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
 

@@ -23,7 +23,7 @@ import {
   TextChannel
 } from 'discord.js';
 import config from '../../config';
-import { archive, forceUpdate, rollback, rollbackColLog } from '../../services/wiseoldman';
+import { archive, forceUpdate, rollback } from '../../services/wiseoldman';
 import { encodeURL } from '../../utils';
 import { Event } from '../../utils/events';
 
@@ -138,10 +138,6 @@ class PlayerFlaggedReview implements Event {
         new ButtonBuilder()
           .setCustomId(`rollback/${uniqueId}`)
           .setLabel('Hiscores Rollback')
-          .setStyle(ButtonStyle.Secondary),
-        new ButtonBuilder()
-          .setCustomId(`col-log-rollback/${uniqueId}`)
-          .setLabel('Col. Log Rollback')
           .setStyle(ButtonStyle.Secondary)
       );
 
@@ -361,21 +357,6 @@ class PlayerFlaggedReview implements Event {
             return;
           }
 
-          if (clickedId === `col-log-rollback/${uniqueId}`) {
-            try {
-              await rollbackColLog(player.username);
-              message
-                .setColor(config.visuals.green)
-                .setFooter({ text: `Col Log rolled back by ${username}` });
-            } catch (error) {
-              console.log(error);
-              message.setColor(config.visuals.red).setFooter({ text: `Col Log rollback failed` });
-            }
-
-            await reportMessage.edit({ embeds: [message], components: [] });
-            return;
-          }
-
           if (clickedId === `deironed/${uniqueId}`) {
             try {
               await handleRollback(player.username);
@@ -429,7 +410,12 @@ async function handleRollback(username: string) {
   try {
     await rollback(username, true);
   } catch (error) {
-    if (error.message !== "Failed to delete a player's last snapshots.") {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'message' in error &&
+      error.message !== "Failed to delete a player's last snapshots."
+    ) {
       throw error;
     }
   }
@@ -443,9 +429,9 @@ function getLargestSkillChanges(previous: SnapshotResponse, rejected: SnapshotRe
   const map = new Map<Skill, { start: number; end: number; delta: number }>();
 
   Object.keys(previous.data.skills).map(s => {
-    if (rejected.data.skills[s].experience === -1) return;
-    const start = Math.max(0, previous.data.skills[s].experience);
-    const end = Math.max(0, rejected.data.skills[s].experience);
+    if (rejected.data.skills[s as Skill].experience === -1) return;
+    const start = Math.max(0, previous.data.skills[s as Skill].experience);
+    const end = Math.max(0, rejected.data.skills[s as Skill].experience);
     map.set(s as Skill, { start, end, delta: end - start });
   });
 
@@ -489,8 +475,8 @@ function getLargestBossChanges(previous: SnapshotResponse, rejected: SnapshotRes
   const map = new Map<Boss, { start: number; end: number; delta: number }>();
 
   Object.keys(previous.data.bosses).map(b => {
-    const start = Math.max(0, previous.data.bosses[b].kills);
-    const end = Math.max(0, rejected.data.bosses[b].kills);
+    const start = Math.max(0, previous.data.bosses[b as Boss].kills);
+    const end = Math.max(0, rejected.data.bosses[b as Boss].kills);
     map.set(b as Boss, { start, end, delta: end - start });
   });
 
@@ -534,8 +520,8 @@ function getLargestActivityChanges(previous: SnapshotResponse, rejected: Snapsho
   const map = new Map<Activity, { start: number; end: number; delta: number }>();
 
   Object.keys(previous.data.activities).map(a => {
-    const start = Math.max(0, previous.data.activities[a].score);
-    const end = Math.max(0, rejected.data.activities[a].score);
+    const start = Math.max(0, previous.data.activities[a as Activity].score);
+    const end = Math.max(0, rejected.data.activities[a as Activity].score);
     map.set(a as Activity, { start, end, delta: end - start });
   });
 
