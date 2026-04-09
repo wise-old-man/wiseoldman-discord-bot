@@ -22,6 +22,12 @@ const womClient = new WOMClient({
   apiKey: config.apiKey
 });
 
+const leagueWomClient = new WOMClient({
+  userAgent: 'WiseOldMan Discord Bot',
+  baseAPIUrl: 'https://api.wiseoldman.net/league',
+  apiKey: config.apiKey
+});
+
 export function getCompetitionStatus<T extends Pick<CompetitionResponse, 'startsAt' | 'endsAt'>>(
   competition: T
 ) {
@@ -198,6 +204,18 @@ export async function claimBenefits(
   groupId?: number
 ): Promise<void> {
   return womClient.putRequest(`/patrons/claim/${discordId}`, {
+    username,
+    groupId,
+    adminPassword: env.SHARED_ADMIN_PASSWORD
+  });
+}
+
+export async function claimLeagueBenefits(
+  discordId: string,
+  username: string,
+  groupId?: number
+): Promise<void> {
+  return leagueWomClient.putRequest(`/patrons/claim/${discordId}`, {
     username,
     groupId,
     adminPassword: env.SHARED_ADMIN_PASSWORD
