@@ -5,7 +5,7 @@ import { parseMetricAbbreviation, rollbackSnapshotMetricValues } from '../../../
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
 
 const CONFIG: CommandConfig = {
-  name: 'rollback-player-snapshot-metric-values',
+  name: 'rollback-player-snapshot-values',
   description: 'Rollback a player snapshot metric values.',
   options: [
     {
