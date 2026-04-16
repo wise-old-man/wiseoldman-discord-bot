@@ -85,6 +85,15 @@ export async function resetGroupCode(groupId: number): Promise<{ newCode: string
 }
 
 /**
+ * Send an API request attempting to reset a league group's verification code.
+ */
+export async function resetLeagueGroupCode(groupId: number): Promise<{ newCode: string }> {
+  return leagueWomClient.groups.putRequest(`/groups/${groupId}/reset-code`, {
+    adminPassword: env.SHARED_ADMIN_PASSWORD
+  });
+}
+
+/**
  * Send an API request attempting to verify a group.
  */
 export async function verifyGroup(groupId: number): Promise<GroupResponse> {
