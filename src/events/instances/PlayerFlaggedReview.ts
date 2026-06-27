@@ -139,6 +139,10 @@ class PlayerFlaggedReview implements Event {
         new ButtonBuilder()
           .setCustomId(`rollback/${uniqueId}`)
           .setLabel('Hiscores Rollback')
+          .setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+          .setCustomId(`alt_rollback/${uniqueId}`)
+          .setLabel('Alt Hiscores Rollback')
           .setStyle(ButtonStyle.Secondary)
       );
 
@@ -354,6 +358,18 @@ class PlayerFlaggedReview implements Event {
               message.setColor(config.visuals.red).setFooter({ text: `Rollback failed` });
             }
 
+            await reportMessage.edit({ embeds: [message], components: [] });
+            return;
+          }
+
+          if (clickedId === `alt_rollback/${uniqueId}`) {
+            try {
+              await forceUpdate(player.username);
+              message.setColor(config.visuals.green).setFooter({ text: `Force updated by ${username}` });
+            } catch (error) {
+              console.log(error);
+              message.setColor(config.visuals.red).setFooter({ text: `Force update failed` });
+            }
             await reportMessage.edit({ embeds: [message], components: [] });
             return;
           }
