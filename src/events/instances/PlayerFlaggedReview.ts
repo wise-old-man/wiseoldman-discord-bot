@@ -9,6 +9,7 @@ import {
   isSkill,
   MetricProps,
   PlayerResponse,
+  REAL_SKILLS,
   Skill,
   SnapshotResponse
 } from '@wise-old-man/utils';
@@ -138,6 +139,10 @@ class PlayerFlaggedReview implements Event {
         new ButtonBuilder()
           .setCustomId(`rollback/${uniqueId}`)
           .setLabel('Hiscores Rollback')
+          .setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+          .setCustomId(`alt_rollback/${uniqueId}`)
+          .setLabel('Alt Hiscores Rollback')
           .setStyle(ButtonStyle.Secondary)
       );
 
@@ -357,6 +362,18 @@ class PlayerFlaggedReview implements Event {
             return;
           }
 
+          if (clickedId === `alt_rollback/${uniqueId}`) {
+            try {
+              await forceUpdate(player.username);
+              message.setColor(config.visuals.green).setFooter({ text: `Force updated by ${username}` });
+            } catch (error) {
+              console.log(error);
+              message.setColor(config.visuals.red).setFooter({ text: `Force update failed` });
+            }
+            await reportMessage.edit({ embeds: [message], components: [] });
+            return;
+          }
+
           if (clickedId === `deironed/${uniqueId}`) {
             try {
               await handleRollback(player.username);
@@ -423,16 +440,34 @@ async function handleRollback(username: string) {
   await rollback(username, false);
 }
 
+function getTotalLevel(snapshot: SnapshotResponse): number {
+  return REAL_SKILLS.reduce(
+    (sum, s) => sum + getLevel(Math.max(0, snapshot.data.skills[s].experience)),
+    0
+  );
+}
+
 function getLargestSkillChanges(previous: SnapshotResponse, rejected: SnapshotResponse) {
   const lines: string[] = [];
 
-  const map = new Map<Skill, { start: number; end: number; delta: number }>();
+  const map = new Map<
+    Skill,
+    {
+      start: number;
+      end: number;
+      delta: number;
+      startLevel: number;
+      endLevel: number;
+    }
+  >();
 
   Object.keys(previous.data.skills).map(s => {
     if (rejected.data.skills[s as Skill].experience === -1) return;
     const start = Math.max(0, previous.data.skills[s as Skill].experience);
     const end = Math.max(0, rejected.data.skills[s as Skill].experience);
-    map.set(s as Skill, { start, end, delta: end - start });
+    const startLevel = s === 'overall' ? getTotalLevel(previous) : getLevel(start);
+    const endLevel = s === 'overall' ? getTotalLevel(rejected) : getLevel(end);
+    map.set(s as Skill, { start, end, delta: end - start, startLevel, endLevel });
   });
 
   const entries = Array.from(map.entries()).sort((a, b) => b[1].delta - a[1].delta);
@@ -450,7 +485,7 @@ function getLargestSkillChanges(previous: SnapshotResponse, rejected: SnapshotRe
     lines.push(
       ...biggestGains.map(
         g =>
-          `${MetricProps[g[0]].name}: \`+${formatNumber(g[1].delta, true)}\` (lvl: \`${getLevel(g[1].start)}\` -> \`${getLevel(g[1].end)}\`)`
+          `${MetricProps[g[0]].name}: \`+${formatNumber(g[1].delta, true)}\` (lvl: \`${g[1].startLevel}\` -> \`${g[1].endLevel}\`)`
       )
     );
   }
@@ -461,7 +496,7 @@ function getLargestSkillChanges(previous: SnapshotResponse, rejected: SnapshotRe
     lines.push(
       ...biggestLosses.map(
         l =>
-          `${MetricProps[l[0]].name}: \`${formatNumber(l[1].delta, true)}\` (lvl: \`${getLevel(l[1].start)}\` -> \`${getLevel(l[1].end)}\`)`
+          `${MetricProps[l[0]].name}: \`${formatNumber(l[1].delta, true)}\` (lvl: \`${l[1].startLevel}\` -> \`${l[1].endLevel}\`)`
       )
     );
   }
