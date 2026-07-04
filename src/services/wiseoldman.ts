@@ -488,11 +488,6 @@ export function parseMetricAbbreviation(abbreviation: string): Metric | null {
     case 'lms':
       return Metric.LAST_MAN_STANDING;
 
-    case 'league':
-    case 'lp':
-    case 'lps':
-      return Metric.LEAGUE_POINTS;
-
     case 'sw':
     case 'zeal':
     case 'soul-wars':

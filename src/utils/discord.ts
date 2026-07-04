@@ -79,6 +79,7 @@ const MetricEmoji = {
   [Metric.KREEARRA]: '<:kreearra:729840085033287680>',
   [Metric.KRIL_TSUTSAROTH]: '<:kril_tsutsaroth:729840084781760574>',
   [Metric.LUNAR_CHESTS]: '<:lunar_chests:1220023608383115275>',
+  [Metric.MAGGOT_KING]: '<:maggot_king:1522973571981512816>',
   [Metric.MIMIC]: '<:mimic:730169728357761145>',
   [Metric.NEX]: '<:nex:927846096611475466>',
   [Metric.NIGHTMARE]: '<:nightmare:729840084844675103>',
@@ -115,7 +116,6 @@ const MetricEmoji = {
   [Metric.ZALCANO]: '<:zalcano:729840085587066882>',
   [Metric.ZULRAH]: '<:zulrah:729840085721284629>',
   // Activity emojis
-  [Metric.LEAGUE_POINTS]: '<:league_points:729840084865515593>',
   [Metric.LAST_MAN_STANDING]: '<:last_man_standing:729840085176025088>',
   [Metric.PVP_ARENA]: '<:pvp_arena:996966253765853244>',
   [Metric.BOUNTY_HUNTER_HUNTER]: '<:bounty_hunter_hunter:730171196410298378>',
