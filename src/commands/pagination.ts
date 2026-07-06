@@ -1,6 +1,8 @@
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import { ButtonStyle, ComponentType, EmbedBuilder } from 'discord.js';
 
+export const RESULTS_PER_PAGE = 20;
+
 const PAGINATION_BUTTONS = {
   NEXT: {
     customId: 'CustomNextAction',
