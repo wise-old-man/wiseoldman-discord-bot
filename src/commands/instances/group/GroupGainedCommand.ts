@@ -10,6 +10,7 @@ import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder
 import config from '../../../config';
 import womClient, { parseMetricAbbreviation } from '../../../services/wiseoldman';
 import { bold, Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
+import { createPaginatedEmbed, RESULTS_PER_PAGE } from '../../pagination';
 
 const CONFIG: CommandConfig = {
   name: 'gained',
@@ -53,9 +54,7 @@ class GroupGainedCommand extends Command {
       throw new CommandError(`${e.message}`);
     });
 
-    const gainedList = gained
-      .map((g, i) => `${i + 1}. ${bold(g.player.displayName)} - ${formatNumber(g.data.gained, true)}`)
-      .join('\n');
+    const pageCount = Math.min(25, Math.ceil(gained.length / RESULTS_PER_PAGE));
 
     const urlPeriod =
       period in PeriodProps
@@ -64,14 +63,26 @@ class GroupGainedCommand extends Command {
             Date.now() - parsePeriodExpression(period)!.durationMs
           ).toISOString()}&endDate=${new Date().toISOString()}`;
 
-    const response = new EmbedBuilder()
+    const embedTemplate = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`${getEmoji(metric)} ${group.name} ${MetricProps[metric].name} gains (${period})`)
-      .setURL(`https://wiseoldman.net/groups/${groupId}/gained?${urlPeriod}&metric=${metric}`)
-      .setFooter({ text: `Tip: Try /group gained metric: zulrah period: day` })
-      .setDescription(gainedList);
+      .setURL(`https://wiseoldman.net/groups/${groupId}/gained?${urlPeriod}&metric=${metric}`);
 
-    await interaction.editReply({ embeds: [response] });
+    const paginatedMessage = createPaginatedEmbed(embedTemplate, 120_000);
+
+    for (let i = 0; i < pageCount; i++) {
+      const gainedList = gained
+        .slice(i * RESULTS_PER_PAGE, i * RESULTS_PER_PAGE + RESULTS_PER_PAGE)
+        .map(
+          (g, idx) =>
+            `${i * RESULTS_PER_PAGE + idx + 1}. ${bold(g.player.displayName)} - ${formatNumber(g.data.gained, true)}`
+        )
+        .join('\n');
+
+      paginatedMessage.addPageEmbed(new EmbedBuilder().setDescription(gainedList));
+    }
+
+    paginatedMessage.run(interaction);
   }
 }
 

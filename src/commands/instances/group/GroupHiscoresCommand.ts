@@ -3,6 +3,7 @@ import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder
 import config from '../../../config';
 import womClient, { parseMetricAbbreviation } from '../../../services/wiseoldman';
 import { bold, Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
+import { createPaginatedEmbed, RESULTS_PER_PAGE } from '../../pagination';
 
 const CONFIG: CommandConfig = {
   name: 'hiscores',
@@ -35,18 +36,27 @@ class GroupHiscoresCommand extends Command {
 
     const hiscores = await womClient.groups.getGroupHiscores(groupId, metric);
 
-    const hiscoresList = hiscores
-      .map((g, i) => `${i + 1}. ${bold(g.player.displayName)} - ${getValue(g)}`)
-      .join('\n');
+    const pageCount = Math.min(25, Math.ceil(hiscores.length / RESULTS_PER_PAGE));
 
-    const response = new EmbedBuilder()
+    const embedTemplate = new EmbedBuilder()
       .setColor(config.visuals.blue)
       .setTitle(`${getEmoji(metric)} ${group.name} ${MetricProps[metric].name} hiscores`)
-      .setDescription(hiscoresList)
-      .setURL(`https://wiseoldman.net/groups/${groupId}/hiscores?metric=${metric}`)
-      .setFooter({ text: `Tip: Try /group hiscores metric: zulrah` });
+      .setURL(`https://wiseoldman.net/groups/${groupId}/hiscores?metric=${metric}`);
 
-    await interaction.editReply({ embeds: [response] });
+    const paginatedMessage = createPaginatedEmbed(embedTemplate, 120_000);
+
+    for (let i = 0; i < pageCount; i++) {
+      const hiscoresList = hiscores
+        .slice(i * RESULTS_PER_PAGE, i * RESULTS_PER_PAGE + RESULTS_PER_PAGE)
+        .map(
+          (g, idx) => `${i * RESULTS_PER_PAGE + idx + 1}. ${bold(g.player.displayName)} - ${getValue(g)}`
+        )
+        .join('\n');
+
+      paginatedMessage.addPageEmbed(new EmbedBuilder().setDescription(hiscoresList));
+    }
+
+    paginatedMessage.run(interaction);
   }
 }
 

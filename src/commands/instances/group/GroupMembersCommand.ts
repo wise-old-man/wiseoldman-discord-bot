@@ -2,9 +2,7 @@ import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import womClient from '../../../services/wiseoldman';
 import config from '../../../config';
 import { CommandConfig, Command, getLinkedGroupId, CommandError, bold } from '../../../utils';
-import { createPaginatedEmbed } from '../../../commands/pagination';
-
-const RESULTS_PER_PAGE = 20;
+import { createPaginatedEmbed, RESULTS_PER_PAGE } from '../../../commands/pagination';
 
 const CONFIG: CommandConfig = {
   name: 'members',
