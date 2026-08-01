@@ -79,6 +79,7 @@ const MetricEmoji = {
   [Metric.KREEARRA]: '<:kreearra:729840085033287680>',
   [Metric.KRIL_TSUTSAROTH]: '<:kril_tsutsaroth:729840084781760574>',
   [Metric.LUNAR_CHESTS]: '<:lunar_chests:1220023608383115275>',
+  [Metric.MAD_ANGEL]: '<:mad_angel:1533072361761538149>',
   [Metric.MAGGOT_KING]: '<:maggot_king:1522973571981512816>',
   [Metric.MIMIC]: '<:mimic:730169728357761145>',
   [Metric.NEX]: '<:nex:927846096611475466>',
