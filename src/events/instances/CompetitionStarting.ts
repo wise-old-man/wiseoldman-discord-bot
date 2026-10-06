@@ -65,7 +65,7 @@ class CompetitionStarting implements Event {
 
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
-      .setTitle(`🕒 ${icons} ${title} is starting in ${timeLeft}`)
+      .setTitle(`${icons} ${title} is starting in ${timeLeft}`)
       .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields(fields);
 

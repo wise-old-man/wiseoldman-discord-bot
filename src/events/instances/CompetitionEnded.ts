@@ -51,7 +51,7 @@ class CompetitionEnded implements Event {
 
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
-      .setTitle(`📢 ${icons} ${title} has ended!`)
+      .setTitle(`${icons} ${title} has ended!`)
       .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields([
         {
