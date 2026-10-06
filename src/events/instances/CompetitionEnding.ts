@@ -1,11 +1,11 @@
 import { AsyncResult, errored } from '@attio/fetchable';
-import { CompetitionResponse, MetricProps } from '@wise-old-man/utils';
+import { CompetitionResponse } from '@wise-old-man/utils';
 import { Client, EmbedBuilder } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
 import {
   durationBetween,
-  getEmoji,
+  formatMetricIcons,
   MessagePropagationError,
   NotificationType,
   propagateMessage
@@ -39,7 +39,7 @@ class CompetitionEnding implements Event {
     { code: 'MISSING_GROUP_ID' } | { code: 'MISSING_TIME_LEFT' } | MessagePropagationError
   > {
     const { groupId, competition } = data;
-    const { id, metric, type, title, startsAt, endsAt } = competition;
+    const { id, metrics, type, title, startsAt, endsAt } = competition;
 
     if (!groupId) {
       return errored({
@@ -56,8 +56,9 @@ class CompetitionEnding implements Event {
       });
     }
 
+    const icons = formatMetricIcons(metrics.map(m => m.metric));
+
     const fields = [
-      { name: 'Metric', value: `${getEmoji(metric)} ${MetricProps[metric].name}` },
       { name: 'Type', value: capitalize(type) },
       { name: 'Duration', value: durationBetween(new Date(startsAt), new Date(endsAt)) }
     ];
@@ -77,7 +78,7 @@ class CompetitionEnding implements Event {
 
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
-      .setTitle(`🕒 ${title} is ending in ${timeLeft}`)
+      .setTitle(`${icons} ${title} is ending in ${timeLeft}`)
       .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields(fields);
 

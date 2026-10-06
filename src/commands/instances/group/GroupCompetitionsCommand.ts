@@ -7,7 +7,13 @@ import {
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import config from '../../../config';
 import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '../../../services/wiseoldman';
-import { Command, CommandConfig, CommandError, getEmoji, getLinkedGroupId } from '../../../utils';
+import {
+  Command,
+  CommandConfig,
+  CommandError,
+  formatMetricIcons,
+  getLinkedGroupId
+} from '../../../utils';
 import { createPaginatedEmbed } from '../../pagination';
 
 const COMPETITIONS_PER_PAGE = 5;
@@ -81,16 +87,16 @@ function buildCompetitionsList(competitions: CompetitionResponse[]) {
         b.endsAt.getTime() - a.endsAt.getTime()
     )
     .map(c => {
-      const { id, metric, type, participantCount } = c;
+      const { id, metrics, type, participantCount } = c;
 
-      const icon = getEmoji(metric);
+      const icons = formatMetricIcons(metrics.map(m => m.metric));
       const typeName = CompetitionTypeProps[type].name;
       const timeLeft = getCompetitionTimeLeft(c);
       const participants = `${participantCount} participants`;
 
       return {
         name: `${c.title}`,
-        value: `${icon} • ${typeName} • ${participants} • ${timeLeft} - ID: ${id}`
+        value: `${icons} • ${typeName} • ${participants} • ${timeLeft} - ID: ${id}`
       };
     });
 }

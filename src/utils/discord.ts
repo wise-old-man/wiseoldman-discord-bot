@@ -1,4 +1,4 @@
-import { GroupRole, Metric } from '@wise-old-man/utils';
+import { GroupRole, Metric, MetricProps } from '@wise-old-man/utils';
 import {
   Channel,
   ChannelType,
@@ -441,6 +441,24 @@ export function isChannelSendable(channel: Channel): channel is TextChannel {
 
 export function getEmoji(metric: string): string {
   return MetricEmoji[parseMetricAbbreviation(metric) || metric.toLocaleLowerCase()] ?? '';
+}
+
+/**
+ * Formats metrics as up to `maxElements` icons. If there are more metrics than that,
+ * the last element is an overflow count instead of an icon.
+ * Ex: 5 metrics, maxElements = 3 -> "<icon> <icon> +3"
+ */
+export function formatMetricIcons(metrics: Array<Metric>, maxElements = 3): string {
+  if (metrics.length <= maxElements) {
+    return metrics.map(getEmoji).join(' ');
+  }
+
+  const icons = metrics.slice(0, maxElements - 1).map(getEmoji);
+  return [...icons, `[+${metrics.length - icons.length}]`].join(' ');
+}
+
+export function formatMetricNames(metrics: Array<Metric>): string {
+  return `${formatMetricIcons(metrics)} ${metrics.map(m => MetricProps[m].name).join(', ')}`;
 }
 
 export function getGroupRoleEmoji(role: string): string {

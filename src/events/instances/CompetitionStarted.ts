@@ -1,11 +1,11 @@
 import { AsyncResult, errored } from '@attio/fetchable';
-import { CompetitionResponse, MetricProps } from '@wise-old-man/utils';
+import { CompetitionResponse } from '@wise-old-man/utils';
 import { Client, EmbedBuilder } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
 import {
   durationBetween,
-  getEmoji,
+  formatMetricIcons,
   MessagePropagationError,
   NotificationType,
   propagateMessage
@@ -29,7 +29,7 @@ class CompetitionStarted implements Event {
     client: Client
   ): AsyncResult<true, { code: 'MISSING_GROUP_ID' } | MessagePropagationError> {
     const { groupId, competition } = data;
-    const { id, metric, startsAt, endsAt, type, title } = competition;
+    const { id, metrics, startsAt, endsAt, type, title } = competition;
 
     if (!groupId) {
       return errored({
@@ -37,15 +37,16 @@ class CompetitionStarted implements Event {
       });
     }
 
+    const icons = formatMetricIcons(metrics.map(m => m.metric));
+
     const fields = [
-      { name: 'Metric', value: `${getEmoji(metric)} ${MetricProps[metric].name}` },
       { name: 'Type', value: capitalize(type) },
       { name: 'Ends in', value: durationBetween(new Date(startsAt), new Date(endsAt)) }
     ];
 
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
-      .setTitle(`📢 ${title} has started!`)
+      .setTitle(`${icons} ${title} has started!`)
       .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields(fields);
 

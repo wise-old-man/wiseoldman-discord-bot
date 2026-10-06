@@ -6,6 +6,7 @@ import {
   GroupResponse,
   isMetric,
   Metric,
+  MetricDelta,
   NameChangeDetailsResponse,
   NameChangeResponse,
   PlayerAnnotationType,
@@ -58,6 +59,14 @@ export function getCompetitionTimeLeft<T extends Pick<CompetitionResponse, 'star
 
   const timeLeft = durationBetween(now, startsAt, 2);
   return `Starting in ${timeLeft}`;
+}
+
+/**
+ * The first delta is always the competition's score: the "total" for multi-metric competitions,
+ * or the only metric for single-metric competitions.
+ */
+export function getCompetitionGained(participation: { deltas: Array<{ values: MetricDelta }> }) {
+  return participation.deltas[0]?.values.gained ?? 0;
 }
 
 /**

@@ -1,11 +1,11 @@
 import { AsyncResult, errored } from '@attio/fetchable';
-import { CompetitionResponse, MetricProps } from '@wise-old-man/utils';
+import { CompetitionResponse } from '@wise-old-man/utils';
 import { Client, EmbedBuilder } from 'discord.js';
 import { capitalize } from 'lodash';
 import config from '../../config';
 import {
   durationBetween,
-  getEmoji,
+  formatMetricNames,
   MessagePropagationError,
   NotificationType,
   propagateMessage
@@ -29,7 +29,7 @@ class CompetitionCreated implements Event {
     client: Client
   ): AsyncResult<true, { code: 'MISSING_GROUP_ID' } | MessagePropagationError> {
     const { groupId, competition } = data;
-    const { id, metric, type, title, startsAt, endsAt } = competition;
+    const { id, metrics, type, title, startsAt, endsAt } = competition;
 
     if (!groupId) {
       return errored({
@@ -39,7 +39,7 @@ class CompetitionCreated implements Event {
 
     const fields = [
       { name: 'Title', value: title },
-      { name: 'Metric', value: `${getEmoji(metric)} ${MetricProps[metric].name}` },
+      { name: 'Metrics', value: formatMetricNames(metrics.map(m => m.metric)) },
       { name: 'Type', value: capitalize(type) },
       { name: 'Duration', value: durationBetween(new Date(startsAt), new Date(endsAt)) }
     ];
