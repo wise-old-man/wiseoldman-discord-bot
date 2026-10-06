@@ -3,7 +3,13 @@ import { CompetitionResponse, CompetitionType, formatNumber } from '@wise-old-ma
 import { Client, EmbedBuilder } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../config';
-import { bold, MessagePropagationError, NotificationType, propagateMessage } from '../../utils';
+import {
+  bold,
+  formatMetricIcons,
+  MessagePropagationError,
+  NotificationType,
+  propagateMessage
+} from '../../utils';
 import { Event } from '../../utils/events';
 
 interface CompetitionStanding {
@@ -30,7 +36,7 @@ class CompetitionEnded implements Event {
     client: Client
   ): AsyncResult<true, { code: 'MISSING_GROUP_ID' } | MessagePropagationError> {
     const { groupId, competition, standings } = data;
-    const { id, title } = competition;
+    const { id, title, metrics } = competition;
 
     if (!groupId) {
       return errored({
@@ -41,9 +47,11 @@ class CompetitionEnded implements Event {
     const isTeamCompetition = competition.type === CompetitionType.TEAM;
     const topParticipations = isTeamCompetition ? getTeamStandings(standings) : getStandings(standings);
 
+    const icons = formatMetricIcons(metrics.map(m => m.metric));
+
     const message = new EmbedBuilder()
       .setColor(config.visuals.blue)
-      .setTitle(`📢 ${title} has ended!`)
+      .setTitle(`📢 ${icons} ${title} has ended!`)
       .setURL(`https://wiseoldman.net/competitions/${id}`)
       .addFields([
         {

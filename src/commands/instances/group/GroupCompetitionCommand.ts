@@ -4,19 +4,22 @@ import {
   CompetitionStatusProps,
   CompetitionType,
   CompetitionTypeProps,
-  formatNumber,
-  MetricProps
+  formatNumber
 } from '@wise-old-man/utils';
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { uniq } from 'lodash';
 import config from '../../../config';
-import womClient, { getCompetitionStatus, getCompetitionTimeLeft } from '../../../services/wiseoldman';
+import womClient, {
+  getCompetitionGained,
+  getCompetitionStatus,
+  getCompetitionTimeLeft
+} from '../../../services/wiseoldman';
 import {
   bold,
   Command,
   CommandConfig,
   CommandError,
-  getEmoji,
+  formatMetricNames,
   getLinkedGroupId,
   keyValue
 } from '../../../utils';
@@ -99,11 +102,11 @@ function getFooterLabel(competition: CompetitionDetailsResponse) {
 }
 
 function buildContent(competition: CompetitionDetailsResponse) {
-  const { metric, type, participations, participantCount } = competition;
+  const { metrics, type, participations, participantCount } = competition;
   const timeLeft = getCompetitionTimeLeft(competition).split(' ');
 
   const lines = [
-    keyValue('Metric', `${getEmoji(metric)} ${MetricProps[metric].name}`),
+    keyValue('Metrics', formatMetricNames(metrics.map(m => m.metric))),
     keyValue('Type', CompetitionTypeProps[type].name),
     keyValue('Participants', participantCount),
     keyValue(timeLeft.slice(0, 2).join(' '), timeLeft.slice(2).join(' '))
@@ -122,7 +125,7 @@ function buildContent(competition: CompetitionDetailsResponse) {
         .map(t => `${t.name} - ${bold(formatNumber(t.totalGained, true))}`)
     );
   } else {
-    const totalGained = participations.reduce((a, b) => a + b.progress.gained, 0) || 0;
+    const totalGained = participations.reduce((a, b) => a + getCompetitionGained(b), 0) || 0;
 
     lines.push(keyValue('Total gained', formatNumber(totalGained, true)));
 
@@ -130,7 +133,7 @@ function buildContent(competition: CompetitionDetailsResponse) {
     lines.push(
       ...participations
         .slice(0, 10)
-        .map(p => `${p.player.displayName} - ${bold(formatNumber(p.progress.gained, true))}`)
+        .map(p => `${p.player.displayName} - ${bold(formatNumber(getCompetitionGained(p), true))}`)
     );
   }
 
@@ -147,7 +150,7 @@ function aggregateTeamData(competition: CompetitionDetailsResponse) {
 
   participants.forEach(p => {
     if (!p.teamName) return;
-    teamTally[p.teamName] = teamTally[p.teamName] + p.progress.gained;
+    teamTally[p.teamName] = teamTally[p.teamName] + getCompetitionGained(p);
   });
 
   const teamStandings = Object.entries(teamTally).map(t => ({ name: t[0], totalGained: t[1] }));
