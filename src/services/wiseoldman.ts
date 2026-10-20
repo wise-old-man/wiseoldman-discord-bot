@@ -391,6 +391,10 @@ export function parseMetricAbbreviation(abbreviation: string): Metric | null {
     case 'the-corrupted-gauntlet':
       return Metric.THE_CORRUPTED_GAUNTLET;
 
+    case 'tfa':
+    case 'archive':
+      return Metric.THE_FRACTURED_ARCHIVE;
+
     case 'tob':
     case 'theatre':
     case 'verzik':
