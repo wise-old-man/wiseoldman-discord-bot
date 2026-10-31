@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import { createAPIKey } from '../../../services/wiseoldman';
 import config from '../../../config';
+import { createAPIKey } from '../../../services/wiseoldman';
 import { Command, CommandConfig, CommandError, sendModLog } from '../../../utils';
 
 const CONFIG: CommandConfig = {
@@ -49,7 +49,7 @@ class CreateAPIKeyCommand extends Command {
     });
 
     sentDM.edit(
-      `Wise Old Man API key for \`${project}\`:\n\`${key.id}\`\n\n<https://docs.wiseoldman.net/#rate-limits--api-keys>`
+      `Wise Old Man API key for \`${project}\`:\n\`${key.id}\`\n\n<https://docs.wiseoldman.net/api#rate-limits--api-keys>`
     );
 
     // Respond on the WOM discord chat with a success status
