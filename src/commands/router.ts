@@ -30,7 +30,10 @@ import RemoveFromCompetitionCommand from './instances/moderation/RemoveFromCompe
 import RemoveFromGroupCommand from './instances/moderation/RemoveFromGroupCommand';
 import ResetCompetitionCodeCommand from './instances/moderation/ResetCompetitionCodeCommand';
 import ResetGroupCodeCommand from './instances/moderation/ResetGroupCodeCommand';
+import RevokeAPIKeyCommand from './instances/moderation/RevokeAPIKeyCommand';
 import RollbackPlayerSnapshotMetricValuesCommand from './instances/moderation/RollbackPlayerSnapshotMetricValuesCommand';
+import ToggleCompetitionVisibilityCommand from './instances/moderation/ToggleCompetitionVisibilityCommand';
+import ToggleGroupVisibilityCommand from './instances/moderation/ToggleGroupVisibilityCommand';
 import VerifyGroupCommand from './instances/moderation/VerifyGroupCommand';
 import PlayerAchievementsCommand from './instances/player/PlayerAchievementsCommand';
 import PlayerActivitiesCommand from './instances/player/PlayerActivitiesCommand';
@@ -72,7 +75,10 @@ export const COMMANDS: BaseCommand[] = [
   CreateAPIKeyCommand,
   DeleteAnnotationCommand,
   AddPlayerAnnotationCommand,
-  RollbackPlayerSnapshotMetricValuesCommand
+  RollbackPlayerSnapshotMetricValuesCommand,
+  RevokeAPIKeyCommand,
+  ToggleGroupVisibilityCommand,
+  ToggleCompetitionVisibilityCommand
 ];
 
 export async function onInteractionReceived(interaction: Interaction) {

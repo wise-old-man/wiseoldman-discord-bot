@@ -96,6 +96,24 @@ export async function verifyGroup(groupId: number): Promise<GroupResponse> {
   });
 }
 
+/**
+ * Send an API request attempting to toggle a group's visibility.
+ */
+export async function toggleGroupVisibility(groupId: number): Promise<{ message: string }> {
+  return womClient.groups.putRequest(`/groups/${groupId}/visibility`, {
+    adminPassword: env.SHARED_ADMIN_PASSWORD
+  });
+}
+
+/**
+ * Send an API request attempting to toggle a competition's visibility.
+ */
+export async function toggleCompetitionVisibility(competitionId: number): Promise<{ message: string }> {
+  return womClient.competitions.putRequest(`/competitions/${competitionId}/visibility`, {
+    adminPassword: env.SHARED_ADMIN_PASSWORD
+  });
+}
+
 export async function deletePlayerAnnotation(
   username: string,
   annotationType: PlayerAnnotationType
@@ -204,9 +222,20 @@ export async function rollbackSnapshotMetricValues(
 }
 
 export async function createAPIKey(application: string, developer: string): Promise<{ id: string }> {
-  return womClient.postRequest(`/api-key`, {
+  return womClient.postRequest(`/api-keys`, {
     application,
     developer,
+    adminPassword: env.SHARED_ADMIN_PASSWORD
+  });
+}
+
+export async function revokeAPIKey(apiKey: string): Promise<{
+  id: string;
+  application: string;
+  developer: string;
+  active: boolean;
+}> {
+  return womClient.putRequest(`/api-keys/${apiKey}/revoke`, {
     adminPassword: env.SHARED_ADMIN_PASSWORD
   });
 }
