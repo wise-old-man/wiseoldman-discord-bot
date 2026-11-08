@@ -132,16 +132,16 @@ class PlayerBossesCommand extends Command {
       ctx.drawImage(badge, originX, originY, badge.width / 2, badge.height / 2);
       ctx.drawImage(icon, originX, originY - 1, icon.width / 2, icon.height / 2);
 
-      const isRanked = value > -1;
+      const isRanked = rank > -1;
+      ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
 
       if (variant === RenderVariant.KILLS) {
         ctx.font = '11px Arial';
 
-        const killsLabel = `${isRanked ? formatNumber(value, true, 1) : '?'}`;
+        const killsLabel = `${value > -1 ? formatNumber(value, true, 1) : '?'}`;
         const killsWidth = ctx.measureText(killsLabel).width;
 
         // Boss kills
-        ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
         ctx.fillText(killsLabel, originX + 42 - killsWidth / 2, originY + 17);
       } else if (variant === RenderVariant.RANKS) {
         ctx.font = '10px Arial';
@@ -150,7 +150,6 @@ class PlayerBossesCommand extends Command {
         const rankWidth = ctx.measureText(rankLabel).width;
 
         // Boss rank
-        ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
         ctx.fillText(rankLabel, originX + 44 - rankWidth / 2, originY + 17);
       } else if (variant === RenderVariant.EHB) {
         ctx.font = '10px Arial';
@@ -159,22 +158,25 @@ class PlayerBossesCommand extends Command {
         const ehbWidth = ctx.measureText(ehbLabel).width;
 
         // Boss EHB
-        ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
         ctx.fillText(ehbLabel, originX + 44 - ehbWidth / 2, originY + 17);
       }
     }
 
+    let totalKills = 0;
     // Player bosses
     for (const [index, boss] of Object.keys(bosses).entries()) {
       if (!isBoss(boss)) continue;
 
-      await renderMetricSlot(index, boss, bosses[boss].kills, bosses[boss].rank, bosses[boss].ehb);
+      const kills = bosses[boss].kills;
+      totalKills += kills;
+      await renderMetricSlot(index, boss, kills, bosses[boss].rank, bosses[boss].ehb);
     }
 
+    console.log(totalKills);
     await renderMetricSlot(
       Object.keys(bosses).length,
       Metric.EHB,
-      computed.ehb.value,
+      totalKills,
       computed.ehb.rank,
       computed.ehb.value
     );
