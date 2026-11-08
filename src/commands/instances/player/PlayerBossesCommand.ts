@@ -17,9 +17,8 @@ import {
   getUsernameParam
 } from '../../../utils';
 
-const RENDER_WIDTH = 415;
-const RENDER_HEIGHT = 390;
-const RENDER_PADDING = 15;
+const RENDER_PADDING = 5;
+const ROWS = 11;
 
 enum RenderVariant {
   KILLS = 'kills',
@@ -93,11 +92,22 @@ class PlayerBossesCommand extends Command {
     const username = playerDetails.username;
     const { bosses, computed } = playerDetails.latestSnapshot!.data;
 
-    // Create a scaled empty canvas
-    const { canvas, ctx, width, height } = getScaledCanvas(RENDER_WIDTH, RENDER_HEIGHT);
-
-    // Load images
+    // Load badge image
     const badge = await Canvas.loadImage(`./public/x2/badge.png`);
+
+    // Padding between the badges
+    const xPadding = 3;
+    const yPadding = 5;
+
+    const totalBadges = Object.keys(bosses).length + 1;
+    const columns = Math.ceil(totalBadges / ROWS);
+
+    // Canvas size
+    const renderWidth = columns * (badge.width / 2) + (columns - 1) * xPadding + RENDER_PADDING * 2;
+    const renderHeight = ROWS * (badge.height / 2) + (ROWS - 1) * yPadding + RENDER_PADDING * 2;
+
+    // Create a scaled empty canvas
+    const { canvas, ctx, width, height } = getScaledCanvas(renderWidth, renderHeight);
 
     // Background fill
     ctx.fillStyle = '#1d1d1d';
@@ -110,29 +120,28 @@ class PlayerBossesCommand extends Command {
       rank: number,
       ehb?: number
     ) {
-      const rows = 12;
-      const x = Math.floor(index / rows);
-      const y = index % rows;
+      const x = Math.floor(index / ROWS);
+      const y = index % ROWS;
 
-      const originX = RENDER_PADDING - 7 + x * 67;
-      const originY = RENDER_PADDING - 5 + y * 31;
+      const originX = RENDER_PADDING + x * (badge.width / 2 + xPadding);
+      const originY = RENDER_PADDING + y * (badge.height / 2 + yPadding);
 
       const icon = await Canvas.loadImage(`./public/x2/${metric}.png`);
 
       // Badge background and boss icon
-      ctx.drawImage(badge, originX, originY, 64, 26);
+      ctx.drawImage(badge, originX, originY, badge.width / 2, badge.height / 2);
       ctx.drawImage(icon, originX, originY - 1, icon.width / 2, icon.height / 2);
 
-      const isRanked = value > -1;
+      const isRanked = rank > -1;
+      ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
 
       if (variant === RenderVariant.KILLS) {
         ctx.font = '11px Arial';
 
-        const killsLabel = `${isRanked ? formatNumber(value, true, 1) : '?'}`;
+        const killsLabel = `${value > -1 ? formatNumber(value, true, 1) : '?'}`;
         const killsWidth = ctx.measureText(killsLabel).width;
 
         // Boss kills
-        ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
         ctx.fillText(killsLabel, originX + 42 - killsWidth / 2, originY + 17);
       } else if (variant === RenderVariant.RANKS) {
         ctx.font = '10px Arial';
@@ -141,7 +150,6 @@ class PlayerBossesCommand extends Command {
         const rankWidth = ctx.measureText(rankLabel).width;
 
         // Boss rank
-        ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
         ctx.fillText(rankLabel, originX + 44 - rankWidth / 2, originY + 17);
       } else if (variant === RenderVariant.EHB) {
         ctx.font = '10px Arial';
@@ -150,22 +158,25 @@ class PlayerBossesCommand extends Command {
         const ehbWidth = ctx.measureText(ehbLabel).width;
 
         // Boss EHB
-        ctx.fillStyle = isRanked ? '#ffffff' : '#6e6e6e';
         ctx.fillText(ehbLabel, originX + 44 - ehbWidth / 2, originY + 17);
       }
     }
 
+    let totalKills = 0;
     // Player bosses
     for (const [index, boss] of Object.keys(bosses).entries()) {
       if (!isBoss(boss)) continue;
 
-      await renderMetricSlot(index, boss, bosses[boss].kills, bosses[boss].rank, bosses[boss].ehb);
+      const kills = bosses[boss].kills;
+      totalKills += kills;
+      await renderMetricSlot(index, boss, kills, bosses[boss].rank, bosses[boss].ehb);
     }
 
+    console.log(totalKills);
     await renderMetricSlot(
       Object.keys(bosses).length,
       Metric.EHB,
-      computed.ehb.value,
+      totalKills,
       computed.ehb.rank,
       computed.ehb.value
     );
