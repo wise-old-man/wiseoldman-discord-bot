@@ -19,14 +19,13 @@ import {
   ButtonStyle,
   ChannelType,
   Client,
-  ComponentType,
   EmbedBuilder,
   TextChannel
 } from 'discord.js';
 import config from '../../config';
-import { archive, forceUpdate, rollback } from '../../services/wiseoldman';
 import { encodeURL } from '../../utils';
 import { Event } from '../../utils/events';
+import { Actions, ModerationType } from '../../utils/buttonInteractions';
 
 interface PlayerFlaggedData {
   player: PlayerResponse;
@@ -96,7 +95,6 @@ class PlayerFlaggedReview implements Event {
     const ehpChange = Math.round(getPercentageIncrease(previousEHP, rejectedEHP) * 100);
     const ehbChange = Math.round(getPercentageIncrease(previousEHB, rejectedEHB) * 100);
 
-    const uniqueId = `${player.id}_${new Date(rejected.createdAt).getTime()}`;
     const actions = new ActionRowBuilder<ButtonBuilder>();
 
     const timeDiff = getTimeDiff(new Date(rejected.createdAt), new Date(previous.createdAt));
@@ -133,15 +131,15 @@ class PlayerFlaggedReview implements Event {
 
       actions.addComponents(
         new ButtonBuilder()
-          .setCustomId(`name_transfer/${uniqueId}`)
+          .setCustomId(`${ModerationType.FLAGGED_REVIEW}/${Actions.NAME_TRANSFER}/${player.username}`)
           .setLabel('Name Transfer')
           .setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
-          .setCustomId(`rollback/${uniqueId}`)
+          .setCustomId(`${ModerationType.FLAGGED_REVIEW}/${Actions.ROLLBACK}/${player.username}`)
           .setLabel('Hiscores Rollback')
           .setStyle(ButtonStyle.Secondary),
         new ButtonBuilder()
-          .setCustomId(`alt_rollback/${uniqueId}`)
+          .setCustomId(`${ModerationType.FLAGGED_REVIEW}/${Actions.ALT_ROLLBACK}/${player.username}`)
           .setLabel('Alt Hiscores Rollback')
           .setStyle(ButtonStyle.Secondary)
       );
@@ -187,15 +185,15 @@ class PlayerFlaggedReview implements Event {
 
       actions.addComponents(
         new ButtonBuilder()
-          .setCustomId(`name_transfer/${uniqueId}`)
+          .setCustomId(`${ModerationType.FLAGGED_REVIEW}/${Actions.NAME_TRANSFER}/${player.username}`)
           .setLabel('Name Transfer')
           .setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
-          .setCustomId(`deironed/${uniqueId}`)
+          .setCustomId(`${ModerationType.FLAGGED_REVIEW}/${Actions.DEIRONED}/${player.username}`)
           .setLabel('De-ironed')
           .setStyle(ButtonStyle.Secondary),
         new ButtonBuilder()
-          .setCustomId(`exp_dump/${uniqueId}`)
+          .setCustomId(`${ModerationType.FLAGGED_REVIEW}/${Actions.EXP_DUMP}/${player.username}`)
           .setLabel('Stackable Exp Dump')
           .setStyle(ButtonStyle.Secondary)
       );
@@ -288,7 +286,7 @@ class PlayerFlaggedReview implements Event {
 
     actions.addComponents(
       new ButtonBuilder()
-        .setCustomId(`idk/${uniqueId}`)
+        .setCustomId(`${ModerationType.FLAGGED_REVIEW}/${Actions.IDK}/${player.username}`)
         .setLabel("I'm not sure  🤷‍♂️")
         .setStyle(ButtonStyle.Secondary)
     );
@@ -326,118 +324,8 @@ class PlayerFlaggedReview implements Event {
       });
     }
 
-    const reportMessage = sendResult.value;
-
-    reviewChannel
-      .createMessageComponentCollector({ componentType: ComponentType.Button, max: 1, time: 900 * 1000 })
-      .on('end', async collection => {
-        try {
-          if (!collection) return;
-
-          const first = collection.first();
-          if (!first) return;
-
-          const username = first.member?.user.username;
-          if (!username) return;
-
-          const clickedId = first.customId;
-
-          if (clickedId === `idk/${uniqueId}`) {
-            message.setColor(config.visuals.orange).setFooter({ text: `Marked as "🤷‍♂️" by ${username}` });
-            await reportMessage.edit({ embeds: [message], components: [] });
-            await reportMessage.reply(`Paging <@329256344798494773>`);
-            return;
-          }
-
-          if (clickedId === `rollback/${uniqueId}`) {
-            try {
-              await rollback(player.username, false);
-              message.setColor(config.visuals.green).setFooter({ text: `Rolled back by ${username}` });
-            } catch (error) {
-              console.log(error);
-              message.setColor(config.visuals.red).setFooter({ text: `Rollback failed` });
-            }
-
-            await reportMessage.edit({ embeds: [message], components: [] });
-            return;
-          }
-
-          if (clickedId === `alt_rollback/${uniqueId}`) {
-            try {
-              await forceUpdate(player.username);
-              message.setColor(config.visuals.green).setFooter({ text: `Force updated by ${username}` });
-            } catch (error) {
-              console.log(error);
-              message.setColor(config.visuals.red).setFooter({ text: `Force update failed` });
-            }
-            await reportMessage.edit({ embeds: [message], components: [] });
-            return;
-          }
-
-          if (clickedId === `deironed/${uniqueId}`) {
-            try {
-              await handleRollback(player.username);
-              message.setColor(config.visuals.green).setFooter({ text: `De-iron fix by ${username}` });
-            } catch (error) {
-              console.log(error);
-              message.setColor(config.visuals.red).setFooter({ text: `De-iron fix failed` });
-            }
-            await reportMessage.edit({ embeds: [message], components: [] });
-            return;
-          }
-
-          if (clickedId === `exp_dump/${uniqueId}`) {
-            try {
-              await forceUpdate(player.username);
-              message.setColor(config.visuals.green).setFooter({ text: `Force updated by ${username}` });
-            } catch (error) {
-              console.log(error);
-              message.setColor(config.visuals.red).setFooter({ text: `Force update failed` });
-            }
-            await reportMessage.edit({ embeds: [message], components: [] });
-            return;
-          }
-
-          if (clickedId === `name_transfer/${uniqueId}`) {
-            try {
-              const archivedPlayer = await archive(player.username);
-              message.setColor(config.visuals.green).setFooter({
-                text: `Archived by ${username} (archived username: ${archivedPlayer.username})`
-              });
-            } catch (error) {
-              console.log(error);
-              message.setColor(config.visuals.red).setFooter({ text: `Archive failed` });
-            }
-            await reportMessage.edit({ embeds: [message], components: [] });
-            return;
-          }
-        } catch (error) {
-          console.error('Error while handling button interaction:', error);
-        }
-      });
-
     return complete(true);
   }
-}
-
-async function handleRollback(username: string) {
-  // First, try to delete only the snapshots AFTER lastChangedAt, if that fails
-  // try to delete the last snapshot (regardless of lastChangedAt date),
-  // if both of those fail, then there's something wrong, just let it throw
-  try {
-    await rollback(username, true);
-  } catch (error) {
-    if (
-      typeof error === 'object' &&
-      error !== null &&
-      'message' in error &&
-      error.message !== "Failed to delete a player's last snapshots."
-    ) {
-      throw error;
-    }
-  }
-
-  await rollback(username, false);
 }
 
 function getTotalLevel(snapshot: SnapshotResponse): number {
