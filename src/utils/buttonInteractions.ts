@@ -7,28 +7,116 @@ import {
 } from 'discord.js';
 import config from '../config';
 import { handlePatreonTrigger, PATREON_TRIGGER_ID } from '../patreon-trigger';
-import { allowActions, blockActions } from '../services/wiseoldman';
+import { allowActions, archive, blockActions, forceUpdate, rollback } from '../services/wiseoldman';
 import { CommandError } from './commands';
 
-enum Actions {
+export enum Actions {
   BLOCK = 'block',
   ALLOW = 'allow',
   CONFIRM = 'confirm',
-  CANCEL = 'cancel'
+  CANCEL = 'cancel',
+  NAME_TRANSFER = 'nametransfer',
+  ROLLBACK = 'rollback',
+  ALT_ROLLBACK = 'altrollback',
+  DEIRONED = 'deironed',
+  EXP_DUMP = 'expDump',
+  IDK = 'idk'
 }
 
 export enum ModerationType {
-  SPAM = 'spam'
+  SPAM = 'spam',
+  FLAGGED_REVIEW = 'flaggedreview'
 }
 
 export async function handleButtonInteraction(interaction: ButtonInteraction): Promise<void> {
-  const [action, type, ipHash, confirmation] = interaction.customId.split('/');
+  const [type, action, ipHash, confirmation] = interaction.customId.split('/');
 
-  if (action === PATREON_TRIGGER_ID) {
+  if (type === PATREON_TRIGGER_ID) {
     handlePatreonTrigger(interaction);
+  } else if (type === ModerationType.FLAGGED_REVIEW) {
+    // Actions for reviewing flagged players
+    await interaction.deferUpdate();
+
+    const username = ipHash;
+    const message = interaction.message;
+    const oldEmbed = message.embeds[0];
+    const interactionUser = interaction.member?.user.username;
+
+    const newEmbed = new EmbedBuilder()
+      .setTitle(oldEmbed.title)
+      .setDescription(oldEmbed.description)
+      .setURL(oldEmbed.url)
+      .setColor(oldEmbed.color);
+
+    if (action === Actions.IDK) {
+      newEmbed
+        .setColor(config.visuals.orange)
+        .setFooter({ text: `Marked as "🤷‍♂️" by ${interactionUser}` });
+
+      await interaction.editReply({ embeds: [newEmbed], components: [] });
+      await interaction.followUp(`Paging <@329256344798494773>`);
+      return;
+    } else if (action === Actions.ROLLBACK) {
+      try {
+        await rollback(username, false);
+        newEmbed.setColor(config.visuals.green).setFooter({ text: `Rolled back by ${interactionUser}` });
+      } catch (error) {
+        console.log(error);
+        newEmbed.setColor(config.visuals.red).setFooter({ text: `Rollback failed` });
+      }
+
+      await interaction.editReply({ embeds: [newEmbed], components: [] });
+      return;
+    } else if (action === Actions.ALT_ROLLBACK) {
+      try {
+        await forceUpdate(username);
+        newEmbed
+          .setColor(config.visuals.green)
+          .setFooter({ text: `Force updated by ${interactionUser}` });
+      } catch (error) {
+        console.log(error);
+        newEmbed.setColor(config.visuals.red).setFooter({ text: `Force update failed` });
+      }
+      await interaction.editReply({ embeds: [newEmbed], components: [] });
+      return;
+    } else if (action === Actions.DEIRONED) {
+      try {
+        await handleRollback(username);
+        newEmbed.setColor(config.visuals.green).setFooter({ text: `De-iron fix by ${interactionUser}` });
+      } catch (error) {
+        console.log(error);
+        newEmbed.setColor(config.visuals.red).setFooter({ text: `De-iron fix failed` });
+      }
+      await interaction.editReply({ embeds: [newEmbed], components: [] });
+      return;
+    } else if (action === Actions.EXP_DUMP) {
+      try {
+        await forceUpdate(username);
+        newEmbed
+          .setColor(config.visuals.green)
+          .setFooter({ text: `Force updated by ${interactionUser}` });
+      } catch (error) {
+        console.log(error);
+        newEmbed.setColor(config.visuals.red).setFooter({ text: `Force update failed` });
+      }
+      await interaction.editReply({ embeds: [newEmbed], components: [] });
+      return;
+    } else if (action === Actions.NAME_TRANSFER) {
+      try {
+        const archivedPlayer = await archive(username);
+        newEmbed.setColor(config.visuals.green).setFooter({
+          text: `Archived by ${interactionUser} (archived username: ${archivedPlayer.username})`
+        });
+      } catch (error) {
+        console.log(error);
+        newEmbed.setColor(config.visuals.red).setFooter({ text: `Archive failed` });
+      }
+      await interaction.editReply({ embeds: [newEmbed], components: [] });
+      return;
+    }
   } else if (action === Actions.BLOCK || action === Actions.ALLOW) {
     await interaction.update({
-      components: [createConfirmationButtons(action, type as ModerationType, ipHash)]
+      components: [createConfirmationButtons(type as ModerationType, action, ipHash)]
     });
   } else if (action === Actions.CONFIRM) {
     if (type === ModerationType.SPAM) {
@@ -54,7 +142,7 @@ export async function handleButtonInteraction(interaction: ButtonInteraction): P
     }
 
     interaction.update({
-      embeds: [await updateEmbed(confirmation, type, interaction)],
+      embeds: [await updateEmbed(type, confirmation, interaction)],
       components: []
     });
   } else if (action === Actions.CANCEL) {
@@ -64,7 +152,7 @@ export async function handleButtonInteraction(interaction: ButtonInteraction): P
   }
 }
 
-async function updateEmbed(confirmation: string, type: string, interaction: ButtonInteraction) {
+async function updateEmbed(type: string, confirmation: string, interaction: ButtonInteraction) {
   const message = interaction.message;
   const oldEmbed = message.embeds[0];
 
@@ -86,11 +174,11 @@ export function createModerationButtons(type: ModerationType, ipHash: string) {
 
   actions.addComponents(
     new ButtonBuilder()
-      .setCustomId(`${Actions.ALLOW}/${type}/${ipHash}`)
+      .setCustomId(`${type}/${Actions.ALLOW}/${ipHash}`)
       .setLabel('Allow')
       .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
-      .setCustomId(`${Actions.BLOCK}/${type}/${ipHash}`)
+      .setCustomId(`${type}/${Actions.BLOCK}/${ipHash}`)
       .setLabel('Block')
       .setStyle(ButtonStyle.Danger)
   );
@@ -99,22 +187,42 @@ export function createModerationButtons(type: ModerationType, ipHash: string) {
 }
 
 function createConfirmationButtons(
-  action: Actions,
   type: ModerationType,
+  action: Actions,
   ipHash: string
 ): ActionRowBuilder<ButtonBuilder> {
   const actions = new ActionRowBuilder<ButtonBuilder>();
 
   actions.addComponents(
     new ButtonBuilder()
-      .setCustomId(`${Actions.CONFIRM}/${type}/${ipHash}/${action}`)
+      .setCustomId(`${type}/${Actions.CONFIRM}/${ipHash}/${action}`)
       .setLabel(`Confirm ${action === Actions.BLOCK ? 'blocking' : 'approval'}`)
       .setStyle(action === Actions.BLOCK ? ButtonStyle.Danger : ButtonStyle.Success),
     new ButtonBuilder()
-      .setCustomId(`${Actions.CANCEL}/${type}/${ipHash}`)
+      .setCustomId(`${type}/${Actions.CANCEL}/${ipHash}`)
       .setLabel('Cancel')
       .setStyle(ButtonStyle.Secondary)
   );
 
   return actions;
+}
+
+async function handleRollback(username: string) {
+  // First, try to delete only the snapshots AFTER lastChangedAt, if that fails
+  // try to delete the last snapshot (regardless of lastChangedAt date),
+  // if both of those fail, then there's something wrong, just let it throw
+  try {
+    await rollback(username, true);
+  } catch (error) {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'message' in error &&
+      error.message !== "Failed to delete a player's last snapshots."
+    ) {
+      throw error;
+    }
+  }
+
+  await rollback(username, false);
 }
